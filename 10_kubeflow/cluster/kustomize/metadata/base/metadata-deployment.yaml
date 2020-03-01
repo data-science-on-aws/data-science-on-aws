@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment
+  labels:
+    component: server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: server
+  template:
+    metadata:
+      labels:
+        component: server
+    spec:
+      containers:
+      - name: container
+        image: gcr.io/kubeflow-images-public/metadata:v0.1.10
+        env:
+          - name: MYSQL_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: metadata-db-secrets
+                key: MYSQL_ROOT_PASSWORD
+        command: ["./server/server",
+                  "--http_port=8080",
+                  "--mysql_service_host=metadata-db.kubeflow",
+                  "--mysql_service_port=3306",
+                  "--mysql_service_user=root",
+                  "--mysql_service_password=$(MYSQL_ROOT_PASSWORD)",
+                  "--mlmd_db_name=metadb"]
+        ports:
+        - name: backendapi
+          containerPort: 8080
+
+        readinessProbe:
+          httpGet:
+            path: /api/v1alpha1/artifact_types
+            port: backendapi
+            httpHeaders:
+            - name: ContentType
+              value: application/json
+          initialDelaySeconds: 3
+          periodSeconds: 5
+          timeoutSeconds: 2
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grpc-deployment
+  labels:
+    component: grpc-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: grpc-server
+  template:
+    metadata:
+      labels:
+        component: grpc-server
+    spec:
+      containers:
+        - name: container
+          image: gcr.io/tfx-oss-public/ml_metadata_store_server:0.14.0
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: metadata-db-secrets
+                  key: MYSQL_ROOT_PASSWORD
+          command: ["/bin/metadata_store_server"]
+          args: ["--grpc_port=8080",
+                 "--mysql_config_host=metadata-db.kubeflow",
+                 "--mysql_config_database=metadb",
+                 "--mysql_config_port=3306",
+                 "--mysql_config_user=root",
+                 "--mysql_config_password=$(MYSQL_ROOT_PASSWORD)"
+          ]
+          ports:
+            - name: grpc-backendapi
+              containerPort: 8080

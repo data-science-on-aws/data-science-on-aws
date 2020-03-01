@@ -1,0 +1,69 @@
+apiVersion: "kubeflow.org/v1alpha3"
+kind: Experiment
+metadata:
+  name: pytorchjob-example
+spec:
+  parallelTrialCount: 3
+  maxTrialCount: 12
+  maxFailedTrialCount: 3
+  objective:
+    type: maximize
+    goal: 0.99
+    objectiveMetricName: accuracy
+  algorithm:
+    algorithmName: random
+  trialTemplate:
+    goTemplate:
+        rawTemplate: |-
+          apiVersion: "kubeflow.org/v1"
+          kind: PyTorchJob
+          metadata:
+            name: {{.Trial}}
+            namespace: {{.NameSpace}}
+          spec:
+           pytorchReplicaSpecs:
+            Master:
+              replicas: 1
+              restartPolicy: OnFailure
+              template:
+                spec:
+                  containers:
+                    - name: pytorch
+                      image: gcr.io/kubeflow-ci/pytorch-dist-mnist-test:v1.0
+                      imagePullPolicy: Always
+                      command:
+                        - "python"
+                        - "/var/mnist.py"
+                        {{- with .HyperParameters}}
+                        {{- range .}}
+                        - "{{.Name}}={{.Value}}"
+                        {{- end}}
+                        {{- end}}
+            Worker:
+              replicas: 2
+              restartPolicy: OnFailure
+              template:
+                spec:
+                  containers:
+                    - name: pytorch
+                      image: gcr.io/kubeflow-ci/pytorch-dist-mnist-test:v1.0
+                      imagePullPolicy: Always
+                      command:
+                        - "python"
+                        - "/var/mnist.py"
+                        {{- with .HyperParameters}}
+                        {{- range .}}
+                        - "{{.Name}}={{.Value}}"
+                        {{- end}}
+                        {{- end}}
+  parameters:
+    - name: --lr
+      parameterType: double
+      feasibleSpace:
+        min: "0.01"
+        max: "0.05"
+    - name: --momentum
+      parameterType: double
+      feasibleSpace:
+        min: "0.5"
+        max: "0.9"
