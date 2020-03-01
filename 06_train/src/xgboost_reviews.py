@@ -23,14 +23,6 @@ def Tokenizer(str_input):
     porter_stemmer=nltk.PorterStemmer()
     words = [porter_stemmer.stem(word) for word in words]
     return words    
-    
-#class NumberSelector(BaseEstimator, TransformerMixin):
-#    def __init__(self, field):
-#        self.field = field
-#    def fit(self, X, y=None):
-#        return self
-#    def transform(self, X):
-#        return X[[self.field]]
 
 def load_dataset(path, sep):
     # Load dataset
@@ -49,7 +41,6 @@ def model_fn(model_dir):
 
     pipeline = joblib.load(os.path.join(model_dir, 'xgboost_reviews_pipeline.pkl'))
     return pipeline
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -82,7 +73,10 @@ if __name__ == '__main__':
                 ('svd', TruncatedSVD(algorithm='randomized', n_components=300)), #for XGB
             ])),
         ])),
-        ('classifier', XGBClassifier(max_depth=5, n_estimators=300, learning_rate=0.1)),
+        ('classifier', XGBClassifier(objective='binary:logistic', 
+                                     num_round=1,
+                                     max_depth=5)
+        ),
     ])    
     
     pipeline.fit(X_train, y_train)    
