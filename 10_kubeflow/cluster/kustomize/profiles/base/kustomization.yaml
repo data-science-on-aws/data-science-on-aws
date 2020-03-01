@@ -1,0 +1,58 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- cluster-role-binding.yaml
+- crd.yaml
+- deployment.yaml
+- service.yaml
+- service-account.yaml
+namePrefix: profiles-
+namespace: kubeflow
+commonLabels:
+  kustomize.component: profiles
+configMapGenerator:
+- name: profiles-parameters
+  env: params.env
+images:
+- name: gcr.io/kubeflow-images-public/profile-controller
+  digest: sha256:9b834c9d44f9e4e8d5b9f8f01645afb84d5b3debcb177f3e49eac8ee46ae239d
+- name: gcr.io/kubeflow-images-public/kfam
+  digest: sha256:3b0d4be7e59a3fa5ed1d80dccc832312caa94f3b2d36682524d3afc4e45164f0
+vars:
+- name: admin
+  objref:
+    kind: ConfigMap
+    name: profiles-parameters
+    apiVersion: v1
+  fieldref:
+    fieldpath: data.admin
+- name: gcp-sa
+  objref:
+    kind: ConfigMap
+    name: profiles-parameters
+    apiVersion: v1
+  fieldref:
+    fieldpath: data.gcp-sa
+- name: userid-header
+  objref:
+    kind: ConfigMap
+    name: profiles-parameters
+    apiVersion: v1
+  fieldref:
+    fieldpath: data.userid-header
+- name: userid-prefix
+  objref:
+    kind: ConfigMap
+    name: profiles-parameters
+    apiVersion: v1
+  fieldref:
+    fieldpath: data.userid-prefix
+- name: namespace
+  objref:
+    kind: Service
+    name: kfam
+    apiVersion: v1
+  fieldref:
+    fieldpath: metadata.namespace
+configurations:
+- params.yaml

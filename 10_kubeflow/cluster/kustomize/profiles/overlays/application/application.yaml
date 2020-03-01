@@ -1,0 +1,39 @@
+apiVersion: app.k8s.io/v1beta1
+kind: Application
+metadata:
+  name: profiles
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: profiles
+      app.kubernetes.io/instance: profiles-v0.7.0
+      app.kubernetes.io/managed-by: kfctl
+      app.kubernetes.io/component: profiles
+      app.kubernetes.io/part-of: kubeflow
+      app.kubernetes.io/version: v0.7.0
+  componentKinds:
+  - group: apps
+    kind: Deployment
+  - group: rbac.authorization.k8s.io
+    kind: RoleBinding
+  - group: rbac.authorization.k8s.io
+    kind: Role
+  - group: core
+    kind: ServiceAccount
+  - group: core
+    kind: Service
+  - group: kubeflow.org
+    kind: Profile
+  descriptor:
+    type: profiles
+    version: v1beta1
+    description: ""
+    maintainers: []
+    owners: []
+    keywords:
+     - profiles
+     - kubeflow
+    links:
+    - description: About
+      url: ""
+  addOwnerRef: true

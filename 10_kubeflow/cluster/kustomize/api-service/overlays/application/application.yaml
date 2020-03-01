@@ -1,0 +1,31 @@
+apiVersion: app.k8s.io/v1beta1
+kind: Application
+metadata:
+  name: api-service
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: api-service
+      app.kubernetes.io/instance: api-service-0.1.31
+      app.kubernetes.io/managed-by: kfctl
+      app.kubernetes.io/component: api-service
+      app.kubernetes.io/part-of: kubeflow
+      app.kubernetes.io/version: 0.1.31
+  componentKinds:
+  - group: core
+    kind: ConfigMap
+  - group: apps
+    kind: Deployment
+  descriptor:
+    type: api-service
+    version: v1beta1
+    description: ""
+    maintainers: []
+    owners: []
+    keywords:
+     - api-service
+     - kubeflow
+    links:
+    - description: About
+      url: ""
+  addOwnerRef: true
