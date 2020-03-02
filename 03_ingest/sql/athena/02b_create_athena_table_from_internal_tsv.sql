@@ -1,4 +1,4 @@
-CREATE EXTERNAL TABLE amazon_reviews_tsv(
+CREATE EXTERNAL TABLE IF NOT EXISTS amazon_reviews_tsv(
          marketplace string,
          customer_id string,
          review_id string,
