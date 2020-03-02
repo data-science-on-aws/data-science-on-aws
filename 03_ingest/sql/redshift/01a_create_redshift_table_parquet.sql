@@ -1,4 +1,4 @@
-CREATE TABLE amazon_reviews(
+CREATE TABLE amazon_reviews_parquet(
          marketplace varchar(2),
          customer_id varchar(8),
          review_id varchar(14),
@@ -13,5 +13,6 @@ CREATE TABLE amazon_reviews(
          verified_purchase varchar(1),
          review_headline varchar(128),
          review_body varchar(65536),
-         review_date varchar(10)
+         review_date varchar(10),
+         year int
 )
