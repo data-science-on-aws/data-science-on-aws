@@ -4,7 +4,7 @@ This workshop creates an ephemeral AWS acccount for you to use only for this wor
 
 _This account will be torn down and not accessible immediately after the workshop._
 
-# 1. Logout of any AWS Consoles in all Browser Tabs
+# 1. Logout of All AWS Consoles Across All Browser Tabs
 If you don't logout, the following instructions will not work properly.
 
 _Please logout of all AWS Console sessions in all browser tabs._
