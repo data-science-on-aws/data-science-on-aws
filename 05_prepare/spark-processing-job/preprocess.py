@@ -67,8 +67,8 @@ def main():
         FROM amazon_reviews_parquet_temp TABLESAMPLE BERNOULLI({}) \
     '.format(reviews_sample_percent))
 
-    # Split the dataset into training, validation, and test datasets (80%, 10%, 10%)
-    (train_df, validation_df, test_df) = df_sentiment.randomSplit([0.8, 0.1, 0.1])
+    # Split the dataset into training, validation, and test datasets (90%, 5%, 5%)
+    (train_df, validation_df, test_df) = df_sentiment.randomSplit([0.9, 0.05, 0.05])
     
     train_df.write.parquet(path=s3_output_train_data,
                            mode='overwrite')
