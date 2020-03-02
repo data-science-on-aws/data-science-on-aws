@@ -14,6 +14,6 @@ SELECT marketplace,
          review_headline,
          review_body,
          CAST(YEAR(DATE(review_date)) AS INTEGER) AS year,
-         DATE_DIFF('day', DATE(review_date), DATE('1970-01-01')) AS review_date,
+         DATE_DIFF('day', DATE('1970-01-01'), DATE(review_date)) AS review_date,
          product_category
 FROM amazon_reviews_tsv

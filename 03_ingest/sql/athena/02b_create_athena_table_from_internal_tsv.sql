@@ -14,4 +14,4 @@ CREATE EXTERNAL TABLE IF NOT EXISTS amazon_reviews_tsv(
          review_headline string,
          review_body string,
          review_date string
-) ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t' ESCAPED BY '\\' LINES TERMINATED BY '\n' LOCATION 's3://sagemaker-us-east-1-806570384721/amazon-reviews-pds/tsv/' TBLPROPERTIES ( 'compressionType'='gzip', 'skip.header.line.count'='1')
+) ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t' LINES TERMINATED BY '\n' LOCATION 's3://sagemaker-us-east-1-806570384721/amazon-reviews-pds/tsv/' TBLPROPERTIES ( 'compressionType'='gzip', 'skip.header.line.count'='1')
