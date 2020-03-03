@@ -10,8 +10,8 @@ import xgboost as xgb
 from xgboost import XGBClassifier
 
 # Note:  header=None
-def load_dataset(path, sep):
-    data = pd.read_csv(path, sep=sep, header=None)
+def load_dataset(path, sep, header):
+    data = pd.read_csv(path, sep=sep, header=header)
 
     labels = data.iloc[:,0]
     features = data.drop(data.columns[0], axis=1)
@@ -43,8 +43,8 @@ if __name__ == '__main__':
     model_dir  = args.model_dir
     
     # Load transformed features (is_positive_sentiment, f0, f1, ...)    
-    X_train, y_train = load_dataset(train_data, ',')
-    X_validation, y_validation = load_dataset(validation_data, ',')
+    X_train, y_train = load_dataset(train_data, ',', header=None)
+    X_validation, y_validation = load_dataset(validation_data, ',', header=None)
                 
     import xgboost as xgb
     from xgboost import XGBClassifier
@@ -57,10 +57,10 @@ if __name__ == '__main__':
 
     # See https://xgboost.readthedocs.io/en/latest/tutorials/saving_model.html
     # Need to save with joblib or pickle.  `xgb.save_model()` does not save feature_names
+
+    os.makedirs(model_dir, exist_ok=True)
     model_path = os.path.join(model_dir, 'xgboost-model')
-
     pkl.dump(model, open(model_path, 'wb'))
-
     print('Wrote model to {}'.format(model_path))
 
     model_restored = model_fn(model_dir)
