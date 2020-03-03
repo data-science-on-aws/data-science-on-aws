@@ -1,1 +1,3 @@
-SM_CHANNEL_TRAIN=../../05_prepare/feature-store/amazon-reviews/balanced-tfidf/train/data.csv SM_CHANNEL_VALIDATION=../../05_prepare/feature-store/amazon-reviews/balanced-tfidf/validation/data.csv SM_MODEL_DIR=. python xgboost_reviews.py
+python copy_data_locally.py
+
+SM_CHANNEL_TRAIN=feature-store/amazon-reviews/balanced-tfidf-without-header/train/data.csv SM_CHANNEL_VALIDATION=feature-store/amazon-reviews/balanced-tfidf-without-header/validation/data.csv SM_MODEL_DIR=. python xgboost_reviews.py
