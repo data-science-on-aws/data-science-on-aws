@@ -9,9 +9,9 @@ region = boto3.Session().region_name
 
 sm = boto3.Session().client(service_name='sagemaker', region_name=region)
 
-prefix_train = 'feature-store/amazon-reviews/balanced-tfidf-without-header/train'
-prefix_validation = 'feature-store/amazon-reviews/balanced-tfidf-without-header/validation'
-prefix_test = 'feature-store/amazon-reviews/balanced-tfidf-without-header/test'
+prefix_train = 'feature-store/amazon-reviews/csv/balanced-tfidf-without-header/train'
+prefix_validation = 'feature-store/amazon-reviews/csv/balanced-tfidf-without-header/validation'
+prefix_test = 'feature-store/amazon-reviews/csv/balanced-tfidf-without-header/test'
 
 balanced_tfidf_without_header_train_path = './{}/data.csv'.format(prefix_train)
 balanced_tfidf_without_header_validation_path = './{}/data.csv'.format(prefix_validation)
