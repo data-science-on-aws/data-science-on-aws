@@ -15,6 +15,12 @@ def load_dataset(path, sep, header):
 
     labels = data.iloc[:,0]
     features = data.drop(data.columns[0], axis=1)
+    
+    if header==None:
+        # Adjust the column names after dropped the 0th column above
+        # New column names are 0 (inclusive) to len(features.columns) (exclusive)
+        new_column_names = list(range(0, len(features.columns)))
+        features.columns = new_column_names
 
     return features, labels
 
