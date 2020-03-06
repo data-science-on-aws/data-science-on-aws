@@ -34,10 +34,30 @@ def parse_args():
 
 def process(args):
     print('Current host: {}'.format(args.current_host))
+
+    print('Creating directory /opt/ml/processing/output/train'.format(args.current_host))
     os.makedirs('/opt/ml/processing/output/train/', exist_ok=True)
 
-    with open('/opt/ml/processing/output/train/{}.csv'.format(args.current_host), 'a') as fd:
+    print('Writing to /opt/ml/processing/output/train/{}.csv'.format(args.current_host))
+    with open('/opt/ml/processing/output/train/{}.csv'.format(args.current_host), 'w') as fd:
         fd.write('host{},thanks,andre,and,alex!'.format(args.current_host))
+        fd.close()
+        
+    print('Listing contents of /opt/ml/processing/output/train/')
+    dirs_output_train = os.listdir('/opt/ml/processing/output/train/')
+
+    # This would print all the files and directories
+    for file in dirs_output_train:
+        print(file)
+
+    print('Listing contents of /opt/ml/processing/input')
+    dirs_input = os.listdir('/opt/ml/processing/input')
+
+    # This would print all the files and directories
+    for file in dirs_input:
+        print(file)
+ 
+    print('Complete')
     
     
 if __name__ == "__main__":
