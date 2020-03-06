@@ -50,8 +50,8 @@ def process(args):
     for file in dirs_output_train:
         print(file)
 
-    print('Listing contents of /opt/ml/processing/input')
-    dirs_input = os.listdir('/opt/ml/processing/input')
+    print('Listing contents of /opt/ml/processing/input/data')
+    dirs_input = os.listdir('/opt/ml/processing/input/data')
 
     # This would print all the files and directories
     for file in dirs_input:
