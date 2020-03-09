@@ -17,6 +17,7 @@ from pyspark.ml.linalg import DenseVector
 from pyspark.sql.functions import split
 from pyspark.sql.functions import udf, col
 from pyspark.sql.types import ArrayType, DoubleType
+from pyspark.ml.feature import PCA, StandardScaler
 
 def to_array(col):
     def to_array_(v):
@@ -52,7 +53,7 @@ def main():
     tokenizer = Tokenizer(inputCol='review_body', outputCol='words')
     wordsData = tokenizer.transform(df_csv)
     
-    hashingTF = HashingTF(inputCol='words', outputCol='rawFeatures', numFeatures=300)
+    hashingTF = HashingTF(inputCol='words', outputCol='raw_features', numFeatures=1000)
     featurizedData = hashingTF.transform(wordsData)
     
     # While applying HashingTF only needs a single pass to the data, applying IDF needs two passes:
@@ -65,42 +66,27 @@ def main():
     # which occur in less than a minimum number of documents.
     # In such cases, the IDF for these terms is set to 0.
     # This feature can be used by passing the minDocFreq value to the IDF constructor.
-    idf = IDF(inputCol='rawFeatures', outputCol='features') #, minDocFreq=2)
+    idf = IDF(inputCol='raw_features', outputCol='features') #, minDocFreq=2)
     idfModel = idf.fit(featurizedData)
     features_df = idfModel.transform(featurizedData)
     features_df.select('is_positive_sentiment', 'features').show()
 
-    # TODO:  Fix this java.lang.UnsupportedOperationException: CSV data source does not support struct<type:tinyint,size:int,indices:array<int>,values:array<double>> data type.    
-#    features_df.select('is_positive_sentiment', 'features').write.csv(path=s3_output_data, 
-#                                                                      header=None,
-#                                                                      mode='overwrite')
+    num_features=300
+    pca = PCA(k=num_features, inputCol='features', outputCol='pca_features')
+    pca_model = pca.fit(features_df)
+    pca_features_df = pca_model.transform(features_df).select('is_positive_sentiment', 'pca_features')
+    pca_features_df.show(truncate=False)
 
-#    from pyspark.mllib.linalg.distributed import RowMatrix
-#    mat = RowMatrix(features_df.rdd)
-#    svd = mat.computeSVD(5, computeU=True)
-#    print(svd)
+    standard_scaler = StandardScaler(inputCol='pca_features', outputCol='scaled_pca_features')
+    standard_scaler_model = standard_scaler.fit(pca_features_df)
+    standard_scaler_features_df = standard_scaler_model.transform(pca_features_df).select('is_positive_sentiment', 'scaled_pca_features')
+    standard_scaler_features_df.show(truncate=False)
 
-    from pyspark.sql.types import Row
-    df2 = features_df.select('is_positive_sentiment', 'features')
-    rdd = df2.rdd.map(lambda x: Row(is_positive_sentiment=x[0], features=DenseVector(x[1].toArray()))
-        if (len(x)>1 and hasattr(x[1], 'toArray'))
-        else Row(label=None, features=DenseVector([])))
-    df3 = spark.createDataFrame(rdd).select('is_positive_sentiment', 'features')
-    df3.show()
+    expanded_features_df = (standard_scaler_features_df.withColumn('f', to_array(col('scaled_pca_features')))
+        .select(['is_positive_sentiment'] + [col('f')[i] for i in range(num_features)]))
+    expanded_features_df.show()
 
-#    os.makedirs('./TRANSFORMED/', exist_ok=True)
-    # TODO: Remove toPandas() as it calls df.collect (not good). 
-#    df3.select('is_positive_sentiment', 'features').toPandas().to_csv(s3_output_data, header=True, index=False)
-
-#    df_split = df3.select(split(df3.features, ',')).rdd.flatMap(
-#              lambda x: x).toDF()
-
-    df_split = (df3.withColumn('f', to_array(col('features')))
-    .select(['is_positive_sentiment'] + [col('f')[i] for i in range(300)]))
-    df_split.show()
-
-#    df_split.toPandas().to_csv(s3_output_data, header=False, index=False)
-    df_split.write.csv(path='./TRANSFORMED/', #s3_output_data,
+    expanded_features_df.write.csv(path=s3_output_data,
                        header=None,
                        quote=None,
                        mode='overwrite')

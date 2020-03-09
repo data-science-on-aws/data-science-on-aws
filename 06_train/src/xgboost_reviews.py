@@ -8,10 +8,11 @@ import nltk
 import re
 import xgboost as xgb
 from xgboost import XGBClassifier
+import glob
 
 # Note:  header=None
 def load_dataset(path, sep, header):
-    data = pd.read_csv(path, sep=sep, header=header)
+    data = pd.concat([pd.read_csv(f, sep=sep, header=header) for f in glob.glob('{}/*.csv'.format(path))], ignore_index = True)
 
     labels = data.iloc[:,0]
     features = data.drop(data.columns[0], axis=1)
@@ -23,12 +24,6 @@ def load_dataset(path, sep, header):
         features.columns = new_column_names
 
     return features, labels
-
-
-def model_fn(model_dir):
-    model_path = os.path.join(model_dir, 'xgboost-model')
-    model = pkl.load(open(model_path, 'rb'))
-    return model
 
 
 if __name__ == '__main__':
@@ -55,28 +50,38 @@ if __name__ == '__main__':
     import xgboost as xgb
     from xgboost import XGBClassifier
 
-    model = XGBClassifier(objective=objective,
-                          num_round=num_round,
-                          max_depth=max_depth)
+    xgb_estimator = XGBClassifier(objective=objective,
+                                  num_round=num_round,
+                                  max_depth=max_depth)
 
-    model.fit(X_train, y_train)
+    xgb_estimator.fit(X_train, y_train)
 
-    # See https://xgboost.readthedocs.io/en/latest/tutorials/saving_model.html
-    # Need to save with joblib or pickle.  `xgb.save_model()` does not save feature_names
-
+    # TODO:  use the model_dir that is passed in (currently SM_MODEL_DIR)
     os.makedirs(model_dir, exist_ok=True)
     model_path = os.path.join(model_dir, 'xgboost-model')
-    pkl.dump(model, open(model_path, 'wb'))
+
+    pkl.dump(xgb_estimator, open(model_path, 'wb'))
     print('Wrote model to {}'.format(model_path))
+    
+    xgb_estimator_restored = pkl.load(open(model_path, 'rb'))
+    type(xgb_estimator_restored) 
+    
+    preds_validation = xgb_estimator_restored.predict(X_validation)
 
-    model_restored = model_fn(model_dir)
-    preds_validation = model_restored.predict(X_validation)
+    #auc = xgb_estimator_restored.score(X_validation, y_validation)
+    #print('Validation AUC: ', auc)
 
-    auc = model_restored.score(X_validation, y_validation)
-    print('Validation AUC: ', auc)
-
-    preds_validation = model_restored.predict(X_validation)
+    # TODO:  Convert to DMatrix
+    preds_validation = xgb_estimator_restored.predict(X_validation)
     print('Validation Accuracy: ', accuracy_score(y_validation, preds_validation))
     print('Validation Precision: ', precision_score(y_validation, preds_validation, average=None))
     
     print(classification_report(y_validation, preds_validation))
+
+    from sklearn import metrics
+
+    #print(metrics.f1_score(y_validation, preds_validation))
+
+    # TODO:  Convert to preds_validation_0_or_1
+    auc = round(metrics.roc_auc_score(y_validation, preds_validation), 4)
+    print('AUC is ' + repr(auc))
