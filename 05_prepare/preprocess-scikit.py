@@ -106,31 +106,83 @@ def process(args):
         print('df_scrubbed_raw_validation.shape={}'.format(df_scrubbed_raw_validation.shape))
         print('df_scrubbed_raw_test.shape={}'.format(df_scrubbed_raw_test.shape))
 
-        train_data = '{}/train'.format(args.output_data)
-        validation_data = '{}/validation'.format(args.output_data)
-        test_data = '{}/test'.format(args.output_data)
+        scrubbed_train_data = '{}/raw/train'.format(args.output_data)
+        scrubbed_validation_data = '{}/raw/validation'.format(args.output_data)
+        scrubbed_test_data = '{}/raw/test'.format(args.output_data)
 
-        print('Creating directory {}'.format(train_data))
-        os.makedirs(train_data, exist_ok=True)
-        print('Creating directory {}'.format(validation_data))
-        os.makedirs(validation_data, exist_ok=True)
-        print('Creating directory {}'.format(test_data))
-        os.makedirs(test_data, exist_ok=True)
+        print('Creating directory {}'.format(scrubbed_train_data))
+        os.makedirs(scrubbed_train_data, exist_ok=True)
+        print('Creating directory {}'.format(scrubbed_validation_data))
+        os.makedirs(scrubbed_validation_data, exist_ok=True)
+        print('Creating directory {}'.format(scrubbed_test_data))
+        os.makedirs(scrubbed_test_data, exist_ok=True)
 
         filename_without_extension = Path(Path(file).stem).stem
 
-        print('Writing to {}/part-{}-{}.csv'.format(train_data, args.current_host, filename_without_extension))
-        df_scrubbed_raw_train.to_csv('{}/part-{}-{}.csv'.format(train_data, args.current_host, filename_without_extension), sep=',', index=False, header=True)
+        print('Writing to {}/part-{}-{}.csv'.format(scrubbed_train_data, args.current_host, filename_without_extension))
+        df_scrubbed_raw_train.to_csv('{}/part-{}-{}.csv'.format(scrubbed_train_data, args.current_host, filename_without_extension), sep=',', index=False, header=True)
 
-        print('Writing to {}/part-{}-{}.csv'.format(validation_data, args.current_host, filename_without_extension))
-        df_scrubbed_raw_validation.to_csv('{}/part-{}-{}.csv'.format(validation_data, args.current_host, filename_without_extension), sep=',', index=False, header=True)
+        print('Writing to {}/part-{}-{}.csv'.format(scrubbed_validation_data, args.current_host, filename_without_extension))
+        df_scrubbed_raw_validation.to_csv('{}/part-{}-{}.csv'.format(scrubbed_validation_data, args.current_host, filename_without_extension), sep=',', index=False, header=True)
 
-        print('Writing to {}/part-{}-{}.csv'.format(test_data, args.current_host, filename_without_extension))
-        df_scrubbed_raw_test.to_csv('{}/part-{}-{}.csv'.format(test_data, args.current_host, filename_without_extension), sep=',', index=False, header=True)
+        print('Writing to {}/part-{}-{}.csv'.format(scrubbed_test_data, args.current_host, filename_without_extension))
+        df_scrubbed_raw_test.to_csv('{}/part-{}-{}.csv'.format(scrubbed_test_data, args.current_host, filename_without_extension), sep=',', index=False, header=True)
 
-#        with open('{}/part-{}-{}.csv'.format(args.output_data, args.current_host, file), 'w') as fd:
-#            fd.write('host{},thanks,andre,and,alex!'.format(args.current_host))
-#            fd.close()
+
+        # Balanced the Dataset between Classes
+        from sklearn.utils import resample
+
+        is_negative_sentiment_df = df_scrubbed_raw.query('is_positive_sentiment == 0')
+        is_positive_sentiment_df = df_scrubbed_raw.query('is_positive_sentiment == 1')
+
+        # TODO:  check which sentiment has the least number of samples
+        is_positive_downsampled_df = resample(is_positive_sentiment_df,
+                                      replace = False,
+                                      n_samples = len(is_negative_sentiment_df),
+                                      random_state = 27)
+
+        df_balanced_raw = pd.concat([is_negative_sentiment_df, is_positive_downsampled_df])
+        df_balanced_raw = df_balanced_raw.reset_index(drop=True)
+
+        df_balanced_raw.head(5)
+
+        from sklearn.model_selection import train_test_split
+
+        # Split all data into 90% train and 10% holdout
+        df_balanced_raw_train, df_balanced_raw_holdout = train_test_split(df_balanced_raw, test_size=0.1, stratify=df_balanced_raw['is_positive_sentiment'])
+        df_balanced_raw_train = df_balanced_raw_train.reset_index(drop=True)
+        df_balanced_raw_holdout = df_balanced_raw_holdout.reset_index(drop=True)
+
+        # Split the holdout into 50% validation and 50% test
+        df_balanced_raw_validation, df_balanced_raw_test = train_test_split(df_balanced_raw_holdout, test_size=0.5, stratify=df_balanced_raw_holdout['is_positive_sentiment'])
+        df_balanced_raw_validation = df_balanced_raw_validation.reset_index(drop=True)
+        df_balanced_raw_test = df_balanced_raw_test.reset_index(drop=True)
+
+        print('df_balanced_raw.shape={}'.format(df_balanced_raw.shape))
+        print('df_balanced_raw_train.shape={}'.format(df_balanced_raw_train.shape))
+        print('df_balanced_raw_validation.shape={}'.format(df_balanced_raw_validation.shape))
+        print('df_balanced_raw_test.shape={}'.format(df_balanced_raw_test.shape))
+
+        balanced_train_data = '{}/balanced/train'.format(args.output_data)
+        balanced_validation_data = '{}/balanced/validation'.format(args.output_data)
+        balanced_test_data = '{}/balanced/test'.format(args.output_data)
+
+        print('Creating directory {}'.format(balanced_train_data))
+        os.makedirs(balanced_train_data, exist_ok=True)
+        print('Creating directory {}'.format(balanced_validation_data))
+        os.makedirs(balanced_validation_data, exist_ok=True)
+        print('Creating directory {}'.format(balanced_test_data))
+        os.makedirs(balanced_test_data, exist_ok=True)
+
+        print('Writing to {}/part-{}-{}.csv'.format(balanced_train_data, args.current_host, filename_without_extension))
+        df_balanced_raw_train.to_csv('{}/part-{}-{}.csv'.format(balanced_train_data, args.current_host, filename_without_extension), sep=',', index=False, header=True)
+
+        print('Writing to {}/part-{}-{}.csv'.format(balanced_validation_data, args.current_host, filename_without_extension))      
+        df_balanced_raw_validation.to_csv('{}/part-{}-{}.csv'.format(balanced_validation_data, args.current_host, filename_without_extension), sep=',', index=False, header=True)
+
+        print('Writing to {}/part-{}-{}.csv'.format(balanced_test_data, args.current_host, filename_without_extension))
+        df_balanced_raw_test.to_csv('{}/part-{}-{}.csv'.format(balanced_test_data, args.current_host, filename_without_extension), sep=',', index=False, header=True)
+
 
     print('Listing contents of {}'.format(args.output_data))
     dirs_output = os.listdir(args.output_data)
