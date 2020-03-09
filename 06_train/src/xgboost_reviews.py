@@ -3,6 +3,7 @@ import argparse
 import pickle as pkl
 import pandas as pd
 from sklearn.metrics import accuracy_score, precision_score, classification_report, confusion_matrix
+from sklearn import metrics
 from sklearn.base import BaseEstimator, TransformerMixin
 import nltk
 import re
@@ -46,9 +47,6 @@ if __name__ == '__main__':
     # Load transformed features (is_positive_sentiment, f0, f1, ...)    
     X_train, y_train = load_dataset(train_data, ',', header=None)
     X_validation, y_validation = load_dataset(validation_data, ',', header=None)
-                
-    import xgboost as xgb
-    from xgboost import XGBClassifier
 
     xgb_estimator = XGBClassifier(objective=objective,
                                   num_round=num_round,
@@ -56,7 +54,8 @@ if __name__ == '__main__':
 
     xgb_estimator.fit(X_train, y_train)
 
-    # TODO:  use the model_dir that is passed in (currently SM_MODEL_DIR)
+    # TODO:  use the model_dir that is passed in through args
+    #        (currently SM_MODEL_DIR)
     os.makedirs(model_dir, exist_ok=True)
     model_path = os.path.join(model_dir, 'xgboost-model')
 
@@ -67,20 +66,10 @@ if __name__ == '__main__':
     type(xgb_estimator_restored) 
     
     preds_validation = xgb_estimator_restored.predict(X_validation)
-
-    #auc = xgb_estimator_restored.score(X_validation, y_validation)
-    #print('Validation AUC: ', auc)
-
-    # TODO:  Convert to DMatrix
-    preds_validation = xgb_estimator_restored.predict(X_validation)
     print('Validation Accuracy: ', accuracy_score(y_validation, preds_validation))
     print('Validation Precision: ', precision_score(y_validation, preds_validation, average=None))
     
     print(classification_report(y_validation, preds_validation))
-
-    from sklearn import metrics
-
-    #print(metrics.f1_score(y_validation, preds_validation))
 
     # TODO:  Convert to preds_validation_0_or_1
     auc = round(metrics.roc_auc_score(y_validation, preds_validation), 4)
