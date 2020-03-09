@@ -87,14 +87,46 @@ def process(args):
         df_scrubbed_raw.insert(0, 'is_positive_sentiment', df_is_positive_sentiment)
         df_scrubbed_raw.shape
 
-        print('Creating directory {}'.format(args.output_data))
-        os.makedirs(args.output_data, exist_ok=True)
+        # Split train, test, validation
+
+        from sklearn.model_selection import train_test_split
+
+        # Split all data into 90% train and 10% holdout
+        df_scrubbed_raw_train, df_scrubbed_raw_holdout = train_test_split(df_scrubbed_raw, test_size=0.1, stratify=df_scrubbed_raw['is_positive_sentiment'])
+        df_scrubbed_raw_train = df_scrubbed_raw_train.reset_index(drop=True)
+        df_scrubbed_raw_holdout = df_scrubbed_raw_holdout.reset_index(drop=True)
+
+        # Split the holdout into 50% validation and 50% test
+        df_scrubbed_raw_validation, df_scrubbed_raw_test = train_test_split(df_scrubbed_raw_holdout, test_size=0.5, stratify=df_scrubbed_raw_holdout['is_positive_sentiment'])
+        df_scrubbed_raw_validation = df_scrubbed_raw_validation.reset_index(drop=True)
+        df_scrubbed_raw_test = df_scrubbed_raw_test.reset_index(drop=True)
+
+        print('df_scrubbed_raw.shape={}'.format(df_scrubbed_raw.shape))
+        print('df_scrubbed_raw_train.shape={}'.format(df_scrubbed_raw_train.shape))
+        print('df_scrubbed_raw_validation.shape={}'.format(df_scrubbed_raw_validation.shape))
+        print('df_scrubbed_raw_test.shape={}'.format(df_scrubbed_raw_test.shape))
+
+        train_data = '{}/train'.format(args.output_data)
+        validation_data = '{}/validation'.format(args.output_data)
+        test_data = '{}/test'.format(args.output_data)
+
+        print('Creating directory {}'.format(train_data))
+        os.makedirs(train_data, exist_ok=True)
+        print('Creating directory {}'.format(validation_data))
+        os.makedirs(validation_data, exist_ok=True)
+        print('Creating directory {}'.format(test_data))
+        os.makedirs(test_data, exist_ok=True)
 
         filename_without_extension = Path(Path(file).stem).stem
 
-        print('Writing to {}/part-{}-{}.csv'.format(args.output_data, args.current_host, filename_without_extension))
+        print('Writing to {}/part-{}-{}.csv'.format(train_data, args.current_host, filename_without_extension))
+        df_scrubbed_raw_train.to_csv('{}/part-{}-{}.csv'.format(train_data, args.current_host, filename_without_extension), sep=',', index=False, header=True)
 
-        df_scrubbed_raw.to_csv('{}/part-{}-{}.csv'.format(args.output_data, args.current_host, filename_without_extension), sep=',', index=False, header=True)
+        print('Writing to {}/part-{}-{}.csv'.format(validation_data, args.current_host, filename_without_extension))
+        df_scrubbed_raw_validation.to_csv('{}/part-{}-{}.csv'.format(validation_data, args.current_host, filename_without_extension), sep=',', index=False, header=True)
+
+        print('Writing to {}/part-{}-{}.csv'.format(test_data, args.current_host, filename_without_extension))
+        df_scrubbed_raw_test.to_csv('{}/part-{}-{}.csv'.format(test_data, args.current_host, filename_without_extension), sep=',', index=False, header=True)
 
 #        with open('{}/part-{}-{}.csv'.format(args.output_data, args.current_host, file), 'w') as fd:
 #            fd.write('host{},thanks,andre,and,alex!'.format(args.current_host))
