@@ -37,8 +37,11 @@ def main():
     
     # Retrieve the args and replace 's3://' with 's3a://' (used by Spark)
     s3_input_data = args['s3_input_data'].replace('s3://', 's3a://')
+    print(s3_input_data)
+    
     s3_output_data = args['s3_output_data'].replace('s3://', 's3a://')
-
+    print(s3_output_data)
+    
     schema = StructType([
         StructField('is_positive_sentiment', IntegerType(), True),
         StructField('marketplace', StringType(), True),
@@ -115,12 +118,14 @@ def main():
         .select(['is_positive_sentiment'] + [col('f')[i] for i in range(num_features)]))
     expanded_features_df.show()
 
+    # Remover overwrite to test for this issue
+    #    https://stackoverflow.com/questions/51050591/spark-throws-java-io-ioexception-failed-to-rename-when-saving-part-xxxxx-gz
     expanded_features_df.write.csv(path=s3_output_data,
                        header=None,
-                       quote=None,
-                       mode='overwrite')
+                       quote=None) #,
+#                       mode='overwrite')
 
-    print('Wrote to train file:  {}'.format(s3_output_data))
+    print('Wrote to output file:  {}'.format(s3_output_data))
         
 
 if __name__ == "__main__":
