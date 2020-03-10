@@ -85,6 +85,14 @@ def main():
     features_df = idfModel.transform(featurizedData)
     features_df.select('is_positive_sentiment', 'features').show()
 
+    # TODO:  Use SVD instead
+    # features_vector_rdd = features_df.select('features').rdd.map( lambda row: Vectors.fromML(row.getAs[MLVector]('features') )
+    # features_vector_rdd.cache()
+    # mat = RowMatrix(features_vector_rdd)
+    # k = 300
+    # svd = mat.computeSVD(k, computeU=True)
+    # TODO:  Reconstruct
+
     num_features=300
     pca = PCA(k=num_features, inputCol='features', outputCol='pca_features')
     pca_model = pca.fit(features_df)
