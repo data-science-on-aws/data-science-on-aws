@@ -41,7 +41,21 @@ def main():
 
     schema = StructType([
         StructField('is_positive_sentiment', IntegerType(), True),
-        StructField('review_body', StringType(), True)
+        StructField('marketplace', StringType(), True),
+        StructField('customer_id', StringType(), True),
+        StructField('review_id', StringType(), True),
+        StructField('product_id', StringType(), True),
+        StructField('product_parent', StringType(), True),
+        StructField('product_title', StringType(), True),
+        StructField('product_category', StringType(), True),
+        StructField('star_rating', IntegerType(), True),
+        StructField('helpful_votes', IntegerType(), True),
+        StructField('total_votes', IntegerType(), True),
+        StructField('vine', StringType(), True),
+        StructField('verified_purchase', StringType(), True),
+        StructField('review_headline', StringType(), True),
+        StructField('review_body', StringType(), True),
+        StructField('review_date', StringType(), True)
     ])
     
     df_csv = spark.read.csv(path=s3_input_data,

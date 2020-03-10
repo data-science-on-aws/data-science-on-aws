@@ -60,80 +60,80 @@ def process(args):
                          compression='gzip')
         df.shape
 
-        df_scrubbed_raw = df
+        df_unbalanced_raw = df
 
-        df_scrubbed_raw['marketplace'] = df_scrubbed_raw['marketplace'].replace(',', ' ')
-        df_scrubbed_raw['review_id'] = df_scrubbed_raw['review_id'].replace(',', ' ')
-        df_scrubbed_raw['product_id'] = df_scrubbed_raw['product_id'].replace(',', ' ')
-        df_scrubbed_raw['product_title'] = df_scrubbed_raw['product_title'].replace(',', ' ')
-        df_scrubbed_raw['product_category'] = df_scrubbed_raw['product_category'].replace(',', ' ')
-        df_scrubbed_raw['review_headline'] = df_scrubbed_raw['review_headline'].replace(',', ' ')
-        df_scrubbed_raw['review_body'] = df_scrubbed_raw['review_body'].replace(',', ' ')
-        df_scrubbed_raw['review_date'] = df_scrubbed_raw['review_date'].replace(',', ' ')
+        df_unbalanced_raw['marketplace'] = df_unbalanced_raw['marketplace'].replace(',', ' ')
+        df_unbalanced_raw['review_id'] = df_unbalanced_raw['review_id'].replace(',', ' ')
+        df_unbalanced_raw['product_id'] = df_unbalanced_raw['product_id'].replace(',', ' ')
+        df_unbalanced_raw['product_title'] = df_unbalanced_raw['product_title'].replace(',', ' ')
+        df_unbalanced_raw['product_category'] = df_unbalanced_raw['product_category'].replace(',', ' ')
+        df_unbalanced_raw['review_headline'] = df_unbalanced_raw['review_headline'].replace(',', ' ')
+        df_unbalanced_raw['review_body'] = df_unbalanced_raw['review_body'].replace(',', ' ')
+        df_unbalanced_raw['review_date'] = df_unbalanced_raw['review_date'].replace(',', ' ')
 
-        df_scrubbed_raw.shape
+        df_unbalanced_raw.shape
 
-        df_scrubbed_raw.head(5)
+        df_unbalanced_raw.head(5)
 
-        df_scrubbed_raw.isna().values.any()
+        df_unbalanced_raw.isna().values.any()
 
-        df_scrubbed_raw = df_scrubbed_raw.dropna()
-        df_scrubbed_raw = df_scrubbed_raw.reset_index(drop=True)
-        df_scrubbed_raw.shape
+        df_unbalanced_raw = df_unbalanced_raw.dropna()
+        df_unbalanced_raw = df_unbalanced_raw.reset_index(drop=True)
+        df_unbalanced_raw.shape
 
-        df_scrubbed_raw.head(5)
+        df_unbalanced_raw.head(5)
 
-        df_is_positive_sentiment = (df_scrubbed_raw['star_rating'] >= 4).astype(int)
-        df_scrubbed_raw.insert(0, 'is_positive_sentiment', df_is_positive_sentiment)
-        df_scrubbed_raw.shape
+        df_is_positive_sentiment = (df_unbalanced_raw['star_rating'] >= 4).astype(int)
+        df_unbalanced_raw.insert(0, 'is_positive_sentiment', df_is_positive_sentiment)
+        df_unbalanced_raw.shape
 
         # Split train, test, validation
 
         from sklearn.model_selection import train_test_split
 
         # Split all data into 90% train and 10% holdout
-        df_scrubbed_raw_train, df_scrubbed_raw_holdout = train_test_split(df_scrubbed_raw, test_size=0.1, stratify=df_scrubbed_raw['is_positive_sentiment'])
-        df_scrubbed_raw_train = df_scrubbed_raw_train.reset_index(drop=True)
-        df_scrubbed_raw_holdout = df_scrubbed_raw_holdout.reset_index(drop=True)
+        df_unbalanced_raw_train, df_unbalanced_raw_holdout = train_test_split(df_unbalanced_raw, test_size=0.1, stratify=df_unbalanced_raw['is_positive_sentiment'])
+        df_unbalanced_raw_train = df_unbalanced_raw_train.reset_index(drop=True)
+        df_unbalanced_raw_holdout = df_unbalanced_raw_holdout.reset_index(drop=True)
 
         # Split the holdout into 50% validation and 50% test
-        df_scrubbed_raw_validation, df_scrubbed_raw_test = train_test_split(df_scrubbed_raw_holdout, test_size=0.5, stratify=df_scrubbed_raw_holdout['is_positive_sentiment'])
-        df_scrubbed_raw_validation = df_scrubbed_raw_validation.reset_index(drop=True)
-        df_scrubbed_raw_test = df_scrubbed_raw_test.reset_index(drop=True)
+        df_unbalanced_raw_validation, df_unbalanced_raw_test = train_test_split(df_unbalanced_raw_holdout, test_size=0.5, stratify=df_unbalanced_raw_holdout['is_positive_sentiment'])
+        df_unbalanced_raw_validation = df_unbalanced_raw_validation.reset_index(drop=True)
+        df_unbalanced_raw_test = df_unbalanced_raw_test.reset_index(drop=True)
 
-        print('df_scrubbed_raw.shape={}'.format(df_scrubbed_raw.shape))
-        print('df_scrubbed_raw_train.shape={}'.format(df_scrubbed_raw_train.shape))
-        print('df_scrubbed_raw_validation.shape={}'.format(df_scrubbed_raw_validation.shape))
-        print('df_scrubbed_raw_test.shape={}'.format(df_scrubbed_raw_test.shape))
+        print('df_unbalanced_raw.shape={}'.format(df_unbalanced_raw.shape))
+        print('df_unbalanced_raw_train.shape={}'.format(df_unbalanced_raw_train.shape))
+        print('df_unbalanced_raw_validation.shape={}'.format(df_unbalanced_raw_validation.shape))
+        print('df_unbalanced_raw_test.shape={}'.format(df_unbalanced_raw_test.shape))
 
-        scrubbed_train_data = '{}/raw/train'.format(args.output_data)
-        scrubbed_validation_data = '{}/raw/validation'.format(args.output_data)
-        scrubbed_test_data = '{}/raw/test'.format(args.output_data)
+        unbalanced_train_data = '{}/raw/labeled/split/unbalanced/header/train'.format(args.output_data)
+        unbalanced_validation_data = '{}/raw/labeled/split/unbalanced/header/validation'.format(args.output_data)
+        unbalanced_test_data = '{}/raw/labeled/split/unbalanced/header/test'.format(args.output_data)
 
-        print('Creating directory {}'.format(scrubbed_train_data))
-        os.makedirs(scrubbed_train_data, exist_ok=True)
-        print('Creating directory {}'.format(scrubbed_validation_data))
-        os.makedirs(scrubbed_validation_data, exist_ok=True)
-        print('Creating directory {}'.format(scrubbed_test_data))
-        os.makedirs(scrubbed_test_data, exist_ok=True)
+        print('Creating directory {}'.format(unbalanced_train_data))
+        os.makedirs(unbalanced_train_data, exist_ok=True)
+        print('Creating directory {}'.format(unbalanced_validation_data))
+        os.makedirs(unbalanced_validation_data, exist_ok=True)
+        print('Creating directory {}'.format(unbalanced_test_data))
+        os.makedirs(unbalanced_test_data, exist_ok=True)
 
         filename_without_extension = Path(Path(file).stem).stem
 
-        print('Writing to {}/part-{}-{}.csv'.format(scrubbed_train_data, args.current_host, filename_without_extension))
-        df_scrubbed_raw_train.to_csv('{}/part-{}-{}.csv'.format(scrubbed_train_data, args.current_host, filename_without_extension), sep=',', index=False, header=True)
+        print('Writing to {}/part-{}-{}.csv'.format(unbalanced_train_data, args.current_host, filename_without_extension))
+        df_unbalanced_raw_train.to_csv('{}/part-{}-{}.csv'.format(unbalanced_train_data, args.current_host, filename_without_extension), sep=',', index=False, header=True)
 
-        print('Writing to {}/part-{}-{}.csv'.format(scrubbed_validation_data, args.current_host, filename_without_extension))
-        df_scrubbed_raw_validation.to_csv('{}/part-{}-{}.csv'.format(scrubbed_validation_data, args.current_host, filename_without_extension), sep=',', index=False, header=True)
+        print('Writing to {}/part-{}-{}.csv'.format(unbalanced_validation_data, args.current_host, filename_without_extension))
+        df_unbalanced_raw_validation.to_csv('{}/part-{}-{}.csv'.format(unbalanced_validation_data, args.current_host, filename_without_extension), sep=',', index=False, header=True)
 
-        print('Writing to {}/part-{}-{}.csv'.format(scrubbed_test_data, args.current_host, filename_without_extension))
-        df_scrubbed_raw_test.to_csv('{}/part-{}-{}.csv'.format(scrubbed_test_data, args.current_host, filename_without_extension), sep=',', index=False, header=True)
+        print('Writing to {}/part-{}-{}.csv'.format(unbalanced_test_data, args.current_host, filename_without_extension))
+        df_unbalanced_raw_test.to_csv('{}/part-{}-{}.csv'.format(unbalanced_test_data, args.current_host, filename_without_extension), sep=',', index=False, header=True)
 
 
         # Balanced the Dataset between Classes
         from sklearn.utils import resample
 
-        is_negative_sentiment_df = df_scrubbed_raw.query('is_positive_sentiment == 0')
-        is_positive_sentiment_df = df_scrubbed_raw.query('is_positive_sentiment == 1')
+        is_negative_sentiment_df = df_unbalanced_raw.query('is_positive_sentiment == 0')
+        is_positive_sentiment_df = df_unbalanced_raw.query('is_positive_sentiment == 1')
 
         # TODO:  check which sentiment has the least number of samples
         is_positive_downsampled_df = resample(is_positive_sentiment_df,
@@ -163,14 +163,16 @@ def process(args):
         print('df_balanced_raw_validation.shape={}'.format(df_balanced_raw_validation.shape))
         print('df_balanced_raw_test.shape={}'.format(df_balanced_raw_test.shape))
 
-        balanced_train_data = '{}/balanced/train'.format(args.output_data)
-        balanced_validation_data = '{}/balanced/validation'.format(args.output_data)
-        balanced_test_data = '{}/balanced/test'.format(args.output_data)
+        balanced_train_data = '{}/raw/labeled/split/balanced/header/train'.format(args.output_data)
+        balanced_validation_data = '{}/raw/labeled/split/balanced/header/validation'.format(args.output_data)
+        balanced_test_data = '{}/raw/labeled/split/balanced/header/test'.format(args.output_data)
 
         print('Creating directory {}'.format(balanced_train_data))
         os.makedirs(balanced_train_data, exist_ok=True)
+
         print('Creating directory {}'.format(balanced_validation_data))
         os.makedirs(balanced_validation_data, exist_ok=True)
+
         print('Creating directory {}'.format(balanced_test_data))
         os.makedirs(balanced_test_data, exist_ok=True)
 
@@ -183,9 +185,38 @@ def process(args):
         print('Writing to {}/part-{}-{}.csv'.format(balanced_test_data, args.current_host, filename_without_extension))
         df_balanced_raw_test.to_csv('{}/part-{}-{}.csv'.format(balanced_test_data, args.current_host, filename_without_extension), sep=',', index=False, header=True)
 
-
     print('Listing contents of {}'.format(args.output_data))
     dirs_output = os.listdir(args.output_data)
+    for file in dirs_output:
+        print(file)
+
+    print('Listing contents of {}'.format(unbalanced_train_data))
+    dirs_output = os.listdir(unbalanced_train_data)
+    for file in dirs_output:
+        print(file)
+
+    print('Listing contents of {}'.format(unbalanced_validation_data))
+    dirs_output = os.listdir(unbalanced_validation_data)
+    for file in dirs_output:
+        print(file)
+
+    print('Listing contents of {}'.format(unbalanced_test_data))
+    dirs_output = os.listdir(unbalanced_test_data)
+    for file in dirs_output:
+        print(file)
+
+    print('Listing contents of {}'.format(balanced_train_data))
+    dirs_output = os.listdir(balanced_train_data)
+    for file in dirs_output:
+        print(file)
+
+    print('Listing contents of {}'.format(balanced_validation_data))
+    dirs_output = os.listdir(balanced_validation_data)
+    for file in dirs_output:
+        print(file)
+
+    print('Listing contents of {}'.format(balanced_test_data))
+    dirs_output = os.listdir(balanced_test_data)
     for file in dirs_output:
         print(file)
 
