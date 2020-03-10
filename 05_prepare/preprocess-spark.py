@@ -20,13 +20,13 @@ from pyspark.sql.types import ArrayType, DoubleType
 from pyspark.ml.feature import PCA, StandardScaler
 
 def to_array(col):
-    def to_array_(v):
-        return v.toArray().tolist()
-    # Important: asNondeterministic requires Spark 2.3 or later
-    # It can be safely removed i.e.
-    # return udf(to_array_, ArrayType(DoubleType()))(col)
-    # but at the cost of decreased performance
-    return udf(to_array_, ArrayType(DoubleType())).asNondeterministic()(col)
+    def to_array_internal(v):
+        if v:
+            return v.toArray().tolist()
+        else:
+            print('EmptyV: {}'.format(v))
+            return []
+    return udf(to_array_internal, ArrayType(DoubleType())).asNondeterministic()(col)
 
 def main():
     spark = SparkSession.builder.appName('AmazonReviewsSparkProcessor').getOrCreate()
@@ -63,9 +63,16 @@ def main():
                             header=True,
                             quote=None)
     df_csv.show()
-    
+
+    # This dataset should already be clean, but always good to double-check
+    print('Showing null review_body rows...')
+    df_csv.where(col('review_body').isNull()).show()
+
+    df_csv_cleaned = df_csv.na.drop(subset=['review_body'])
+    df_csv_cleaned.where(col('review_body').isNull()).show()
+   
     tokenizer = Tokenizer(inputCol='review_body', outputCol='words')
-    wordsData = tokenizer.transform(df_csv)
+    wordsData = tokenizer.transform(df_csv_cleaned)
     
     hashingTF = HashingTF(inputCol='words', outputCol='raw_features', numFeatures=1000)
     featurizedData = hashingTF.transform(wordsData)
