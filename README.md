@@ -49,19 +49,21 @@ In the AWS Console search bar, type `SageMaker` and select `Amazon SageMaker` to
 
 Select `Create notebook instance`.
 
+![SageMaker Console](img/setup_aws_console_2.png)
+
 In the Notebook instance name text box, enter a name for the notebook instance.
 
 For this workshop select `workshop` as the instance name.
 
-Choose `ml.t3.xlarge`. We'll only be using this instance to launch jobs. The training job themselves will run either on a SageMaker managed cluster or an Amazon EKS cluster.
+Choose `ml.c5.2xlarge`. We'll only be using this instance to launch jobs. The training job themselves will run either on a SageMaker managed cluster or an Amazon EKS cluster.
 
-Volume size `50` - this is only needed for building docker containers. During training data is copied directly from Amazon S3 to the training cluster when using SageMaker. When using Amazon EKS, we'll setup a distributed file system that worker nodes will use to get access to training data.
+Volume size `250` - this is only needed for building docker containers. During training data is copied directly from Amazon S3 to the training cluster when using SageMaker. When using Amazon EKS, we'll setup a distributed file system that worker nodes will use to get access to training data.
 
 ![Fill notebook instance](img/setup_fill_notebook.png)
 
-In the IAM role box, select the default `TeamRole`. 
+In the IAM role box, select the default `TeamRole`.
 
-Specify the `amazon-reviews-pds` S3 bucket
+Specify the `amazon-reviews-pds` S3 bucket.
 
 ![Amazon SageMaker IAM Role](img/sm_iam_role.png)
 
