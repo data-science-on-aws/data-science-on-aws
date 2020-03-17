@@ -111,4 +111,4 @@ git clone https://github.com/data-science-on-aws/workshop
 # 9. Start the Workshop
 Navigate to `01_setup/` in your Jupyter notebook to start the workshop.
 
-![Start Workshop](img/start-workshop.png)
+![Start Workshop](img/start_workshop.png)
