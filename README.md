@@ -63,8 +63,6 @@ Volume size `250` - this is only needed for building docker containers. During t
 
 In the IAM role box, select the default `TeamRole`.
 
-Specify the `amazon-reviews-pds` S3 bucket.
-
 ![Amazon SageMaker IAM Role](img/sm_iam_role.png)
 
 Keep the default settings for the other options and click `Create notebook instance`. On the `Notebook instances` section you should see the status change from `Pending` -> `InService`
@@ -84,6 +82,8 @@ Click `Attach Policies`.
 ![IAM Policy](img/view_policies.png)
               
 Select `AdministratorAccess` and click on `Attach Policy`.
+
+_Note:  Never do this in your production account.  Please follow a least-priviledge security model._ 
 
 ![Attach Admin Policy](img/attach_admin_policy.png)
 
