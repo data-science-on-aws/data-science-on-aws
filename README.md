@@ -1,4 +1,4 @@
-![Workshop Outline](img/outline.png)
+![Workshop Outline](img/outline.png) 
 
 This workshop creates an ephemeral AWS acccount for you to use only for this workshop.  
 
