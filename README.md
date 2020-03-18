@@ -59,7 +59,7 @@ For this workshop select `workshop` as the instance name.
 
 Choose `ml.c5.2xlarge`. We'll only be using this instance to launch jobs. The training job themselves will run either on a SageMaker managed cluster or an Amazon EKS cluster.
 
-Volume size `250` - this is only needed for building docker containers. During training data is copied directly from Amazon S3 to the training cluster when using SageMaker. When using Amazon EKS, we'll setup a distributed file system that worker nodes will use to get access to training data.
+Volume size `250` - this is needed to explore datasets, build docker containers, and more.  During training data is copied directly from Amazon S3 to the training cluster when using SageMaker.  When using Amazon EKS, we'll setup a distributed file system that worker nodes will use to get access to training data.
 
 In the IAM role box, select the default `TeamRole`.
 
