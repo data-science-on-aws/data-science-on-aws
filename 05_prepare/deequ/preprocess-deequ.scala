@@ -12,15 +12,16 @@ object SparkAmazonReviewsAnalyzer {
   def run(s3InputData: String, s3OutputAnalyzeData: String): Unit = {
     // TODO:  Retrieve s3_input_data and s3_output_analyze_data args from the list of args (argv-style)
     // System.out.println(args)
-    System.out.println(s3InputData)
-    System.out.println(s3OutputAnalyzeData)
+    System.out.println(s"s3_input_data: ${s3InputData}")
+    System.out.println(s"s3_output_analyze_data: ${s3OutputAnalyzeData}")
       
     val spark = SparkSession
       .builder
       .appName("SparkAmazonReviewsAnalyzer")
       .getOrCreate()
      
-    val dataset = spark.read.parquet("s3a://amazon-reviews-pds/parquet/")
+    //val dataset = spark.read.parquet("s3a://amazon-reviews-pds/parquet/")
+    val dataset = spark.read.parquet(s3InputData)
 
     val analysisResult: AnalyzerContext = { AnalysisRunner
           // data to run the analysis on
@@ -45,8 +46,8 @@ object SparkAmazonReviewsAnalyzer {
       .write
       .mode(SaveMode.Overwrite)
       .option("header", true)      
-      .option("delimiter", ",")
-      .csv("s3a://sagemaker-us-east-1-835319576252/amazon-reviews-spark-analyzer/dataset-metrics")
+      .option("delimiter", "\t")
+      .csv(s"${s3OutputAnalyzeData}/dataset-metrics")
 
     val verificationResult: VerificationResult = { VerificationSuite()
           // data to run the verification on
@@ -77,8 +78,8 @@ object SparkAmazonReviewsAnalyzer {
       .write
       .mode(SaveMode.Overwrite)
       .option("header", true)
-      .option("delimiter", ",")
-      .csv("s3a://sagemaker-us-east-1-835319576252/amazon-reviews-spark-analyzer/constraint-checks")
+      .option("delimiter", "\t")
+      .csv(s"${s3OutputAnalyzeData}/constraint-checks")
       
     val verificationSuccessMetricsDataFrame = VerificationResult
       .successMetricsAsDataFrame(spark, verificationResult)
@@ -88,9 +89,9 @@ object SparkAmazonReviewsAnalyzer {
       .repartition(1)
       .write
       .mode(SaveMode.Overwrite)
-      .option("header", true)      
-      .option("delimiter", ",")
-      .csv("s3a://sagemaker-us-east-1-835319576252/amazon-reviews-spark-analyzer/success-metrics")
+      .option("header", true)
+      .option("delimiter", "\t")
+      .csv(s"${s3OutputAnalyzeData}/success-metrics")      
       
     // We ask deequ to compute constraint suggestions for us on the data
     val suggestionsResult = { ConstraintSuggestionRunner()
@@ -117,8 +118,8 @@ object SparkAmazonReviewsAnalyzer {
       .repartition(1)      
       .write      
       .mode(SaveMode.Overwrite)
-      .option("header", true)      
-      .option("delimiter", ",")
-      .csv("s3a://sagemaker-us-east-1-835319576252/amazon-reviews-spark-analyzer/constraint-suggestions")
+      .option("header", true)  
+      .option("delimiter", "\t")
+      .csv(s"${s3OutputAnalyzeData}/constraint-suggestions")      
   }
 }

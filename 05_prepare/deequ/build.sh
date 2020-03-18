@@ -2,4 +2,4 @@ scalac -classpath ./spark-2.4.5-bin-hadoop2.7/jars/spark-network-shuffle_2.11-2.
 
 cp preprocess-deequ.jar ../container/jars/
 
-echo "Copied to preprocess-deequ.jar to ../container/jars/   Don't forget to rebuild the Docker image!"
+echo "Copied to preprocess-deequ.jar to ../container/jars/   Don't forget to rebuild the Docker image (currently through the notebook)!"
