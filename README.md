@@ -63,7 +63,7 @@ Volume size `250` - this is only needed for building docker containers. During t
 
 In the IAM role box, select the default `TeamRole`.
 
-You must select the default `VPC`, `Subnet`, and `Security group` as shown below.  Your values will likely be different.  This is OK.
+You must select the default `VPC`, `Subnet`, and `Security group` as shown in the screenshow.  Your values will likely be different.  This is OK.
 
 Keep the default settings for the other options not highlighted in red, and click `Create notebook instance`.  On the `Notebook instances` section you should see the status change from `Pending` -> `InService`
 
