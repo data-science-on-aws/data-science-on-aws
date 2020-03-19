@@ -3,14 +3,7 @@ kind: Application
 metadata:
   name: metadata
 spec:
-  selector:
-    matchLabels:
-      app.kubernetes.io/name: metadata
-      app.kubernetes.io/instance: metadata-v0.7.0
-      app.kubernetes.io/managed-by: kfctl
-      app.kubernetes.io/component: metadata
-      app.kubernetes.io/part-of: kubeflow
-      app.kubernetes.io/version: v0.7.0
+  addOwnerRef: true
   componentKinds:
   - group: core
     kind: Service
@@ -21,20 +14,27 @@ spec:
   - group: core
     kind: ServiceAccount
   descriptor:
-    type: "metadata"
-    version: "alpha"
-    description: "Tracking and managing metadata of machine learning workflows in Kubeflow."
-    maintainers:
-    - name: Zhenghui Wang
-      email: zhenghui@google.com
-    owners:
-    - name: Ajay Gopinathan
-      email: ajaygopinathan@google.com
-    - name: Zhenghui Wang
-      email: zhenghui@google.com
+    description: Tracking and managing metadata of machine learning workflows in Kubeflow.
     keywords:
-    - "metadata"
+    - metadata
     links:
     - description: Docs
-      url: "https://www.kubeflow.org/docs/components/misc/metadata/"
-  addOwnerRef: true
+      url: https://www.kubeflow.org/docs/components/misc/metadata/
+    maintainers:
+    - email: zhenghui@google.com
+      name: Zhenghui Wang
+    owners:
+    - email: ajaygopinathan@google.com
+      name: Ajay Gopinathan
+    - email: zhenghui@google.com
+      name: Zhenghui Wang
+    type: metadata
+    version: alpha
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: metadata
+      app.kubernetes.io/instance: metadata-0.2.1
+      app.kubernetes.io/managed-by: kfctl
+      app.kubernetes.io/name: metadata
+      app.kubernetes.io/part-of: kubeflow
+      app.kubernetes.io/version: 0.2.1

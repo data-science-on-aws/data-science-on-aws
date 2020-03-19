@@ -3,11 +3,11 @@ bases:
 - base
 commonLabels:
   app.kubernetes.io/component: pipelines-ui
-  app.kubernetes.io/instance: pipelines-ui-0.1.31
+  app.kubernetes.io/instance: pipelines-ui-0.2.0
   app.kubernetes.io/managed-by: kfctl
   app.kubernetes.io/name: pipelines-ui
   app.kubernetes.io/part-of: kubeflow
-  app.kubernetes.io/version: 0.1.31
+  app.kubernetes.io/version: 0.2.0
 configurations:
 - overlays/istio/params.yaml
 kind: Kustomization

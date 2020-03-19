@@ -14,41 +14,41 @@ commonLabels:
 images:
 - name: gcr.io/kubeflow-images-public/centraldashboard
   newName: gcr.io/kubeflow-images-public/centraldashboard
-  digest: sha256:4299297b8390599854aa8f77e9eb717db684b32ca9a94a0ab0e73f3f73e5d8b5
+  newTag: v1.0.0-g3ec0de71
 configMapGenerator:
-- name: parameters
-  env: params.env
+- envs:
+  - params.env
+  name: parameters
 generatorOptions:
   disableNameSuffixHash: true
 vars:
-- name: namespace
+- fieldref:
+    fieldPath: metadata.namespace
+  name: namespace
   objref:
+    apiVersion: v1
     kind: Service
     name: centraldashboard
-    apiVersion: v1
-  fieldref:
-    fieldpath: metadata.namespace
-- name: clusterDomain
+- fieldref:
+    fieldPath: data.clusterDomain
+  name: clusterDomain
   objref:
+    apiVersion: v1
     kind: ConfigMap
     name: parameters
-    apiVersion: v1
-  fieldref:
-    fieldpath: data.clusterDomain
-- name: userid-header
+- fieldref:
+    fieldPath: data.userid-header
+  name: userid-header
   objref:
+    apiVersion: v1
     kind: ConfigMap
     name: parameters
-    apiVersion: v1
-  fieldref:
-    fieldpath: data.userid-header
-- name: userid-prefix
+- fieldref:
+    fieldPath: data.userid-prefix
+  name: userid-prefix
   objref:
+    apiVersion: v1
     kind: ConfigMap
     name: parameters
-    apiVersion: v1
-  fieldref:
-    fieldpath: data.userid-prefix
 configurations:
 - params.yaml
-

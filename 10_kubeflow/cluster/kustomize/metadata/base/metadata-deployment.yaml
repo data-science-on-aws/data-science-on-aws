@@ -16,20 +16,9 @@ spec:
     spec:
       containers:
       - name: container
-        image: gcr.io/kubeflow-images-public/metadata:v0.1.10
-        env:
-          - name: MYSQL_ROOT_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: metadata-db-secrets
-                key: MYSQL_ROOT_PASSWORD
+        image: gcr.io/kubeflow-images-public/metadata:v0.1.11
         command: ["./server/server",
-                  "--http_port=8080",
-                  "--mysql_service_host=metadata-db.kubeflow",
-                  "--mysql_service_port=3306",
-                  "--mysql_service_user=root",
-                  "--mysql_service_password=$(MYSQL_ROOT_PASSWORD)",
-                  "--mlmd_db_name=metadb"]
+                  "--http_port=8080"]
         ports:
         - name: backendapi
           containerPort: 8080
@@ -63,21 +52,12 @@ spec:
     spec:
       containers:
         - name: container
-          image: gcr.io/tfx-oss-public/ml_metadata_store_server:0.14.0
-          env:
-            - name: MYSQL_ROOT_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: metadata-db-secrets
-                  key: MYSQL_ROOT_PASSWORD
+          envFrom:
+          - configMapRef:
+              name: metadata-grpc-configmap
+          image: gcr.io/tfx-oss-public/ml_metadata_store_server:v0.21.1
           command: ["/bin/metadata_store_server"]
-          args: ["--grpc_port=8080",
-                 "--mysql_config_host=metadata-db.kubeflow",
-                 "--mysql_config_database=metadb",
-                 "--mysql_config_port=3306",
-                 "--mysql_config_user=root",
-                 "--mysql_config_password=$(MYSQL_ROOT_PASSWORD)"
-          ]
+          args: ["--grpc_port=$(METADATA_GRPC_SERVICE_PORT)"]
           ports:
             - name: grpc-backendapi
-              containerPort: 8080
+              containerPort: 8080 #The value of the port number needs to be in sync with value  specified in grpc-params.env

@@ -3,11 +3,11 @@ bases:
 - base
 commonLabels:
   app.kubernetes.io/component: pipeline-visualization-service
-  app.kubernetes.io/instance: pipeline-visualization-service-0.1.31
+  app.kubernetes.io/instance: pipeline-visualization-service-0.2.0
   app.kubernetes.io/managed-by: kfctl
   app.kubernetes.io/name: pipeline-visualization-service
   app.kubernetes.io/part-of: kubeflow
-  app.kubernetes.io/version: 0.1.31
+  app.kubernetes.io/version: 0.2.0
 kind: Kustomization
 namespace: kubeflow
 resources:

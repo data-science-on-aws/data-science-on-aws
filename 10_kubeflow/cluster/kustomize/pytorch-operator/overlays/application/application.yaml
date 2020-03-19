@@ -6,8 +6,8 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: pytorch-operator
-      app.kubernetes.io/instance: pytorch-operator-v0.7.0
-      app.kubernetes.io/version: v0.7.0
+      app.kubernetes.io/instance: pytorch-operator-v1.0.0
+      app.kubernetes.io/version: v1.0.0
       app.kubernetes.io/component: pytorch
       app.kubernetes.io/part-of: kubeflow
       app.kubernetes.io/managed-by: kfctl

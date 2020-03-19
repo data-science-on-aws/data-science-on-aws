@@ -9,10 +9,11 @@ spec:
     metadata:
       labels:
         name: tf-job-operator
+      annotations:
+        sidecar.istio.io/inject: "false"
     spec:
       containers:
-      - command:
-        - /opt/kubeflow/tf-operator.v1
+      - args:
         - --alsologtostderr
         - -v=1
         - --monitoring-port=8443

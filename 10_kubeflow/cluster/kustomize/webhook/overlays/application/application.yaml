@@ -6,14 +6,14 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: webhook
-      app.kubernetes.io/instance: webhook-v0.7.0
+      app.kubernetes.io/instance: webhook-v1.0.0
       app.kubernetes.io/managed-by: kfctl
       app.kubernetes.io/component: bootstrap
       app.kubernetes.io/part-of: webhook
-      app.kubernetes.io/version: v0.7.0
+      app.kubernetes.io/version: v1.0.0
   componentKinds:
-  - group: admissionregistration.k8s.io
-    kind: MutatingWebhookConfiguration
+  # Do not select any cluster scoped resources
+  # as that will cause problems.
   - group: core
     kind: ConfigMap
   - group: apps
