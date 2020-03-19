@@ -7,13 +7,11 @@ import com.amazon.deequ.checks.{Check, CheckLevel}
 import com.amazon.deequ.suggestions.{ConstraintSuggestionRunner, Rules}
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.SaveMode
-import org.apache.spark.sql.types.{StructType, StructField, StringType, IntegerType}
-
 
 object SparkAmazonReviewsAnalyzer {
   def run(s3InputData: String, s3OutputAnalyzeData: String): Unit = {
     // TODO:  Retrieve s3_input_data and s3_output_analyze_data args from the list of args (argv-style)
-//    System.out.println(args)
+    // System.out.println(args)
     System.out.println(s"s3_input_data: ${s3InputData}")
     System.out.println(s"s3_output_analyze_data: ${s3OutputAnalyzeData}")
       
@@ -21,34 +19,9 @@ object SparkAmazonReviewsAnalyzer {
       .builder
       .appName("SparkAmazonReviewsAnalyzer")
       .getOrCreate()
-    
-    // Uncomment this to read parquet instead
-    //val dataset = spark.read.parquet(s3InputData)  
-
-    val schema = StructType(Array(
-        StructField("is_positive_sentiment", IntegerType, true),
-        StructField("marketplace", StringType, true),
-        StructField("customer_id", StringType, true),
-        StructField("review_id", StringType, true),
-        StructField("product_id", StringType, true),
-        StructField("product_parent", StringType, true),
-        StructField("product_title", StringType, true),
-        StructField("product_category", StringType, true),
-        StructField("star_rating", IntegerType, true),
-        StructField("helpful_votes", IntegerType, true),
-        StructField("total_votes", IntegerType, true),
-        StructField("vine", StringType, true),
-        StructField("verified_purchase", StringType, true),
-        StructField("review_headline", StringType, true),
-        StructField("review_body", StringType, true),
-        StructField("review_date", StringType, true)
-    ))
-
-    val dataset = spark.read.option("sep", "\t")
-                            .option("header", "true")
-                            .option("quote", "")
-                            .schema(schema)
-                            .csv(s3InputData)
+     
+    //val dataset = spark.read.parquet("s3a://amazon-reviews-pds/parquet/")
+    val dataset = spark.read.parquet(s3InputData)
 
     val analysisResult: AnalyzerContext = { AnalysisRunner
           // data to run the analysis on
@@ -75,7 +48,6 @@ object SparkAmazonReviewsAnalyzer {
       .option("header", true)      
       .option("delimiter", "\t")
       .csv(s"${s3OutputAnalyzeData}/dataset-metrics")
-//      .csv(s3OutputAnalyzeData)
 
     val verificationResult: VerificationResult = { VerificationSuite()
           // data to run the verification on
@@ -108,7 +80,7 @@ object SparkAmazonReviewsAnalyzer {
       .option("header", true)
       .option("delimiter", "\t")
       .csv(s"${s3OutputAnalyzeData}/constraint-checks")
-    
+      
     val verificationSuccessMetricsDataFrame = VerificationResult
       .successMetricsAsDataFrame(spark, verificationResult)
 
@@ -120,7 +92,7 @@ object SparkAmazonReviewsAnalyzer {
       .option("header", true)
       .option("delimiter", "\t")
       .csv(s"${s3OutputAnalyzeData}/success-metrics")      
-
+      
     // We ask deequ to compute constraint suggestions for us on the data
     val suggestionsResult = { ConstraintSuggestionRunner()
           // data to suggest constraints for
