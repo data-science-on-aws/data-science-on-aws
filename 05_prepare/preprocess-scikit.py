@@ -45,10 +45,16 @@ def parse_args():
 def process(args):
     print('Current host: {}'.format(args.current_host))
 
-    print('Listing contents of {}'.format(args.input_data))
+#    print('Listing contents of {}'.format(args.input_data))
 #    dirs_input = os.listdir(args.input_data)
 
-#    data = pd.concat([pd.read_csv(f, sep='\t', header=header) for f in glob.glob('{}/*.csv'.format(path))], ignore_index = True)
+    unbalanced_train_data = None
+    unbalanced_validation_data = None
+    unbalanced_test_data = None
+
+    balanced_train_data = None
+    balanced_validation_data = None
+    balanced_test_data = None
 
     # This would print all the files and directories
     for file in glob.glob('{}/*.tsv.gz'.format(args.input_data)):
