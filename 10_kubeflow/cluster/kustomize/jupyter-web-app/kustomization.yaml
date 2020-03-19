@@ -4,11 +4,11 @@ bases:
 - overlays/istio
 commonLabels:
   app.kubernetes.io/component: jupyter-web-app
-  app.kubernetes.io/instance: jupyter-web-app-v0.7.0
+  app.kubernetes.io/instance: jupyter-web-app-v1.0.0
   app.kubernetes.io/managed-by: kfctl
   app.kubernetes.io/name: jupyter-web-app
   app.kubernetes.io/part-of: kubeflow
-  app.kubernetes.io/version: v0.7.0
+  app.kubernetes.io/version: v1.0.0
 kind: Kustomization
 namespace: kubeflow
 resources:

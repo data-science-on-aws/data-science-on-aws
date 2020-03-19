@@ -23,6 +23,8 @@ spec:
       creationTimestamp: null
       labels:
         app: argo-ui
+      annotations:
+        sidecar.istio.io/inject: "false"
     spec:
       containers:
       - env:
@@ -32,7 +34,9 @@ spec:
               apiVersion: v1
               fieldPath: metadata.namespace
         - name: IN_CLUSTER
-          value: "true"
+          value: 'true'
+        - name: ENABLE_WEB_CONSOLE
+          value: 'false'
         - name: BASE_HREF
           value: /argo/
         image: argoproj/argoui:v2.3.0
@@ -77,6 +81,8 @@ spec:
       creationTimestamp: null
       labels:
         app: workflow-controller
+      annotations:
+        sidecar.istio.io/inject: "false"
     spec:
       containers:
       - args:

@@ -15,31 +15,32 @@ commonLabels:
 images:
 - name: gcr.io/kubeflow-images-public/notebook-controller
   newName: gcr.io/kubeflow-images-public/notebook-controller
-  digest: sha256:6490f737000bd1d2520ac4b8cbde2b09749cdb291b1967ddda95d05131db49db
+  newTag: v1.0.0-gcd65ce25
 configMapGenerator:
-- name: parameters
-  env: params.env
+- envs:
+  - params.env
+  name: parameters
 generatorOptions:
   disableNameSuffixHash: true
 vars:
-- name: POD_LABELS
+- fieldref:
+    fieldPath: data.POD_LABELS
+  name: POD_LABELS
   objref:
+    apiVersion: v1
     kind: ConfigMap
     name: parameters
-    apiVersion: v1
-  fieldref:
-    fieldpath: data.POD_LABELS
-- name: USE_ISTIO
+- fieldref:
+    fieldPath: data.USE_ISTIO
+  name: USE_ISTIO
   objref:
+    apiVersion: v1
     kind: ConfigMap
     name: parameters
-    apiVersion: v1
-  fieldref:
-    fieldpath: data.USE_ISTIO
-- name: ISTIO_GATEWAY
+- fieldref:
+    fieldPath: data.ISTIO_GATEWAY
+  name: ISTIO_GATEWAY
   objref:
+    apiVersion: v1
     kind: ConfigMap
     name: parameters
-    apiVersion: v1
-  fieldref:
-    fieldpath: data.ISTIO_GATEWAY

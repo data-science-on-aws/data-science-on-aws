@@ -3,11 +3,11 @@ bases:
 - base
 commonLabels:
   app.kubernetes.io/component: katib
-  app.kubernetes.io/instance: katib-controller-v0.7.0
+  app.kubernetes.io/instance: katib-controller-0.8.0
   app.kubernetes.io/managed-by: kfctl
   app.kubernetes.io/name: katib-controller
   app.kubernetes.io/part-of: kubeflow
-  app.kubernetes.io/version: v0.7.0
+  app.kubernetes.io/version: 0.8.0
 configurations:
 - overlays/istio/params.yaml
 kind: Kustomization

@@ -17,6 +17,12 @@ spec:
       containers:
       - image: gcr.io/kubeflow-images-public/centraldashboard
         imagePullPolicy: IfNotPresent
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8082
+          initialDelaySeconds: 30
+          periodSeconds: 30
         name: centraldashboard
         ports:
         - containerPort: 8082

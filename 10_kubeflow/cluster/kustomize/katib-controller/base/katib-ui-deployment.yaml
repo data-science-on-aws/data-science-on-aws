@@ -24,12 +24,14 @@ spec:
         imagePullPolicy: IfNotPresent
         command:
           - './katib-ui'
+        args:
+          - '--port=8080'
         env:
-          - name: KATIB_CORE_NAMESPACE
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.namespace
+        - name: KATIB_CORE_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
         ports:
         - name: ui
-          containerPort: 80
+          containerPort: 8080
       serviceAccountName: katib-ui

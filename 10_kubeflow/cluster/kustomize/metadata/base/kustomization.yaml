@@ -6,11 +6,9 @@ commonLabels:
 configMapGenerator:
 - name: ui-parameters
   env: params.env
+- name: metadata-grpc-configmap
+  env: grpc-params.env
 resources:
-- metadata-db-pvc.yaml
-- metadata-db-secret.yaml
-- metadata-db-deployment.yaml
-- metadata-db-service.yaml
 - metadata-deployment.yaml
 - metadata-service.yaml
 - metadata-ui-deployment.yaml
@@ -53,10 +51,10 @@ vars:
 images:
 - name: gcr.io/kubeflow-images-public/metadata
   newName: gcr.io/kubeflow-images-public/metadata
-  newTag: v0.1.10
+  newTag: v0.1.11
 - name: gcr.io/tfx-oss-public/ml_metadata_store_server
   newName: gcr.io/tfx-oss-public/ml_metadata_store_server
-  newTag: 0.14.0
+  newTag: v0.21.1
 - name: gcr.io/ml-pipeline/envoy
   newName: gcr.io/ml-pipeline/envoy
   newTag: metadata-grpc

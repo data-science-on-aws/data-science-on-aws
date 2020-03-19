@@ -37,6 +37,7 @@ rules:
   - argoproj.io
   resources:
   - workflows
+  - workflows/finalizers
   verbs:
   - get
   - list
@@ -71,6 +72,7 @@ rules:
   - argoproj.io
   resources:
   - workflows
+  - workflows/finalizers
   verbs:
   - get
   - list
