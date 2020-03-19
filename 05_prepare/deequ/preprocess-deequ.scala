@@ -26,7 +26,7 @@ object SparkAmazonReviewsAnalyzer {
     //val dataset = spark.read.parquet(s3InputData)  
 
     val schema = StructType(Array(
-        StructField("is_positive_sentiment", IntegerType, true),
+//        StructField("is_positive_sentiment", IntegerType, true),
         StructField("marketplace", StringType, true),
         StructField("customer_id", StringType, true),
         StructField("review_id", StringType, true),
