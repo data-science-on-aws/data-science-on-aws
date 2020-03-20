@@ -31,6 +31,7 @@ def to_array(col):
 
 
 def transform(spark, s3_input_data, s3_output_data): 
+    print('Processing {} => {}'.format(s3_input_data, s3_output_data))
  
     schema = StructType([
         StructField('is_positive_sentiment', IntegerType(), True),
@@ -139,11 +140,11 @@ def main():
     s3_output_balanced_train_data = args['s3_output_balanced_train_data'].replace('s3://', 's3a://')
     print(s3_output_balanced_train_data)
 
-    s3_output_balanced_train_data = args['s3_output_balanced_train_data'].replace('s3://', 's3a://')
-    print(s3_output_balanced_train_data)
+    s3_output_balanced_validation_data = args['s3_output_balanced_validation_data'].replace('s3://', 's3a://')
+    print(s3_output_balanced_validation_data)
 
-    s3_output_balanced_train_data = args['s3_output_balanced_train_data'].replace('s3://', 's3a://')
-    print(s3_output_balanced_train_data)
+    s3_output_balanced_test_data = args['s3_output_balanced_test_data'].replace('s3://', 's3a://')
+    print(s3_output_balanced_test_data)
 
 
     transform(spark, s3_input_balanced_train_data, s3_output_balanced_train_data)
