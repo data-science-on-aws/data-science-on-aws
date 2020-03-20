@@ -54,9 +54,6 @@ Select `Create notebook instance`.
 In the Notebook instance name text box, enter a name for the notebook instance.
 
 <!--- ![Fill notebook instance](img/setup_fill_notebook.png) --->
-![Fill notebook instance](img/notebook-setup01.png)
-![Fill notebook instance](img/notebook-setup02.png)
-![Fill notebook instance](img/notebook-setup03.png)
 
 For this workshop select `workshop` as the instance name.
 
@@ -64,11 +61,17 @@ Choose `ml.c5.2xlarge`. We'll only be using this instance to launch jobs. The tr
 
 Volume size `250` - this is needed to explore datasets, build docker containers, and more.  During training data is copied directly from Amazon S3 to the training cluster when using SageMaker.  When using Amazon EKS, we'll setup a distributed file system that worker nodes will use to get access to training data.
 
+![Fill notebook instance](img/notebook-setup01.png)
+
 In the IAM role box, select the default `TeamRole`.
+
+![Fill notebook instance](img/notebook-setup02.png)
 
 You must select the default `VPC`, `Subnet`, and `Security group` as shown in the screenshow.  Your values will likely be different.  This is OK.
 
 Keep the default settings for the other options not highlighted in red, and click `Create notebook instance`.  On the `Notebook instances` section you should see the status change from `Pending` -> `InService`
+
+![Fill notebook instance](img/notebook-setup03.png)
 
 While the notebook spins up, continue to work on the next section.  We'll come back to the notebook when it's ready.
 
