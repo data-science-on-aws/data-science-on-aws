@@ -48,10 +48,6 @@ def process(args):
 #    print('Listing contents of {}'.format(args.input_data))
 #    dirs_input = os.listdir(args.input_data)
 
-    unbalanced_train_data = None
-    unbalanced_validation_data = None
-    unbalanced_test_data = None
-
     balanced_train_data = None
     balanced_validation_data = None
     balanced_test_data = None
@@ -112,30 +108,9 @@ def process(args):
         print('df_unbalanced_raw_validation.shape={}'.format(df_unbalanced_raw_validation.shape))
         print('df_unbalanced_raw_test.shape={}'.format(df_unbalanced_raw_test.shape))
 
-        unbalanced_train_data = '{}/raw/labeled/split/unbalanced/header/train'.format(args.output_data)
-        unbalanced_validation_data = '{}/raw/labeled/split/unbalanced/header/validation'.format(args.output_data)
-        unbalanced_test_data = '{}/raw/labeled/split/unbalanced/header/test'.format(args.output_data)
-
-        print('Creating directory {}'.format(unbalanced_train_data))
-        os.makedirs(unbalanced_train_data, exist_ok=True)
-        print('Creating directory {}'.format(unbalanced_validation_data))
-        os.makedirs(unbalanced_validation_data, exist_ok=True)
-        print('Creating directory {}'.format(unbalanced_test_data))
-        os.makedirs(unbalanced_test_data, exist_ok=True)
-
         filename_without_extension = Path(Path(file).stem).stem
 
-        print('Writing to {}/part-{}-{}.csv'.format(unbalanced_train_data, args.current_host, filename_without_extension))
-        df_unbalanced_raw_train.to_csv('{}/part-{}-{}.csv'.format(unbalanced_train_data, args.current_host, filename_without_extension), sep=',', index=False, header=True)
-
-        print('Writing to {}/part-{}-{}.csv'.format(unbalanced_validation_data, args.current_host, filename_without_extension))
-        df_unbalanced_raw_validation.to_csv('{}/part-{}-{}.csv'.format(unbalanced_validation_data, args.current_host, filename_without_extension), sep=',', index=False, header=True)
-
-        print('Writing to {}/part-{}-{}.csv'.format(unbalanced_test_data, args.current_host, filename_without_extension))
-        df_unbalanced_raw_test.to_csv('{}/part-{}-{}.csv'.format(unbalanced_test_data, args.current_host, filename_without_extension), sep=',', index=False, header=True)
-
-
-        # Balanced the Dataset between Classes
+        # Balance the Dataset between Classes
         from sklearn.utils import resample
 
         is_negative_sentiment_df = df_unbalanced_raw.query('is_positive_sentiment == 0')
@@ -193,21 +168,6 @@ def process(args):
 
     print('Listing contents of {}'.format(args.output_data))
     dirs_output = os.listdir(args.output_data)
-    for file in dirs_output:
-        print(file)
-
-    print('Listing contents of {}'.format(unbalanced_train_data))
-    dirs_output = os.listdir(unbalanced_train_data)
-    for file in dirs_output:
-        print(file)
-
-    print('Listing contents of {}'.format(unbalanced_validation_data))
-    dirs_output = os.listdir(unbalanced_validation_data)
-    for file in dirs_output:
-        print(file)
-
-    print('Listing contents of {}'.format(unbalanced_test_data))
-    dirs_output = os.listdir(unbalanced_test_data)
     for file in dirs_output:
         print(file)
 

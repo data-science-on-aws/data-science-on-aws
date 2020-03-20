@@ -19,6 +19,7 @@ from pyspark.sql.functions import udf, col
 from pyspark.sql.types import ArrayType, DoubleType
 from pyspark.ml.feature import PCA, StandardScaler
 
+
 def to_array(col):
     def to_array_internal(v):
         if v:
@@ -28,20 +29,9 @@ def to_array(col):
             return []
     return udf(to_array_internal, ArrayType(DoubleType())).asNondeterministic()(col)
 
-def main():
-    spark = SparkSession.builder.appName('AmazonReviewsSparkProcessor').getOrCreate()
-    
-    # Convert command line args into a map of args
-    args_iter = iter(sys.argv[1:])
-    args = dict(zip(args_iter, args_iter))
-    
-    # Retrieve the args and replace 's3://' with 's3a://' (used by Spark)
-    s3_input_data = args['s3_input_data'].replace('s3://', 's3a://')
-    print(s3_input_data)
-    
-    s3_output_data = args['s3_output_data'].replace('s3://', 's3a://')
-    print(s3_output_data)
-    
+
+def transform(spark, s3_input_data, s3_output_data): 
+ 
     schema = StructType([
         StructField('is_positive_sentiment', IntegerType(), True),
         StructField('marketplace', StringType(), True),
@@ -127,6 +117,39 @@ def main():
 
     print('Wrote to output file:  {}'.format(s3_output_data))
         
+
+def main():
+    spark = SparkSession.builder.appName('AmazonReviewsSparkProcessor').getOrCreate()
+
+    # Convert command line args into a map of args
+    args_iter = iter(sys.argv[1:])
+    args = dict(zip(args_iter, args_iter))
+
+
+    # Retrieve the args and replace 's3://' with 's3a://' (used by Spark)
+    s3_input_balanced_train_data = args['s3_input_balanced_train_data'].replace('s3://', 's3a://')
+    print(s3_input_balanced_train_data)
+
+    s3_input_balanced_validation_data = args['s3_input_balanced_validation_data'].replace('s3://', 's3a://')
+    print(s3_input_balanced_validation_data)
+
+    s3_input_balanced_test_data = args['s3_input_balanced_test_data'].replace('s3://', 's3a://')
+    print(s3_input_balanced_test_data)
+
+    s3_output_balanced_train_data = args['s3_output_balanced_train_data'].replace('s3://', 's3a://')
+    print(s3_output_balanced_train_data)
+
+    s3_output_balanced_train_data = args['s3_output_balanced_train_data'].replace('s3://', 's3a://')
+    print(s3_output_balanced_train_data)
+
+    s3_output_balanced_train_data = args['s3_output_balanced_train_data'].replace('s3://', 's3a://')
+    print(s3_output_balanced_train_data)
+
+
+    transform(spark, s3_input_balanced_train_data, s3_output_balanced_train_data)
+    transform(spark, s3_input_balanced_validation_data, s3_output_balanced_validation_data)
+    transform(spark, s3_input_balanced_test_data, s3_output_balanced_test_data)
+
 
 if __name__ == "__main__":
     main()
