@@ -53,7 +53,10 @@ Select `Create notebook instance`.
 
 In the Notebook instance name text box, enter a name for the notebook instance.
 
-![Fill notebook instance](img/setup_fill_notebook.png)
+<!--- ![Fill notebook instance](img/setup_fill_notebook.png) --->
+![Fill notebook instance](img/notebook-setup01.png)
+![Fill notebook instance](img/notebook-setup02.png)
+![Fill notebook instance](img/notebook-setup03.png)
 
 For this workshop select `workshop` as the instance name.
 
