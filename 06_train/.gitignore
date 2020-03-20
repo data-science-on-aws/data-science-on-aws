@@ -1,3 +1,7 @@
+cache/
+data/
+outputs/
+runs/
 models/
 generated_module/
 notebooks/
