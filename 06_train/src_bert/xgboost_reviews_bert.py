@@ -1,0 +1,139 @@
+import os
+import argparse
+import csv
+import pickle as pkl
+import pandas as pd
+from sklearn.metrics import accuracy_score, precision_score, classification_report, confusion_matrix
+import sklearn
+from sklearn import metrics
+from sklearn.base import BaseEstimator, TransformerMixin
+import nltk
+import re
+import xgboost as xgb
+from xgboost import XGBClassifier
+import glob
+from simpletransformers.classification import ClassificationModel
+
+# Note:  header=None
+def load_dataset(path, sep, header):
+    data = pd.concat([pd.read_csv(f, sep=sep, header=header) for f in glob.glob('{}/*.csv'.format(path))], ignore_index = True)
+
+    labels = data.iloc[:,0]
+    features = data.drop(data.columns[0], axis=1)
+    
+    if header==None:
+        # Adjust the column names after dropped the 0th column above
+        # New column names are 0 (inclusive) to len(features.columns) (exclusive)
+        new_column_names = list(range(0, len(features.columns)))
+        features.columns = new_column_names
+
+    return features, labels
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--model-type', type=str, default='bert')
+    parser.add_argument('--model-name', type=str, default='bert-base-cased')
+    parser.add_argument('--use-cuda', type=bool, default=False)
+    parser.add_argument('--train-data', type=str, default=os.environ['SM_CHANNEL_TRAIN'])
+    parser.add_argument('--validation-data', type=str, default=os.environ['SM_CHANNEL_VALIDATION'])
+    parser.add_argument('--model-dir', type=str, default=os.environ['SM_MODEL_DIR'])
+
+    args, _ = parser.parse_known_args()   
+    model_type = args.model_type
+    model_name = args.model_name
+    usa_cuda = args.use_cuda
+    train_data = args.train_data
+    validation_data = args.validation_data    
+    model_dir = args.model_dir
+    
+#    X_train, y_train = load_dataset(train_data, ',', header=None)
+#    X_validation, y_validation = load_dataset(validation_data, ',', header=None)
+
+    df = pd.read_csv('./data/amazon_reviews_us_Digital_Software_v1_00.tsv.gz', 
+                 delimiter='\t', 
+                 quoting=csv.QUOTE_NONE,
+                 compression='gzip')
+
+    # Enrich the data
+    df['is_positive_sentiment'] = (df['star_rating'] >= 4).astype(int)
+
+    df_bert = df[['review_body', 'is_positive_sentiment']]
+    df_bert.columns = ['text', 'labels']
+    df_bert.head(5)
+
+    df_bert = df_bert[:2000]
+    df_bert.shape
+
+    from sklearn.model_selection import train_test_split
+
+    df_bert_train, df_bert_holdout = train_test_split(df_bert, test_size=0.10)
+    df_bert_validation, df_bert_test = train_test_split(df_bert_holdout, test_size=0.50)
+
+    print(df_bert_train.shape)
+    print(df_bert_validation.shape)
+    print(df_bert_test.shape)
+
+    args = {
+       'output_dir': 'outputs/',
+       'cache_dir': 'cache/',
+       'fp16': False,
+       'max_seq_length': 128,
+       'train_batch_size': 8,
+       'eval_batch_size': 8,
+       'gradient_accumulation_steps': 1,
+       'num_train_epochs': 1,
+       'weight_decay': 0,
+       'learning_rate': 3e-5,
+       'adam_epsilon': 1e-8,
+       'warmup_ratio': 0.06,
+       'warmup_steps': 0,
+       'max_grad_norm': 1.0,
+       'logging_steps': 50,
+       'evaluate_during_training': False,
+       'save_steps': 2000,
+       'eval_all_checkpoints': True,
+       'use_tensorboard': True,
+       'tensorboard_dir': 'tensorboard',
+       'overwrite_output_dir': True,
+       'reprocess_input_data': False,
+    }
+
+    bert_model = ClassificationModel(model_type='distilbert', # bert, distilbert, etc, etc.
+                                     model_name='distilbert-base-cased',
+                                     args=args,
+                                     use_cuda=False)
+
+    bert_model.train_model(train_df=df_bert_train,
+                       eval_df=df_bert_validation,
+                       show_running_loss=True)
+
+    # TODO:  use the model_dir that is passed in through args
+    #        (currently SM_MODEL_DIR)
+    os.makedirs(model_dir, exist_ok=True)
+    model_path = os.path.join(model_dir, 'bert-model')
+
+    pkl.dump(bert_model, open(model_path, 'wb'))
+    print('Wrote model to {}'.format(model_path))
+   
+    result, model_outputs, wrong_predictions = bert_model.eval_model(eval_df=df_bert_test, acc=sklearn.metrics.accuracy_score)
+
+    print(result)
+
+    # Show bad predictions
+    print('Number of wrong predictions: {}'.format(len(wrong_predictions)))
+    print('\n')
+
+    for prediction in wrong_predictions:
+        print(prediction.text_a)
+        print('\n')
+
+    predictions, raw_outputs = bert_model.predict(["""I really enjoyed this item.  I highly recommend it."""])
+
+    print('Predictions: {}'.format(predictions))
+    print('Raw outputs: {}'.format(raw_outputs))
+
+    predictions, raw_outputs = bert_model.predict(["""This item is awful and terrible."""])
+
+    print('Predictions: {}'.format(predictions))
+    print('Raw outputs: {}'.format(raw_outputs))

@@ -1,8 +1,8 @@
+tensorboard/
 amazon-reviews-spark-processor-*/
 cache/
 data/
 outputs/
-runs/
 models/
 generated_module/
 notebooks/
