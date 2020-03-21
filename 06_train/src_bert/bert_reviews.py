@@ -9,12 +9,11 @@ from sklearn import metrics
 from sklearn.base import BaseEstimator, TransformerMixin
 import re
 import glob
-
+import json
 import subprocess
 import sys
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'simpletransformers'])
-
-
+import torch
 import simpletransformers
 from simpletransformers.classification import ClassificationModel
 
@@ -43,46 +42,45 @@ if __name__ == '__main__':
     parser.add_argument('--train-data', type=str, default=os.environ['SM_CHANNEL_TRAIN'])
     parser.add_argument('--validation-data', type=str, default=os.environ['SM_CHANNEL_VALIDATION'])
     parser.add_argument('--model-dir', type=str, default=os.environ['SM_MODEL_DIR'])
+    parser.add_argument('--hosts', type=list, default=json.loads(os.environ['SM_HOSTS']))
+    parser.add_argument('--current-host', type=str, default=os.environ['SM_CURRENT_HOST'])
+    parser.add_argument('--num-gpus', type=int, default=os.environ['SM_NUM_GPUS'])
 
     args, _ = parser.parse_known_args()   
     model_type = args.model_type
     model_name = args.model_name
+#    use_cuda = args.use_cuda
     backend = args.backend
     train_data = args.train_data
-    validation_data = args.validation_data    
+    validation_data = args.validation_data
     model_dir = args.model_dir
+    hosts = args.hosts
+    current_host = args.current_host
+    num_gpus = args.num_gpus
 
 ################
 # From https://github.com/aws/sagemaker-python-sdk/issues/1110
-#    is_distributed = len(args.hosts) > 1 and args.backend is not None
-#    logger.debug("Distributed training - {}".format(is_distributed))
-#    use_cuda = args.num_gpus > 0
-#    logger.debug("Number of gpus available - {}".format(args.num_gpus))
-#    kwargs = {'num_workers': 1, 'pin_memory': True} if use_cuda else {}
-#    device = torch.device("cuda" if use_cuda else "cpu")
-#
-#    if is_distributed:
-#        # Initialize the distributed environment.
-#        world_size = len(args.hosts)
-#        os.environ['WORLD_SIZE'] = str(world_size)
-#        host_rank = args.hosts.index(args.current_host)
-#        os.environ['RANK'] = str(host_rank)
-#        dist.init_process_group(backend=args.backend, rank=host_rank, world_size=world_size)
-#        logger.info('Initialized the distributed environment: \'{}\' backend on {} nodes. '.format(
-#            args.backend, dist.get_world_size()) + 'Current host rank is {}. Number of gpus: {}'.format(
-#            dist.get_rank(), args.num_gpus))
+    is_distributed = len(args.hosts) > 1 and args.backend is not None
+    print('Distributed training - {}'.format(is_distributed))
+    use_cuda = args.num_gpus > 0
+    print('Number of gpus available - {}'.format(args.num_gpus))
+    kwargs = {'num_workers': 1, 'pin_memory': True} if use_cuda else {}
+    device = torch.device("cuda" if use_cuda else "cpu")
+
+    if is_distributed:
+        # Initialize the distributed environment.
+        world_size = len(args.hosts)
+        os.environ['WORLD_SIZE'] = str(world_size)
+        host_rank = args.hosts.index(args.current_host)
+        os.environ['RANK'] = str(host_rank)
+        dist.init_process_group(backend=args.backend, rank=host_rank, world_size=world_size)
+        print('Initialized the distributed environment: \'{}\' backend on {} nodes. '.format(
+            args.backend, dist.get_world_size()) + 'Current host rank is {}. Number of gpus: {}'.format(
+            dist.get_rank(), args.num_gpus))
 ###############
 
-#    if args.distributed:
-#        # Initialize the distributed environment.
-#        world_size = len(args.hosts)
-#        os.environ['WORLD_SIZE'] = str(world_size)
-#        host_rank = args.hosts.index(args.current_host)
-#        dist.init_process_group(backend=backend, rank=host_rank)
-    
 #    X_train, y_train = load_dataset(train_data, ',', header=None)
 #    X_validation, y_validation = load_dataset(validation_data, ',', header=None)
-
 
     # TODO:  Change this to use SM_CHANNEL_TRAIN, etc
 
