@@ -135,7 +135,7 @@ if __name__ == '__main__':
     bert_model = ClassificationModel(model_type='distilbert', # bert, distilbert, etc, etc.
                                      model_name='distilbert-base-cased',
                                      args=bert_args,
-                                     use_cuda=False)
+                                     use_cuda=use_cuda)
 
     bert_model.train_model(train_df=df_bert_train,
                        eval_df=df_bert_validation,
