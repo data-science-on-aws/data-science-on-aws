@@ -1,2 +1,5 @@
+data/
+cache/
+outputs/
+tensorboard/
 bert-model
-xgboost_reviews_pipeline.pkl
