@@ -14,6 +14,7 @@ import subprocess
 import sys
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'simpletransformers'])
 import torch
+import torch.distributed as dist
 import torch.utils.data
 import torch.utils.data.distributed
 
