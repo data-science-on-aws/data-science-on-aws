@@ -21,13 +21,12 @@ import torch.utils.data.distributed
 import simpletransformers
 from simpletransformers.classification import ClassificationModel
 
-# Note:  header=None
 def load_dataset(path, sep, header):
     data = pd.concat([pd.read_csv(f, sep=sep, header=header) for f in glob.glob('{}/*.csv'.format(path))], ignore_index = True)
 
     labels = data.iloc[:,0]
     features = data.drop(data.columns[0], axis=1)
-    
+
     if header==None:
         # Adjust the column names after dropped the 0th column above
         # New column names are 0 (inclusive) to len(features.columns) (exclusive)
@@ -41,7 +40,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--model-type', type=str, default='bert')
     parser.add_argument('--model-name', type=str, default='bert-base-cased')
-    parser.add_argument('--use-cuda', type=bool, default=False)
     parser.add_argument('--backend', type=str, default='gloo')
     parser.add_argument('--train-data', type=str, default=os.environ['SM_CHANNEL_TRAIN'])
     parser.add_argument('--validation-data', type=str, default=os.environ['SM_CHANNEL_VALIDATION'])
@@ -53,7 +51,6 @@ if __name__ == '__main__':
     args, _ = parser.parse_known_args()   
     model_type = args.model_type
     model_name = args.model_name
-#    use_cuda = args.use_cuda
     backend = args.backend
     train_data = args.train_data
     validation_data = args.validation_data
@@ -62,8 +59,7 @@ if __name__ == '__main__':
     current_host = args.current_host
     num_gpus = args.num_gpus
 
-################
-# From https://github.com/aws/sagemaker-python-sdk/issues/1110
+    # From https://github.com/aws/sagemaker-python-sdk/issues/1110
     is_distributed = len(args.hosts) > 1 and args.backend is not None
     print('Distributed training - {}'.format(is_distributed))
     use_cuda = args.num_gpus > 0
@@ -81,12 +77,10 @@ if __name__ == '__main__':
         print('Initialized the distributed environment: \'{}\' backend on {} nodes. '.format(
             args.backend, dist.get_world_size()) + 'Current host rank is {}. Number of gpus: {}'.format(
             dist.get_rank(), args.num_gpus))
-###############
-
-#    X_train, y_train = load_dataset(train_data, ',', header=None)
-#    X_validation, y_validation = load_dataset(validation_data, ',', header=None)
 
     # TODO:  Change this to use SM_CHANNEL_TRAIN, etc
+    # X_train, y_train = load_dataset(train_data, ',', header=0)
+    # X_validation, y_validation = load_dataset(validation_data, ',', header=0)
 
     df = pd.read_csv('./data/amazon_reviews_us_Digital_Software_v1_00.tsv.gz', 
                  delimiter='\t', 
