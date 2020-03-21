@@ -14,6 +14,9 @@ import subprocess
 import sys
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'simpletransformers'])
 import torch
+import torch.utils.data
+import torch.utils.data.distributed
+
 import simpletransformers
 from simpletransformers.classification import ClassificationModel
 
