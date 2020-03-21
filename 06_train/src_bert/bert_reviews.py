@@ -110,8 +110,9 @@ if __name__ == '__main__':
     print(df_bert_validation.shape)
     print(df_bert_test.shape)
 
-    args = {
-       'output_dir': 'outputs/',
+    # TODO:  change output_dir to SM_model_dir or output_path
+    bert_args = {
+       'output_dir': model_dir, 
        'cache_dir': 'cache/',
        'fp16': False,
        'max_seq_length': 128,
@@ -137,7 +138,7 @@ if __name__ == '__main__':
 
     bert_model = ClassificationModel(model_type='distilbert', # bert, distilbert, etc, etc.
                                      model_name='distilbert-base-cased',
-                                     args=args,
+                                     args=bert_args,
                                      use_cuda=False)
 
     bert_model.train_model(train_df=df_bert_train,
@@ -146,11 +147,11 @@ if __name__ == '__main__':
 
     # TODO:  use the model_dir that is passed in through args
     #        (currently SM_MODEL_DIR)
-    os.makedirs(model_dir, exist_ok=True)
-    model_path = os.path.join(model_dir, 'bert-model')
+#    os.makedirs(model_dir, exist_ok=True)
+#    model_path = os.path.join(model_dir, 'bert-model')
 
-    pkl.dump(bert_model, open(model_path, 'wb'))
-    print('Wrote model to {}'.format(model_path))
+#    pkl.dump(bert_model, open(model_path, 'wb'))
+#    print('Wrote model to {}'.format(model_path))
    
     result, model_outputs, wrong_predictions = bert_model.eval_model(eval_df=df_bert_test, acc=sklearn.metrics.accuracy_score)
 
