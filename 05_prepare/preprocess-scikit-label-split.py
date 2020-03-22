@@ -85,8 +85,9 @@ def process(args):
 
         df_unbalanced_raw.head(5)
 
-        df_is_positive_sentiment = (df_unbalanced_raw['star_rating'] >= 4).astype(int)
-        df_unbalanced_raw.insert(0, 'is_positive_sentiment', df_is_positive_sentiment)
+        df_unbalanced_raw['is_positive_sentiment'] = (df_unbalanced_raw['star_rating'] >= 4).astype(int)            
+#        df_is_positive_sentiment = (df_unbalanced_raw['star_rating'] >= 4).astype(int)
+#        df_unbalanced_raw.insert(0, 'is_positive_sentiment', df_is_positive_sentiment)
         df_unbalanced_raw.shape
 
         # Split train, test, validation
