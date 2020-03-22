@@ -69,14 +69,18 @@ def process(args):
 
     # This would print all the files and directories
     for file in glob.glob('{}/*.tsv.gz'.format(args.input_data)):
-        print(file)
+      print(file)
 
-        filename_without_extension = Path(Path(file).stem).stem
-        
-        df = pd.read_csv(file, 
-                         delimiter='\t', 
-                         quoting=csv.QUOTE_NONE,
-                         compression='gzip')
+      filename_without_extension = Path(Path(file).stem).stem
+      
+      # chunksize=100 seems to work well 
+      df_reader = pd.read_csv(file, 
+                              delimiter='\t', 
+                              quoting=csv.QUOTE_NONE,
+                              compression='gzip',
+                              chunksize=100)
+
+      for df in df_reader:
         df.shape
         df.head(5)
 
@@ -93,7 +97,8 @@ def process(args):
         # TODO:  increase batch size and run through all the data
         ###########        
 
-        batch_1 = df[['review_body', 'is_positive_sentiment']][:100]
+        # Note:  we need to keep this at size 100
+        batch_1 = df[['review_body', 'is_positive_sentiment']]
         batch_1.shape
         batch_1.head(5)
 
