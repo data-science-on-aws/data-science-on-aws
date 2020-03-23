@@ -10,6 +10,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 import re
 import glob
 import json
+import numpy as np
 import subprocess
 import sys
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'simpletransformers'])
@@ -59,7 +60,9 @@ if __name__ == '__main__':
     current_host = args.current_host
     num_gpus = args.num_gpus
 
-    # From https://github.com/aws/sagemaker-python-sdk/issues/1110
+    # TODO:  Convert to distributed data loader
+    #        https://pytorch.org/tutorials/beginner/aws_distributed_training_tutorial.html
+    #        https://github.com/aws/sagemaker-python-sdk/issues/1110
     is_distributed = len(args.hosts) > 1 and args.backend is not None
     print('Distributed training - {}'.format(is_distributed))
     use_cuda = args.num_gpus > 0
@@ -78,14 +81,29 @@ if __name__ == '__main__':
             args.backend, dist.get_world_size()) + 'Current host rank is {}. Number of gpus: {}'.format(
             dist.get_rank(), args.num_gpus))
 
-    # TODO:  Change this to use SM_CHANNEL_TRAIN, etc
+    # TODO:  Change this to use SM_CHANNEL_TRAIN and DistributedDataLoader, etc
     # X_train, y_train = load_dataset(train_data, ',', header=0)
     # X_validation, y_validation = load_dataset(validation_data, ',', header=0)
 
-    df = pd.read_csv('./data/amazon_reviews_us_Digital_Software_v1_00.tsv.gz', 
+    df1 = pd.read_csv('./data/amazon_reviews_us_Digital_Software_v1_00.tsv.gz', 
                  delimiter='\t', 
                  quoting=csv.QUOTE_NONE,
-                 compression='gzip')
+                 compression='gzip',
+                 header=0)
+    print(df1.shape)
+
+    df2 = pd.read_csv('./data/amazon_reviews_us_Video_Games_v1_00.tsv.gz',
+                 delimiter='\t', 
+                 quoting=csv.QUOTE_NONE,
+                 compression='gzip', 
+                 header=0)
+    print(df2.shape)
+
+    df = pd.concat([df1, df2])
+
+    print('YES: {}'.format(df.isna().values.any()))
+    df = df.dropna()
+    df = df.reset_index(drop=True)
 
     # Enrich the data
     df['is_positive_sentiment'] = (df['star_rating'] >= 4).astype(int)
@@ -94,7 +112,9 @@ if __name__ == '__main__':
     df_bert.columns = ['text', 'labels']
     df_bert.head(5)
 
-    df_bert = df_bert[:2000]
+    print(df_bert.shape)
+
+    df_bert = df_bert #[:200100]
     df_bert.shape
 
     from sklearn.model_selection import train_test_split
@@ -138,8 +158,8 @@ if __name__ == '__main__':
                                      use_cuda=use_cuda)
 
     bert_model.train_model(train_df=df_bert_train,
-                       eval_df=df_bert_validation,
-                       show_running_loss=True)
+                           eval_df=df_bert_validation,
+                           show_running_loss=True)
 
     # TODO:  use the model_dir that is passed in through args
     #        (currently SM_MODEL_DIR)
@@ -149,24 +169,24 @@ if __name__ == '__main__':
 #    pkl.dump(bert_model, open(model_path, 'wb'))
 #    print('Wrote model to {}'.format(model_path))
    
-    result, model_outputs, wrong_predictions = bert_model.eval_model(eval_df=df_bert_test, acc=sklearn.metrics.accuracy_score)
+#    result, model_outputs, wrong_predictions = bert_model.eval_model(eval_df=df_bert_test, acc=sklearn.metrics.accuracy_score)
 
-    print(result)
+#    print(result)
 
     # Show bad predictions
-    print('Number of wrong predictions: {}'.format(len(wrong_predictions)))
-    print('\n')
+#    print('Number of wrong predictions: {}'.format(len(wrong_predictions)))
+#    print('\n')
 
-    for prediction in wrong_predictions:
-        print(prediction.text_a)
-        print('\n')
+#    for prediction in wrong_predictions:
+#        print(prediction.text_a)
+#        print('\n')
 
-    predictions, raw_outputs = bert_model.predict(["""I really enjoyed this item.  I highly recommend it."""])
+#    predictions, raw_outputs = bert_model.predict(["""I really enjoyed this item.  I highly recommend it."""])
 
-    print('Predictions: {}'.format(predictions))
-    print('Raw outputs: {}'.format(raw_outputs))
+#    print('Predictions: {}'.format(predictions))
+#    print('Raw outputs: {}'.format(raw_outputs))
 
-    predictions, raw_outputs = bert_model.predict(["""This item is awful and terrible."""])
+#    predictions, raw_outputs = bert_model.predict(["""This item is awful and terrible."""])
 
-    print('Predictions: {}'.format(predictions))
-    print('Raw outputs: {}'.format(raw_outputs))
+#    print('Predictions: {}'.format(predictions))
+#    print('Raw outputs: {}'.format(raw_outputs))
