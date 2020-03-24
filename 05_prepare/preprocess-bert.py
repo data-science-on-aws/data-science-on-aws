@@ -6,8 +6,8 @@ from datetime import datetime
 import subprocess
 import sys
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow==1.15.2'])
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow-hub'])
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'bert-tensorflow'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow-hub==0.7.0'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'bert-tensorflow==1.0.1'])
 
 import tensorflow as tf
 import tensorflow_hub as hub
@@ -190,31 +190,18 @@ def process(args):
         # We'll set sequences to be at most 128 tokens long.
         MAX_SEQ_LENGTH = 128
 
-        train_data = '{}/bert/labeled/split/balanced/header/train/part-{}-{}.csv'.format(args.output_data, args.current_host, filename_without_extension)
-        validation_data = '{}/bert/labeled/split/balanced/header/validation/part-{}-{}.csv'.format(args.output_data, args.current_host, filename_without_extension)
-        test_data = '{}/bert/labeled/split/balanced/header/test/part-{}-{}.csv'.format(args.output_data, args.current_host, filename_without_extension)
+        train_data = '{}/bert/labeled/split/balanced/header/train'.format(args.output_data)
+        validation_data = '{}/bert/labeled/split/balanced/header/validation'.format(args.output_data, args.current_host, filename_without_extension)
+        test_data = '{}/bert/labeled/split/balanced/header/test'.format(args.output_data, args.current_host, filename_without_extension)
 
-        # Convert our train and test features to InputFeatures that BERT understands.
-        df_train_embeddings = bert.run_classifier.file_based_convert_examples_to_features(train_InputExamples, LABEL_VALUES, MAX_SEQ_LENGTH, tokenizer, train_data)
-        df_validation_embeddings = bert.file_based_run_classifier.convert_examples_to_features(validation_InputExamples, LABEL_VALUES, MAX_SEQ_LENGTH, tokenizer, validation_data)
-        df_test_embeddings = bert.file_based_run_classifier.convert_examples_to_features(test_InputExamples, LABEL_VALUES, MAX_SEQ_LENGTH, tokenizer, test_data)
+        # Convert our train and validation features to InputFeatures (.tfrecord protobuf) that works with BERT and TensorFlow.
+        df_train_embeddings = bert.run_classifier.file_based_convert_examples_to_features(train_InputExamples, LABEL_VALUES, MAX_SEQ_LENGTH, tokenizer, '{}/part-{}-{}.tfrecord'.format(train_data, args.current_host, filename_without_extension))
+
+        df_validation_embeddings = bert.run_classifier.file_based_convert_examples_to_features(validation_InputExamples, LABEL_VALUES, MAX_SEQ_LENGTH, tokenizer, '{}/part-{}-{}.tfrecord'.format(validation_data, args.current_host, filename_without_extension))
+
+        df_test_embeddings = bert.run_classifier.file_based_convert_examples_to_features(test_InputExamples, LABEL_VALUES, MAX_SEQ_LENGTH, tokenizer, '{}/part-{}-{}.tfrecord'.format(test_data, args.current_host, filename_without_extension))
         
-#         print('Creating directory {}'.format(train_data))
-#         os.makedirs(train_data, exist_ok=True)
-#         print('Writing to {}/part-{}-{}.csv'.format(train_data, args.current_host, filename_without_extension))
-#         df_train_embeddings.to_csv('{}/part-{}-{}.csv'.format(train_data, args.current_host, filename_without_extension), sep=',', index=False, header=True)
-
-#         print('Creating directory {}'.format(validation_data))
-#         os.makedirs(validation_data, exist_ok=True)
-#         print('Writing to {}/part-{}-{}.csv'.format(validation_data, args.current_host, filename_without_extension))      
-#         df_validation_embeddings.to_csv('{}/part-{}-{}.csv'.format(validation_data, args.current_host, filename_without_extension), sep=',', index=False, header=True)
-
-#         print('Creating directory {}'.format(test_data))
-#         os.makedirs(test_data, exist_ok=True)
-#         print('Writing to {}/part-{}-{}.csv'.format(test_data, args.current_host, filename_without_extension))
-#         df_test_embeddings.to_csv('{}/part-{}-{}.csv'.format(test_data, args.current_host, filename_without_extension), sep=',', index=False, header=True)
-
-
+                                                                                         
     print('Listing contents of {}'.format(args.output_data))
     dirs_output = os.listdir(args.output_data)
     for file in dirs_output:

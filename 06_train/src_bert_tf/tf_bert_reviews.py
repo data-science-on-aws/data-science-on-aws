@@ -5,9 +5,13 @@ import pandas as pd
 from datetime import datetime
 import subprocess
 import sys
+
+# We should remove this once the bug is fixed.
+import subprocess
+import sys
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow==1.15.2'])
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow-hub'])
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'bert-tensorflow'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow-hub==0.7.0'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'bert-tensorflow==1.0.1'])
 
 import tensorflow as tf
 import tensorflow_hub as hub
@@ -258,7 +262,6 @@ if __name__ == '__main__':
     current_time = datetime.now()
     estimator.train(input_fn=train_input_fn, max_steps=num_train_steps)
     print("Training took time ", datetime.now() - current_time)
-
     
     validation_data_filenames = print(glob.glob('{}/*'.format(train_data)))
 
