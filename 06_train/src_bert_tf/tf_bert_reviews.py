@@ -41,6 +41,9 @@ from pathlib import Path
 MAX_SEQ_LENGTH = 128
 LABEL_VALUES = [0, 1]
 
+# TODO:  Pass this into the processor
+BERT_MODEL_HUB = "https://tfhub.dev/google/bert_uncased_L-12_H-768_A-12/1"
+
 def create_model(is_predicting, input_ids, input_mask, segment_ids, labels,
                  num_labels):
     """Creates a classification model."""
@@ -249,8 +252,9 @@ if __name__ == '__main__':
 
     # Next we create an input builder function that takes our training feature set (`train_features`) and produces a generator. This is a pretty standard design pattern for working with Tensorflow [Estimators](https://www.tensorflow.org/guide/estimators).
 
-    train_data_filenames = print(glob.glob('{}/*'.format(train_data)))
-
+    train_data_filenames = glob.glob('{}/*.tfrecord'.format(train_data))
+    print(train_data_filenames)
+    
     # Create an input function for training. drop_remainder = True for using TPUs.
     train_input_fn = bert.run_classifier.file_based_input_fn_builder(
         train_data_filenames,
@@ -263,12 +267,12 @@ if __name__ == '__main__':
     estimator.train(input_fn=train_input_fn, max_steps=num_train_steps)
     print("Training took time ", datetime.now() - current_time)
     
-    validation_data_filenames = print(glob.glob('{}/*'.format(train_data)))
+    validation_data_filenames = glob.glob('{}/*.tfrecord'.format(validation_data))
 
     validation_input_fn = bert.run_classifier.file_based_input_fn_builder(
         validation_data_filenames,
         seq_length=MAX_SEQ_LENGTH,
-        is_training=True,
+        is_training=False,
         drop_remainder=False)
 
     # Now let's use our test data to see how well our model did:
