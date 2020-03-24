@@ -37,7 +37,7 @@ Double-check that your account name is something like `TeamRole/MasterKey` as fo
 
 If not, please logout of your AWS Console in all browser tabs and re-run the steps above!
 
-# 4. Launch an Amazon SageMaker Notebook Instance
+# 3. Launch an Amazon SageMaker Notebook Instance
 
 Open the [AWS Management Console](https://console.aws.amazon.com/console/home)
 
@@ -53,7 +53,7 @@ Select `Create notebook instance`.
 
 In the Notebook instance name text box, enter a name for the notebook instance.
 
-![Fill notebook instance](img/setup_fill_notebook.png)
+<!--- ![Fill notebook instance](img/setup_fill_notebook.png) --->
 
 For this workshop select `workshop` as the instance name.
 
@@ -61,15 +61,21 @@ Choose `ml.c5.2xlarge`. We'll only be using this instance to launch jobs. The tr
 
 Volume size `250` - this is needed to explore datasets, build docker containers, and more.  During training data is copied directly from Amazon S3 to the training cluster when using SageMaker.  When using Amazon EKS, we'll setup a distributed file system that worker nodes will use to get access to training data.
 
+![Fill notebook instance](img/notebook-setup01.png)
+
 In the IAM role box, select the default `TeamRole`.
+
+![Fill notebook instance](img/notebook-setup02.png)
 
 You must select the default `VPC`, `Subnet`, and `Security group` as shown in the screenshow.  Your values will likely be different.  This is OK.
 
 Keep the default settings for the other options not highlighted in red, and click `Create notebook instance`.  On the `Notebook instances` section you should see the status change from `Pending` -> `InService`
 
+![Fill notebook instance](img/notebook-setup03.png)
+
 While the notebook spins up, continue to work on the next section.  We'll come back to the notebook when it's ready.
 
-# 5. Update IAM Role Policy
+# 4. Update IAM Role Policy
 
 Click on the notebook instance to see the instance details.
 
@@ -87,19 +93,19 @@ _Note:  Never do this in your production account.  Please follow a least-privile
 
 ![Attach Admin Policy](img/attach_admin_policy.png)
 
-# 6. Start the Jupyter notebook
+# 5. Start the Jupyter notebook
 
 _Note:  Proceed when the status of the notebook instance changes from `Pending` to `InService`._
 
 ![Start Jupyter](img/start_jupyter.png)
 
-# 7. Launch a new Terminal within the Jupyter notebook
+# 6. Launch a new Terminal within the Jupyter notebook
 
 Click `File` > `New` > `Terminal` to launch a terminal in your Jupyter instance.
 
 ![](img/launch_jupyter_terminal.png)
 
-# 8. Clone this Workshop content in the terminal
+# 7. Clone this Workshop content in the terminal
 
 Within the Jupyter terminal, run the following:
 ```
@@ -108,7 +114,7 @@ cd ~/SageMaker
 git clone https://github.com/data-science-on-aws/workshop
 ```
 
-# 9. Start the Workshop
+# 8. Start the Workshop
 Navigate to `01_setup/` in your Jupyter notebook to start the workshop.
 
 ![Start Workshop](img/start_workshop.png)
