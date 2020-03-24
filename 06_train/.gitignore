@@ -1,3 +1,4 @@
+output/
 tensorboard/
 amazon-reviews-spark-processor-*/
 cache/
