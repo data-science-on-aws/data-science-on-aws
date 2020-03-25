@@ -283,13 +283,13 @@ if __name__ == '__main__':
 #     estimator.evaluate(input_fn=validation_input_fn, steps=None)
 #     print('End Validating!')
     
-#     # Now let's write code to make predictions on new sentences:
-#     pred_sentences = [
-#       "That movie was absolutely awful",
-#       "The acting was a bit lacking",
-#       "The film was creative and surprising",
-#       "Absolutely fantastic!"
-#     ]
+    # Now let's write code to make predictions on new sentences:
+    pred_sentences = [
+      "That movie was absolutely awful",
+      "The acting was a bit lacking",
+      "The film was creative and surprising",
+      "Absolutely fantastic!"
+    ]
 
     print('Begin Predicting!')
     predictions = predict(pred_sentences)
