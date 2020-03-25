@@ -88,9 +88,9 @@ def create_tokenizer_from_hub_module():
 def process(args):
     print('Current host: {}'.format(args.current_host))
     
-    train_output_data = None
-    validation_output_data = None
-    test_output_data = None
+    train_data = None
+    validation_data = None
+    test_data = None
 
     # This would print all the files and directories
     for file in glob.glob('{}/*.tsv.gz'.format(args.input_data)):
@@ -107,36 +107,37 @@ def process(args):
         df = df.dropna()
         df = df.reset_index(drop=True)
         
-        df['is_positive_sentiment'] = (df['star_rating'] >= 4).astype(int) 
-        df.shape
-        df.head(5)  
+#         df['is_positive_sentiment'] = (df['star_rating'] >= 4).astype(int) 
+#         df.shape
+#         df.head(5)  
 
-        # Balance the Dataset between Classes
-        is_negative_sentiment_df = df.query('is_positive_sentiment == 0')
-        is_positive_sentiment_df = df.query('is_positive_sentiment == 1')
+#         # Balance the Dataset between Classes
+#         is_negative_sentiment_df = df.query('is_positive_sentiment == 0')
+#         is_positive_sentiment_df = df.query('is_positive_sentiment == 1')
 
-        # TODO:  check which sentiment has the least number of samples
-        is_positive_downsampled_df = resample(is_positive_sentiment_df,
-                                      replace = False,
-                                      n_samples = len(is_negative_sentiment_df),
-                                      random_state = 27)
+#         # TODO:  check which sentiment has the least number of samples
+#         is_positive_downsampled_df = resample(is_positive_sentiment_df,
+#                                       replace = False,
+#                                       n_samples = len(is_negative_sentiment_df),
+#                                       random_state = 27)
 
-        df_balanced = pd.concat([is_negative_sentiment_df, is_positive_downsampled_df])
-        df_balanced = df_balanced.reset_index(drop=True)
-        df_balanced.shape
-        df_balanced.head(5)
+#         df_balanced = pd.concat([is_negative_sentiment_df, is_positive_downsampled_df])
+#         df_balanced = df_balanced.reset_index(drop=True)
+#         df_balanced.shape
+#         df_balanced.head(5)
        
         # Split all data into 90% train and 10% holdout
-        df_train, df_holdout = train_test_split(df_balanced, test_size=0.9, stratify=df_balanced['is_positive_sentiment'])
-        df_validation, df_test = train_test_split(df_holdout, test_size=0.1, stratify=df_holdout['is_positive_sentiment'])
+        df_train, df_holdout = train_test_split(df, test_size=0.10, stratify=df['star_rating'])        
+        # Split holdout data into 50% validation and t0% test
+        df_validation, df_test = train_test_split(df_holdout, test_size=0.50, stratify=df_holdout['star_rating'])
 
         df_train = df_train.reset_index(drop=True)
         df_validation = df_validation.reset_index(drop=True)
         df_test = df_test.reset_index(drop=True)
         
         DATA_COLUMN = 'review_body'
-        LABEL_COLUMN = 'is_positive_sentiment'
-        LABEL_VALUES = [0, 1]
+        LABEL_COLUMN = 'star_rating'
+        LABEL_VALUES = [1, 2, 3, 4, 5]
 
         # #Data Preprocessing
         # We'll need to transform our data into a format BERT understands. This involves two steps. First, we create  `InputExample`'s using the constructor provided in the BERT library.
@@ -190,9 +191,9 @@ def process(args):
         # We'll set sequences to be at most 128 tokens long.
         MAX_SEQ_LENGTH = 128
 
-        train_data = '{}/bert/labeled/split/balanced/header/train'.format(args.output_data)
-        validation_data = '{}/bert/labeled/split/balanced/header/validation'.format(args.output_data, args.current_host, filename_without_extension)
-        test_data = '{}/bert/labeled/split/balanced/header/test'.format(args.output_data, args.current_host, filename_without_extension)
+        train_data = '{}/bert/train'.format(args.output_data)
+        validation_data = '{}/bert/validation'.format(args.output_data)
+        test_data = '{}/bert/test'.format(args.output_data)
 
         # Convert our train and validation features to InputFeatures (.tfrecord protobuf) that works with BERT and TensorFlow.
         df_train_embeddings = bert.run_classifier.file_based_convert_examples_to_features(train_InputExamples, LABEL_VALUES, MAX_SEQ_LENGTH, tokenizer, '{}/part-{}-{}.tfrecord'.format(train_data, args.current_host, filename_without_extension))

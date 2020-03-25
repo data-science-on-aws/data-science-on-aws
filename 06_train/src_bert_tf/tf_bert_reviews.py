@@ -39,7 +39,7 @@ from pathlib import Path
 # https://github.com/google-research/bert/blob/eedf5716ce1268e56f0a50264a88cafad334ac61/run_classifier.py#L479
 
 MAX_SEQ_LENGTH = 128
-LABEL_VALUES = [0, 1]
+LABEL_VALUES = [1, 2, 3, 4, 5]
 
 # TODO:  Pass this into the processor
 BERT_MODEL_HUB = "https://tfhub.dev/google/bert_uncased_L-12_H-768_A-12/1"
@@ -182,7 +182,7 @@ def model_fn_builder(num_labels, learning_rate, num_train_steps,
 
 
 def predict(in_sentences):
-    labels = ["Negative", "Positive"]
+    labels = ["1", "2", "3", "4", "5"]
     input_examples = [run_classifier.InputExample(guid="", text_a = x, text_b = None, label = 0) for x in in_sentences] # here, "" is just a dummy label
     input_features = run_classifier.convert_examples_to_features(input_examples, LABEL_VALUES, MAX_SEQ_LENGTH, tokenizer)
     predict_input_fn = run_classifier.input_fn_builder(features=input_features, seq_length=MAX_SEQ_LENGTH, is_training=False, drop_remainder=False)
@@ -262,29 +262,36 @@ if __name__ == '__main__':
         is_training=True,
         drop_remainder=False)
     
-    print(f'Beginning Training!')
+    print('Beginning Training!')
     current_time = datetime.now()
     estimator.train(input_fn=train_input_fn, max_steps=num_train_steps)
     print("Training took time ", datetime.now() - current_time)
+    print('Ending Training!')
+        
+#   TODO:  Figure out why this gets stuck    
+#
+#     print('Begin Validating!')
+#     validation_data_filenames = glob.glob('{}/*.tfrecord'.format(validation_data))
+#     print(validation_data_filenames)
+#     validation_input_fn = bert.run_classifier.file_based_input_fn_builder(
+#         validation_data_filenames,
+#         seq_length=MAX_SEQ_LENGTH,
+#         is_training=False,
+#         drop_remainder=False)
+
+#     # Now let's use our test data to see how well our model did:
+#     estimator.evaluate(input_fn=validation_input_fn, steps=None)
+#     print('End Validating!')
     
-    validation_data_filenames = glob.glob('{}/*.tfrecord'.format(validation_data))
+#     # Now let's write code to make predictions on new sentences:
+#     pred_sentences = [
+#       "That movie was absolutely awful",
+#       "The acting was a bit lacking",
+#       "The film was creative and surprising",
+#       "Absolutely fantastic!"
+#     ]
 
-    validation_input_fn = bert.run_classifier.file_based_input_fn_builder(
-        validation_data_filenames,
-        seq_length=MAX_SEQ_LENGTH,
-        is_training=False,
-        drop_remainder=False)
-
-    # Now let's use our test data to see how well our model did:
-    estimator.evaluate(input_fn=validation_input_fn, steps=None)
-
-    # Now let's write code to make predictions on new sentences:
-    pred_sentences = [
-      "That movie was absolutely awful",
-      "The acting was a bit lacking",
-      "The film was creative and surprising",
-      "Absolutely fantastic!"
-    ]
-
+    print('Begin Predicting!')
     predictions = predict(pred_sentences)
     print(predictions)
+    print('End Predicting!')
