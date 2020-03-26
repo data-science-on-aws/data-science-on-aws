@@ -181,14 +181,33 @@ def model_fn_builder(num_labels, learning_rate, num_train_steps,
   return model_fn
 
 
-# TODO:  create - or pass in - tokenizer in this functions
-# def predict(in_sentences):
-#     labels = ["1", "2", "3", "4", "5"]
-#     input_examples = [run_classifier.InputExample(guid="", text_a = x, text_b = None, label = 0) for x in in_sentences] # here, "" is just a dummy label
-#     input_features = run_classifier.convert_examples_to_features(input_examples, LABEL_VALUES, MAX_SEQ_LENGTH, tokenizer)
-#     predict_input_fn = run_classifier.input_fn_builder(features=input_features, seq_length=MAX_SEQ_LENGTH, is_training=False, drop_remainder=False)
-#     predictions = estimator.predict(predict_input_fn)
-#     return [(sentence, prediction['probabilities'], labels[prediction['labels']]) for sentence, prediction in zip(in_sentences, predictions)]
+def create_tokenizer_from_hub_module():
+    """Get the vocab file and casing info from the Hub module."""
+    with tf.Graph().as_default():
+        bert_module = hub.Module(BERT_MODEL_HUB)
+        tokenization_info = bert_module(signature="tokenization_info", as_dict=True)
+        with tf.Session() as sess:
+            vocab_file, do_lower_case = sess.run([tokenization_info["vocab_file"],
+                                                tokenization_info["do_lower_case"]])
+      
+        return bert.tokenization.FullTokenizer(vocab_file=vocab_file,
+                                               do_lower_case=do_lower_case)
+    
+    
+def predict(in_sentences):
+    labels = ["1", "2", "3", "4", "5"]
+
+    tokenizer = create_tokenizer_from_hub_module()
+    
+    input_examples = [run_classifier.InputExample(guid="", text_a = x, text_b = None, label = 0) for x in in_sentences] # here, "" is just a dummy label
+
+    input_features = run_classifier.convert_examples_to_features(input_examples, LABEL_VALUES, MAX_SEQ_LENGTH, tokenizer)
+
+    predict_input_fn = run_classifier.input_fn_builder(features=input_features, seq_length=MAX_SEQ_LENGTH, is_training=False, drop_remainder=False)
+
+    predictions = estimator.predict(predict_input_fn)
+
+    return [(sentence, prediction['probabilities'], labels[prediction['labels']]) for sentence, prediction in zip(in_sentences, predictions)]
 
 
 if __name__ == '__main__':
@@ -266,9 +285,10 @@ if __name__ == '__main__':
     print('Beginning Training!')
     current_time = datetime.now()
     estimator.train(input_fn=train_input_fn, max_steps=num_train_steps)
-    print("Training took time ", datetime.now() - current_time)
+    print('Training took time ', datetime.now() - current_time)
     print('Ending Training!')
         
+    print('Complete')
 #   TODO:  Figure out why this gets stuck    
 #
 #     print('Begin Validating!')
@@ -284,7 +304,7 @@ if __name__ == '__main__':
 #     estimator.evaluate(input_fn=validation_input_fn, steps=None)
 #     print('End Validating!')
     
-#     # Now let's write code to make predictions on new sentences:
+    # Now let's write code to make predictions on new sentences:
 #     pred_sentences = [
 #       "That movie was absolutely awful",
 #       "The acting was a bit lacking",
