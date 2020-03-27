@@ -83,9 +83,14 @@ def create_model(is_predicting, input_ids, input_mask, segment_ids, labels,
         log_probs = tf.nn.log_softmax(logits, axis=-1)
 
         # Convert labels into one-hot encoding
+        print('**** ONE HOT ENCODING THESE LABELS {}'.format(labels))
         one_hot_labels = tf.one_hot(labels, depth=num_labels, dtype=tf.float32)
-
+        print('**** ONE HOT ENCODINGS {}'.format(one_hot_labels))
+        
+        print('**** LOG_PROBS {} ****'.format(log_probs))
         predicted_labels = tf.squeeze(tf.argmax(log_probs, axis=-1, output_type=tf.int32))
+        print('**** PREDICTED LABELS {}'.format(predicted_labels))
+
         # If we're predicting, we want predicted labels and the probabiltiies.
         if is_predicting:
             return (predicted_labels, log_probs)
@@ -302,17 +307,17 @@ if __name__ == '__main__':
     print('Training took time ', datetime.now() - current_time)
     print('Ending Training!')
         
-        
     print('Starting Exporting!')
-    estimator.export_savedmodel('./tf-bert-model-oh-yeah/', serving_input_fn)
+    estimator.export_savedmodel('{}/tf-bert-model-oh-yeah/'.format(model_dir), serving_input_fn)
+    print('Listing contents of {}'.format(model_dir))
+    model_dir = os.listdir(model_dir)
+    for file in model_dir:
+        print(file)
     print('Ending Exporting!')
           
 #   TODO:  Figure out why this gets stuck    
-
     print('Begin Validating!')
 
-    # HACK:
-#    validation_date = train_data
     validation_data_filenames = glob.glob('{}/*.tfrecord'.format(validation_data))
     print(validation_data_filenames)
     validation_input_fn = amazon_run_classifier.file_based_input_fn_builder(
