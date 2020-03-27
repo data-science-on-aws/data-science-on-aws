@@ -39,7 +39,7 @@ from pathlib import Path
 # https://github.com/google-research/bert/blob/eedf5716ce1268e56f0a50264a88cafad334ac61/run_classifier.py#L479
 
 MAX_SEQ_LENGTH = 128
-LABEL_VALUES = [1, 2, 3, 4, 5]
+LABEL_VALUES = ['1', '2', '3', '4', '5']
 
 # TODO:  Pass this into the processor
 BERT_MODEL_HUB = "https://tfhub.dev/google/bert_uncased_L-12_H-768_A-12/1"
@@ -195,7 +195,7 @@ def create_tokenizer_from_hub_module():
     
     
 def predict(in_sentences):
-    labels = ["1", "2", "3", "4", "5"]
+    labels = ['1', '2', '3', '4', '5']
 
     tokenizer = create_tokenizer_from_hub_module()
     
@@ -208,6 +208,20 @@ def predict(in_sentences):
     predictions = estimator.predict(predict_input_fn)
 
     return [(sentence, prediction['probabilities'], labels[prediction['labels']]) for sentence, prediction in zip(in_sentences, predictions)]
+
+
+def serving_input_fn():
+    label_ids = tf.placeholder(tf.int32, [None], name='label_ids')
+    input_ids = tf.placeholder(tf.int32, [None, MAX_SEQ_LENGTH], name='input_ids')
+    input_mask = tf.placeholder(tf.int32, [None, MAX_SEQ_LENGTH], name='input_mask')
+    segment_ids = tf.placeholder(tf.int32, [None, MAX_SEQ_LENGTH], name='segment_ids')
+    input_fn = tf.estimator.export.build_raw_serving_input_receiver_fn({
+        'label_ids': label_ids,
+        'input_ids': input_ids,
+        'input_mask': input_mask,
+        'segment_ids': segment_ids,
+    })()
+    return input_fn
 
 
 if __name__ == '__main__':
@@ -288,6 +302,11 @@ if __name__ == '__main__':
     print('Training took time ', datetime.now() - current_time)
     print('Ending Training!')
         
+        
+    print('Starting Exporting!')
+    estimator.export_savedmodel('./tf-bert-model-oh-yeah/', serving_input_fn)
+    print('Ending Exporting!')
+          
     print('Complete')
 #   TODO:  Figure out why this gets stuck    
 #
@@ -305,14 +324,14 @@ if __name__ == '__main__':
 #     print('End Validating!')
     
     # Now let's write code to make predictions on new sentences:
-#     pred_sentences = [
-#       "That movie was absolutely awful",
-#       "The acting was a bit lacking",
-#       "The film was creative and surprising",
-#       "Absolutely fantastic!"
-#     ]
+    pred_sentences = [
+      "That movie was absolutely awful",
+      "The acting was a bit lacking",
+      "The film was creative and surprising",
+      "Absolutely fantastic!"
+    ]
 
-#     print('Begin Predicting!')
-#     predictions = predict(pred_sentences)
-#     print(predictions)
-#     print('End Predicting!')
+    print('Begin Predicting!')
+    predictions = predict(pred_sentences)
+    print(predictions)
+    print('End Predicting!')
