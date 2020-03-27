@@ -18,8 +18,8 @@ import tensorflow_hub as hub
 
 print(tf.__version__)
 
-import bert
-from bert import run_classifier
+import amazon_run_classifier
+#from bert import run_classifier
 from bert import optimization
 from bert import tokenization
 
@@ -115,7 +115,7 @@ def model_fn_builder(num_labels, learning_rate, num_train_steps,
       (loss, predicted_labels, log_probs) = create_model(
         is_predicting, input_ids, input_mask, segment_ids, label_ids, num_labels)
 
-      train_op = bert.optimization.create_optimizer(
+      train_op = optimization.create_optimizer(
           loss, learning_rate, num_train_steps, num_warmup_steps, use_tpu=False)
 
       # Calculate evaluation metrics. 
@@ -190,20 +190,20 @@ def create_tokenizer_from_hub_module():
             vocab_file, do_lower_case = sess.run([tokenization_info["vocab_file"],
                                                 tokenization_info["do_lower_case"]])
       
-        return bert.tokenization.FullTokenizer(vocab_file=vocab_file,
+        return tokenization.FullTokenizer(vocab_file=vocab_file,
                                                do_lower_case=do_lower_case)
     
     
 def predict(in_sentences):
-    labels = ['1', '2', '3', '4', '5']
+    labels = [1, 2, 3, 4, 5]
 
     tokenizer = create_tokenizer_from_hub_module()
     
-    input_examples = [run_classifier.InputExample(guid="", text_a = x, text_b = None, label = 0) for x in in_sentences] # here, "" is just a dummy label
+    input_examples = [amazon_run_classifier.InputExample(guid="", text_a = x, text_b = None, label = -1) for x in in_sentences] # here, "" is just a dummy label
 
-    input_features = run_classifier.convert_examples_to_features(input_examples, LABEL_VALUES, MAX_SEQ_LENGTH, tokenizer)
+    input_features = amazon_run_classifier.convert_examples_to_features(input_examples, LABEL_VALUES, MAX_SEQ_LENGTH, tokenizer)
 
-    predict_input_fn = run_classifier.input_fn_builder(features=input_features, seq_length=MAX_SEQ_LENGTH, is_training=False, drop_remainder=False)
+    predict_input_fn = amazon_run_classifier.input_fn_builder(features=input_features, seq_length=MAX_SEQ_LENGTH, is_training=False, drop_remainder=False)
 
     predictions = estimator.predict(predict_input_fn)
 
@@ -290,7 +290,7 @@ if __name__ == '__main__':
     print(train_data_filenames)
     
     # Create an input function for training. drop_remainder = True for using TPUs.
-    train_input_fn = bert.run_classifier.file_based_input_fn_builder(
+    train_input_fn = amazon_run_classifier.file_based_input_fn_builder(
         train_data_filenames,
         seq_length=MAX_SEQ_LENGTH,
         is_training=True,
@@ -307,21 +307,25 @@ if __name__ == '__main__':
     estimator.export_savedmodel('./tf-bert-model-oh-yeah/', serving_input_fn)
     print('Ending Exporting!')
           
-    print('Complete')
 #   TODO:  Figure out why this gets stuck    
-#
-#     print('Begin Validating!')
-#     validation_data_filenames = glob.glob('{}/*.tfrecord'.format(validation_data))
-#     print(validation_data_filenames)
-#     validation_input_fn = bert.run_classifier.file_based_input_fn_builder(
-#         validation_data_filenames,
-#         seq_length=MAX_SEQ_LENGTH,
-#         is_training=False,
-#         drop_remainder=False)
 
-#     # Now let's use our test data to see how well our model did:
-#     estimator.evaluate(input_fn=validation_input_fn, steps=None)
-#     print('End Validating!')
+    print('Begin Validating!')
+
+    # HACK:
+#    validation_date = train_data
+    validation_data_filenames = glob.glob('{}/*.tfrecord'.format(validation_data))
+    print(validation_data_filenames)
+    validation_input_fn = amazon_run_classifier.file_based_input_fn_builder(
+         validation_data_filenames,
+         seq_length=MAX_SEQ_LENGTH,
+         is_training=False,
+         drop_remainder=False)
+
+    # Now let's use our test data to see how well our model did:
+    estimator.evaluate(input_fn=validation_input_fn, steps=None)
+
+    # TODO:  Print out evaluation metrics
+    print('End Validating!')
     
     # Now let's write code to make predictions on new sentences:
     pred_sentences = [
@@ -335,3 +339,5 @@ if __name__ == '__main__':
     predictions = predict(pred_sentences)
     print(predictions)
     print('End Predicting!')
+
+    print('Complete')
