@@ -315,22 +315,23 @@ if __name__ == '__main__':
         print(file)
     print('Ending Exporting!')
           
-#   TODO:  Figure out why this gets stuck    
-    print('Begin Validating!')
+#   TODO:  Figure out why this gets stuck  
+#            tensorflow.python.framework.errors_impl.InvalidArgumentError: assertion failed: [predictions must be in [0, 1]] [Condition x <= y did not hold element-wise:] [x (f1/remove_squeezable_dimensions/cond/Merge:0) = ] [4 4 4...] [y (f1/Cast_1:0) = ] [1]  
+#    print('Begin Validating!')
 
-    validation_data_filenames = glob.glob('{}/*.tfrecord'.format(validation_data))
-    print(validation_data_filenames)
-    validation_input_fn = amazon_run_classifier.file_based_input_fn_builder(
-         validation_data_filenames,
-         seq_length=MAX_SEQ_LENGTH,
-         is_training=False,
-         drop_remainder=False)
+#    validation_data_filenames = glob.glob('{}/*.tfrecord'.format(validation_data))
+#    print(validation_data_filenames)
+#    validation_input_fn = amazon_run_classifier.file_based_input_fn_builder(
+#         validation_data_filenames,
+#         seq_length=MAX_SEQ_LENGTH,
+#         is_training=False,
+#         drop_remainder=False)
+#
+#    # Now let's use our test data to see how well our model did:
+#    estimator.evaluate(input_fn=validation_input_fn, steps=None)
 
-    # Now let's use our test data to see how well our model did:
-    estimator.evaluate(input_fn=validation_input_fn, steps=None)
-
-    # TODO:  Print out evaluation metrics
-    print('End Validating!')
+#    # TODO:  Print out evaluation metrics
+#    print('End Validating!')
     
     # Now let's write code to make predictions on new sentences:
     pred_sentences = [
