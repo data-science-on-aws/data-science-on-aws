@@ -75,15 +75,16 @@ object SparkAmazonReviewsAnalyzer {
       .option("header", true)      
       .option("delimiter", "\t")
       .csv(s"${s3OutputAnalyzeData}/dataset-metrics")
-//      .csv(s3OutputAnalyzeData)
 
     val verificationResult: VerificationResult = { VerificationSuite()
           // data to run the verification on
           .onData(dataset)
-          // define a data quality check
+          // define data quality checks,
+          // compute metrics 
+          //verify check conditions
           .addCheck(
             Check(CheckLevel.Error, "Review Check") 
-              .hasSize(_ >= 3000000) // at least 3 million rows
+              .hasSize(_ >= 150000000) // at least 150 million rows
               .hasMin("star_rating", _ == 1.0) // min is 1.0
               .hasMax("star_rating", _ == 5.0) // max is 5.0
               .isComplete("review_id") // should never be NULL
@@ -94,7 +95,6 @@ object SparkAmazonReviewsAnalyzer {
 //  TODO:  This is not working in deequ-1.0.1.jar
 //              .isNonNegative("year")) // should not contain negative values  
               )
-          // compute metrics and verify check conditions
           .run()
     }
 
