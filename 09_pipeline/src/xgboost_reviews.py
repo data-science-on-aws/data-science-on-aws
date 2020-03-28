@@ -11,6 +11,7 @@ import xgboost as xgb
 from xgboost import XGBClassifier
 import glob
 
+
 # Note:  header=None
 def load_dataset(path, sep, header):
     data = pd.concat([pd.read_csv(f, sep=sep, header=header) for f in glob.glob('{}/*.csv'.format(path))], ignore_index = True)
@@ -25,6 +26,50 @@ def load_dataset(path, sep, header):
         features.columns = new_column_names
 
     return features, labels
+
+
+def model_fn(model_dir):
+    """
+    :param: model_dir The directory where model files are stored.
+    :return: a model
+    """
+    model = pkl.load(open(model_dir, 'rb'))
+
+    print(type(model))
+    
+    return model
+
+
+def input_fn(request_body, request_content_type):
+    """
+    Deserialize the Invoke request body into an object we can perform prediction on
+    """
+    """An input_fn that loads a pickled object"""
+    if request_content_type == "application/json":
+        pass
+    else:
+        # Handle other content-types here or raise an Exception
+        # if the content type is not supported.
+        pass
+
+    print(request_body)    
+    return [1]
+
+
+def predict_fn(input_object, model):
+    """
+    Perform prediction on the deserialized object, with the loaded model
+    """
+    return [1]
+
+
+def output_fn(output, output_content_type):
+    """
+    Serialize the prediction result into the desired response content type
+    """
+    #return json.dumps({'output':output.reshape(-1).tolist()}), output_content_type
+    print(output)
+    return [1]
 
 
 if __name__ == '__main__':
@@ -68,9 +113,26 @@ if __name__ == '__main__':
     preds_validation = xgb_estimator_restored.predict(X_validation)
     print('Validation Accuracy: ', accuracy_score(y_validation, preds_validation))
     print('Validation Precision: ', precision_score(y_validation, preds_validation, average=None))
-    
+        
     print(classification_report(y_validation, preds_validation))
 
     # TODO:  Convert to preds_validation_0_or_1
-    auc = round(metrics.roc_auc_score(y_validation, preds_validation), 4)
-    print('AUC is ' + repr(auc))
+    
+    ##############
+#   Note:  roc_auc is causing the following:
+#   ValueError: multiclass format is not supported
+#     Traceback (most recent call last):
+#   File "/miniconda3/lib/python3.6/runpy.py", line 193, in _run_module_as_main
+#     "__main__", mod_spec)
+#   File "/miniconda3/lib/python3.6/runpy.py", line 85, in _run_code
+#     exec(code, run_globals)
+#   File "/opt/ml/code/xgboost_reviews.py", line 75, in <module>
+#     auc = round(metrics.roc_auc_score(y_validation, preds_validation), 4)
+#   File "/miniconda3/lib/python3.6/site-packages/sklearn/metrics/ranking.py", line 356, in roc_auc_score
+#     sample_weight=sample_weight)
+#   File "/miniconda3/lib/python3.6/site-packages/sklearn/metrics/base.py", line 74, in _average_binary_score
+#     raise ValueError("{0} format is not supported".format(y_type))
+ 
+#    auc = round(metrics.roc_auc_score(y_validation, preds_validation), 4)
+#    print('AUC is ' + repr(auc))
+    ##############
