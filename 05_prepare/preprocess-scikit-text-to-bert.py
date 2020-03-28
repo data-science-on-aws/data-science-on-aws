@@ -14,7 +14,7 @@ import tensorflow_hub as hub
 
 print(tf.__version__)
 
-import bert
+#import bert
 from bert import run_classifier
 from bert import optimization
 from bert import tokenization
@@ -81,7 +81,7 @@ def create_tokenizer_from_hub_module():
             vocab_file, do_lower_case = sess.run([tokenization_info["vocab_file"],
                                                   tokenization_info["do_lower_case"]])
 
-    return bert.tokenization.FullTokenizer(
+    return tokenization.FullTokenizer(
         vocab_file=vocab_file, do_lower_case=do_lower_case)
     
     
@@ -147,17 +147,17 @@ def process(args):
         # - `label` is the label for our example (0 or 1)
 
         # Use the InputExample class from BERT's run_classifier code to create examples from the data
-        train_InputExamples = df_train.apply(lambda x: bert.run_classifier.InputExample(guid=None, # Unused in this example
+        train_InputExamples = df_train.apply(lambda x: run_classifier.InputExample(guid=None, # Unused in this example
                                                                            text_a = x[DATA_COLUMN], 
                                                                            text_b = None, 
                                                                            label = x[LABEL_COLUMN]), axis = 1)
 
-        validation_InputExamples = df_validation.apply(lambda x: bert.run_classifier.InputExample(guid=None, 
+        validation_InputExamples = df_validation.apply(lambda x: run_classifier.InputExample(guid=None, 
                                                                            text_a = x[DATA_COLUMN], 
                                                                            text_b = None, 
                                                                            label = x[LABEL_COLUMN]), axis = 1)
 
-        test_InputExamples = df_test.apply(lambda x: bert.run_classifier.InputExample(guid=None, 
+        test_InputExamples = df_test.apply(lambda x: run_classifier.InputExample(guid=None, 
                                                                            text_a = x[DATA_COLUMN], 
                                                                            text_b = None, 
                                                                            label = x[LABEL_COLUMN]), axis = 1)
@@ -196,11 +196,11 @@ def process(args):
         test_data = '{}/bert/test'.format(args.output_data)
 
         # Convert our train and validation features to InputFeatures (.tfrecord protobuf) that works with BERT and TensorFlow.
-        df_train_embeddings = bert.run_classifier.file_based_convert_examples_to_features(train_InputExamples, LABEL_VALUES, MAX_SEQ_LENGTH, tokenizer, '{}/part-{}-{}.tfrecord'.format(train_data, args.current_host, filename_without_extension))
+        df_train_embeddings = run_classifier.file_based_convert_examples_to_features(train_InputExamples, LABEL_VALUES, MAX_SEQ_LENGTH, tokenizer, '{}/part-{}-{}.tfrecord'.format(train_data, args.current_host, filename_without_extension))
 
-        df_validation_embeddings = bert.run_classifier.file_based_convert_examples_to_features(validation_InputExamples, LABEL_VALUES, MAX_SEQ_LENGTH, tokenizer, '{}/part-{}-{}.tfrecord'.format(validation_data, args.current_host, filename_without_extension))
+        df_validation_embeddings = run_classifier.file_based_convert_examples_to_features(validation_InputExamples, LABEL_VALUES, MAX_SEQ_LENGTH, tokenizer, '{}/part-{}-{}.tfrecord'.format(validation_data, args.current_host, filename_without_extension))
 
-        df_test_embeddings = bert.run_classifier.file_based_convert_examples_to_features(test_InputExamples, LABEL_VALUES, MAX_SEQ_LENGTH, tokenizer, '{}/part-{}-{}.tfrecord'.format(test_data, args.current_host, filename_without_extension))
+        df_test_embeddings = run_classifier.file_based_convert_examples_to_features(test_InputExamples, LABEL_VALUES, MAX_SEQ_LENGTH, tokenizer, '{}/part-{}-{}.tfrecord'.format(test_data, args.current_host, filename_without_extension))
         
                                                                                          
     print('Listing contents of {}'.format(args.output_data))
