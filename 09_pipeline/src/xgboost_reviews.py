@@ -33,6 +33,12 @@ def model_fn(model_dir):
     :param: model_dir The directory where model files are stored.
     :return: a model
     """
+    # IsADirectoryError: [Errno 21] Is a directory: '/opt/ml/model'
+    import os
+    list_dirs = os.listdir(model_dir)
+    for file in dirs:
+        print(file)    
+
     model = pkl.load(open(model_dir, 'rb'))
 
     print(type(model))

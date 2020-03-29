@@ -32,6 +32,12 @@ def model_fn(model_dir):
     :param: model_dir The directory where model files are stored.
     :return: a model
     """
+    # IsADirectoryError: [Errno 21] Is a directory: '/opt/ml/model'
+    import os
+    list_dirs = os.listdir(model_dir)
+    for file in dirs:
+        print(file)
+
     model = pkl.load(open(model_dir, 'rb'))
 
     print(type(model))
@@ -132,8 +138,5 @@ if __name__ == '__main__':
 #   File "/miniconda3/lib/python3.6/site-packages/sklearn/metrics/base.py", line 74, in _average_binary_score
 #     raise ValueError("{0} format is not supported".format(y_type))
  
-#    auc = round(metrics.roc_auc_score(y_validation, preds_validation), 4)
-#    print('AUC is ' + repr(auc))
-    ##############
 #    auc = round(metrics.roc_auc_score(y_validation, preds_validation), 4)
 #    print('AUC is ' + repr(auc))
