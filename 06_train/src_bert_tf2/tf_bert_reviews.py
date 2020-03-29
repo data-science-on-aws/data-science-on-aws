@@ -204,4 +204,3 @@ for review_body, star_rating in zip(sentences, predictions):
 
 model.save('/opt/ml/model/0/', save_format='tf')
 model.save('/opt/ml/model/bert_reviews.h5')
-
