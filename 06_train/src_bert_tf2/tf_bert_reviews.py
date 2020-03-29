@@ -9,15 +9,7 @@ import tensorflow as tf
 print(tf.__version__)
 
 import boto3
-import sagemaker
 import pandas as pd
-
-sess   = sagemaker.Session()
-bucket = sess.default_bucket()
-role = sagemaker.get_execution_role()
-region = boto3.Session().region_name
-
-sm = boto3.Session().client(service_name='sagemaker', region_name=region)
 
 import os
 import math
@@ -38,8 +30,8 @@ from bert.tokenization.bert_tokenization import FullTokenizer
 
 from sklearn.metrics import confusion_matrix, classification_report
 
-train = pd.read_csv('./data/amazon_reviews_us_Digital_Software_v1_00.tsv.gz', delimiter='\t')[:100]
-test = pd.read_csv('./data/amazon_reviews_us_Digital_Software_v1_00.tsv.gz', delimiter='\t')[:100]
+train = pd.read_csv('./data/amazon_reviews_us_Digital_Software_v1_00.tsv.gz', delimiter='\t')
+test = pd.read_csv('./data/amazon_reviews_us_Digital_Software_v1_00.tsv.gz', delimiter='\t')
 
 train.shape
 train.head()
@@ -51,7 +43,13 @@ os.system('rm -rf uncased_L-12_H-768_A-12')
 
 os.system('wget https://storage.googleapis.com/bert_models/2018_10_18/uncased_L-12_H-768_A-12.zip')
 
-os.system('unzip uncased_L-12_H-768_A-12.zip')
+#os.system('unzip uncased_L-12_H-768_A-12.zip')
+
+import zipfile
+with zipfile.ZipFile('uncased_L-12_H-768_A-12.zip', 'r') as zip_ref:
+  zip_ref.extractall('.')
+
+
 os.system('ls -al ./uncased_L-12_H-768_A-12')
 #subprocess.check_call([sys.executable, 'unzip', '-f', 'uncased_L-12_H-768_A-12.zip'])
 #subprocess.check_call([sys.executable, 'ls', '-al', './model/uncased_L-12_H-768_A-12'])
