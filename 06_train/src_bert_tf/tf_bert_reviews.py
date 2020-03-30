@@ -308,7 +308,7 @@ if __name__ == '__main__':
     print('Ending Training!')
         
     print('Starting Exporting!')
-    estimator.export_savedmodel('{}/tf-bert-model-oh-yeah/'.format(model_dir), serving_input_fn)
+    estimator.export_savedmodel('{}/tf-bert-model/'.format(model_dir), serving_input_fn)
     print('Listing contents of {}'.format(model_dir))
     model_dir = os.listdir(model_dir)
     for file in model_dir:
