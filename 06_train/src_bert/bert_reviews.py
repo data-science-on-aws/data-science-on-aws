@@ -13,6 +13,8 @@ import json
 import numpy as np
 import subprocess
 import sys
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'torch==1.4.0'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'torchvision'])
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'simpletransformers'])
 import torch
 import torch.distributed as dist
@@ -89,14 +91,14 @@ if __name__ == '__main__':
                  delimiter='\t', 
                  quoting=csv.QUOTE_NONE,
                  compression='gzip',
-                 header=0)
+                 header=0)[:100]
     print(df1.shape)
 
     df2 = pd.read_csv('./data/amazon_reviews_us_Video_Games_v1_00.tsv.gz',
                  delimiter='\t', 
                  quoting=csv.QUOTE_NONE,
                  compression='gzip', 
-                 header=0)
+                 header=0)[:100]
     print(df2.shape)
 
     df = pd.concat([df1, df2])
