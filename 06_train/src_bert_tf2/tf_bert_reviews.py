@@ -30,8 +30,8 @@ from bert.tokenization.bert_tokenization import FullTokenizer
 
 from sklearn.metrics import confusion_matrix, classification_report
 
-train = pd.read_csv('./data/amazon_reviews_us_Digital_Software_v1_00.tsv.gz', delimiter='\t')
-test = pd.read_csv('./data/amazon_reviews_us_Digital_Software_v1_00.tsv.gz', delimiter='\t')
+train = pd.read_csv('./data/amazon_reviews_us_Digital_Software_v1_00.tsv.gz', delimiter='\t')[:100]
+test = pd.read_csv('./data/amazon_reviews_us_Digital_Software_v1_00.tsv.gz', delimiter='\t')[:100]
 
 train.shape
 train.head()
@@ -103,7 +103,43 @@ tokens = tokenizer.tokenize("I can't wait to visit Bulgaria again!")
 tokenizer.convert_tokens_to_ids(tokens)
 
 
-def create_model(max_seq_len, bert_ckpt_file):
+def flatten_layers(root_layer):
+    if isinstance(root_layer, keras.layers.Layer):
+        yield root_layer
+    for layer in root_layer._layers:
+        for sub_layer in flatten_layers(layer):
+            yield sub_layer
+
+
+def freeze_bert_layers(l_bert):
+    """
+    Freezes all but LayerNorm and adapter layers - see arXiv:1902.00751.
+    """
+    for layer in flatten_layers(l_bert):
+        if layer.name in ["LayerNorm", "adapter-down", "adapter-up"]:
+            layer.trainable = True
+        elif len(layer._layers) == 0:
+            layer.trainable = False
+        l_bert.embeddings_layer.trainable = False
+
+
+def create_learning_rate_scheduler(max_learn_rate=5e-5,
+                                   end_learn_rate=1e-7,
+                                   warmup_epoch_count=10,
+                                   total_epoch_count=90):
+
+    def lr_scheduler(epoch):
+        if epoch < warmup_epoch_count:
+            res = (max_learn_rate/warmup_epoch_count) * (epoch + 1)
+        else:
+            res = max_learn_rate*math.exp(math.log(end_learn_rate/max_learn_rate)*(epoch-warmup_epoch_count+1)/(total_epoch_count-warmup_epoch_count+1))
+        return float(res)
+    learning_rate_scheduler = tf.keras.callbacks.LearningRateScheduler(lr_scheduler, verbose=1)
+
+    return learning_rate_scheduler
+
+
+def create_model(max_seq_len, bert_ckpt_file, adapter_size):
 
   with tf.io.gfile.GFile(bert_config_file, "r") as reader:
       bc = StockBertConfig.from_json_string(reader.read())
@@ -126,7 +162,10 @@ def create_model(max_seq_len, bert_ckpt_file):
   model.build(input_shape=(None, max_seq_len))
 
   load_stock_weights(bert, bert_ckpt_file)
-        
+
+  if adapter_size is not None:
+    freeze_bert_layers(bert)
+
   return model
 
 
@@ -146,7 +185,7 @@ features.train_y[0]
 
 features.max_seq_len
 
-model = create_model(features.max_seq_len, bert_ckpt_file)
+model = create_model(features.max_seq_len, bert_ckpt_file, 64)
 
 model.summary()
 
