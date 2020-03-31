@@ -2,7 +2,7 @@ import sys
 import subprocess
 import argparse
 import json
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow==2.2.0-rc1'])
+#subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow-gpu==2.2.0-rc2'])
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'bert-for-tf2'])
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'sentencepiece'])
 
@@ -264,7 +264,8 @@ if __name__ == '__main__':
     # features.train_y[0]
     # features.max_seq_len
 
-    model = create_model(MAX_SEQ_LEN, bert_ckpt_file, 64)
+    adapter_size = None # Change to 64?
+    model = create_model(MAX_SEQ_LEN, bert_ckpt_file, adapter_size)
 
     model.summary()
 

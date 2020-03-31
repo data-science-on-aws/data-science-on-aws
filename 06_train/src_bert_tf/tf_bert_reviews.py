@@ -9,7 +9,7 @@ import sys
 # We should remove this once the bug is fixed.
 import subprocess
 import sys
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow==1.15.2'])
+#subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow==1.15.2'])
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow-hub==0.7.0'])
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'bert-tensorflow==1.0.1'])
 
@@ -44,7 +44,11 @@ LABEL_VALUES = ['1', '2', '3', '4', '5']
 # TODO:  Pass this into the processor
 BERT_MODEL_HUB = "https://tfhub.dev/google/bert_uncased_L-12_H-768_A-12/1"
 
-def create_model(is_predicting, input_ids, input_mask, segment_ids, labels,
+def create_model(is_predicting, 
+                 input_ids, 
+                 input_mask, 
+                 segment_ids, 
+                 labels,
                  num_labels):
     """Creates a classification model."""
 
