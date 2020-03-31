@@ -1,3 +1,4 @@
+__pycache__
 # keep the data/ until we switch to use SM_TRAIN_CHANNEL
 #data/
 output/
