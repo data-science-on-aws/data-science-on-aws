@@ -1,5 +1,7 @@
 from sklearn.model_selection import train_test_split
 from sklearn.utils import resample
+import functools
+import multiprocessing
 
 import pandas as pd
 from datetime import datetime
@@ -85,6 +87,97 @@ def create_tokenizer_from_hub_module():
         vocab_file=vocab_file, do_lower_case=do_lower_case)
     
     
+def _transform_tsv_to_tfrecord(file):
+    print(file)
+
+    filename_without_extension = Path(Path(file).stem).stem
+
+    df = pd.read_csv(file, 
+                     delimiter='\t', 
+                     quoting=csv.QUOTE_NONE,
+                     compression='gzip')
+
+    df.isna().values.any()
+    df = df.dropna()
+    df = df.reset_index(drop=True)
+
+    # Split all data into 90% train and 10% holdout
+    df_train, df_holdout = train_test_split(df, test_size=0.10, stratify=df['star_rating'])        
+    # Split holdout data into 50% validation and t0% test
+    df_validation, df_test = train_test_split(df_holdout, test_size=0.50, stratify=df_holdout['star_rating'])
+
+    df_train = df_train.reset_index(drop=True)
+    df_validation = df_validation.reset_index(drop=True)
+    df_test = df_test.reset_index(drop=True)
+
+    DATA_COLUMN = 'review_body'
+    LABEL_COLUMN = 'star_rating'
+    LABEL_VALUES = [1, 2, 3, 4, 5]
+
+    # #Data Preprocessing
+    # We'll need to transform our data into a format BERT understands. This involves two steps. First, we create  `InputExample`'s using the constructor provided in the BERT library.
+    # 
+    # - `text_a` is the text we want to classify, which in this case, is the `Request` field in our Dataframe. 
+    # - `text_b` is used if we're training a model to understand the relationship between sentences (i.e. is `text_b` a translation of `text_a`? Is `text_b` an answer to the question asked by `text_a`?). This doesn't apply to our task since we are predicting sentiment, so we can leave `text_b` blank.
+    # - `label` is the label for our example (0 or 1)
+
+    # Use the InputExample class from BERT's run_classifier code to create examples from the data
+    train_InputExamples = df_train.apply(lambda x: run_classifier.InputExample(guid=None, # Unused in this example
+                                                                       text_a = x[DATA_COLUMN], 
+                                                                       text_b = None, 
+                                                                       label = x[LABEL_COLUMN]), axis = 1)
+
+    validation_InputExamples = df_validation.apply(lambda x: run_classifier.InputExample(guid=None, 
+                                                                       text_a = x[DATA_COLUMN], 
+                                                                       text_b = None, 
+                                                                       label = x[LABEL_COLUMN]), axis = 1)
+
+    test_InputExamples = df_test.apply(lambda x: run_classifier.InputExample(guid=None, 
+                                                                       text_a = x[DATA_COLUMN], 
+                                                                       text_b = None, 
+                                                                       label = x[LABEL_COLUMN]), axis = 1)
+
+    # Next, we need to preprocess our data so that it matches the data BERT was trained on. For this, we'll need to do a couple of things (but don't worry--this is also included in the Python library):
+    # 
+    # 
+    # 1. Lowercase our text (if we're using a BERT lowercase model)
+    # 2. Tokenize it (i.e. "sally says hi" -> ["sally", "says", "hi"])
+    # 3. Break words into WordPieces (i.e. "calling" -> ["call", "##ing"])
+    # 4. Map our words to indexes using a vocab file that BERT provides
+    # 5. Add special "CLS" and "SEP" tokens (see the [readme](https://github.com/google-research/bert))
+    # 6. Append "index" and "segment" tokens to each input (see the [BERT paper](https://arxiv.org/pdf/1810.04805.pdf))
+    # 
+    # Happily, we don't have to worry about most of these details.
+    # 
+    # To start, we'll need to load a vocabulary file and lowercasing information directly from the BERT tf hub module:
+
+    # This is a path to an uncased (all lowercase) version of BERT
+    BERT_MODEL_HUB = "https://tfhub.dev/google/bert_uncased_L-12_H-768_A-12/1"
+
+    tokenizer = create_tokenizer_from_hub_module()
+
+    # This BERT model expects lowercase data (that's what stored in tokenization_info["do_lower_case"]).
+    # We also loaded BERT's vocab file. We also created a tokenizer, which breaks words into word pieces:
+
+    tokenizer.tokenize("This here's an example of using the BERT tokenizer")
+
+    # Using our tokenizer, we'll call `run_classifier.file_based_convert_examples_to_features` on our InputExamples to convert them into features BERT understands, then write the features to a file.
+
+    # We'll set sequences to be at most 128 tokens long.
+    MAX_SEQ_LENGTH = 128
+
+    train_data = '{}/bert/train'.format(args.output_data)
+    validation_data = '{}/bert/validation'.format(args.output_data)
+    test_data = '{}/bert/test'.format(args.output_data)
+
+    # Convert our train and validation features to InputFeatures (.tfrecord protobuf) that works with BERT and TensorFlow.
+    df_train_embeddings = run_classifier.file_based_convert_examples_to_features(train_InputExamples, LABEL_VALUES, MAX_SEQ_LENGTH, tokenizer, '{}/part-{}-{}.tfrecord'.format(train_data, args.current_host, filename_without_extension))
+
+    df_validation_embeddings = run_classifier.file_based_convert_examples_to_features(validation_InputExamples, LABEL_VALUES, MAX_SEQ_LENGTH, tokenizer, '{}/part-{}-{}.tfrecord'.format(validation_data, args.current_host, filename_without_extension))
+
+    df_test_embeddings = run_classifier.file_based_convert_examples_to_features(test_InputExamples, LABEL_VALUES, MAX_SEQ_LENGTH, tokenizer, '{}/part-{}-{}.tfrecord'.format(test_data, args.current_host, filename_without_extension))
+        
+    
 def process(args):
     print('Current host: {}'.format(args.current_host))
     
@@ -92,117 +185,15 @@ def process(args):
     validation_data = None
     test_data = None
 
-    # This would print all the files and directories
-    for file in glob.glob('{}/*.tsv.gz'.format(args.input_data)):
-        print(file)
-        
-        filename_without_extension = Path(Path(file).stem).stem
-        
-        df = pd.read_csv(file, 
-                         delimiter='\t', 
-                         quoting=csv.QUOTE_NONE,
-                         compression='gzip')
+    transform_tsv_to_tfrecord = functools.partial(_transform_tsv_to_tfrecord)
+    input_files = glob.glob('{}/*.tsv.gz'.format(args.input_data))
 
-        df.isna().values.any()
-        df = df.dropna()
-        df = df.reset_index(drop=True)
-        
-#         df['is_positive_sentiment'] = (df['star_rating'] >= 4).astype(int) 
-#         df.shape
-#         df.head(5)  
+    num_cpus = multiprocessing.cpu_count()
+    print('num_cpus {}'.format(num_cpus))
 
-#         # Balance the Dataset between Classes
-#         is_negative_sentiment_df = df.query('is_positive_sentiment == 0')
-#         is_positive_sentiment_df = df.query('is_positive_sentiment == 1')
+    p = multiprocessing.Pool(num_cpus)
+    p.map(transform_tsv_to_tfrecord, input_files)
 
-#         # TODO:  check which sentiment has the least number of samples
-#         is_positive_downsampled_df = resample(is_positive_sentiment_df,
-#                                       replace = False,
-#                                       n_samples = len(is_negative_sentiment_df),
-#                                       random_state = 27)
-
-#         df_balanced = pd.concat([is_negative_sentiment_df, is_positive_downsampled_df])
-#         df_balanced = df_balanced.reset_index(drop=True)
-#         df_balanced.shape
-#         df_balanced.head(5)
-       
-        # Split all data into 90% train and 10% holdout
-        df_train, df_holdout = train_test_split(df, test_size=0.10, stratify=df['star_rating'])        
-        # Split holdout data into 50% validation and t0% test
-        df_validation, df_test = train_test_split(df_holdout, test_size=0.50, stratify=df_holdout['star_rating'])
-
-        df_train = df_train.reset_index(drop=True)
-        df_validation = df_validation.reset_index(drop=True)
-        df_test = df_test.reset_index(drop=True)
-        
-        DATA_COLUMN = 'review_body'
-        LABEL_COLUMN = 'star_rating'
-        LABEL_VALUES = [1, 2, 3, 4, 5]
-
-        # #Data Preprocessing
-        # We'll need to transform our data into a format BERT understands. This involves two steps. First, we create  `InputExample`'s using the constructor provided in the BERT library.
-        # 
-        # - `text_a` is the text we want to classify, which in this case, is the `Request` field in our Dataframe. 
-        # - `text_b` is used if we're training a model to understand the relationship between sentences (i.e. is `text_b` a translation of `text_a`? Is `text_b` an answer to the question asked by `text_a`?). This doesn't apply to our task since we are predicting sentiment, so we can leave `text_b` blank.
-        # - `label` is the label for our example (0 or 1)
-
-        # Use the InputExample class from BERT's run_classifier code to create examples from the data
-        train_InputExamples = df_train.apply(lambda x: run_classifier.InputExample(guid=None, # Unused in this example
-                                                                           text_a = x[DATA_COLUMN], 
-                                                                           text_b = None, 
-                                                                           label = x[LABEL_COLUMN]), axis = 1)
-
-        validation_InputExamples = df_validation.apply(lambda x: run_classifier.InputExample(guid=None, 
-                                                                           text_a = x[DATA_COLUMN], 
-                                                                           text_b = None, 
-                                                                           label = x[LABEL_COLUMN]), axis = 1)
-
-        test_InputExamples = df_test.apply(lambda x: run_classifier.InputExample(guid=None, 
-                                                                           text_a = x[DATA_COLUMN], 
-                                                                           text_b = None, 
-                                                                           label = x[LABEL_COLUMN]), axis = 1)
-
-        # Next, we need to preprocess our data so that it matches the data BERT was trained on. For this, we'll need to do a couple of things (but don't worry--this is also included in the Python library):
-        # 
-        # 
-        # 1. Lowercase our text (if we're using a BERT lowercase model)
-        # 2. Tokenize it (i.e. "sally says hi" -> ["sally", "says", "hi"])
-        # 3. Break words into WordPieces (i.e. "calling" -> ["call", "##ing"])
-        # 4. Map our words to indexes using a vocab file that BERT provides
-        # 5. Add special "CLS" and "SEP" tokens (see the [readme](https://github.com/google-research/bert))
-        # 6. Append "index" and "segment" tokens to each input (see the [BERT paper](https://arxiv.org/pdf/1810.04805.pdf))
-        # 
-        # Happily, we don't have to worry about most of these details.
-        # 
-        # To start, we'll need to load a vocabulary file and lowercasing information directly from the BERT tf hub module:
-
-        # This is a path to an uncased (all lowercase) version of BERT
-        BERT_MODEL_HUB = "https://tfhub.dev/google/bert_uncased_L-12_H-768_A-12/1"
-
-        tokenizer = create_tokenizer_from_hub_module()
-
-        # This BERT model expects lowercase data (that's what stored in tokenization_info["do_lower_case"]).
-        # We also loaded BERT's vocab file. We also created a tokenizer, which breaks words into word pieces:
-
-        tokenizer.tokenize("This here's an example of using the BERT tokenizer")
-
-        # Using our tokenizer, we'll call `run_classifier.file_based_convert_examples_to_features` on our InputExamples to convert them into features BERT understands, then write the features to a file.
-
-        # We'll set sequences to be at most 128 tokens long.
-        MAX_SEQ_LENGTH = 128
-
-        train_data = '{}/bert/train'.format(args.output_data)
-        validation_data = '{}/bert/validation'.format(args.output_data)
-        test_data = '{}/bert/test'.format(args.output_data)
-
-        # Convert our train and validation features to InputFeatures (.tfrecord protobuf) that works with BERT and TensorFlow.
-        df_train_embeddings = run_classifier.file_based_convert_examples_to_features(train_InputExamples, LABEL_VALUES, MAX_SEQ_LENGTH, tokenizer, '{}/part-{}-{}.tfrecord'.format(train_data, args.current_host, filename_without_extension))
-
-        df_validation_embeddings = run_classifier.file_based_convert_examples_to_features(validation_InputExamples, LABEL_VALUES, MAX_SEQ_LENGTH, tokenizer, '{}/part-{}-{}.tfrecord'.format(validation_data, args.current_host, filename_without_extension))
-
-        df_test_embeddings = run_classifier.file_based_convert_examples_to_features(test_InputExamples, LABEL_VALUES, MAX_SEQ_LENGTH, tokenizer, '{}/part-{}-{}.tfrecord'.format(test_data, args.current_host, filename_without_extension))
-        
-                                                                                         
     print('Listing contents of {}'.format(args.output_data))
     dirs_output = os.listdir(args.output_data)
     for file in dirs_output:
