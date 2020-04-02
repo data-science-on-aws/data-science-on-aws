@@ -29,6 +29,8 @@ from bert import tokenization
 import tensorflow as tf
 import numpy as np
 
+from sagemaker_tensorflow import PipeModeDataset
+
 flags = tf.flags
 
 FLAGS = flags.FLAGS
@@ -398,8 +400,8 @@ def file_based_convert_examples_to_features(
   writer.close()
 
 
-def file_based_input_fn_builder(input_file, seq_length, is_training,
-                                drop_remainder):
+def file_based_input_fn_builder(input_files, seq_length, is_training,
+                                drop_remainder, pipe_mode):
   """Creates an `input_fn` closure to be passed to TPUEstimator."""
 
   name_to_features = {
@@ -426,22 +428,33 @@ def file_based_input_fn_builder(input_file, seq_length, is_training,
 
   def input_fn(params):
     """The actual input function."""
-    batch_size = params["batch_size"]
+    batch_size = params['batch_size']
 
     # For training, we want a lot of parallel reading and shuffling.
     # For eval, we want no shuffling and parallel reading doesn't matter.
-    d = tf.data.TFRecordDataset(input_file)
-    if is_training:
-      d = d.repeat()
-      d = d.shuffle(buffer_size=100)
 
-    d = d.apply(
+    if is_training:
+        channel = 'train'
+    else:
+        channel = 'validation'
+
+    if pipe_mode:
+        print('***** Using pipe_mode!!!!')
+        ds = PipeModeDataset(channel=channel, record_format='TFRecord')
+    else:
+        ds = tf.data.TFRecordDataset(input_files)
+
+    if is_training:
+        ds = ds.repeat()
+        ds = ds.shuffle(buffer_size=100)
+
+    ds = ds.apply(
         tf.contrib.data.map_and_batch(
             lambda record: _decode_record(record, name_to_features),
             batch_size=batch_size,
             drop_remainder=drop_remainder))
 
-    return d
+    return ds
 
   return input_fn
 
@@ -750,16 +763,19 @@ def main(_):
       eval_batch_size=FLAGS.eval_batch_size,
       predict_batch_size=FLAGS.predict_batch_size)
 
+  
+
   if FLAGS.do_train:
-    train_file = os.path.join(FLAGS.output_dir, "train.tf_record")
+    train_files = os.path.join(FLAGS.output_dir, "train.tf_record")
+    print('train_files {}'.format(train_files))
     file_based_convert_examples_to_features(
-        train_examples, label_list, FLAGS.max_seq_length, tokenizer, train_file)
+        train_examples, label_list, FLAGS.max_seq_length, tokenizer, train_files)
     tf.logging.info("***** Running training *****")
     tf.logging.info("  Num examples = %d", len(train_examples))
     tf.logging.info("  Batch size = %d", FLAGS.train_batch_size)
     tf.logging.info("  Num steps = %d", num_train_steps)
     train_input_fn = file_based_input_fn_builder(
-        input_file=train_file,
+        input_files=train_files,
         seq_length=FLAGS.max_seq_length,
         is_training=True,
         drop_remainder=True)

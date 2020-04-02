@@ -31,12 +31,6 @@ from bert.tokenization.bert_tokenization import FullTokenizer
 
 from sklearn.metrics import confusion_matrix, classification_report
 
-#train = pd.read_csv('./data/amazon_reviews_us_Digital_Software_v1_00.tsv.gz', delimiter='\t')[:100]
-#test = pd.read_csv('./data/amazon_reviews_us_Digital_Software_v1_00.tsv.gz', delimiter='\t')[:100]
-
-#train.shape
-#train.head()
-
 import os
 
 os.system('rm uncased_L-12_H-768_A-12.zip')
@@ -44,16 +38,11 @@ os.system('rm -rf uncased_L-12_H-768_A-12')
 
 os.system('wget -q https://storage.googleapis.com/bert_models/2018_10_18/uncased_L-12_H-768_A-12.zip')
 
-#os.system('unzip uncased_L-12_H-768_A-12.zip')
-
 import zipfile
 with zipfile.ZipFile('uncased_L-12_H-768_A-12.zip', 'r') as zip_ref:
   zip_ref.extractall('.')
 
-
 os.system('ls -al ./uncased_L-12_H-768_A-12')
-#subprocess.check_call([sys.executable, 'unzip', '-f', 'uncased_L-12_H-768_A-12.zip'])
-#subprocess.check_call([sys.executable, 'ls', '-al', './model/uncased_L-12_H-768_A-12'])
 
 bert_ckpt_dir = './uncased_L-12_H-768_A-12'
 bert_ckpt_file = os.path.join(bert_ckpt_dir, "bert_model.ckpt")
@@ -61,15 +50,15 @@ bert_config_file = os.path.join(bert_ckpt_dir, "bert_config.json")
 
 CLASSES=[1, 2, 3, 4, 5]
 MAX_SEQ_LEN=128
-BATCH_SIZE=128
-EPOCHS=2
-STEPS_PER_EPOCH=1000
+BATCH_SIZE=8
+EPOCHS=1
+STEPS_PER_EPOCH=100
 
 def select_data_and_label_from_record(record):
     x = {
-        'input_word_ids': record['input_ids'],
+        'input_ids': record['input_ids'],
         'input_mask': record['input_mask'],
-        'input_type_ids': record['segment_ids']
+        'segment_ids': record['segment_ids']
     }
     y = record['label_ids']
 
@@ -121,46 +110,6 @@ def file_based_input_dataset_builder(input_file,
           drop_remainder=drop_remainder))
 
   return dataset
-
-#  return input_fn
-
-
-# class ClassificationData:
-#   TEXT_COLUMN = 'review_body'
-#   LABEL_COLUMN = 'star_rating'
-
-#   def __init__(self, train, test, tokenizer: FullTokenizer, classes, max_seq_len=192):
-#     self.tokenizer = tokenizer
-#     self.max_seq_len = 0
-#     self.classes = classes
-    
-#     ((self.train_x, self.train_y), (self.test_x, self.test_y)) = map(self._prepare, [train, test])
-
-# #    print('max seq_len', self.max_seq_len)
-#     self.max_seq_len = min(self.max_seq_len, max_seq_len)
-#     self.train_x, self.test_x = map(self._pad, [self.train_x, self.test_x])
-
-#   def _prepare(self, df):
-#     x, y = [], []
-    
-#     for _, row in tqdm(df.iterrows()):
-#       text, label = row[ClassificationData.TEXT_COLUMN], row[ClassificationData.LABEL_COLUMN]
-#       tokens = self.tokenizer.tokenize(text)
-#       tokens = ["[CLS]"] + tokens + ["[SEP]"]
-#       token_ids = self.tokenizer.convert_tokens_to_ids(tokens)
-#       self.max_seq_len = max(self.max_seq_len, len(token_ids))
-#       x.append(token_ids)
-#       y.append(self.classes.index(label))
-
-#     return np.array(x), np.array(y)
-
-#   def _pad(self, ids):
-#     x = []
-#     for input_ids in ids:
-#       input_ids = input_ids[:min(len(input_ids), self.max_seq_len - 2)]
-#       input_ids = input_ids + [0] * (self.max_seq_len - len(input_ids))
-#       x.append(np.array(input_ids))
-#     return np.array(x)
 
 tokenizer = FullTokenizer(vocab_file=os.path.join(bert_ckpt_dir, "vocab.txt"))
 
@@ -267,6 +216,8 @@ if __name__ == '__main__':
     adapter_size = None # Change to 64?
     model = create_model(MAX_SEQ_LEN, bert_ckpt_file, adapter_size)
 
+    model.layers[0].trainable = False
+
     model.summary()
 
     model.compile(
@@ -286,39 +237,13 @@ if __name__ == '__main__':
         train_data_filenames,
         seq_length=MAX_SEQ_LEN,
         is_training=True,
-        drop_remainder=False)
+        drop_remainder=False).map(select_data_and_label_from_record)
 
     print('*********** {}'.format(train_dataset))
 
-#    (train_dataset_X, train_dataset_y) = train_dataset.map(select_data_and_label_from_record)
-    train_dataset_2 = train_dataset.map(select_data_and_label_from_record)
-    print(train_dataset_2)
-
-    iterator = iter(train_dataset_2)
-    next_element = iterator.get_next()
-    print('*********** {}'.format(next_element))
-
-#    if is_training:
-#        dataset = dataset.shuffle(100)
-#        dataset = dataset.repeat()
-
-#    dataset = dataset.batch(batch_size, drop_remainder=is_training)
-#    dataset = dataset.prefetch(1024)
-
-#    iterator = iter(train_dataset_2)
-#    next_element = iterator.get_next()
-#    print('*********** {}'.format(next_element))
-
     history = model.fit(
-      train_dataset_2,
-#       x=train_dataset_X,
-#       y=train_dataset_y,
-#      train_dataset.batch(10),
-#      train_dataset,
-#      x=features.train_x, 
-#      y=features.train_y,
-#      validation_split=0.1,
-      batch_size=BATCH_SIZE,
+      train_dataset,
+#      batch_size=BATCH_SIZE,
       shuffle=True,
       epochs=EPOCHS,
       steps_per_epoch=STEPS_PER_EPOCH,
