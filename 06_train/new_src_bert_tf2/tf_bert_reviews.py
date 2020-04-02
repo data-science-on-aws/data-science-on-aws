@@ -59,9 +59,10 @@ def file_based_input_dataset_builder(channel,
         print('***** Using input_filenames {}'.format(input_filenames))
         dataset = tf.data.TFRecordDataset(input_filenames)
 
+    dataset = dataset.repeat()
+
     if is_training:
-        dataset = dataset.repeat()
-        dataset = dataset.shuffle(buffer_size=1)
+        dataset = dataset.shuffle(buffer_size=1000)
 
     name_to_features = {
       "input_ids": tf.io.FixedLenFeature([MAX_SEQ_LENGTH], tf.int64),
@@ -140,7 +141,7 @@ if __name__ == '__main__':
         input_filenames=train_data_filenames,
         pipe_mode=pipe_mode,
         is_training=True,
-        drop_remainder=True).map(select_data_and_label_from_record)
+        drop_remainder=False).map(select_data_and_label_from_record)
 
     validation_data_filenames = glob('{}/*.tfrecord'.format(validation_data))
     print(validation_data_filenames)
@@ -149,7 +150,7 @@ if __name__ == '__main__':
         input_filenames=validation_data_filenames,
         pipe_mode=pipe_mode,
         is_training=False,
-        drop_remainder=True).map(select_data_and_label_from_record)
+        drop_remainder=False).map(select_data_and_label_from_record)
 
     tf.config.optimizer.set_jit(USE_XLA)
     tf.config.optimizer.set_experimental_options({"auto_mixed_precision": USE_AMP})
