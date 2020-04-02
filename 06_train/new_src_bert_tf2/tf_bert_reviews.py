@@ -18,11 +18,11 @@ from transformers import TextClassificationPipeline
 from transformers.configuration_bert import BertConfig
 
 MAX_SEQ_LENGTH=128
-BATCH_SIZE=8
+BATCH_SIZE=256
 EVAL_BATCH_SIZE=BATCH_SIZE * 2
-EPOCHS=1
-STEPS_PER_EPOCH=10
-VALIDATION_STEPS=10
+EPOCHS=5
+STEPS_PER_EPOCH=1000
+VALIDATION_STEPS=1000
 CLASSES = [1, 2, 3, 4, 5]
 # XLA is an optimization compiler for tensorflow
 USE_XLA = True
@@ -171,11 +171,16 @@ if __name__ == '__main__':
     model.layers[0].trainable = False
     model.summary()
 
+    log_dir = './tensorboard/classification/'
+    tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir)
+
     history = model.fit(train_dataset,
+#                        shuffle=True,
                         epochs=EPOCHS,
                         steps_per_epoch=STEPS_PER_EPOCH,
-                        validation_data=validation_dataset,
-                        validation_steps=VALIDATION_STEPS)
+#                        validation_data=validation_dataset,
+#                        validation_steps=VALIDATION_STEPS,
+                        callbacks=[tensorboard_callback])
 
     # Save the Model
     model.save_pretrained(model_dir)
