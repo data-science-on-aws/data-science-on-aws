@@ -6,12 +6,12 @@ import subprocess
 import sys
 import os
 import tensorflow as tf
-from tensorflow.io import TFRecordWriter
-from tensorflow.io import FixedLenFeature
-from tensorflow.data import TFRecordDataset
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow==2.2.0-rc2'])
+#from tensorflow.io import TFRecordWriter
+#from tensorflow.io import FixedLenFeature
+#from tensorflow.data import TFRecordDataset
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow==2.0.0'])
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'transformers'])
-
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'sagemaker-tensorflow==2.0.0.1.1.0'])
 from transformers import BertTokenizer, TFBertForSequenceClassification
 from transformers import TFBertForSequenceClassification
 from transformers import TextClassificationPipeline
@@ -41,7 +41,8 @@ def select_data_and_label_from_record(record):
     return (x, y)
 
 
-def file_based_input_dataset_builder(channel_or_input_files,
+def file_based_input_dataset_builder(channel,
+                                     input_filenames,
                                      pipe_mode,
                                      is_training,
                                      drop_remainder):
@@ -50,12 +51,13 @@ def file_based_input_dataset_builder(channel_or_input_files,
     # For eval, we want no shuffling and parallel reading doesn't matter.
 
     if pipe_mode:
-        print('***** Using pipe_mode with channel {}'.format(channel_or_input_files))
+        print('***** Using pipe_mode with channel {}'.format(channel))
         from sagemaker_tensorflow import PipeModeDataset
-        dataset = PipeModeDataset(channel=channel_or_input_files,
+        dataset = PipeModeDataset(channel=channel,
                                   record_format='TFRecord')
     else:
-        dataset = tf.data.TFRecordDataset(channel_or_input_files)
+        print('***** Using input_filenames {}'.format(input_filenames))
+        dataset = tf.data.TFRecordDataset(input_filenames)
 
     if is_training:
         dataset = dataset.repeat()
@@ -134,7 +136,8 @@ if __name__ == '__main__':
     train_data_filenames = glob('{}/*.tfrecord'.format(train_data))
     print(train_data_filenames)
     train_dataset = file_based_input_dataset_builder(
-        train_data_filenames,
+        channel='train',
+        input_filenames=train_data_filenames,
         pipe_mode=pipe_mode,
         is_training=True,
         drop_remainder=True).map(select_data_and_label_from_record)
@@ -142,7 +145,8 @@ if __name__ == '__main__':
     validation_data_filenames = glob('{}/*.tfrecord'.format(validation_data))
     print(validation_data_filenames)
     validation_dataset = file_based_input_dataset_builder(
-        validation_data_filenames,
+        channel='validation',
+        input_filenames=validation_data_filenames,
         pipe_mode=pipe_mode,
         is_training=False,
         drop_remainder=True).map(select_data_and_label_from_record)
