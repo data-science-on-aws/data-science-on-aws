@@ -8,28 +8,25 @@ import subprocess
 import sys
 import os
 import tensorflow as tf
-#from tensorflow.io import TFRecordWriter
-#from tensorflow.io import FixedLenFeature
-#from tensorflow.data import TFRecordDataset
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow==2.0.0'])
+#subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow==2.0.0'])
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'transformers'])
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'sagemaker-tensorflow==2.0.0.1.1.0'])
-from transformers import BertTokenizer, TFBertForSequenceClassification
-from transformers import TFBertForSequenceClassification
+from transformers import DistilBertTokenizer
+from transformers import TFDistilBertForSequenceClassification
 from transformers import TextClassificationPipeline
-from transformers.configuration_bert import BertConfig
+from transformers.configuration_distilbert import DistilBertConfig
 
 MAX_SEQ_LENGTH = 128
-BATCH_SIZE = 256
-EVAL_BATCH_SIZE=BATCH_SIZE * 2
-EPOCHS = 5
+BATCH_SIZE = 128 
+EVAL_BATCH_SIZE = BATCH_SIZE * 2
+EPOCHS = 10 
 STEPS_PER_EPOCH = 1000
 VALIDATION_STEPS = 1000
 CLASSES = [1, 2, 3, 4, 5]
 # XLA is an optimization compiler for tensorflow
-USE_XLA = True 
+USE_XLA = False 
 # Mixed precision can help to speed up training time
-USE_AMP = True 
+USE_AMP = False
 
 
 def select_data_and_label_from_record(record):
@@ -38,7 +35,9 @@ def select_data_and_label_from_record(record):
         'input_mask': record['input_mask'],
         'segment_ids': record['segment_ids']
     }
+
     y = record['label_ids']
+    print(y)
 
     return (x, y)
 
@@ -61,7 +60,7 @@ def file_based_input_dataset_builder(channel,
         print('***** Using input_filenames {}'.format(input_filenames))
         dataset = tf.data.TFRecordDataset(input_filenames)
 
-    dataset = dataset.repeat(EPOCHS)
+    dataset = dataset.repeat(EPOCHS * STEPS_PER_EPOCH)
     dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
 
     name_to_features = {
@@ -96,7 +95,9 @@ def file_based_input_dataset_builder(channel,
     dataset.cache()
 
     if is_training:
-        dataset = dataset.shuffle(buffer_size=1000)
+        dataset = dataset.shuffle(seed=42,
+                                  buffer_size=1000,
+                                  reshuffle_each_iteration=True)
 
     return dataset
 
@@ -136,18 +137,19 @@ if __name__ == '__main__':
     num_gpus = args.num_gpus
 
     tokenizer = None
+    config = None
     model = None
-    config = None 
 
     # This is required when launching many instances at once...  the urllib request seems to get denied periodically
     successful_download = False
     retries = 0
     while (retries < 5 and not successful_download):
         try:
-            tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-            model = TFBertForSequenceClassification.from_pretrained('bert-base-uncased', 
-                                                                    config=config)
-            config = BertConfig(num_labels=len(CLASSES))
+            tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
+            config = DistilBertConfig.from_pretrained('distilbert-base-uncased',
+                                                      num_labels=len(CLASSES))
+            model = TFDistilBertForSequenceClassification.from_pretrained('distilbert-base-uncased', 
+                                                                          config=config)
             successful_download = True
             print('Sucessfully downloaded after {} retries.'.format(retries))
         except:
@@ -193,24 +195,26 @@ if __name__ == '__main__':
     loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
     metric = tf.keras.metrics.SparseCategoricalAccuracy('accuracy')
     model.compile(optimizer=optimizer, loss=loss, metrics=[metric])
-    model.layers[0].trainable = False
+#    model.layers[0].trainable=False
     model.summary()
 
     log_dir = './tensorboard/classification/'
     tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir)
 
     history = model.fit(train_dataset,
-#                        shuffle=True,
+                        shuffle=True,
                         epochs=EPOCHS,
                         steps_per_epoch=STEPS_PER_EPOCH,
-                        validation_data=validation_dataset,
-                        validation_steps=VALIDATION_STEPS,
+#                        validation_data=validation_dataset,
+#                        validation_steps=VALIDATION_STEPS,
                         callbacks=[tensorboard_callback])
+
+    print('Trained model {}'.format(model))
 
     # Save the Model
     model.save_pretrained(model_dir)
 
-    loaded_model = TFBertForSequenceClassification.from_pretrained(model_dir,
+    loaded_model = TFDistilBertForSequenceClassification.from_pretrained(model_dir,
                                                                    id2label={
                                                                     0: 1,
                                                                     1: 2,
@@ -226,14 +230,13 @@ if __name__ == '__main__':
                                                                     5: 4
                                                                    })
 
-    tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+    tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
 
     inference_pipeline = TextClassificationPipeline(model=loaded_model, 
                                                     tokenizer=tokenizer,
                                                     framework='tf',
                                                     device=-1) # -1 is CPU, >= 0 is GPU
 
-    print(inference_pipeline('This is great!'))
-    print(inference_pipeline('This is wonderful!'))
-    print(inference_pipeline('This is OK.'))
-    print(inference_pipeline('This sucks!'))
+    print("""I loved it!  I will recommend this to everyone.""", inference_pipeline("""I loved it!  I will recommend this to everyone."""))
+    print("""Really bad.  I hope they don't make this anymore.""", inference_pipeline("""Really bad.  I hope they don't make this anymore."""))
+    print("""It's OK.""", inference_pipeline("""It's OK."""))
