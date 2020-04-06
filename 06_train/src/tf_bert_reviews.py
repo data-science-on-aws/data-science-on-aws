@@ -161,6 +161,7 @@ if __name__ == '__main__':
                         default=False)
 
     args, _ = parser.parse_known_args()
+    print(args)
     train_data = args.train_data
     print(train_data)
     validation_data = args.validation_data
@@ -300,10 +301,14 @@ if __name__ == '__main__':
         if enable_sagemaker_debugger:
             import smdebug.tensorflow as smd
             callback = smd.KerasHook(out_dir=output_data_dir,
-                                             tensorboard_dir=tensorboard_logs_path,
-                                             save_config=smd.SaveConfig(save_interval=1),
-                                             include_collections=['metrics', 'losses', 'sm_metrics'],
-                                             include_workers='all')
+                                     export_tensorboard=True,        
+                                     tensorboard_dir=tensorboard_logs_path,
+                                     save_config=smd.SaveConfig(save_interval=1),
+                                     save_all=True,
+                                     include_collections=['metrics', 
+                                                          'losses', 
+                                                          'sm_metrics'],
+                                     include_workers='all')
             callbacks.append(callback)
             # Lightweight wrapper on the original optimizer
             optimizer = callback.wrap_optimizer(optimizer)
