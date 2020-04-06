@@ -163,46 +163,27 @@ if __name__ == '__main__':
     args, _ = parser.parse_known_args()
     print(args)
     train_data = args.train_data
-    print(train_data)
     validation_data = args.validation_data
-    print(validation_data)
     test_data = args.test_data
-    print(test_data)
     model_dir = args.model_dir
-    print(model_dir)
     output_data_dir = args.output_data_dir
-    print(output_data_dir)
     hosts = args.hosts
-    print(hosts)
     current_host = args.current_host
-    print(current_host)
     num_gpus = args.num_gpus
-    print(num_gpus)
     use_xla = args.use_xla
-    print(use_xla)
     use_amp = args.use_amp
-    print(use_amp)
     max_seq_length = args.max_seq_length
-    print(max_seq_length)
     train_batch_size = args.train_batch_size
-    print(train_batch_size)
     validation_batch_size = args.validation_batch_size
-    print(validation_batch_size)
     test_batch_size = args.test_batch_size
-    print(test_batch_size)
     epochs = args.epochs
-    print(epochs)
     train_steps_per_epoch = args.train_steps_per_epoch
-    print(train_steps_per_epoch)
     validation_steps = args.validation_steps
-    print(validation_steps)
     test_steps = args.test_steps
-    print(test_steps)
     freeze_bert_layer = args.freeze_bert_layer
-    print(freeze_bert_layer)
     enable_sagemaker_debugger = args.enable_sagemaker_debugger
-    print(enable_sagemaker_debugger)
- 
+
+    # Determine if PipeMode is enabled 
     pipe_mode_str = os.environ.get('SM_INPUT_DATA_CONFIG', '')
     print('pipe_mode_str {}'.format(pipe_mode_str))
     pipe_mode = (pipe_mode_str.find('Pipe') >= 0)
@@ -303,8 +284,8 @@ if __name__ == '__main__':
             callback = smd.KerasHook(out_dir=output_data_dir,
                                      export_tensorboard=True,        
                                      tensorboard_dir=tensorboard_logs_path,
-                                     save_config=smd.SaveConfig(save_interval=1),
-                                     save_all=True,
+                                     save_config=smd.SaveConfig(save_interval=100),
+#                                     save_all=True,
                                      include_collections=['metrics', 
                                                           'losses', 
                                                           'sm_metrics'],
@@ -313,7 +294,7 @@ if __name__ == '__main__':
             # Lightweight wrapper on the original optimizer
             optimizer = callback.wrap_optimizer(optimizer)
         else:
-            callback = tf.keras.callbacks.TensorBoard(log_dir=output_data_dir)
+            callback = tf.keras.callbacks.TensorBoard(log_dir=tensorboard_logs_path)
             callbacks.append(callback)
             
         loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
@@ -360,13 +341,15 @@ if __name__ == '__main__':
     tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
 
     if num_gpus >= 1:
-        device = 0 # GPU 0
+        inference_device = 0 # GPU 0
     else:
-        device = -1 # CPU
+        inference_device = -1 # CPU
+    print('inference_device {}'.format(inference_device))
+
     inference_pipeline = TextClassificationPipeline(model=loaded_model, 
                                                     tokenizer=tokenizer,
                                                     framework='tf',
-                                                    device=device)  
+                                                    device=inference_device)  
 
     print("""I loved it!  I will recommend this to everyone.""", inference_pipeline("""I loved it!  I will recommend this to everyone."""))
     print("""It's OK.""", inference_pipeline("""It's OK."""))
