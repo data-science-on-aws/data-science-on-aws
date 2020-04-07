@@ -236,9 +236,6 @@ if __name__ == '__main__':
             steps_per_epoch=test_steps,
             max_seq_length=max_seq_length).map(select_data_and_label_from_record)
 
-        tf.config.optimizer.set_jit(use_xla)
-        tf.config.optimizer.set_experimental_options({'auto_mixed_precision': use_amp})
-
         tokenizer = None
         config = None
         model = None
