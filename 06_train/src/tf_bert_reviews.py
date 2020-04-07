@@ -69,13 +69,12 @@ def file_based_input_dataset_builder(channel,
         """Decodes a record to a TensorFlow example."""
         example = tf.io.parse_single_example(record, name_to_features)
 
-        # tf.Example only supports tf.int64, but the TPU only supports tf.int32.
         # So cast all int64 to int32.
-        for name in list(example.keys()):
-            t = example[name]
-            if t.dtype == tf.int64:
-                t = tf.cast(t, tf.int32)
-            example[name] = t
+#         for name in list(example.keys()):
+#             t = example[name]
+#             if t.dtype == tf.int64:
+#                 t = tf.cast(t, tf.int32)
+#             example[name] = t
 
         return example
         
@@ -162,6 +161,7 @@ if __name__ == '__main__':
 
     args, _ = parser.parse_known_args()
     print(args)
+    
     train_data = args.train_data
     validation_data = args.validation_data
     test_data = args.test_data
