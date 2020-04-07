@@ -67,17 +67,8 @@ def file_based_input_dataset_builder(channel,
 
     def _decode_record(record, name_to_features):
         """Decodes a record to a TensorFlow example."""
-        example = tf.io.parse_single_example(record, name_to_features)
-
-        # So cast all int64 to int32.
-#         for name in list(example.keys()):
-#             t = example[name]
-#             if t.dtype == tf.int64:
-#                 t = tf.cast(t, tf.int32)
-#             example[name] = t
-
-        return example
-        
+        return tf.io.parse_single_example(record, name_to_features)
+    
     dataset = dataset.apply(
         tf.data.experimental.map_and_batch(
           lambda record: _decode_record(record, name_to_features),
