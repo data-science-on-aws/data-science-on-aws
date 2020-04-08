@@ -279,7 +279,6 @@ if __name__ == '__main__':
                                                           'sm_metrics'],
                                      include_workers='all')
             callbacks.append(callback)
-            # Lightweight wrapper on the original optimizer
             optimizer = callback.wrap_optimizer(optimizer)
         else:
             callback = tf.keras.callbacks.TensorBoard(log_dir=tensorboard_logs_path)
@@ -300,10 +299,10 @@ if __name__ == '__main__':
 
         print('Trained model {}'.format(model))
 
-#        test_history = model.evaluate(test_dataset,
-#                                      steps=test_steps,
-#                                      callbacks=callbacks)
-#        print(test_history)
+        test_history = model.evaluate(test_dataset,
+                                      steps=test_steps,
+                                      callbacks=callbacks)
+        print(test_history)
 
         # Save the Model
         model.save_pretrained(transformer_pretrained_model_path)
