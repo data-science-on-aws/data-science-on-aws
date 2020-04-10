@@ -1,15 +1,21 @@
-![Workshop Outline](img/outline.png) 
+# Attend the Next Free Online Workshop!
+RSVP Here:  **https://www.eventbrite.com/e/full-day-workshop-kubeflow-gpu-kerastensorflow-20-tf-extended-tfx-kubernetes-pytorch-xgboost-tickets-63362929227**
+
+# Agenda
+![Workshop Agenda](img/outline.png) 
 
 This workshop creates an ephemeral AWS acccount for you to use only for this workshop.  
 
 _This account will be torn down and not accessible immediately after the workshop._
 
-# 1. Logout of All AWS Consoles Across All Browser Tabs
+# Instructions for the Day of the Workshop
+
+## 1. Logout of All AWS Consoles Across All Browser Tabs
 If you don't logout, the following instructions will not work properly.
 
 _Please logout of all AWS Console sessions in all browser tabs._
 
-# 2. Login to AWS Workshop Portal
+## 2. Login to AWS Workshop Portal
 
 You will need the **Participant Hash** provided upon entry, and your email address to track your unique session.
 
@@ -37,7 +43,7 @@ Double-check that your account name is something like `TeamRole/MasterKey` as fo
 
 If not, please logout of your AWS Console in all browser tabs and re-run the steps above!
 
-# 3. Launch an Amazon SageMaker Notebook Instance
+## 3. Launch an Amazon SageMaker Notebook Instance
 
 Open the [AWS Management Console](https://console.aws.amazon.com/console/home)
 
@@ -75,7 +81,7 @@ Keep the default settings for the other options not highlighted in red, and clic
 
 While the notebook spins up, continue to work on the next section.  We'll come back to the notebook when it's ready.
 
-# 4. Update IAM Role Policy
+## 4. Update IAM Role Policy
 
 Click on the notebook instance to see the instance details.
 
@@ -93,19 +99,19 @@ _Note:  Never do this in your production account.  Please follow a least-privile
 
 ![Attach Admin Policy](img/attach_admin_policy.png)
 
-# 5. Start the Jupyter notebook
+## 5. Start the Jupyter notebook
 
 _Note:  Proceed when the status of the notebook instance changes from `Pending` to `InService`._
 
 ![Start Jupyter](img/start_jupyter.png)
 
-# 6. Launch a new Terminal within the Jupyter notebook
+## 6. Launch a new Terminal within the Jupyter notebook
 
 Click `File` > `New` > `Terminal` to launch a terminal in your Jupyter instance.
 
 ![](img/launch_jupyter_terminal.png)
 
-# 7. Clone this Workshop content in the terminal
+## 7. Clone this Workshop content in the terminal
 
 Within the Jupyter terminal, run the following:
 ```
@@ -114,7 +120,7 @@ cd ~/SageMaker
 git clone https://github.com/data-science-on-aws/workshop
 ```
 
-# 8. Start the Workshop
+## 8. Start the Workshop
 Navigate to `01_setup/` in your Jupyter notebook to start the workshop.
 
 ![Start Workshop](img/start_workshop.png)

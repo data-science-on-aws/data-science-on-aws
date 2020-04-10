@@ -2,6 +2,7 @@ import time
 import random
 import pandas as pd
 from glob import glob
+import pprint
 import argparse
 import json
 import subprocess
@@ -149,10 +150,27 @@ if __name__ == '__main__':
     parser.add_argument('--enable-sagemaker-debugger',
                         type=bool,
                         default=False)
-
+    parser.add_argument('--run-validation',
+                        type=bool,
+                        default=False)    
+    parser.add_argument('--run-test',
+                        type=bool,
+                        default=False)    
+    parser.add_argument('--run-sample-predictions',
+                        type=bool,
+                        default=False)    
+    parser.add_argument('--disable-eager-execution',
+                        type=bool,
+                        default=False) 
+    
     args, _ = parser.parse_known_args()
+    print("Args:") 
     print(args)
     
+    env_var = os.environ 
+    print("Environment Variables:") 
+    pprint.pprint(dict(env_var), width = 1) 
+
     train_data = args.train_data
     validation_data = args.validation_data
     test_data = args.test_data
@@ -173,12 +191,15 @@ if __name__ == '__main__':
     test_steps = args.test_steps
     freeze_bert_layer = args.freeze_bert_layer
     enable_sagemaker_debugger = args.enable_sagemaker_debugger
+    run_validation = args.run_validation
+    run_test = args.run_test
+    run_sample_predictions = args.run_sample_predictions
+    disable_eager_execution = args.disable_eager_execution    
 
     # Determine if PipeMode is enabled 
     pipe_mode_str = os.environ.get('SM_INPUT_DATA_CONFIG', '')
-    print('pipe_mode_str {}'.format(pipe_mode_str))
     pipe_mode = (pipe_mode_str.find('Pipe') >= 0)
-    print('pipe_mode {}'.format(pipe_mode))
+    print('Using pipe_mode: {}'.format(pipe_mode))
  
     # Model Output 
     transformer_pretrained_model_path = os.path.join(model_dir, 'transformer/pretrained')
@@ -192,7 +213,12 @@ if __name__ == '__main__':
     tensorboard_logs_path = os.path.join(output_data_dir, 'tensorboard') 
     os.makedirs(tensorboard_logs_path, exist_ok=True)
 
+    print('disable_eager_execution {}'.format(disable_eager_execution))
+    if disable_eager_execution: 
+        tf.compat.v1.disable_eager_execution()        
+        
     distributed_strategy = tf.distribute.MirroredStrategy()
+#    distributed_strategy = tf.distribute.experimental.MultiWorkerMirroredStrategy()
     with distributed_strategy.scope():
         tf.config.optimizer.set_jit(use_xla)
         tf.config.optimizer.set_experimental_options({"auto_mixed_precision": use_amp})
@@ -208,32 +234,6 @@ if __name__ == '__main__':
             batch_size=train_batch_size,
             epochs=epochs,
             steps_per_epoch=train_steps_per_epoch,
-            max_seq_length=max_seq_length).map(select_data_and_label_from_record)
-
-        validation_data_filenames = glob(os.path.join(validation_data, '*.tfrecord'))
-        print('validation_data_filenames {}'.format(validation_data_filenames))
-        validation_dataset = file_based_input_dataset_builder(
-            channel='validation',
-            input_filenames=validation_data_filenames,
-            pipe_mode=pipe_mode,
-            is_training=False,
-            drop_remainder=False,
-            batch_size=validation_batch_size,
-            epochs=epochs,
-            steps_per_epoch=validation_steps,
-            max_seq_length=max_seq_length).map(select_data_and_label_from_record)
-
-        test_data_filenames = glob(os.path.join(test_data, '*.tfrecord'))
-        print('test_data_filenames {}'.format(test_data_filenames))
-        test_dataset = file_based_input_dataset_builder(
-            channel='test',
-            input_filenames=test_data_filenames,
-            pipe_mode=pipe_mode,
-            is_training=False,
-            drop_remainder=False,
-            batch_size=test_batch_size,
-            epochs=epochs,
-            steps_per_epoch=test_steps,
             max_seq_length=max_seq_length).map(select_data_and_label_from_record)
 
         tokenizer = None
@@ -288,56 +288,93 @@ if __name__ == '__main__':
         metric = tf.keras.metrics.SparseCategoricalAccuracy('accuracy')
 
         model.compile(optimizer=optimizer, loss=loss, metrics=[metric])
-        train_and_validation_history = model.fit(train_dataset,
-                                                 shuffle=True,
-                                                 epochs=epochs,
-                                                 steps_per_epoch=train_steps_per_epoch,
-                                                 validation_data=validation_dataset,
-                                                 validation_steps=validation_steps,
-                                                 callbacks=callbacks)
-        print(train_and_validation_history)
-
         print('Trained model {}'.format(model))
 
-        test_history = model.evaluate(test_dataset,
-                                      steps=test_steps,
-                                      callbacks=callbacks)
-        print(test_history)
+        if run_validation:
+            validation_data_filenames = glob(os.path.join(validation_data, '*.tfrecord'))
+            print('validation_data_filenames {}'.format(validation_data_filenames))
+            validation_dataset = file_based_input_dataset_builder(
+                channel='validation',
+                input_filenames=validation_data_filenames,
+                pipe_mode=pipe_mode,
+                is_training=False,
+                drop_remainder=False,
+                batch_size=validation_batch_size,
+                epochs=epochs,
+                steps_per_epoch=validation_steps,
+                max_seq_length=max_seq_length).map(select_data_and_label_from_record)
 
-        # Save the Model
+            train_and_validation_history = model.fit(train_dataset,
+                                                     shuffle=True,
+                                                     epochs=epochs,
+                                                     steps_per_epoch=train_steps_per_epoch,
+                                                     validation_data=validation_dataset,
+                                                     validation_steps=validation_steps,
+                                                     callbacks=callbacks)
+            print(train_and_validation_history)
+        else: # Not running validation
+            train_history = model.fit(train_dataset,
+                                      shuffle=True,
+                                      epochs=epochs,
+                                      steps_per_epoch=train_steps_per_epoch,
+                                      callbacks=callbacks)
+            print(train_history)
+
+        if run_test:
+            test_data_filenames = glob(os.path.join(test_data, '*.tfrecord'))
+            print('test_data_filenames {}'.format(test_data_filenames))
+            test_dataset = file_based_input_dataset_builder(
+                channel='test',
+                input_filenames=test_data_filenames,
+                pipe_mode=pipe_mode,
+                is_training=False,
+                drop_remainder=False,
+                batch_size=test_batch_size,
+                epochs=epochs,
+                steps_per_epoch=test_steps,
+                max_seq_length=max_seq_length).map(select_data_and_label_from_record)
+
+            test_history = model.evaluate(test_dataset,
+                                          steps=test_steps,
+                                          callbacks=callbacks)
+            print(test_history)
+
+            
+        # Save the fine-tuned Transformers Model
         model.save_pretrained(transformer_pretrained_model_path)
+        # Save the TensorFlow SavedModel
         model.save(tensorflow_saved_model_path, save_format='tf')
 
+    if run_sample_predictions:
+        loaded_model = TFDistilBertForSequenceClassification.from_pretrained(transformer_pretrained_model_path,
+                                                                       id2label={
+                                                                        0: 1,
+                                                                        1: 2,
+                                                                        2: 3,
+                                                                        3: 4,
+                                                                        4: 5
+                                                                       },
+                                                                       label2id={
+                                                                        1: 0,
+                                                                        2: 1,
+                                                                        3: 2,
+                                                                        4: 3,
+                                                                        5: 4
+                                                                       })
 
-    loaded_model = TFDistilBertForSequenceClassification.from_pretrained(transformer_pretrained_model_path,
-                                                                   id2label={
-                                                                    0: 1,
-                                                                    1: 2,
-                                                                    2: 3,
-                                                                    3: 4,
-                                                                    4: 5
-                                                                   },
-                                                                   label2id={
-                                                                    1: 0,
-                                                                    2: 1,
-                                                                    3: 2,
-                                                                    4: 3,
-                                                                    5: 4
-                                                                   })
+        tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
 
-    tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
+        if num_gpus >= 1:
+            inference_device = 0 # GPU 0
+        else:
+            inference_device = -1 # CPU
+        print('inference_device {}'.format(inference_device))
 
-    if num_gpus >= 1:
-        inference_device = 0 # GPU 0
-    else:
-        inference_device = -1 # CPU
-    print('inference_device {}'.format(inference_device))
+        inference_pipeline = TextClassificationPipeline(model=loaded_model, 
+                                                        tokenizer=tokenizer,
+                                                        framework='tf',
+                                                        device=inference_device)  
 
-    inference_pipeline = TextClassificationPipeline(model=loaded_model, 
-                                                    tokenizer=tokenizer,
-                                                    framework='tf',
-                                                    device=inference_device)  
-
-    print("""I loved it!  I will recommend this to everyone.""", inference_pipeline("""I loved it!  I will recommend this to everyone."""))
-    print("""It's OK.""", inference_pipeline("""It's OK."""))
-    print("""Really bad.  I hope they don't make this anymore.""", inference_pipeline("""Really bad.  I hope they don't make this anymore."""))
+        print("""I loved it!  I will recommend this to everyone.""", inference_pipeline("""I loved it!  I will recommend this to everyone."""))
+        print("""It's OK.""", inference_pipeline("""It's OK."""))
+        print("""Really bad.  I hope they don't make this anymore.""", inference_pipeline("""Really bad.  I hope they don't make this anymore."""))
