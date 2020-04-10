@@ -1,3 +1,6 @@
+# Attend the Next Workshop
+RSVP Here:  https://www.eventbrite.com/e/full-day-workshop-kubeflow-gpu-kerastensorflow-20-tf-extended-tfx-kubernetes-pytorch-xgboost-tickets-63362929227
+
 ![Workshop Outline](img/outline.png) 
 
 This workshop creates an ephemeral AWS acccount for you to use only for this workshop.  
