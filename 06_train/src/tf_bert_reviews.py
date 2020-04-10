@@ -11,7 +11,7 @@ import os
 import tensorflow as tf
 #subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow==2.0.0'])
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'transformers'])
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'sagemaker-tensorflow==2.0.0.1.1.0'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'sagemaker-tensorflow==2.1.0.1.0.0'])
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'smdebug==0.7.2'])
 from transformers import DistilBertTokenizer
 from transformers import TFDistilBertForSequenceClassification
@@ -28,7 +28,6 @@ def select_data_and_label_from_record(record):
     }
 
     y = record['label_ids']
-    print(y)
 
     return (x, y)
 
@@ -63,7 +62,7 @@ def file_based_input_dataset_builder(channel,
       "input_mask": tf.io.FixedLenFeature([max_seq_length], tf.int64),
       "segment_ids": tf.io.FixedLenFeature([max_seq_length], tf.int64),
       "label_ids": tf.io.FixedLenFeature([], tf.int64),
-      "is_real_example": tf.io.FixedLenFeature([], tf.int64),
+#      "is_real_example": tf.io.FixedLenFeature([], tf.int64),
     }
 
     def _decode_record(record, name_to_features):
@@ -159,9 +158,9 @@ if __name__ == '__main__':
     parser.add_argument('--run-sample-predictions',
                         type=bool,
                         default=False)    
-    parser.add_argument('--disable-eager-execution',
-                        type=bool,
-                        default=False) 
+#     parser.add_argument('--disable-eager-execution',
+#                         type=bool,
+#                         default=False) 
     
     args, _ = parser.parse_known_args()
     print("Args:") 
@@ -194,7 +193,7 @@ if __name__ == '__main__':
     run_validation = args.run_validation
     run_test = args.run_test
     run_sample_predictions = args.run_sample_predictions
-    disable_eager_execution = args.disable_eager_execution    
+#    disable_eager_execution = args.disable_eager_execution    
 
     # Determine if PipeMode is enabled 
     pipe_mode_str = os.environ.get('SM_INPUT_DATA_CONFIG', '')
@@ -213,12 +212,12 @@ if __name__ == '__main__':
     tensorboard_logs_path = os.path.join(output_data_dir, 'tensorboard') 
     os.makedirs(tensorboard_logs_path, exist_ok=True)
 
-    print('disable_eager_execution {}'.format(disable_eager_execution))
-    if disable_eager_execution: 
-        tf.compat.v1.disable_eager_execution()        
+#     print('disable_eager_execution {}'.format(disable_eager_execution))
+#     if disable_eager_execution: 
+#         tf.compat.v1.disable_eager_execution()        
         
-    distributed_strategy = tf.distribute.MirroredStrategy()
-#    distributed_strategy = tf.distribute.experimental.MultiWorkerMirroredStrategy()
+#    distributed_strategy = tf.distribute.MirroredStrategy()
+    distributed_strategy = tf.distribute.experimental.MultiWorkerMirroredStrategy()
     with distributed_strategy.scope():
         tf.config.optimizer.set_jit(use_xla)
         tf.config.optimizer.set_experimental_options({"auto_mixed_precision": use_amp})
