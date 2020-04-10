@@ -1,5 +1,5 @@
 # Attend the Next Free Online Workshop
-RSVP Here:  https://www.eventbrite.com/e/full-day-workshop-kubeflow-gpu-kerastensorflow-20-tf-extended-tfx-kubernetes-pytorch-xgboost-tickets-63362929227
+RSVP Here:  **https://www.eventbrite.com/e/full-day-workshop-kubeflow-gpu-kerastensorflow-20-tf-extended-tfx-kubernetes-pytorch-xgboost-tickets-63362929227**
 
 ![Workshop Outline](img/outline.png) 
 
