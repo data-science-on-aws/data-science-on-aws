@@ -84,6 +84,8 @@ While the notebook spins up, continue to work on the next section.  We'll come b
 ## 4. Update IAM Role Policy
 
 Click on the notebook instance to see the instance details.
+`
+![Notebook Instance Details](img/click_notebook_instance.png)
 
 Click on the IAM role link and navigate to the IAM Management Console.
 
