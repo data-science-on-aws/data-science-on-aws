@@ -10,7 +10,7 @@ import sys
 import os
 import tensorflow as tf
 #subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow==2.1.0'])
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'transformers'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'transformers==2.8.0'])
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'sagemaker-tensorflow==2.1.0.1.0.0'])
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'smdebug==0.7.2'])
 from transformers import DistilBertTokenizer
@@ -71,6 +71,7 @@ def file_based_input_dataset_builder(channel,
         # Convert input_ids into input_tokens with DistilBert vocabulary 
         #  if hook.get_collections()['all'].save_config.should_save_step(modes.EVAL, hook.mode_steps[modes.EVAL]):
 #              hook._write_raw_tensor_simple("input_tokens", input_tokens)
+        return record
     
     dataset = dataset.apply(
         tf.data.experimental.map_and_batch(
@@ -138,11 +139,11 @@ if __name__ == '__main__':
                         type=int,
                         default=2)
     parser.add_argument('--learning-rate',
-                        type=int,
-                        default=3e-5)
+                        type=float,
+                        default=0.00003)
     parser.add_argument('--epsilon',
-                        type=int,
-                        default=1e-8)
+                        type=float,
+                        default=0.00000001)
     parser.add_argument('--train-steps-per-epoch',
                         type=int,
                         default=1000)
