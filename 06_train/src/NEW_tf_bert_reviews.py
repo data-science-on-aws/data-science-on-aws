@@ -66,7 +66,11 @@ def file_based_input_dataset_builder(channel,
 
     def _decode_record(record, name_to_features):
         """Decodes a record to a TensorFlow example."""
-        return tf.io.parse_single_example(record, name_to_features)
+        record = tf.io.parse_single_example(record, name_to_features)
+        # TODO:  wip/bert/bert_attention_head_view/train.py
+        # Convert input_ids into input_tokens with DistilBert vocabulary 
+        #  if hook.get_collections()['all'].save_config.should_save_step(modes.EVAL, hook.mode_steps[modes.EVAL]):
+#              hook._write_raw_tensor_simple("input_tokens", input_tokens)
     
     dataset = dataset.apply(
         tf.data.experimental.map_and_batch(
@@ -133,6 +137,12 @@ if __name__ == '__main__':
     parser.add_argument('--epochs',
                         type=int,
                         default=2)
+    parser.add_argument('--learning-rate',
+                        type=int,
+                        default=3e-5)
+    parser.add_argument('--epsilon',
+                        type=int,
+                        default=1e-8)
     parser.add_argument('--train-steps-per-epoch',
                         type=int,
                         default=1000)
@@ -181,6 +191,8 @@ if __name__ == '__main__':
     validation_batch_size = args.validation_batch_size
     test_batch_size = args.test_batch_size
     epochs = args.epochs
+    learning_rate = args.learning_rate
+    epsilon = args.epsilon
     train_steps_per_epoch = args.train_steps_per_epoch
     validation_steps = args.validation_steps
     test_steps = args.test_steps
@@ -252,7 +264,7 @@ if __name__ == '__main__':
         if not tokenizer or not model or not config:
             print('Not properly initialized...')
 
-        optimizer = tf.keras.optimizers.Adam(learning_rate=3e-5, epsilon=1e-08)
+        optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate, epsilon=epsilon)
         if use_amp:
             # loss scaling is currently required when using mixed precision
             optimizer = tf.keras.mixed_precision.experimental.LossScaleOptimizer(optimizer, 'dynamic')
@@ -266,16 +278,6 @@ if __name__ == '__main__':
             # This assumes that we specified debugger_hook_config
             callback = smd.KerasHook.create_from_json_file()
             print(callback)
-#            callback = smd.KerasHook(out_dir='s3://sagemaker-us-east-1-828802286385/tensors/',
-# #                                     export_tensorboard=True,        
-# #                                     tensorboard_dir=tensorboard_logs_path,
-# #                                     save_config=smd.SaveConfig(save_interval=100),
-# #                                     save_all=True,
-#                                      include_collections=['metrics', 
-#                                                           'losses', 
-#                                                           'sm_metrics'],
-#                                     )
-# #                                     include_workers='all')
             print('*** CALLBACK {} ***'.format(callback))
             callbacks.append(callback)
             optimizer = callback.wrap_optimizer(optimizer)
@@ -344,9 +346,9 @@ if __name__ == '__main__':
         # Save the fine-tuned Transformers Model
         model.save_pretrained(transformer_pretrained_model_path)
 
-        print('tensorflow_saved_model_path {}'.format(tensorflow_saved_model_path))
         # Save the TensorFlow SavedModel
-        # model.save(tensorflow_saved_model_path, save_format='tf')
+        print('tensorflow_saved_model_path {}'.format(tensorflow_saved_model_path))        
+        model.save(tensorflow_saved_model_path, save_format='tf')
 
     if run_sample_predictions:
         loaded_model = TFDistilBertForSequenceClassification.from_pretrained(transformer_pretrained_model_path,
