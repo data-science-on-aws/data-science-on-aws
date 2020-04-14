@@ -93,80 +93,80 @@ def file_based_input_dataset_builder(channel,
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--train-data', 
+    parser.add_argument('--train_data', 
                         type=str, 
                         default=os.environ['SM_CHANNEL_TRAIN'])
-    parser.add_argument('--validation-data', 
+    parser.add_argument('--validation_data', 
                         type=str, 
                         default=os.environ['SM_CHANNEL_VALIDATION'])
-    parser.add_argument('--test-data',
+    parser.add_argument('--test_data',
                         type=str,
                         default=os.environ['SM_CHANNEL_TEST'])
-    parser.add_argument('--model-dir', 
+    parser.add_argument('--model_dir', 
                         type=str, 
                         default=os.environ['SM_MODEL_DIR'])
-    parser.add_argument('--output-data-dir',
+    parser.add_argument('--output_data_dir',
                         type=str,
                         default=os.environ['SM_OUTPUT_DATA_DIR'])
     parser.add_argument('--hosts', 
                         type=list, 
                         default=json.loads(os.environ['SM_HOSTS']))
-    parser.add_argument('--current-host', 
+    parser.add_argument('--current_host', 
                         type=str, 
                         default=os.environ['SM_CURRENT_HOST'])    
-    parser.add_argument('--num-gpus', 
+    parser.add_argument('--num_gpus', 
                         type=int, 
                         default=os.environ['SM_NUM_GPUS'])
-    parser.add_argument('--use-xla',
-                        type=bool,
+    parser.add_argument('--use_xla',
+                        type=eval,
                         default=False)
-    parser.add_argument('--use-amp',
-                        type=bool,
+    parser.add_argument('--use_amp',
+                        type=eval,
                         default=False)
-    parser.add_argument('--max-seq-length',
+    parser.add_argument('--max_seq_length',
                         type=int,
                         default=128)
-    parser.add_argument('--train-batch-size',
+    parser.add_argument('--train_batch_size',
                         type=int,
                         default=128)
-    parser.add_argument('--validation-batch-size',
+    parser.add_argument('--validation_batch_size',
                         type=int,
                         default=256)
-    parser.add_argument('--test-batch-size',
+    parser.add_argument('--test_batch_size',
                         type=int,
                         default=256)
     parser.add_argument('--epochs',
                         type=int,
                         default=2)
-    parser.add_argument('--learning-rate',
+    parser.add_argument('--learning_rate',
                         type=float,
                         default=0.00003)
     parser.add_argument('--epsilon',
                         type=float,
                         default=0.00000001)
-    parser.add_argument('--train-steps-per-epoch',
+    parser.add_argument('--train_steps_per_epoch',
                         type=int,
                         default=1000)
-    parser.add_argument('--validation-steps',
+    parser.add_argument('--validation_steps',
                         type=int,
                         default=1000)
-    parser.add_argument('--test-steps',
+    parser.add_argument('--test_steps',
                         type=int,
                         default=1000)
-    parser.add_argument('--freeze-bert-layer',
-                        type=bool,
+    parser.add_argument('--freeze_bert_layer',
+                        type=eval,
                         default=False)
-    parser.add_argument('--enable-sagemaker-debugger',
-                        type=bool,
+    parser.add_argument('--enable_sagemaker_debugger',
+                        type=eval,
                         default=False)
-    parser.add_argument('--run-validation',
-                        type=bool,
+    parser.add_argument('--run_validation',
+                        type=eval,
                         default=False)    
-    parser.add_argument('--run-test',
-                        type=bool,
+    parser.add_argument('--run_test',
+                        type=eval,
                         default=False)    
-    parser.add_argument('--run-sample-predictions',
-                        type=bool,
+    parser.add_argument('--run_sample_predictions',
+                        type=eval,
                         default=False)
     
     args, _ = parser.parse_known_args()
@@ -178,30 +178,55 @@ if __name__ == '__main__':
     pprint.pprint(dict(env_var), width = 1) 
 
     train_data = args.train_data
+    print('train_data {}'.format(train_data))
     validation_data = args.validation_data
+    print('validation_data {}'.format(validation_data))
     test_data = args.test_data
+    print('test_data {}'.format(test_data))    
     model_dir = args.model_dir
+    print('model_dir {}'.format(model_dir))    
     output_data_dir = args.output_data_dir
+    print('output_data_dir {}'.format(output_data_dir))    
     hosts = args.hosts
+    print('hosts {}'.format(hosts))    
     current_host = args.current_host
+    print('current_host {}'.format(current_host))    
     num_gpus = args.num_gpus
+    print('num_gpus {}'.format(num_gpus))
     use_xla = args.use_xla
+    print('use_xla {}'.format(use_xla))    
     use_amp = args.use_amp
+    print('use_amp {}'.format(use_amp))    
     max_seq_length = args.max_seq_length
+    print('max_seq_length {}'.format(max_seq_length))    
     train_batch_size = args.train_batch_size
+    print('train_batch_size {}'.format(train_batch_size))    
     validation_batch_size = args.validation_batch_size
+    print('validation_batch_size {}'.format(validation_batch_size))    
     test_batch_size = args.test_batch_size
+    print('test_batch_size {}'.format(test_batch_size))    
     epochs = args.epochs
+    print('epochs {}'.format(epochs))    
     learning_rate = args.learning_rate
+    print('learning_rate {}'.format(learning_rate))    
     epsilon = args.epsilon
+    print('epsilon {}'.format(epsilon))    
     train_steps_per_epoch = args.train_steps_per_epoch
+    print('train_steps_per_epoch {}'.format(train_steps_per_epoch))    
     validation_steps = args.validation_steps
+    print('validation_steps {}'.format(validation_steps))    
     test_steps = args.test_steps
+    print('test_steps {}'.format(test_steps))    
     freeze_bert_layer = args.freeze_bert_layer
+    print('freeze_bert_layer {}'.format(freeze_bert_layer))    
     enable_sagemaker_debugger = args.enable_sagemaker_debugger
+    print('enable_sagemaker_debugger {}'.format(enable_sagemaker_debugger))    
     run_validation = args.run_validation
+    print('run_validation {}'.format(run_validation))    
     run_test = args.run_test
+    print('run_test {}'.format(run_test))    
     run_sample_predictions = args.run_sample_predictions
+    print('run_sample_predictions {}'.format(run_sample_predictions))    
 
     # Determine if PipeMode is enabled 
     pipe_mode_str = os.environ.get('SM_INPUT_DATA_CONFIG', '')
@@ -217,8 +242,8 @@ if __name__ == '__main__':
     os.makedirs(tensorflow_saved_model_path, exist_ok=True)
 
     # Tensorboard Logs 
-    tensorboard_logs_path = os.path.join(output_data_dir, 'tensorboard') 
-    os.makedirs(tensorboard_logs_path, exist_ok=True)
+#    tensorboard_logs_path = os.path.join(output_data_dir, 'tensorboard') 
+#    os.makedirs(tensorboard_logs_path, exist_ok=True)
 
     distributed_strategy = tf.distribute.MirroredStrategy()
     # smdebug currently (0.7.2) does not support MultiWorkerMirroredStrategy()
@@ -266,13 +291,13 @@ if __name__ == '__main__':
             print('Not properly initialized...')
 
         optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate, epsilon=epsilon)
+        print('** use_amp {}'.format(use_amp))        
         if use_amp:
             # loss scaling is currently required when using mixed precision
             optimizer = tf.keras.mixed_precision.experimental.LossScaleOptimizer(optimizer, 'dynamic')
 
         callbacks = []
-        print('freeze BERT layer {}'.format(args.freeze_bert_layer))
-        print('enable SM_DEBUGGER {}'.format(args.enable_sagemaker_debugger))
+        print('enable_sagemaker_debugger {}'.format(enable_sagemaker_debugger))
         if enable_sagemaker_debugger:
             print('*** DEBUGGING ***')
             import smdebug.tensorflow as smd
@@ -282,9 +307,9 @@ if __name__ == '__main__':
             print('*** CALLBACK {} ***'.format(callback))
             callbacks.append(callback)
             optimizer = callback.wrap_optimizer(optimizer)
-        else:
-            callback = tf.keras.callbacks.TensorBoard(log_dir=tensorboard_logs_path)
-            callbacks.append(callback)
+#        else:
+#            callback = tf.keras.callbacks.TensorBoard(log_dir=tensorboard_logs_path)
+#            callbacks.append(callback)
             
         print('*** OPTIMIZER {} ***'.format(optimizer))
         
