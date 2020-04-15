@@ -102,9 +102,15 @@ if __name__ == '__main__':
     parser.add_argument('--test_data',
                         type=str,
                         default=os.environ['SM_CHANNEL_TEST'])
-    parser.add_argument('--model_dir', 
-                        type=str, 
-                        default=os.environ['SM_MODEL_DIR'])
+    # This points to the S3 location - this should not be used by our code
+    # We should use /opt/ml/model/ instead
+#     parser.add_argument('--model_dir', 
+#                         type=str, 
+#                         default=os.environ['SM_MODEL_DIR'])
+    parser.add_argument('--output_dir',
+                        type=str,
+                        default=os.environ['SM_OUTPUT_DIR'])
+    # This is unused
     parser.add_argument('--output_data_dir',
                         type=str,
                         default=os.environ['SM_OUTPUT_DATA_DIR'])
@@ -183,10 +189,17 @@ if __name__ == '__main__':
     print('validation_data {}'.format(validation_data))
     test_data = args.test_data
     print('test_data {}'.format(test_data))    
-    model_dir = args.model_dir
-    print('model_dir {}'.format(model_dir))    
-    output_data_dir = args.output_data_dir
-    print('output_data_dir {}'.format(output_data_dir))    
+
+#    model_dir = args.model_dir
+#    print('model_dir {}'.format(model_dir))    
+    local_model_dir = os.environ['SM_MODEL_DIR']
+
+    output_dir = args.output_dir
+    print('output_dir {}'.format(output_dir))    
+
+    # This is unused
+#    output_data_dir = args.output_data_dir
+#    print('output_data_dir {}'.format(output_data_dir))    
     hosts = args.hosts
     print('hosts {}'.format(hosts))    
     current_host = args.current_host
@@ -234,16 +247,16 @@ if __name__ == '__main__':
     print('Using pipe_mode: {}'.format(pipe_mode))
  
     # Model Output 
-    transformer_pretrained_model_path = os.path.join(model_dir, 'transformer/pretrained')
-    os.makedirs(transformer_pretrained_model_path, exist_ok=True)
+    transformer_fine_tuned_model_path = os.path.join(local_model_dir, 'transformers/fine-tuned/')
+    os.makedirs(transformer_fine_tuned_model_path, exist_ok=True)
 
     # SavedModel Output
-    tensorflow_saved_model_path = os.path.join(model_dir, 'saved_model/0')
+    tensorflow_saved_model_path = os.path.join(local_model_dir, 'tensorflow/saved_model/0')
     os.makedirs(tensorflow_saved_model_path, exist_ok=True)
 
     # Tensorboard Logs 
-#    tensorboard_logs_path = os.path.join(output_data_dir, 'tensorboard') 
-#    os.makedirs(tensorboard_logs_path, exist_ok=True)
+    tensorboard_logs_path = os.path.join(output_dir, 'tensorboard') 
+    os.makedirs(tensorboard_logs_path, exist_ok=True)
 
     distributed_strategy = tf.distribute.MirroredStrategy()
     # smdebug currently (0.7.2) does not support MultiWorkerMirroredStrategy()
@@ -307,9 +320,9 @@ if __name__ == '__main__':
             print('*** CALLBACK {} ***'.format(callback))
             callbacks.append(callback)
             optimizer = callback.wrap_optimizer(optimizer)
-#        else:
-#            callback = tf.keras.callbacks.TensorBoard(log_dir=tensorboard_logs_path)
-#            callbacks.append(callback)
+
+        callback = tf.keras.callbacks.TensorBoard(log_dir=tensorboard_logs_path)
+        callbacks.append(callback)
             
         print('*** OPTIMIZER {} ***'.format(optimizer))
         
@@ -318,6 +331,7 @@ if __name__ == '__main__':
 
         model.compile(optimizer=optimizer, loss=loss, metrics=[metric])
         print('Trained model {}'.format(model))
+        print(model.summary())
 
         if run_validation:
             validation_data_filenames = glob(os.path.join(validation_data, '*.tfrecord'))
@@ -370,14 +384,16 @@ if __name__ == '__main__':
 
             
         # Save the fine-tuned Transformers Model
-        model.save_pretrained(transformer_pretrained_model_path)
+        print('transformer_fine_tuned_model_path {}'.format(transformer_fine_tuned_model_path))   
+
+        model.save_pretrained(transformer_fine_tuned_model_path)
 
         # Save the TensorFlow SavedModel
-        print('tensorflow_saved_model_path {}'.format(tensorflow_saved_model_path))        
+        print('tensorflow_saved_model_path {}'.format(tensorflow_saved_model_path))   
         model.save(tensorflow_saved_model_path, save_format='tf')
 
     if run_sample_predictions:
-        loaded_model = TFDistilBertForSequenceClassification.from_pretrained(transformer_pretrained_model_path,
+        loaded_model = TFDistilBertForSequenceClassification.from_pretrained(transformer_fine_tuned_model_path,
                                                                        id2label={
                                                                         0: 1,
                                                                         1: 2,

@@ -10,7 +10,7 @@ import sys
 import os
 import tensorflow as tf
 #subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow==2.0.0'])
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'transformers'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'transformers==2.8.0'])
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'sagemaker-tensorflow==2.1.0.1.0.0'])
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'smdebug==0.7.2'])
 from transformers import DistilBertTokenizer
@@ -136,13 +136,13 @@ if __name__ == '__main__':
                         default=2)
     parser.add_argument('--train-steps-per-epoch',
                         type=int,
-                        default=1000)
+                        default=100)
     parser.add_argument('--validation-steps',
                         type=int,
-                        default=1000)
+                        default=100)
     parser.add_argument('--test-steps',
                         type=int,
-                        default=1000)
+                        default=100)
     parser.add_argument('--freeze-bert-layer',
                         type=bool,
                         default=False)
