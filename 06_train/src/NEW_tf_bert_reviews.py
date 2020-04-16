@@ -346,7 +346,10 @@ if __name__ == '__main__':
                 epochs=epochs,
                 steps_per_epoch=validation_steps,
                 max_seq_length=max_seq_length).map(select_data_and_label_from_record)
-
+            
+            # HACK:  trim the Validation dataset down to equal the number of validation steps to workaround PipeMode issue
+            validation_dataset = validation_dataset.take(validation_steps)
+            
             train_and_validation_history = model.fit(train_dataset,
                                                      shuffle=True,
                                                      epochs=epochs,
