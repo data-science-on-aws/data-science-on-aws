@@ -32,12 +32,10 @@ class InputFeatures(object):
                input_mask,
                segment_ids,
                label_id):
-#               is_real_example=True):
     self.input_ids = input_ids
     self.input_mask = input_mask
     self.segment_ids = segment_ids
     self.label_id = label_id
-#    self.is_real_example = is_real_example
     
     
 def convert_single_example(ex_index, example, label_list, max_seq_length,
@@ -121,7 +119,6 @@ def convert_single_example(ex_index, example, label_list, max_seq_length,
       input_mask=input_mask,
       segment_ids=segment_ids,
       label_id=label_id)
-#      is_real_example=True)
   return feature
 
 
@@ -147,8 +144,6 @@ def file_based_convert_examples_to_features(
     features["input_mask"] = create_int_feature(feature.input_mask)
     features["segment_ids"] = create_int_feature(feature.segment_ids)
     features["label_ids"] = create_int_feature([feature.label_id])
-#    features["is_real_example"] = create_int_feature(
-#        [int(feature.is_real_example)])
 
     tf_example = tf.train.Example(features=tf.train.Features(feature=features))
     writer.write(tf_example.SerializeToString())
@@ -233,8 +228,6 @@ def file_based_convert_examples_to_features(
     features["input_mask"] = create_int_feature(feature.input_mask)
     features["segment_ids"] = create_int_feature(feature.segment_ids)
     features["label_ids"] = create_int_feature([feature.label_id])
-#    features["is_real_example"] = create_int_feature(
-#        [int(feature.is_real_example)])
 
     tf_example = tf.train.Example(features=tf.train.Features(feature=features))
     writer.write(tf_example.SerializeToString())
