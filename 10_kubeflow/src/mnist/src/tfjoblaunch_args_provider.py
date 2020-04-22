@@ -23,7 +23,7 @@ def tfjoblauncher_args(step, s3bucketexportpath, args):
                         "env": [
                             {
                                 "name": "AWS_REGION",
-                                "value": "us-west-2"
+                                "value": "us-east-1"
                             },
                             {
                                 "name": "AWS_ACCESS_KEY_ID",
@@ -74,7 +74,7 @@ def tfjoblauncher_args(step, s3bucketexportpath, args):
                         "env": [
                             {
                                 "name": "AWS_REGION",
-                                "value": "us-west-2"
+                                "value": "us-east-1"
                             },
                             {
                                 "name": "AWS_ACCESS_KEY_ID",
