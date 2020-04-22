@@ -4,30 +4,17 @@ RSVP Here:  **https://www.eventbrite.com/e/full-day-workshop-kubeflow-gpu-kerast
 # Agenda
 ![Workshop Agenda](img/outline.png) 
 
-This workshop creates an ephemeral AWS acccount for you to use only for this workshop.  
-
-_This ephmeral account is not accessible after the workshop._
-
 # Instructions for the Day of the Workshop
+
+_This workshop creates an ephemeral AWS acccount for you to use only for this workshop.  This ephemeral account is not accessible after the workshop, however you can clone this repo and reproduce in your own AWS Account._
 
 ## 1. Logout of All AWS Consoles Across All Browser Tabs
 If you don't logout, the following instructions will not work properly.
 
 _Please logout of all AWS Console sessions in all browser tabs._
 
-## 2. Login to AWS Workshop Portal
-
-You will need the **Participant Hash** provided upon entry, and your email address to track your unique session.
-
-Connect to the portal by clicking the button or browsing to the following url:
-
-[**https://dashboard.eventengine.run/**](https://dashboard.eventengine.run/)
-
-We will provide you with a hash code.  Enter this code when you see the following screen.
-
-![Event Engine](img/event-engine-initial-screen.png)
-
-Enter the provided hash in the text box. The button on the bottom right corner changes to **Accept Terms & Login**. Click on that button to continue.
+## 2. Login to the Workshop Portal (aka Event Engine)
+_Note:  At the start of the workshop, we will provide each of your with a personalized link to your specific Workshop Portal environment._
 
 ![Event Engine Dashboard](img/event-engine-dashboard.png)
 
@@ -113,7 +100,7 @@ Click `File` > `New` > `Terminal` to launch a terminal in your Jupyter instance.
 
 ![](img/launch_jupyter_terminal.png)
 
-## 7. Clone this Workshop content in the terminal
+## 7. Clone this GitHub Repor in the Terminal
 
 Within the Jupyter terminal, run the following:
 ```
@@ -122,7 +109,7 @@ cd ~/SageMaker
 git clone https://github.com/data-science-on-aws/workshop
 ```
 
-## 8. Start the Workshop
+## 8. Start the Workshop!
 Navigate to `01_setup/` in your Jupyter notebook and start the workshop!
 
 ![Start Workshop](img/start_workshop.png)
