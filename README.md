@@ -6,7 +6,7 @@ RSVP Here:  **https://www.eventbrite.com/e/full-day-workshop-kubeflow-gpu-kerast
 
 This workshop creates an ephemeral AWS acccount for you to use only for this workshop.  
 
-_This account will be torn down and not accessible immediately after the workshop._
+_This ephmeral account is not accessible after the workshop._
 
 # Instructions for the Day of the Workshop
 
@@ -123,6 +123,6 @@ git clone https://github.com/data-science-on-aws/workshop
 ```
 
 ## 8. Start the Workshop
-Navigate to `01_setup/` in your Jupyter notebook to start the workshop.
+Navigate to `01_setup/` in your Jupyter notebook and start the workshop!
 
 ![Start Workshop](img/start_workshop.png)
