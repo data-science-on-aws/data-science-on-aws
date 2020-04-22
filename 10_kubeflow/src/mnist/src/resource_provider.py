@@ -192,7 +192,10 @@ def tfservingsvc_resource(namespace, servingdeploy_name, servingsvc_name):
     return serviceresource
     
 
-def tfservingdeploy_resource(namespace, s3bucketexportpath, servingdeploy_name):
+def tfservingdeploy_resource(namespace, 
+                             s3bucketexportpath, 
+                             servingdeploy_name,
+                             aws_region):
     deployjson_template = Template("""
     {
       "apiVersion": "apps/v1",
@@ -236,7 +239,7 @@ def tfservingdeploy_resource(namespace, s3bucketexportpath, servingdeploy_name):
                 "env": [
                   {
                     "name": "AWS_REGION",
-                    "value": "us-west-2"
+                    "value": "$aws_region"
                   },
                   {
                     "name": "AWS_ACCESS_KEY_ID",
@@ -297,6 +300,7 @@ def tfservingdeploy_resource(namespace, s3bucketexportpath, servingdeploy_name):
             {'namespace': namespace,
              's3bucketexportpath': s3bucketexportpath,
              'servingdeploy': servingdeploy_name,
+             'aws_region': aws_region             
             })
     
     deploy = json.loads(deployjson)
