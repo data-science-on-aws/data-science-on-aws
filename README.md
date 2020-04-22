@@ -6,7 +6,7 @@ RSVP Here:  **https://www.eventbrite.com/e/full-day-workshop-kubeflow-gpu-kerast
 
 This workshop creates an ephemeral AWS acccount for you to use only for this workshop.  
 
-_This account will be torn down and not accessible immediately after the workshop._
+_This ephmeral account is not accessible after the workshop._
 
 # Instructions for the Day of the Workshop
 
