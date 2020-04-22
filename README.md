@@ -15,19 +15,7 @@ If you don't logout, the following instructions will not work properly.
 
 _Please logout of all AWS Console sessions in all browser tabs._
 
-## 2. Login to AWS Workshop Portal
-
-You will need the **Participant Hash** provided upon entry, and your email address to track your unique session.
-
-Connect to the portal by clicking the button or browsing to the following url:
-
-[**https://dashboard.eventengine.run/**](https://dashboard.eventengine.run/)
-
-We will provide you with a hash code.  Enter this code when you see the following screen.
-
-![Event Engine](img/event-engine-initial-screen.png)
-
-Enter the provided hash in the text box. The button on the bottom right corner changes to **Accept Terms & Login**. Click on that button to continue.
+## 2. Login to the Workshop Portal called Event Engine
 
 ![Event Engine Dashboard](img/event-engine-dashboard.png)
 
