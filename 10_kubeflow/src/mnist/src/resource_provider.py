@@ -236,7 +236,7 @@ def tfservingdeploy_resource(namespace, s3bucketexportpath, servingdeploy_name):
                 "env": [
                   {
                     "name": "AWS_REGION",
-                    "value": "us-east-1"
+                    "value": "us-west-2"
                   },
                   {
                     "name": "AWS_ACCESS_KEY_ID",
