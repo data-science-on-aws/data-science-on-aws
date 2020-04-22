@@ -4,11 +4,9 @@ RSVP Here:  **https://www.eventbrite.com/e/full-day-workshop-kubeflow-gpu-kerast
 # Agenda
 ![Workshop Agenda](img/outline.png) 
 
-This workshop creates an ephemeral AWS acccount for you to use only for this workshop.  
-
-_This ephmeral account is not accessible after the workshop._
-
 # Instructions for the Day of the Workshop
+
+_This workshop creates an ephemeral AWS acccount for you to use only for this workshop.  This ephemeral account is not accessible after the workshop, however you can clone this repo and reproduce in your own AWS Account._
 
 ## 1. Logout of All AWS Consoles Across All Browser Tabs
 If you don't logout, the following instructions will not work properly.
