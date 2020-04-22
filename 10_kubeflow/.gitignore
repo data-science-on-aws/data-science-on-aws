@@ -1,3 +1,4 @@
+cluster.yaml
 cluster/
 calculate-sum-pipeline.zip
 mnist-classification-pipeline.zip
