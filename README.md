@@ -1,15 +1,17 @@
 # Attend the Next Free Online Workshop!
-You must register on [**Eventbrite**](https://www.eventbrite.com/e/full-day-workshop-kubeflow-gpu-kerastensorflow-20-tf-extended-tfx-kubernetes-pytorch-xgboost-tickets-63362929227).  All instructions will come through Eventbrite.  Please make sure your Eventbrite email address is up to date.
+You must register on [**Eventbrite**](https://www.eventbrite.com/e/full-day-workshop-kubeflow-gpu-kerastensorflow-20-tf-extended-tfx-kubernetes-pytorch-xgboost-tickets-63362929227).  
+
+_All instructions will come through Eventbrite.  Please make sure your Eventbrite email address is up to date._
 
 # Upcoming O'Reilly Book:  _Data Science on Amazon Web Services_
 Register for early access directly on our [**website**](https://datascienceonaws.com).
 
-Influence the book by filling out our [**quick survey**](https://www.surveymonkey.com/r/798CMZ3).
+_Influence the book by filling out our [**quick survey**](https://www.surveymonkey.com/r/798CMZ3)._
 
 [![Data Science on Amazon Web Services](img/data-science-on-aws-book.png)](https://datascienceonaws.com)
 
 # Workshop Agenda
-![Workshop Agenda](img/outline.png) 
+[![Workshop Agenda](img/outline.png)](https://www.eventbrite.com/e/full-day-workshop-kubeflow-gpu-kerastensorflow-20-tf-extended-tfx-kubernetes-pytorch-xgboost-tickets-63362929227)
 
 # Workshop Instructions
 _Note:  This workshop will create an ephemeral AWS acccount for each attendee.  This ephemeral account is not accessible after the workshop.  You can, of course, clone this GitHub repo and reproduce the entire workshop in your own AWS Account._
