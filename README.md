@@ -4,9 +4,9 @@ RSVP Here:  **https://www.eventbrite.com/e/full-day-workshop-kubeflow-gpu-kerast
 # Signup for our Upcoming O'Reilly Book, "Data Science on Amazon Web Services"
 Signup Here:  https://datascienceonaws.com
 
-![Data Science on Amazon Web Services](img/data-science-on-aws-book.png)
-
 Influence the book and take our quick survey here:  https://www.surveymonkey.com/r/798CMZ3
+
+![Data Science on Amazon Web Services](img/data-science-on-aws-book.png)
 
 # Workshop Agenda
 ![Workshop Agenda](img/outline.png) 
