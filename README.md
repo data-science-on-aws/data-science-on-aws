@@ -1,21 +1,21 @@
 # Attend the Next Free Online Workshop!
-RSVP Here:  **https://www.eventbrite.com/e/full-day-workshop-kubeflow-gpu-kerastensorflow-20-tf-extended-tfx-kubernetes-pytorch-xgboost-tickets-63362929227**
+You must register on [**Eventbrite**](https://www.eventbrite.com/e/full-day-workshop-kubeflow-gpu-kerastensorflow-20-tf-extended-tfx-kubernetes-pytorch-xgboost-tickets-63362929227).
 
 # Signup for our Upcoming O'Reilly Book, "Data Science on Amazon Web Services"
-Signup Here:  **https://datascienceonaws.com**
+Signup on our [**website**](https://datascienceonaws.com).
 
-Influence the book and take our quick survey here:  **https://www.surveymonkey.com/r/798CMZ3**
+Influence the book and take our [**quick survey**](https://www.surveymonkey.com/r/798CMZ3).
 
 ![Data Science on Amazon Web Services](img/data-science-on-aws-book.png)
 
 # Workshop Agenda
 ![Workshop Agenda](img/outline.png) 
 
-# Instructions for the Day of the Workshop
-_This workshop creates an ephemeral AWS acccount for you to use only for this workshop.  This ephemeral account is not accessible after the workshop, however you can clone this repo and reproduce in your own AWS Account._
+# Workshop Instructions
+_Note:  This workshop will create an ephemeral AWS acccount for each attendee.  The ephemeral account is not accessible after the workshop, however you can clone this repo and reproduce the entire workshop in your own AWS Account._
 
 ## 1. Logout of All AWS Consoles Across All Browser Tabs
-If you don't logout, the following instructions will not work properly.
+If you do not logout of existing AWS Consoles, things will not work properly.
 
 _Please logout of all AWS Console sessions in all browser tabs._
 
@@ -32,7 +32,7 @@ Take the defaults and click on **Open AWS Console**. This will open AWS Console 
 
 Double-check that your account name is something like `TeamRole/MasterKey` as follows:
 
-![](img/teamrole-masterkey.png)
+![IAM Role](img/teamrole-masterkey.png)
 
 If not, please logout of your AWS Console in all browser tabs and re-run the steps above!
 
@@ -50,11 +50,7 @@ Select `Create notebook instance`.
 
 ![SageMaker Console](img/setup_aws_console_2.png)
 
-In the Notebook instance name text box, enter a name for the notebook instance.
-
-<!--- ![Fill notebook instance](img/setup_fill_notebook.png) --->
-
-For this workshop select `workshop` as the instance name.
+In the Notebook instance name text box, enter `workshop`.
 
 Choose `ml.c5.2xlarge`. We'll only be using this instance to launch jobs. The training job themselves will run either on a SageMaker managed cluster or an Amazon EKS cluster.
 
