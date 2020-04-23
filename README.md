@@ -1,7 +1,14 @@
 # Attend the Next Free Online Workshop!
 RSVP Here:  **https://www.eventbrite.com/e/full-day-workshop-kubeflow-gpu-kerastensorflow-20-tf-extended-tfx-kubernetes-pytorch-xgboost-tickets-63362929227**
 
-# Agenda
+# Signup for our Upcoming O'Reilly Book, "Data Science on Amazon Web Services"
+Signup Here:  https://datascienceonaws.com
+
+![Data Science on Amazon Web Services](img/data-science-on-aws-book.png)
+
+Influence the book and take our quick survey here:  https://www.surveymonkey.com/r/798CMZ3
+
+# Workshop Agenda
 ![Workshop Agenda](img/outline.png) 
 
 # Instructions for the Day of the Workshop
