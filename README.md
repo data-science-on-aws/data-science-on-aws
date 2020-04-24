@@ -22,7 +22,8 @@ If you do not logout of existing AWS Consoles, things will not work properly.
 _Please logout of all AWS Console sessions in all browser tabs._
 
 ## 2. Login to the Workshop Portal (aka Event Engine)
-_Note:  At the start of the workshop, we will provide each of your with a personalized link to your specific Workshop Portal environment._
+
+**If you are registered on Eventbrite, you will review a link to the Workshop 1 hour before the event.  The email will come through Eventbrite.**
 
 ![Event Engine Dashboard](img/event-engine-dashboard.png)
 
