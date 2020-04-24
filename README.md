@@ -23,7 +23,11 @@ _Please logout of all AWS Console sessions in all browser tabs._
 
 ## 2. Login to the Workshop Portal (aka Event Engine)
 
-**If you are registered on Eventbrite, you will review a link to the Workshop 1 hour before the event.  The email will come through Eventbrite.**
+**If you are registered on Eventbrite, you will review a link to the Workshop 1 hour before the event.**  
+
+**The email with the link will come through Eventbrite.**
+
+**Please make sure your Eventbrite email is up to date.**
 
 ![Event Engine Dashboard](img/event-engine-dashboard.png)
 
