@@ -34,7 +34,6 @@ def transform(spark, s3_input_data, s3_output_train_data, s3_output_validation_d
     print('Processing {} => {}'.format(s3_input_data, s3_output_train_data, s3_output_validation_data, s3_output_test_data))
  
     schema = StructType([
-#        StructField('is_positive_sentiment', IntegerType(), True),
         StructField('marketplace', StringType(), True),
         StructField('customer_id', StringType(), True),
         StructField('review_id', StringType(), True),
@@ -87,14 +86,6 @@ def transform(spark, s3_input_data, s3_output_train_data, s3_output_validation_d
     features_df = idfModel.transform(featurizedData)
     features_df.select('star_rating', 'features').show()
 
-    # TODO:  Use SVD instead
-    # features_vector_rdd = features_df.select('features').rdd.map( lambda row: Vectors.fromML(row.getAs[MLVector]('features') )
-    # features_vector_rdd.cache()
-    # mat = RowMatrix(features_vector_rdd)
-    # k = 300
-    # svd = mat.computeSVD(k, computeU=True)
-    # TODO:  Reconstruct
-
     num_features=300
     pca = PCA(k=num_features, inputCol='features', outputCol='pca_features')
     pca_model = pca.fit(features_df)
@@ -112,28 +103,19 @@ def transform(spark, s3_input_data, s3_output_train_data, s3_output_validation_d
 
     train_df, validation_df, test_df = expanded_features_df.randomSplit([0.9, 0.05, 0.05])
 
-    # Removed overwrite to test for this issue
-    #    https://stackoverflow.com/questions/51050591/spark-throws-java-io-ioexception-failed-to-rename-when-saving-part-xxxxx-gz
     train_df.write.csv(path=s3_output_train_data,
                        header=None,
                        quote=None) #,
-#                       mode='overwrite')
     print('Wrote to output file:  {}'.format(s3_output_train_data))
 
-    # Removed overwrite to test for this issue
-    #    https://stackoverflow.com/questions/51050591/spark-throws-java-io-ioexception-failed-to-rename-when-saving-part-xxxxx-gz
     validation_df.write.csv(path=s3_output_validation_data,
                             header=None,
                             quote=None) #,
-#                            mode='overwrite')
     print('Wrote to output file:  {}'.format(s3_output_validation_data))
 
-    # Removed overwrite to test for this issue
-    #    https://stackoverflow.com/questions/51050591/spark-throws-java-io-ioexception-failed-to-rename-when-saving-part-xxxxx-gz
     test_df.write.csv(path=s3_output_test_data,
                        header=None,
-                       quote=None) #,
-#                       mode='overwrite')
+                       quote=None) 
     print('Wrote to output file:  {}'.format(s3_output_test_data))
 
 
