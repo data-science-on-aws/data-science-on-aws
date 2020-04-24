@@ -93,7 +93,7 @@ Click `Attach Policies`.
               
 Select `AdministratorAccess` and click on `Attach Policy`.
 
-_Note:  Never do this in your production account.  Please follow a least-priviledge security model._ 
+_Note:  Never do this in your production account.  Please follow a least-privilege security model._ 
 
 ![Attach Admin Policy](img/attach_admin_policy.png)
 
