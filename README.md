@@ -77,39 +77,19 @@ Keep the default settings for the other options not highlighted in red, and clic
 
 While the notebook spins up, continue to work on the next section.  We'll come back to the notebook when it's ready.
 
-## 4. Update IAM Role Policy
-
-Click on the `notebook` instance to see the instance details.
-`
-![Notebook Instance Details](img/click_notebook_instance.png)
-
-Click on the IAM role link and navigate to the IAM Management Console.
-
-![IAM Role](img/update_iam.png)
-
-Click `Attach Policies`.
-
-![IAM Policy](img/view_policies.png)
-              
-Select `AdministratorAccess` and click on `Attach Policy`.
-
-_Note:  Never do this in your production account.  Please follow a least-privilege security model._ 
-
-![Attach Admin Policy](img/attach_admin_policy.png)
-
-## 5. Start the Jupyter notebook
+## 4. Start the Jupyter notebook
 
 _Note:  Proceed when the status of the notebook instance changes from `Pending` to `InService`._
 
 ![Start Jupyter](img/start_jupyter.png)
 
-## 6. Launch a new Terminal within the Jupyter notebook
+## 5. Launch a new Terminal within the Jupyter notebook
 
 Click `File` > `New` > `Terminal` to launch a terminal in your Jupyter instance.
 
 ![](img/launch_jupyter_terminal.png)
 
-## 7. Clone this GitHub Repo in the Terminal
+## 6. Clone this GitHub Repo in the Terminal
 
 Within the Jupyter terminal, run the following:
 ```
@@ -118,11 +98,11 @@ cd ~/SageMaker
 git clone https://github.com/data-science-on-aws/workshop
 ```
 
-## 8. Navigate Back to Notebook View
+## 7. Navigate Back to Notebook View
 
 ![](img/back-to-jupyter-notebook.png)
 
-## 9. Start the Workshop!
+## 8. Start the Workshop!
 Navigate to `01_setup/` in your Jupyter notebook and start the workshop!
 
 ![Start Workshop](img/start_workshop.png)
