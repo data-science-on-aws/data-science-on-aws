@@ -84,7 +84,7 @@ object SparkAmazonReviewsAnalyzer {
           //verify check conditions
           .addCheck(
             Check(CheckLevel.Error, "Review Check") 
-              .hasSize(_ >= 150000000) // at least 150 million rows
+              .hasSize(_ >= 200000) // at least 200.000 rows
               .hasMin("star_rating", _ == 1.0) // min is 1.0
               .hasMax("star_rating", _ == 5.0) // max is 5.0
               .isComplete("review_id") // should never be NULL
