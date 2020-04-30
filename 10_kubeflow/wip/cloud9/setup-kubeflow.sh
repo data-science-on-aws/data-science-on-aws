@@ -294,7 +294,6 @@ TRUST="{ \"Version\": \"2012-10-17\", \"Statement\": [ { \"Effect\": \"Allow\", 
 aws iam create-role --role-name workshop-sagemaker-kfp-role --assume-role-policy-document "$TRUST"
 aws iam attach-role-policy --role-name workshop-sagemaker-kfp-role --policy-arn arn:aws:iam::aws:policy/AmazonS3FullAccess
 aws iam attach-role-policy --role-name workshop-sagemaker-kfp-role --policy-arn arn:aws:iam::aws:policy/AmazonSageMakerFullAccess
-aws iam attach-role-policy --role-name workshop-sagemaker-kfp-role --policy-arn arn:aws:iam::aws:policy/AmazonElasticMapReduceFullAccess
 
 export SAGEMAKER_ROLE_ARN=$(aws iam get-role --role-name workshop-sagemaker-kfp-role --output text --query 'Role.Arn')
 echo "export SAGEMAKER_ROLE_ARN=${SAGEMAKER_ROLE_ARN}" | tee -a ~/.bash_profile
