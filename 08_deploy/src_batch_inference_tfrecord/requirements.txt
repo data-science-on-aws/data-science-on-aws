@@ -1,0 +1,2 @@
+# TODO:  Add dependencies.  Be careful of ping/ healthcheck failure when adding new libraries here.
+tensorflow==2.1.0

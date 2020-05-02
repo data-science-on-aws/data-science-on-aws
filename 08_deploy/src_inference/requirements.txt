@@ -1,2 +1,0 @@
-# TODO:  Add dependencies.  Be careful of ping/ healthcheck failure when adding new libraries here.
-# transformers==2.8.0
