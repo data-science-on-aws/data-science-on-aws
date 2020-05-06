@@ -1,2 +1,5 @@
+model.tar.gz
+transformers/
+tensorflow/
 models/
 outputs/

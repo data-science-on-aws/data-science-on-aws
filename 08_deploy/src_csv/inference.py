@@ -2,8 +2,12 @@ import json
 import tensorflow as tf
 from transformers import DistilBertTokenizer
 
+review_body_column_idx_tsv = 13
+
 classes=[1, 2, 3, 4, 5]
+
 max_seq_length=128
+
 tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
 
 def input_handler(data, context):
@@ -21,10 +25,10 @@ def input_handler(data, context):
 
         data_str_split = data_str.split('\t')
         print(len(data_str_split))
-        if (len(data_str_split) >= 13):
-            print(data_str_split[13])
+        if (len(data_str_split) >= review_body_column_idx_tsv):
+            print(data_str_split[review_body_column_idx_tsv])
 
-        tokens_a = tokenizer.tokenize(data_str_split[13])
+        tokens_a = tokenizer.tokenize(data_str_split[review_body_column_idx_tsv])
 
         # Account for [CLS] and [SEP] with "- 2"
         if len(tokens_a) > max_seq_length - 2:
@@ -94,25 +98,3 @@ def output_handler(response, context):
 
     return predicted_classes_json, response_content_type
 
-    
-if __name__ == "__main__":
-
-    f = open('data/amazon_reviews_us_Digital_Software_v1_00_noheader_predict.csv', 'r') 
-    lines = f.readlines()
-
-    instances = []
-
-    i = 0
-    for line in lines:
-        instances.append(line.replace(',', ' '))
-
-        i = i + 1
-        if i == 3: 
-            break 
-
-#    instances = ["This is great!", 
-#                 "This is terrible."]
-
-    predicted_classes = input_handler(data=instances, context=None)
-
-    print(predicted_classes)
