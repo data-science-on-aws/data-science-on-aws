@@ -24,9 +24,21 @@ import csv
 import glob
 from pathlib import Path
 
+tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
 
+# We set sequences to be at most 128 tokens long.
+MAX_SEQ_LENGTH = 128
+DATA_COLUMN = 'review_body'
+LABEL_COLUMN = 'star_rating'
+LABEL_VALUES = [1, 2, 3, 4, 5]
+    
+label_map = {}
+for (i, label) in enumerate(LABEL_VALUES):
+    label_map[label] = i
+
+    
 class InputFeatures(object):
-  """A single set of features of data."""
+  """BERT feature vectors."""
 
   def __init__(self,
                input_ids,
@@ -39,136 +51,90 @@ class InputFeatures(object):
     self.label_id = label_id
     
     
-class InputExample(object):
-  """A single training/test example for simple sequence classification."""
+class Input(object):
+  """A single training/test input for sequence classification."""
 
-  def __init__(self, guid, text_a, text_b=None, label=None):
-    """Constructs a InputExample.
+  def __init__(self, text, label=None):
+    """Constructs an Input.
     Args:
-      guid: Unique id for the example.
-      text_a: string. The untokenized text of the first sequence. For single
+      text: string. The untokenized text of the first sequence. For single
         sequence tasks, only this sequence must be specified.
-      text_b: (Optional) string. The untokenized text of the second sequence.
-        Only must be specified for sequence pair tasks.
       label: (Optional) string. The label of the example. This should be
         specified for train and dev examples, but not for test examples.
     """
-    self.guid = guid
-    self.text_a = text_a
-    self.text_b = text_b
+    self.text = text
     self.label = label
     
     
-def convert_single_example(ex_index, example, label_list, max_seq_length,
-                           tokenizer):
-  """Converts a single `InputExample` into a single `InputFeatures`."""
+def convert_input(text_input):
+    # First, we need to preprocess our data so that it matches the data BERT was trained on:
+    #
+    # 1. Lowercase our text (if we're using a BERT lowercase model)
+    # 2. Tokenize it (i.e. "sally says hi" -> ["sally", "says", "hi"])
+    # 3. Break words into WordPieces (i.e. "calling" -> ["call", "##ing"])
+    # 
+    # Fortunately, the Transformers tokenizer does this for us!
+    #
+    tokens = tokenizer.tokenize(text_input.text)    
 
-  label_map = {}
-  for (i, label) in enumerate(label_list):
-    label_map[label] = i
+    # Next, we need to do the following:
+    #
+    # 4. Map our words to indexes using a vocab file that BERT provides
+    # 5. Add special "CLS" and "SEP" tokens (see the [readme](https://github.com/google-research/bert))
+    # 6. Append "index" and "segment" tokens to each input (see the [BERT paper](https://arxiv.org/pdf/1810.04805.pdf))
+    #
+    # Again, the Transformers tokenizer does this for us!
+    #
+    encode_plus_tokens = tokenizer.encode_plus(text_input.text,
+                                               pad_to_max_length=True,
+                                               max_length=MAX_SEQ_LENGTH)
 
-  tokens_a = tokenizer.tokenize(example.text_a)
-  tokens_b = None
-  if example.text_b:
-    tokens_b = tokenizer.tokenize(example.text_b)
+    # Convert the text-based tokens to ids from the pre-trained BERT vocabulary
+    input_ids = encode_plus_tokens['input_ids']
+    # Specifies which tokens BERT should pay attention to (0 or 1)
+    input_mask = encode_plus_tokens['attention_mask']
+    # Segment Ids are always 0 for single-sequence tasks (or 1 if two-sequence tasks)
+    segment_ids = [0] * MAX_SEQ_LENGTH
 
-  if tokens_b:
-    # Modifies `tokens_a` and `tokens_b` in place so that the total
-    # length is less than the specified length.
-    # Account for [CLS], [SEP], [SEP] with "- 3"
-    _truncate_seq_pair(tokens_a, tokens_b, max_seq_length - 3)
-  else:
-    # Account for [CLS] and [SEP] with "- 2"
-    if len(tokens_a) > max_seq_length - 2:
-      tokens_a = tokens_a[0:(max_seq_length - 2)]
+    # Label for our training data (star_rating 1 through 5)
+    label_id = label_map[text_input.label]
 
-  # The convention in BERT is:
-  # (a) For sequence pairs:
-  #  tokens:   [CLS] is this jack ##son ##ville ? [SEP] no it is not . [SEP]
-  #  type_ids: 0     0  0    0    0     0       0 0     1  1  1  1   1 1
-  # (b) For single sequences:
-  #  tokens:   [CLS] the dog is hairy . [SEP]
-  #  type_ids: 0     0   0   0  0     0 0
-  #
-  # Where "type_ids" are used to indicate whether this is the first
-  # sequence or the second sequence. The embedding vectors for `type=0` and
-  # `type=1` were learned during pre-training and are added to the wordpiece
-  # embedding vector (and position vector). This is not *strictly* necessary
-  # since the [SEP] token unambiguously separates the sequences, but it makes
-  # it easier for the model to learn the concept of sequences.
-  #
-  # For classification tasks, the first vector (corresponding to [CLS]) is
-  # used as the "sentence vector". Note that this only makes sense because
-  # the entire model is fine-tuned.
-  tokens = []
-  segment_ids = []
-  tokens.append("[CLS]")
-  segment_ids.append(0)
-  for token in tokens_a:
-    tokens.append(token)
-    segment_ids.append(0)
-  tokens.append("[SEP]")
-  segment_ids.append(0)
+    features = InputFeatures(
+        input_ids=input_ids,
+        input_mask=input_mask,
+        segment_ids=segment_ids,
+        label_id=label_id)
 
-  if tokens_b:
-    for token in tokens_b:
-      tokens.append(token)
-      segment_ids.append(1)
-    tokens.append("[SEP]")
-    segment_ids.append(1)
+#    print('**tokens**\n{}\n'.format(tokens))    
+#    print('**input_ids**\n{}\n'.format(features.input_ids))
+#    print('**input_mask**\n{}\n'.format(features.input_mask))
+#    print('**segment_ids**\n{}\n'.format(features.segment_ids))
+#    print('**label_id**\n{}\n'.format(features.label_id))
 
-  input_ids = tokenizer.convert_tokens_to_ids(tokens)
-
-  # The mask has 1 for real tokens and 0 for padding tokens. Only real
-  # tokens are attended to.
-  input_mask = [1] * len(input_ids)
-
-  # Zero-pad up to the sequence length.
-  while len(input_ids) < max_seq_length:
-    input_ids.append(0)
-    input_mask.append(0)
-    segment_ids.append(0)
-
-  assert len(input_ids) == max_seq_length
-  assert len(input_mask) == max_seq_length
-  assert len(segment_ids) == max_seq_length
-
-  label_id = label_map[example.label]
-
-  feature = InputFeatures(
-      input_ids=input_ids,
-      input_mask=input_mask,
-      segment_ids=segment_ids,
-      label_id=label_id)
-  return feature
+    return features
 
 
-def file_based_convert_examples_to_features(
-    examples, label_list, max_seq_length, tokenizer, output_file):
-  """Convert a set of `InputExample`s to a TFRecord file."""
+def file_based_convert_examples_to_features(inputs,
+                                            output_file):
+    """Convert a set of `Input`s to a TFRecord file."""
 
-  writer = tf.io.TFRecordWriter(output_file)
+    writer = tf.io.TFRecordWriter(output_file)
 
-  for (ex_index, example) in enumerate(examples):
-    if ex_index % 10000 == 0:
-      print("Writing example %d of %d" % (ex_index, len(examples)))
+    for (input_idx, text_input) in enumerate(inputs):
+        if input_idx % 10000 == 0:
+            print("Writing example %d of %d" % (input_idx, len(inputs)))
 
-    feature = convert_single_example(ex_index, example, label_list,
-                                     max_seq_length, tokenizer)
+            features = convert_input(text_input)
+        
+            all_features = collections.OrderedDict()
+            all_features['input_ids'] = tf.train.Feature(int64_list=tf.train.Int64List(value=features.input_ids))
+            all_features['input_mask'] = tf.train.Feature(int64_list=tf.train.Int64List(value=features.input_mask))
+            all_features['segment_ids'] = tf.train.Feature(int64_list=tf.train.Int64List(value=features.segment_ids))
+            all_features['label_ids'] = tf.train.Feature(int64_list=tf.train.Int64List(value=[features.label_id]))
 
-    def create_int_feature(values):
-      f = tf.train.Feature(int64_list=tf.train.Int64List(value=list(values)))
-      return f
-
-    features = collections.OrderedDict()
-    features["input_ids"] = create_int_feature(feature.input_ids)
-    features["input_mask"] = create_int_feature(feature.input_mask)
-    features["segment_ids"] = create_int_feature(feature.segment_ids)
-    features["label_ids"] = create_int_feature([feature.label_id])
-
-    tf_example = tf.train.Example(features=tf.train.Features(feature=features))
-    writer.write(tf_example.SerializeToString())
-  writer.close()
+            tf_record = tf.train.Example(features=tf.train.Features(feature=all_features))
+            writer.write(tf_record.SerializeToString())
+    writer.close()
     
     
 def list_arg(raw_value):
@@ -229,33 +195,15 @@ def _transform_tsv_to_tfrecord(file):
     df_validation = df_validation.reset_index(drop=True)
     df_test = df_test.reset_index(drop=True)
 
-    DATA_COLUMN = 'review_body'
-    LABEL_COLUMN = 'star_rating'
-    LABEL_VALUES = [1, 2, 3, 4, 5]
+    # TODO:  Balance
+    
+    train_inputs = df_train.apply(lambda x: Input(text = x[DATA_COLUMN], 
+                                                         label = x[LABEL_COLUMN]), axis = 1)
 
-    #
-    # Data Preprocessing
-    #
-    # We'll need to transform our data into a format BERT understands. This involves two steps. First, we create  `InputExample`'s using the constructor provided in the BERT library.
-    # 
-    # - `text_a` is the text we want to classify, which in this case, is the `Request` field in our Dataframe. 
-    # - `text_b` is used if we're training a model to understand the relationship between sentences (i.e. is `text_b` a translation of `text_a`? Is `text_b` an answer to the question asked by `text_a`?). This doesn't apply to our task since we are predicting sentiment, so we can leave `text_b` blank.
-    # - `label` is the label for our example (0 or 1)
+    validation_inputs = df_validation.apply(lambda x: Input(text = x[DATA_COLUMN], 
+                                                                   label = x[LABEL_COLUMN]), axis = 1)
 
-    # Use the InputExample class from BERT's run_classifier code to create examples from the data
-    train_InputExamples = df_train.apply(lambda x: InputExample(guid=None, # Unused in this example
-                                                                text_a = x[DATA_COLUMN], 
-                                                                text_b = None, 
-                                                                label = x[LABEL_COLUMN]), axis = 1)
-
-    validation_InputExamples = df_validation.apply(lambda x: InputExample(guid=None, 
-                                                                          text_a = x[DATA_COLUMN], 
-                                                                          text_b = None, 
-                                                                          label = x[LABEL_COLUMN]), axis = 1)
-
-    test_InputExamples = df_test.apply(lambda x: InputExample(guid=None, 
-                                                              text_a = x[DATA_COLUMN], 
-                                                              text_b = None, 
+    test_inputs = df_test.apply(lambda x: Input(text = x[DATA_COLUMN], 
                                                               label = x[LABEL_COLUMN]), axis = 1)
 
     # Next, we need to preprocess our data so that it matches the data BERT was trained on. For this, we'll need to do a couple of things (but don't worry--this is also included in the Python library):
@@ -270,24 +218,16 @@ def _transform_tsv_to_tfrecord(file):
     # 
     # We don't have to worry about these details.  The Transformers tokenizer does this for us.
     # 
-    tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
-    tokenizer.tokenize("This here's an example of using the BERT tokenizer")
-
-    # Using our tokenizer, we'll call `file_based_convert_examples_to_features` on our InputExamples to convert them into features BERT understands, then write the features to a file.
-
-    # We'll set sequences to be at most 128 tokens long.
-    MAX_SEQ_LENGTH = 128
-
     train_data = '{}/bert/train'.format(args.output_data)
     validation_data = '{}/bert/validation'.format(args.output_data)
     test_data = '{}/bert/test'.format(args.output_data)
 
     # Convert our train and validation features to InputFeatures (.tfrecord protobuf) that works with BERT and TensorFlow.
-    df_train_embeddings = file_based_convert_examples_to_features(train_InputExamples, LABEL_VALUES, MAX_SEQ_LENGTH, tokenizer, '{}/part-{}-{}.tfrecord'.format(train_data, args.current_host, filename_without_extension))
+    df_train_embeddings = file_based_convert_examples_to_features(train_inputs, '{}/part-{}-{}.tfrecord'.format(train_data, args.current_host, filename_without_extension))
 
-    df_validation_embeddings = file_based_convert_examples_to_features(validation_InputExamples, LABEL_VALUES, MAX_SEQ_LENGTH, tokenizer, '{}/part-{}-{}.tfrecord'.format(validation_data, args.current_host, filename_without_extension))
+    df_validation_embeddings = file_based_convert_examples_to_features(validation_inputs, '{}/part-{}-{}.tfrecord'.format(validation_data, args.current_host, filename_without_extension))
 
-    df_test_embeddings = file_based_convert_examples_to_features(test_InputExamples, LABEL_VALUES, MAX_SEQ_LENGTH, tokenizer, '{}/part-{}-{}.tfrecord'.format(test_data, args.current_host, filename_without_extension))
+    df_test_embeddings = file_based_convert_examples_to_features(test_inputs, '{}/part-{}-{}.tfrecord'.format(test_data, args.current_host, filename_without_extension))
         
     
 def process(args):
