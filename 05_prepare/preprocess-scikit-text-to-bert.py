@@ -10,7 +10,7 @@ import sys
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow==2.1.0'])
 import tensorflow as tf
 print(tf.__version__)
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'transformers==2.7.0'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'transformers==2.8.0'])
 from transformers import DistilBertTokenizer
 from tensorflow import keras
 import os
@@ -24,6 +24,7 @@ import csv
 import glob
 from pathlib import Path
 
+
 class InputFeatures(object):
   """A single set of features of data."""
 
@@ -36,6 +37,26 @@ class InputFeatures(object):
     self.input_mask = input_mask
     self.segment_ids = segment_ids
     self.label_id = label_id
+    
+    
+class InputExample(object):
+  """A single training/test example for simple sequence classification."""
+
+  def __init__(self, guid, text_a, text_b=None, label=None):
+    """Constructs a InputExample.
+    Args:
+      guid: Unique id for the example.
+      text_a: string. The untokenized text of the first sequence. For single
+        sequence tasks, only this sequence must be specified.
+      text_b: (Optional) string. The untokenized text of the second sequence.
+        Only must be specified for sequence pair tasks.
+      label: (Optional) string. The label of the example. This should be
+        specified for train and dev examples, but not for test examples.
+    """
+    self.guid = guid
+    self.text_a = text_a
+    self.text_b = text_b
+    self.label = label
     
     
 def convert_single_example(ex_index, example, label_list, max_seq_length,
@@ -148,27 +169,6 @@ def file_based_convert_examples_to_features(
     tf_example = tf.train.Example(features=tf.train.Features(feature=features))
     writer.write(tf_example.SerializeToString())
   writer.close()
-
-
-
-class InputExample(object):
-  """A single training/test example for simple sequence classification."""
-
-  def __init__(self, guid, text_a, text_b=None, label=None):
-    """Constructs a InputExample.
-    Args:
-      guid: Unique id for the example.
-      text_a: string. The untokenized text of the first sequence. For single
-        sequence tasks, only this sequence must be specified.
-      text_b: (Optional) string. The untokenized text of the second sequence.
-        Only must be specified for sequence pair tasks.
-      label: (Optional) string. The label of the example. This should be
-        specified for train and dev examples, but not for test examples.
-    """
-    self.guid = guid
-    self.text_a = text_a
-    self.text_b = text_b
-    self.label = label
     
     
 def list_arg(raw_value):
@@ -204,34 +204,6 @@ def parse_args():
         default='/opt/ml/processing/output',
     )
     return parser.parse_args()
-
-
-def file_based_convert_examples_to_features(
-    examples, label_list, max_seq_length, tokenizer, output_file):
-  """Convert a set of `InputExample`s to a TFRecord file."""
-
-  writer = tf.io.TFRecordWriter(output_file)
-
-  for (ex_index, example) in enumerate(examples):
-    if ex_index % 10000 == 0:
-      print("Writing example %d of %d" % (ex_index, len(examples)))
-
-    feature = convert_single_example(ex_index, example, label_list,
-                                     max_seq_length, tokenizer)
-
-    def create_int_feature(values):
-      f = tf.train.Feature(int64_list=tf.train.Int64List(value=list(values)))
-      return f
-
-    features = collections.OrderedDict()
-    features["input_ids"] = create_int_feature(feature.input_ids)
-    features["input_mask"] = create_int_feature(feature.input_mask)
-    features["segment_ids"] = create_int_feature(feature.segment_ids)
-    features["label_ids"] = create_int_feature([feature.label_id])
-
-    tf_example = tf.train.Example(features=tf.train.Features(feature=features))
-    writer.write(tf_example.SerializeToString())
-  writer.close()
 
     
 def _transform_tsv_to_tfrecord(file):
