@@ -121,7 +121,7 @@ def convert_features_to_tfrecord(inputs,
     tfrecord_writer = tf.io.TFRecordWriter(output_file)
 
     for (input_idx, text_input) in enumerate(inputs):
-        if input_idx % 10000 == 0:
+        if input_idx % 1000 == 0:
             print("Writing example %d of %d" % (input_idx, len(inputs)))
 
             bert_features = convert_input(text_input)
@@ -247,10 +247,10 @@ def _transform_tsv_to_tfrecord(file):
                                                          label = x[LABEL_COLUMN]), axis = 1)
 
     validation_inputs = df_validation.apply(lambda x: Input(text = x[DATA_COLUMN], 
-                                                                   label = x[LABEL_COLUMN]), axis = 1)
+                                                            label = x[LABEL_COLUMN]), axis = 1)
 
     test_inputs = df_test.apply(lambda x: Input(text = x[DATA_COLUMN], 
-                                                              label = x[LABEL_COLUMN]), axis = 1)
+                                                label = x[LABEL_COLUMN]), axis = 1)
 
     # Next, we need to preprocess our data so that it matches the data BERT was trained on. For this, we'll need to do a couple of things (but don't worry--this is also included in the Python library):
     # 
