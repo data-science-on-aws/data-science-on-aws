@@ -114,27 +114,30 @@ def convert_input(text_input):
     return features
 
 
-def file_based_convert_examples_to_features(inputs,
-                                            output_file):
+def convert_features_to_tfrecord(inputs,
+                                 output_file):
     """Convert a set of `Input`s to a TFRecord file."""
 
-    writer = tf.io.TFRecordWriter(output_file)
+    tfrecord_writer = tf.io.TFRecordWriter(output_file)
 
     for (input_idx, text_input) in enumerate(inputs):
         if input_idx % 10000 == 0:
             print("Writing example %d of %d" % (input_idx, len(inputs)))
 
-            features = convert_input(text_input)
+            bert_features = convert_input(text_input)
         
-            all_features = collections.OrderedDict()
-            all_features['input_ids'] = tf.train.Feature(int64_list=tf.train.Int64List(value=features.input_ids))
-            all_features['input_mask'] = tf.train.Feature(int64_list=tf.train.Int64List(value=features.input_mask))
-            all_features['segment_ids'] = tf.train.Feature(int64_list=tf.train.Int64List(value=features.segment_ids))
-            all_features['label_ids'] = tf.train.Feature(int64_list=tf.train.Int64List(value=[features.label_id]))
+            tfrecord_features = collections.OrderedDict()
+            
+            tfrecord_features['input_ids'] = tf.train.Feature(int64_list=tf.train.Int64List(value=bert_features.input_ids))
+            tfrecord_features['input_mask'] = tf.train.Feature(int64_list=tf.train.Int64List(value=bert_features.input_mask))
+            tfrecord_features['segment_ids'] = tf.train.Feature(int64_list=tf.train.Int64List(value=bert_features.segment_ids))
+            tfrecord_features['label_ids'] = tf.train.Feature(int64_list=tf.train.Int64List(value=[bert_features.label_id]))
 
-            tf_record = tf.train.Example(features=tf.train.Features(feature=all_features))
-            writer.write(tf_record.SerializeToString())
-    writer.close()
+            tfrecord = tf.train.Example(features=tf.train.Features(feature=tfrecord_features))
+            
+            tfrecord_writer.write(tfrecord.SerializeToString())
+
+    tfrecord_writer.close()
     
     
 def list_arg(raw_value):
@@ -186,17 +189,60 @@ def _transform_tsv_to_tfrecord(file):
     df = df.dropna()
     df = df.reset_index(drop=True)
 
-    # Split all data into 90% train and 10% holdout
-    df_train, df_holdout = train_test_split(df, test_size=0.10, stratify=df['star_rating'])        
-    # Split holdout data into 50% validation and t0% test
-    df_validation, df_test = train_test_split(df_holdout, test_size=0.50, stratify=df_holdout['star_rating'])
+    print('Shape of dataframe {}'.format(df.shape))
+    
+    # Balance to the minority class (star_rating 2 in our overall dataset)
+    from sklearn.utils import resample
 
+    five_star_df = df.query('star_rating == 5')
+    four_star_df = df.query('star_rating == 4')
+    three_star_df = df.query('star_rating == 3')
+    two_star_df = df.query('star_rating == 2')
+    one_star_df = df.query('star_rating == 1')
+
+    five_star_df = resample(five_star_df,
+                            replace = False,
+                            n_samples = len(two_star_df),
+                            random_state = 27)
+
+    four_star_df = resample(four_star_df,
+                            replace = False,
+                            n_samples = len(two_star_df),
+                            random_state = 27)
+
+    three_star_df = resample(three_star_df,
+                            replace = False,
+                            n_samples = len(two_star_df),
+                            random_state = 27)
+
+    two_star_df = resample(two_star_df,
+                            replace = False,
+                            n_samples = len(two_star_df),
+                            random_state = 27)
+
+    one_star_df = resample(one_star_df,
+                            replace = False,
+                            n_samples = len(two_star_df),
+                            random_state = 27)
+
+    df_balanced = pd.concat([five_star_df, four_star_df, three_star_df, two_star_df, one_star_df])
+    df_balanced = df_balanced.reset_index(drop=True)
+
+    print('Shape of balanced dataframe {}'.format(df_balanced.shape))
+    
+    # Split all data into 90% train and 10% holdout
+    df_train, df_holdout = train_test_split(df_balanced, test_size=0.10, stratify=df_balanced['star_rating'])        
+    # Split holdout data into 50% validation and 50% test
+    df_validation, df_test = train_test_split(df_holdout, test_size=0.50, stratify=df_holdout['star_rating'])
+    
     df_train = df_train.reset_index(drop=True)
     df_validation = df_validation.reset_index(drop=True)
     df_test = df_test.reset_index(drop=True)
 
-    # TODO:  Balance
-    
+    print('Shape of train dataframe {}'.format(df_train.shape))
+    print('Shape of validation dataframe {}'.format(df_validation.shape))
+    print('Shape of test dataframe {}'.format(df_test.shape))
+
     train_inputs = df_train.apply(lambda x: Input(text = x[DATA_COLUMN], 
                                                          label = x[LABEL_COLUMN]), axis = 1)
 
@@ -223,11 +269,11 @@ def _transform_tsv_to_tfrecord(file):
     test_data = '{}/bert/test'.format(args.output_data)
 
     # Convert our train and validation features to InputFeatures (.tfrecord protobuf) that works with BERT and TensorFlow.
-    df_train_embeddings = file_based_convert_examples_to_features(train_inputs, '{}/part-{}-{}.tfrecord'.format(train_data, args.current_host, filename_without_extension))
+    df_train_embeddings = convert_features_to_tfrecord(train_inputs, '{}/part-{}-{}.tfrecord'.format(train_data, args.current_host, filename_without_extension))
 
-    df_validation_embeddings = file_based_convert_examples_to_features(validation_inputs, '{}/part-{}-{}.tfrecord'.format(validation_data, args.current_host, filename_without_extension))
+    df_validation_embeddings = convert_features_to_tfrecord(validation_inputs, '{}/part-{}-{}.tfrecord'.format(validation_data, args.current_host, filename_without_extension))
 
-    df_test_embeddings = file_based_convert_examples_to_features(test_inputs, '{}/part-{}-{}.tfrecord'.format(test_data, args.current_host, filename_without_extension))
+    df_test_embeddings = convert_features_to_tfrecord(test_inputs, '{}/part-{}-{}.tfrecord'.format(test_data, args.current_host, filename_without_extension))
         
     
 def process(args):
