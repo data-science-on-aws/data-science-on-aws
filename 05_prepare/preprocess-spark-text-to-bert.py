@@ -25,8 +25,6 @@ from pyspark.sql.functions import split
 from pyspark.sql.functions import udf, col
 from pyspark.sql.types import ArrayType, DoubleType
 
-
-
 tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
 
 # We set sequences to be at most 128 tokens long.
@@ -319,7 +317,7 @@ def _transform_tsv_to_tfrecord(df):
 
 #     print('Complete')
     
-    
+
 def transform(spark, s3_input_data, s3_output_train_data, s3_output_validation_data, s3_output_test_data): 
     print('Processing {} => {}'.format(s3_input_data, s3_output_train_data, s3_output_validation_data, s3_output_test_data))
  
@@ -397,8 +395,16 @@ def transform(spark, s3_input_data, s3_output_train_data, s3_output_validation_d
 
     features_df = df_csv_cleaned.select(['star_rating', 'review_body'])
 
+    bert_transformer = udf(lambda str: tokenizer.encode_plus(str, 
+                                                             pad_to_max_length=True,
+                                                             max_length=MAX_SEQ_LENGTH),
+			   StringType())
+    spark.udf.register('bert_transformer', bert_transformer)
+
+    transformed_df = features_df.withColumn('star_rating', bert_transformer('review_body'))
+
     # TODO:  Split
-    train_df, validation_df, test_df = df_csv_cleaned.randomSplit([0.9, 0.05, 0.05])
+    train_df, validation_df, test_df = transformed_df.randomSplit([0.9, 0.05, 0.05])
 
     train_df.write.csv(path=s3_output_train_data,
                        header=None,
