@@ -395,6 +395,7 @@ def transform(spark, s3_input_data, s3_output_train_data, s3_output_validation_d
 
     features_df = df_csv_cleaned.select(['star_rating', 'review_body'])
 
+    # TODO:  Convert to TFRecord
     bert_transformer = udf(lambda str: tokenizer.encode_plus(str, 
                                                              pad_to_max_length=True,
                                                              max_length=MAX_SEQ_LENGTH),
@@ -406,6 +407,7 @@ def transform(spark, s3_input_data, s3_output_train_data, s3_output_validation_d
     # TODO:  Split
     train_df, validation_df, test_df = transformed_df.randomSplit([0.9, 0.05, 0.05])
 
+    # TODO:  Potentially use TFRecord Writer from LI
     train_df.write.csv(path=s3_output_train_data,
                        header=None,
                        quote=None)
