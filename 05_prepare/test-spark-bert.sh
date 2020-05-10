@@ -1,0 +1,4 @@
+rm -rf ./output/spark/bert/
+
+spark-submit --jars ./spark/aws-java-sdk-dynamodb-1.11.722.jar,./spark/aws-java-sdk-core-1.11.722.jar,./spark/aws-java-sdk-s3-1.11.722.jar,./spark/aws-java-sdk-1.11.722.jar,./spark/hadoop-common-3.2.1.jar,./spark/hadoop-aws-3.2.1.jar,./spark/spark-2.4.5-bin-hadoop2.7/jars/spark-repl_2.11-2.4.5.jar,./spark/spark-2.4.5-bin-hadoop2.7/jars/spark-catalyst_2.11-2.4.5.jar,./spark/spark-2.4.5-bin-hadoop2.7/jars/spark-sql_2.11-2.4.5.jar,./spark/spark-2.4.5-bin-hadoop2.7/jars/spark-core_2.11-2.4.5.jar,./spark/spark-2.4.5-bin-hadoop2.7/jars/spark-launcher_2.11-2.4.5.jar,./spark/spark-2.4.5-bin-hadoop2.7/jars/spark-tags_2.11-2.4.5.jar preprocess-spark-text-to-bert.py s3_input_data ./data/ s3_output_train_data ./output/spark/bert/train s3_output_validation_data ./output/spark/bert/validation s3_output_test_data ./output/spark/bert/test
+
