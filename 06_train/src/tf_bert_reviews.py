@@ -18,7 +18,9 @@ from transformers import TFDistilBertForSequenceClassification
 from transformers import TextClassificationPipeline
 from transformers.configuration_distilbert import DistilBertConfig
 
+
 CLASSES = [1, 2, 3, 4, 5]
+
 
 def select_data_and_label_from_record(record):
     x = {
@@ -321,9 +323,17 @@ if __name__ == '__main__':
             callbacks.append(callback)
             optimizer = callback.wrap_optimizer(optimizer)
 
-        callback = tf.keras.callbacks.TensorBoard(log_dir=tensorboard_logs_path)
-        callbacks.append(callback)
-            
+        tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=tensorboard_logs_path)
+        callbacks.append(tensorboard_callback)
+        
+#        checkpoint_path  = "/opt/ml/checkpoints"
+#        checkpoint_names = 'cifar10-' + model_type + '.{epoch:03d}.h5'
+#        f'{checkpoint_path}', # /{checkpoint_names}',
+#        checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
+#                                                                 save_weights_only=False,
+#                                                                 monitor='val_accuracy')
+#        callbacks.append(checkpoint_callback)
+
         print('*** OPTIMIZER {} ***'.format(optimizer))
         
         loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
@@ -348,21 +358,21 @@ if __name__ == '__main__':
                 max_seq_length=max_seq_length).map(select_data_and_label_from_record)
             
             # HACK:  trim the Validation dataset down to equal the number of validation steps to workaround PipeMode issue
-            validation_dataset = validation_dataset.take(validation_steps)
+#            validation_dataset = validation_dataset.take(validation_steps)
             
             train_and_validation_history = model.fit(train_dataset,
                                                      shuffle=True,
                                                      epochs=epochs,
-                                                     steps_per_epoch=train_steps_per_epoch,
+#                                                     steps_per_epoch=train_steps_per_epoch,
                                                      validation_data=validation_dataset,
-                                                     validation_steps=validation_steps,
+#                                                     validation_steps=validation_steps,
                                                      callbacks=callbacks)
             print(train_and_validation_history)
         else: # Not running validation
             train_history = model.fit(train_dataset,
                                       shuffle=True,
                                       epochs=epochs,
-                                      steps_per_epoch=train_steps_per_epoch,
+#                                      steps_per_epoch=train_steps_per_epoch,
                                       callbacks=callbacks)
             print(train_history)
 
@@ -381,7 +391,7 @@ if __name__ == '__main__':
                 max_seq_length=max_seq_length).map(select_data_and_label_from_record)
 
             test_history = model.evaluate(test_dataset,
-                                          steps=test_steps,
+#                                          steps=test_steps,
                                           callbacks=callbacks)
             print(test_history)
 
