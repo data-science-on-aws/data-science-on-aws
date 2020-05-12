@@ -358,21 +358,23 @@ if __name__ == '__main__':
                 max_seq_length=max_seq_length).map(select_data_and_label_from_record)
             
             # HACK:  trim the Validation dataset down to equal the number of validation steps to workaround PipeMode issue
-#            validation_dataset = validation_dataset.take(validation_steps)
+            validation_dataset = validation_dataset.take(validation_steps)
             
+            print('Starting Training and Validation...')
             train_and_validation_history = model.fit(train_dataset,
                                                      shuffle=True,
                                                      epochs=epochs,
-#                                                     steps_per_epoch=train_steps_per_epoch,
+                                                     steps_per_epoch=train_steps_per_epoch,
                                                      validation_data=validation_dataset,
-#                                                     validation_steps=validation_steps,
+                                                     validation_steps=validation_steps,
                                                      callbacks=callbacks)
             print(train_and_validation_history)
         else: # Not running validation
+            print('Starting Training (Without Validation)...')
             train_history = model.fit(train_dataset,
                                       shuffle=True,
                                       epochs=epochs,
-#                                      steps_per_epoch=train_steps_per_epoch,
+                                      steps_per_epoch=train_steps_per_epoch,
                                       callbacks=callbacks)
             print(train_history)
 
@@ -390,8 +392,9 @@ if __name__ == '__main__':
                 steps_per_epoch=test_steps,
                 max_seq_length=max_seq_length).map(select_data_and_label_from_record)
 
+            print('Starting test...')
             test_history = model.evaluate(test_dataset,
-#                                          steps=test_steps,
+                                          steps=test_steps,
                                           callbacks=callbacks)
             print(test_history)
 
