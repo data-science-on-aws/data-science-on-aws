@@ -1,0 +1,4 @@
+model.tar.gz
+tensorflow/
+tflite_optimized_model.tflite
+transformers/
