@@ -20,12 +20,11 @@ from transformers import DistilBertTokenizer
 import pyspark
 from pyspark.sql import SparkSession
 from pyspark.ml import Pipeline
-from pyspark.sql.types import StructField, StructType, StringType, IntegerType, DateType, BinaryType
 from pyspark.sql.functions import *
 from pyspark.ml.linalg import DenseVector
 from pyspark.sql.functions import split
 from pyspark.sql.functions import udf, col
-from pyspark.sql.types import ArrayType, DoubleType
+from pyspark.sql.types import *
 
 tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
 
@@ -102,37 +101,8 @@ def convert_input(label, text):
     # Label for our training data (star_rating 1 through 5)
     label_id = label_map[label]
 
-#    features = InputFeatures(
-#        input_ids=input_ids,
-#        input_mask=input_mask,
-#        segment_ids=segment_ids,
-#        label_id=label_id)
+    return {'input_ids': input_ids, 'input_mask': input_mask, 'segment_ids': segment_ids, 'label_ids': [label_id]}
 
-#    print('**tokens**\n{}\n'.format(tokens))
-#    print('**input_ids**\n{}\n'.format(features.input_ids))
-#    print('**input_mask**\n{}\n'.format(features.input_mask))
-#    print('**segment_ids**\n{}\n'.format(features.segment_ids))
-#    print('**label_id**\n{}\n'.format(features.label_id))
-
-#    return input_ids, input_mask, segment_ids, label_id
-
-    tfrecord_features = collections.OrderedDict()
-
-    tfrecord_features['input_ids'] = tf.train.Feature(int64_list=tf.train.Int64List(value=input_ids))
-    tfrecord_features['input_mask'] = tf.train.Feature(int64_list=tf.train.Int64List(value=input_mask))
-    tfrecord_features['segment_ids'] = tf.train.Feature(int64_list=tf.train.Int64List(value=segment_ids))
-    tfrecord_features['label_ids'] = tf.train.Feature(int64_list=tf.train.Int64List(value=[label_id]))
-
-    tfrecord = tf.train.Example(features=tf.train.Features(feature=tfrecord_features))
-#    print(tfrecord)
-#    print(tfrecord.SerializeToString())
-
-#    print(type(tfrecord.SerializeToString()))
-    return tfrecord.SerializeToString()
-
-#    return features
-
-#    return input_ids, input_mask, segment_ids, [label_id]
 
 def list_arg(raw_value):
     """argparse type for a list of strings"""
@@ -207,47 +177,40 @@ def transform(spark, s3_input_data, s3_output_train_data, s3_output_validation_d
 
     # TODO:  Balance
     
-#     expanded_features_df = (standard_scaler_features_df.withColumn('f', to_array(col('scaled_pca_features')))
-#         .select(['star_rating'] + [col('f')[i] for i in range(num_features)]))
-#     expanded_features_df.show()
-
     features_df = df_csv_dropped.select(['star_rating', 'review_body'])
     features_df.show()
 
-    # TODO:  Convert to TFRecord
-    bert_transformer = udf(lambda text, label: convert_input(text, label),
-                           BinaryType())
+    tfrecord_schema = StructType([
+      StructField("input_ids", ArrayType(IntegerType(), False)),
+      StructField("input_mask", ArrayType(IntegerType(), False)),
+      StructField("segment_ids", ArrayType(IntegerType(), False)),
+      StructField("label_ids", ArrayType(IntegerType(), False))
+    ])
+
+    bert_transformer = udf(lambda text, label: convert_input(text, label), tfrecord_schema)
+
     spark.udf.register('bert_transformer', bert_transformer)
 
     transformed_df = features_df.select(bert_transformer('star_rating', 'review_body').alias('tfrecords'))
     transformed_df.show(truncate=False)
 
-    # TODO:  Split
-    train_df, validation_df, test_df = transformed_df.randomSplit([0.9, 0.05, 0.05])
-    # TODO:  Potentially use TFRecord Writer from LI
-#    test_df.write.mode('overwrite').format('tfrecord').option('recordType', 'Example').save(path='{}-sparktfrecord'.format(s3_output_train_data))
-#    train_df.write.binaryFile(path=s3_output_train_data)
+    flattened_df = transformed_df.select('tfrecords.*')
+    flattened_df.show()
 
-    train_df.write.csv(path=s3_output_train_data,
-                       sep=None,
-                       header=None,
-                       escape=None,
-                       quote=None)
+    # Split 90-5-5%
+    train_df, validation_df, test_df = flattened_df.randomSplit([0.9, 0.05, 0.05])
+
+    train_df.write.format('tfrecord').option('recordType', 'Example').save(path=s3_output_train_data)
     print('Wrote to output file:  {}'.format(s3_output_train_data))
 
-    validation_df.write.csv(path=s3_output_validation_data,
-                            sep=None,
-                            header=None,
-                            escape=None,
-                            quote=None)
+    validation_df.write.format('tfrecord').option('recordType', 'Example').save(path=s3_output_validation_data)
     print('Wrote to output file:  {}'.format(s3_output_validation_data))
 
-    test_df.write.csv(path=s3_output_test_data,
-                      sep=None,
-                      header=None,
-                      escape=None,
-                      quote=None) 
+    test_df.write.format('tfrecord').option('recordType', 'Example').save(path=s3_output_test_data)
     print('Wrote to output file:  {}'.format(s3_output_test_data))
+
+    restored_test_df = spark.read.format('tfrecord').option('recordType', 'Example').load(path=s3_output_test_data)
+    restored_test_df.show()
 
 
 def main():
