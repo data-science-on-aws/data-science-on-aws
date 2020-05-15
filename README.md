@@ -1,4 +1,4 @@
-# Attend the Next Free Online Workshop!
+# Attend our Free Online Workshop!
 You must register on [**Eventbrite**](https://www.eventbrite.com/e/full-day-workshop-kubeflow-gpu-kerastensorflow-20-tf-extended-tfx-kubernetes-pytorch-xgboost-tickets-63362929227).  
 
 _All instructions will come through Eventbrite.  Please make sure your Eventbrite email address is up to date._
