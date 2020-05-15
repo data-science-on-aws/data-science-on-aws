@@ -49,8 +49,8 @@ def input_handler(data, context):
         example.ParseFromString(instance)
         print(example)
 
-        example_feature = MessageToDict(example.features)['feature']
-        print(example_feature)
+        record = MessageToDict(example.features)['feature']
+        print(record)
 
         name_to_features = {
           "input_ids": tf.io.FixedLenFeature([max_seq_length], tf.int64),
@@ -70,12 +70,17 @@ def input_handler(data, context):
 
         input_ids, input_mask, segment_ids = _decode_record(record, name_to_features)
 
+        print(input_ids)
+        print(input_mask)
+        print(segment_ids)
+        
         transformed_instance = {
                                  "input_ids": input_ids,
                                  "input_mask": input_mask,
                                  "segment_ids": segment_ids
                                }
 
+        print(transformed_instance)
         transformed_instances.append(transformed_instance)
 
     transformed_data = {"instances": transformed_instances}
