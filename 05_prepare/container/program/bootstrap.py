@@ -41,13 +41,20 @@ def copy_aws_jars():
     dst = HADOOP_PATH + "/share/hadoop/common/lib/hadoop-aws-3.0.0.jar"
     copyfile(src, dst)
 
-    # HACK
+    # Add Deequ Jars
+    #    https://github.com/awslabs/deequ
     src = EXTRA_JARS_PATH + "/deequ-1.0.1.jar"
     dst = SPARK_PATH + "/jars/deequ-1.0.1.jar"
     copyfile(src, dst)
 
     src = EXTRA_JARS_PATH + "/preprocess-deequ.jar"
     dst = SPARK_PATH + "/jars/preprocess-deequ.jar"
+    copyfile(src, dst)
+
+    # Add Spark-TFRecord Jars
+    #     https://github.com/linkedin/spark-tfrecord
+    src = EXTRA_JARS_PATH + "/spark-tfrecord_2.11-0.1.1.jar"
+    dst = SPARK_PATH + "/jars/spark-tfrecord_2.11-0.1.1.jar"
     copyfile(src, dst)
 
     

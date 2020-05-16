@@ -105,17 +105,17 @@ def transform(spark, s3_input_data, s3_output_train_data, s3_output_validation_d
 
     train_df.write.csv(path=s3_output_train_data,
                        header=None,
-                       quote=None) #,
+                       quote=None)
     print('Wrote to output file:  {}'.format(s3_output_train_data))
 
     validation_df.write.csv(path=s3_output_validation_data,
                             header=None,
-                            quote=None) #,
+                            quote=None)
     print('Wrote to output file:  {}'.format(s3_output_validation_data))
 
     test_df.write.csv(path=s3_output_test_data,
                        header=None,
-                       quote=None) 
+                       quote=None)
     print('Wrote to output file:  {}'.format(s3_output_test_data))
 
 
