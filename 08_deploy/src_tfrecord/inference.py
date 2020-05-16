@@ -2,6 +2,7 @@ import json
 import tensorflow as tf
 from string import whitespace
 from collections import namedtuple
+from google.protobuf.json_format import MessageToDict
 
 max_seq_length = 128
 
@@ -45,12 +46,19 @@ def input_handler(data, context):
         print(type(instance))
         print(instance)
 
-        example = tf.train.Example()
-        example.ParseFromString(instance)
-        print(example)
+#        example = tf.train.Example()
+#        example.ParseFromString(instance)
+#        print(example)
 
-        record = MessageToDict(example.features)['feature']
-        print(record)
+#        record = MessageToDict(example.features)['feature']
+#        print(record)
+
+        decoded_instance = tf.io.decode_raw(instance, tf.uint8)
+        example = tf.train.Example()
+        example.ParseFromString(decoded_instance)
+
+        example_dict = MessageToDict(example.features)
+        record = example_dict['feature']
 
         name_to_features = {
           "input_ids": tf.io.FixedLenFeature([max_seq_length], tf.int64),
