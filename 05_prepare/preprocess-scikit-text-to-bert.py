@@ -180,6 +180,9 @@ def parse_args():
     parser.add_argument('--test-split-percentage', type=float,
         default=0.05,
     )
+    parser.add_argument('--balance-dataset', type=eval,
+        default=False
+    )
     parser.add_argument('--max-seq-length', type=int,
         default=128,
     )  
@@ -187,9 +190,12 @@ def parse_args():
     return parser.parse_args()
 
     
-def _transform_tsv_to_tfrecord(file, max_seq_length):
+def _transform_tsv_to_tfrecord(file, 
+                               max_seq_length, 
+                               balance_dataset):
     print('file {}'.format(file))
     print('max_seq_length {}'.format(max_seq_length))
+    print('balance_dataset {}'.format(balance_dataset))
 
     filename_without_extension = Path(Path(file).stem).stem
 
@@ -203,60 +209,64 @@ def _transform_tsv_to_tfrecord(file, max_seq_length):
     df = df.reset_index(drop=True)
 
     print('Shape of dataframe {}'.format(df.shape))
+
+    if balance_dataset:  
+        # Balance the dataset down to the minority class
+        from sklearn.utils import resample
+
+        five_star_df = df.query('star_rating == 5')
+        four_star_df = df.query('star_rating == 4')
+        three_star_df = df.query('star_rating == 3')
+        two_star_df = df.query('star_rating == 2')
+        one_star_df = df.query('star_rating == 1')
+
+        minority_count = min(five_star_df.shape[0], 
+                             four_star_df.shape[0], 
+                             three_star_df.shape[0], 
+                             two_star_df.shape[0], 
+                             one_star_df.shape[0]) 
+
+        five_star_df = resample(five_star_df,
+                                replace = False,
+                                n_samples = minority_count,
+                                random_state = 27)
+
+        four_star_df = resample(four_star_df,
+                                replace = False,
+                                n_samples = minority_count,
+                                random_state = 27)
+
+        three_star_df = resample(three_star_df,
+                                 replace = False,
+                                 n_samples = minority_count,
+                                 random_state = 27)
+
+        two_star_df = resample(two_star_df,
+                               replace = False,
+                               n_samples = minority_count,
+                               random_state = 27)
+
+        one_star_df = resample(one_star_df,
+                               replace = False,
+                               n_samples = minority_count,
+                               random_state = 27)
+
+        df_balanced = pd.concat([five_star_df, four_star_df, three_star_df, two_star_df, one_star_df])
+        df_balanced = df_balanced.reset_index(drop=True)        
+        print('Shape of balanced dataframe {}'.format(df_balanced.shape))
+        df = df_balanced
+        
+    print('Shape of dataframe before splitting {}'.format(df.shape))
     
-    # Balance the dataset down to the minority class
-    from sklearn.utils import resample
-
-    five_star_df = df.query('star_rating == 5')
-    four_star_df = df.query('star_rating == 4')
-    three_star_df = df.query('star_rating == 3')
-    two_star_df = df.query('star_rating == 2')
-    one_star_df = df.query('star_rating == 1')
-
-    minority_count = min(five_star_df.shape[0], 
-                         four_star_df.shape[0], 
-                         three_star_df.shape[0], 
-                         two_star_df.shape[0], 
-                         one_star_df.shape[0]) 
-
-    five_star_df = resample(five_star_df,
-                            replace = False,
-                            n_samples = minority_count,
-                            random_state = 27)
-
-    four_star_df = resample(four_star_df,
-                            replace = False,
-                            n_samples = minority_count,
-                            random_state = 27)
-
-    three_star_df = resample(three_star_df,
-                             replace = False,
-                             n_samples = minority_count,
-                             random_state = 27)
-
-    two_star_df = resample(two_star_df,
-                           replace = False,
-                           n_samples = minority_count,
-                           random_state = 27)
-
-    one_star_df = resample(one_star_df,
-                           replace = False,
-                           n_samples = minority_count,
-                           random_state = 27)
-
-    df_balanced = pd.concat([five_star_df, four_star_df, three_star_df, two_star_df, one_star_df])
-    df_balanced = df_balanced.reset_index(drop=True)
-    print('Shape of balanced dataframe {}'.format(df_balanced.shape))
-
     print('train split percentage {}'.format(args.train_split_percentage))
     print('validation split percentage {}'.format(args.validation_split_percentage))
     print('test split percentage {}'.format(args.test_split_percentage))    
     
     holdout_percentage = 1.00 - args.train_split_percentage
     print('holdout percentage {}'.format(holdout_percentage))
-    df_train, df_holdout = train_test_split(df_balanced, 
+    df_train, df_holdout = train_test_split(df, 
                                             test_size=holdout_percentage, 
-                                            stratify=df_balanced['star_rating'])
+                                            stratify=df['star_rating'])
 
     test_holdout_percentage = args.test_split_percentage / holdout_percentage
     print('test holdout percentage {}'.format(test_holdout_percentage))
@@ -314,7 +324,11 @@ def process(args):
     validation_data = None
     test_data = None
 
-    transform_tsv_to_tfrecord = functools.partial(_transform_tsv_to_tfrecord, max_seq_length=args.max_seq_length)
+    transform_tsv_to_tfrecord = functools.partial(_transform_tsv_to_tfrecord, 
+                                                 max_seq_length=args.max_seq_length,
+                                                 balance_dataset=args.balance_dataset
+
+    )
     input_files = glob.glob('{}/*.tsv.gz'.format(args.input_data))
 
     num_cpus = multiprocessing.cpu_count()

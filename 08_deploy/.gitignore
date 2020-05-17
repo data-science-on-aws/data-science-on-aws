@@ -1,3 +1,7 @@
+model1.tar.gz
+model2.tar.gz
+multi.tar.gz
+multi/
 model.tar.gz
 transformers/
 tensorflow/

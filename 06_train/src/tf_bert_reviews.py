@@ -72,7 +72,7 @@ def file_based_input_dataset_builder(channel,
         # TODO:  wip/bert/bert_attention_head_view/train.py
         # Convert input_ids into input_tokens with DistilBert vocabulary 
         #  if hook.get_collections()['all'].save_config.should_save_step(modes.EVAL, hook.mode_steps[modes.EVAL]):
-#              hook._write_raw_tensor_simple("input_tokens", input_tokens)
+        #    hook._write_raw_tensor_simple("input_tokens", input_tokens)
         return record
     
     dataset = dataset.apply(
