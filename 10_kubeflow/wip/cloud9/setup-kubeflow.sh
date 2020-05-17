@@ -104,8 +104,8 @@ eksctl utils describe-stacks --region=${AWS_REGION} --cluster=${AWS_CLUSTER_NAME
 source ~/.bash_profile
 
 ### Create more environment variables
-export STACK_NAME=$(eksctl get nodegroup --cluster ${AWS_CLUSTER_NAME} -o json | jq -r '.[].StackName')
-echo "export STACK_NAME=${STACK_NAME}" | tee -a ~/.bash_profile
+#export STACK_NAME=$(eksctl get nodegroup --cluster ${AWS_CLUSTER_NAME} -o json | jq -r '.[].StackName')
+#echo "export STACK_NAME=${STACK_NAME}" | tee -a ~/.bash_profile
 
 export INSTANCE_ROLE_NAME=$(aws iam list-roles \
     | jq -r ".Roles[] \
@@ -162,7 +162,7 @@ source ~/.bash_profile
 #### Check environment variables are set with valid values
 echo $S3_BUCKET
 echo $AWS_CLUSTER_NAME
-echo $STACK_NAME
+#echo $STACK_NAME
 echo $INSTANCE_ROLE_NAME
 echo $INSTANCE_PROFILE_ARN
 
