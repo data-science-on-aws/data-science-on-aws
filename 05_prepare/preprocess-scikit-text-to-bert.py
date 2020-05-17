@@ -26,8 +26,6 @@ from pathlib import Path
 
 tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
 
-# We set sequences to be at most 128 tokens long.
-MAX_SEQ_LENGTH = 128
 DATA_COLUMN = 'review_body'
 LABEL_COLUMN = 'star_rating'
 LABEL_VALUES = [1, 2, 3, 4, 5]
@@ -66,7 +64,7 @@ class Input(object):
     self.label = label
     
     
-def convert_input(text_input):
+def convert_input(text_input, max_seq_length):
     # First, we need to preprocess our data so that it matches the data BERT was trained on:
     #
     # 1. Lowercase our text (if we're using a BERT lowercase model)
@@ -87,14 +85,14 @@ def convert_input(text_input):
     #
     encode_plus_tokens = tokenizer.encode_plus(text_input.text,
                                                pad_to_max_length=True,
-                                               max_length=MAX_SEQ_LENGTH)
+                                               max_length=max_seq_length)
 
     # Convert the text-based tokens to ids from the pre-trained BERT vocabulary
     input_ids = encode_plus_tokens['input_ids']
     # Specifies which tokens BERT should pay attention to (0 or 1)
     input_mask = encode_plus_tokens['attention_mask']
     # Segment Ids are always 0 for single-sequence tasks (or 1 if two-sequence tasks)
-    segment_ids = [0] * MAX_SEQ_LENGTH
+    segment_ids = [0] * max_seq_length
 
     # Label for our training data (star_rating 1 through 5)
     label_id = label_map[text_input.label]
@@ -115,7 +113,8 @@ def convert_input(text_input):
 
 
 def convert_features_to_tfrecord(inputs,
-                                 output_file):
+                                 output_file,
+                                 max_seq_length):
     """Convert a set of `Input`s to a TFRecord file."""
 
     tfrecord_writer = tf.io.TFRecordWriter(output_file)
@@ -124,7 +123,7 @@ def convert_features_to_tfrecord(inputs,
         if input_idx % 1000 == 0:
             print("Writing example %d of %d" % (input_idx, len(inputs)))
 
-            bert_features = convert_input(text_input)
+            bert_features = convert_input(text_input, max_seq_length)
         
             tfrecord_features = collections.OrderedDict()
             
@@ -172,11 +171,25 @@ def parse_args():
     parser.add_argument('--output-data', type=str,
         default='/opt/ml/processing/output',
     )
+    parser.add_argument('--train-split-percentage', type=float,
+        default=0.90,
+    )
+    parser.add_argument('--validation-split-percentage', type=float,
+        default=0.05,
+    )    
+    parser.add_argument('--test-split-percentage', type=float,
+        default=0.05,
+    )
+    parser.add_argument('--max-seq-length', type=int,
+        default=128,
+    )  
+    
     return parser.parse_args()
 
     
-def _transform_tsv_to_tfrecord(file):
-    print(file)
+def _transform_tsv_to_tfrecord(file, max_seq_length):
+    print('file {}'.format(file))
+    print('max_seq_length {}'.format(max_seq_length))
 
     filename_without_extension = Path(Path(file).stem).stem
 
@@ -191,7 +204,7 @@ def _transform_tsv_to_tfrecord(file):
 
     print('Shape of dataframe {}'.format(df.shape))
     
-    # Balance to the minority class (star_rating 2 in our overall dataset)
+    # Balance the dataset down to the minority class
     from sklearn.utils import resample
 
     five_star_df = df.query('star_rating == 5')
@@ -200,42 +213,56 @@ def _transform_tsv_to_tfrecord(file):
     two_star_df = df.query('star_rating == 2')
     one_star_df = df.query('star_rating == 1')
 
+    minority_count = min(five_star_df.shape[0], 
+                         four_star_df.shape[0], 
+                         three_star_df.shape[0], 
+                         two_star_df.shape[0], 
+                         one_star_df.shape[0]) 
+
     five_star_df = resample(five_star_df,
                             replace = False,
-                            n_samples = len(two_star_df),
+                            n_samples = minority_count,
                             random_state = 27)
 
     four_star_df = resample(four_star_df,
                             replace = False,
-                            n_samples = len(two_star_df),
+                            n_samples = minority_count,
                             random_state = 27)
 
     three_star_df = resample(three_star_df,
                              replace = False,
-                             n_samples = len(two_star_df),
+                             n_samples = minority_count,
                              random_state = 27)
 
     two_star_df = resample(two_star_df,
                            replace = False,
-                           n_samples = len(two_star_df),
+                           n_samples = minority_count,
                            random_state = 27)
 
     one_star_df = resample(one_star_df,
                            replace = False,
-                           n_samples = len(two_star_df),
+                           n_samples = minority_count,
                            random_state = 27)
 
     df_balanced = pd.concat([five_star_df, four_star_df, three_star_df, two_star_df, one_star_df])
     df_balanced = df_balanced.reset_index(drop=True)
     print('Shape of balanced dataframe {}'.format(df_balanced.shape))
 
-    # HACK - Running on just 2 files, not balancing, and training without steps_per_epoch
-#    df_balanced = df
+    print('train split percentage {}'.format(args.train_split_percentage))
+    print('validation split percentage {}'.format(args.validation_split_percentage))
+    print('test split percentage {}'.format(args.test_split_percentage))    
     
-    # Split all data into 90% train and 10% holdout
-    df_train, df_holdout = train_test_split(df_balanced, test_size=0.10, stratify=df_balanced['star_rating'])        
-    # Split holdout data into 50% validation and 50% test
-    df_validation, df_test = train_test_split(df_holdout, test_size=0.50, stratify=df_holdout['star_rating'])
+    holdout_percentage = 1.00 - args.train_split_percentage
+    print('holdout percentage {}'.format(holdout_percentage))
+    df_train, df_holdout = train_test_split(df_balanced, 
+                                            test_size=holdout_percentage, 
+                                            stratify=df_balanced['star_rating'])
+
+    test_holdout_percentage = args.test_split_percentage / holdout_percentage
+    print('test holdout percentage {}'.format(test_holdout_percentage))
+    df_validation, df_test = train_test_split(df_holdout, 
+                                              test_size=test_holdout_percentage,
+                                              stratify=df_holdout['star_rating'])
     
     df_train = df_train.reset_index(drop=True)
     df_validation = df_validation.reset_index(drop=True)
@@ -271,11 +298,13 @@ def _transform_tsv_to_tfrecord(file):
     test_data = '{}/bert/test'.format(args.output_data)
 
     # Convert our train and validation features to InputFeatures (.tfrecord protobuf) that works with BERT and TensorFlow.
-    df_train_embeddings = convert_features_to_tfrecord(train_inputs, '{}/part-{}-{}.tfrecord'.format(train_data, args.current_host, filename_without_extension))
+    df_train_embeddings = convert_features_to_tfrecord(train_inputs, 
+                                                       '{}/part-{}-{}.tfrecord'.format(train_data, args.current_host, filename_without_extension), 
+                                                       max_seq_length)
 
-    df_validation_embeddings = convert_features_to_tfrecord(validation_inputs, '{}/part-{}-{}.tfrecord'.format(validation_data, args.current_host, filename_without_extension))
+    df_validation_embeddings = convert_features_to_tfrecord(validation_inputs, '{}/part-{}-{}.tfrecord'.format(validation_data, args.current_host, filename_without_extension), max_seq_length)
 
-    df_test_embeddings = convert_features_to_tfrecord(test_inputs, '{}/part-{}-{}.tfrecord'.format(test_data, args.current_host, filename_without_extension))
+    df_test_embeddings = convert_features_to_tfrecord(test_inputs, '{}/part-{}-{}.tfrecord'.format(test_data, args.current_host, filename_without_extension), max_seq_length)
         
     
 def process(args):
@@ -285,7 +314,7 @@ def process(args):
     validation_data = None
     test_data = None
 
-    transform_tsv_to_tfrecord = functools.partial(_transform_tsv_to_tfrecord)
+    transform_tsv_to_tfrecord = functools.partial(_transform_tsv_to_tfrecord, max_seq_length=args.max_seq_length)
     input_files = glob.glob('{}/*.tsv.gz'.format(args.input_data))
 
     num_cpus = multiprocessing.cpu_count()
