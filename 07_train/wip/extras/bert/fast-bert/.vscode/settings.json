@@ -1,0 +1,7 @@
+{
+    "python.formatting.provider": "black",
+    "python.pythonPath": "/Users/kaushaltrivedi/anaconda3/envs/transformer/bin/python",
+    "python.linting.pylintEnabled": false,
+    "python.linting.flake8Enabled": true,
+    "python.linting.enabled": true
+}

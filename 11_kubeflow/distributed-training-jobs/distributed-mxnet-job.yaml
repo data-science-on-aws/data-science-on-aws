@@ -1,0 +1,41 @@
+apiVersion: "kubeflow.org/v1beta1"
+kind: "MXJob"
+metadata:
+  name: "distributed-mxnet-job"
+spec:
+  jobMode: MXTrain
+  mxReplicaSpecs:
+    Scheduler:
+      replicas: 1
+      restartPolicy: Never
+      template:
+        spec:
+          containers:
+            - name: mxnet
+              image: mxjob/mxnet:cpu
+    Server:
+      replicas: 1
+      restartPolicy: Never
+      template:
+        spec:
+          containers:
+            - name: mxnet
+              image: mxjob/mxnet:cpu
+    Worker:
+      replicas: 1
+      restartPolicy: Never
+      template:
+        spec:
+          containers:
+            - name: mxnet
+              image: mxjob/mxnet:cpu
+              command:
+              - "python"
+              args:
+              - "/incubator-mxnet/example/image-classification/train_mnist.py"
+              - "--num-epochs"
+              - "10"
+              - "--num-layers"
+              - "2"
+              - "--kv-store"
+              - "dist_device_sync"

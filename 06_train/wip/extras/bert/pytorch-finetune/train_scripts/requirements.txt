@@ -1,3 +1,0 @@
-tensorboardX
-scikit-learn
-pytorch_transformers
