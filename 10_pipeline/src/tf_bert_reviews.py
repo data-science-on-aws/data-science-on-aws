@@ -12,13 +12,15 @@ import tensorflow as tf
 #subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow==2.1.0'])
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'transformers==2.8.0'])
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'sagemaker-tensorflow==2.1.0.1.0.0'])
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'smdebug==0.7.2'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'smdebug==0.8.0'])
 from transformers import DistilBertTokenizer
 from transformers import TFDistilBertForSequenceClassification
 from transformers import TextClassificationPipeline
 from transformers.configuration_distilbert import DistilBertConfig
 
+
 CLASSES = [1, 2, 3, 4, 5]
+
 
 def select_data_and_label_from_record(record):
     x = {
@@ -70,7 +72,7 @@ def file_based_input_dataset_builder(channel,
         # TODO:  wip/bert/bert_attention_head_view/train.py
         # Convert input_ids into input_tokens with DistilBert vocabulary 
         #  if hook.get_collections()['all'].save_config.should_save_step(modes.EVAL, hook.mode_steps[modes.EVAL]):
-#              hook._write_raw_tensor_simple("input_tokens", input_tokens)
+        #    hook._write_raw_tensor_simple("input_tokens", input_tokens)
         return record
     
     dataset = dataset.apply(
@@ -321,9 +323,17 @@ if __name__ == '__main__':
             callbacks.append(callback)
             optimizer = callback.wrap_optimizer(optimizer)
 
-        callback = tf.keras.callbacks.TensorBoard(log_dir=tensorboard_logs_path)
-        callbacks.append(callback)
-            
+        tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=tensorboard_logs_path)
+        callbacks.append(tensorboard_callback)
+        
+#        checkpoint_path  = "/opt/ml/checkpoints"
+#        checkpoint_names = 'cifar10-' + model_type + '.{epoch:03d}.h5'
+#        f'{checkpoint_path}', # /{checkpoint_names}',
+#        checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
+#                                                                 save_weights_only=False,
+#                                                                 monitor='val_accuracy')
+#        callbacks.append(checkpoint_callback)
+
         print('*** OPTIMIZER {} ***'.format(optimizer))
         
         loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
@@ -350,6 +360,7 @@ if __name__ == '__main__':
             # HACK:  trim the Validation dataset down to equal the number of validation steps to workaround PipeMode issue
             validation_dataset = validation_dataset.take(validation_steps)
             
+            print('Starting Training and Validation...')
             train_and_validation_history = model.fit(train_dataset,
                                                      shuffle=True,
                                                      epochs=epochs,
@@ -359,6 +370,7 @@ if __name__ == '__main__':
                                                      callbacks=callbacks)
             print(train_and_validation_history)
         else: # Not running validation
+            print('Starting Training (Without Validation)...')
             train_history = model.fit(train_dataset,
                                       shuffle=True,
                                       epochs=epochs,
@@ -380,6 +392,7 @@ if __name__ == '__main__':
                 steps_per_epoch=test_steps,
                 max_seq_length=max_seq_length).map(select_data_and_label_from_record)
 
+            print('Starting test...')
             test_history = model.evaluate(test_dataset,
                                           steps=test_steps,
                                           callbacks=callbacks)

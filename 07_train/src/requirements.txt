@@ -4,8 +4,8 @@
 #tensorflow-hub==0.7.0
 #bert-tensorflow==1.0.2
 
-tensorflow==2.2.0-rc1
-grpcio
-tqdm
-bert-for-tf2
-sentencepiece
+#tensorflow==2.2.0-rc1
+#grpcio
+#tqdm
+#bert-for-tf2
+#sentencepiece
