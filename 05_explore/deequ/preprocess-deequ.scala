@@ -12,8 +12,7 @@ import org.apache.spark.sql.types.{StructType, StructField, StringType, IntegerT
 
 object SparkAmazonReviewsAnalyzer {
   def run(s3InputData: String, s3OutputAnalyzeData: String): Unit = {
-    // TODO:  Retrieve s3_input_data and s3_output_analyze_data args from the list of args (argv-style)
-//    System.out.println(args)
+
     System.out.println(s"s3_input_data: ${s3InputData}")
     System.out.println(s"s3_output_analyze_data: ${s3OutputAnalyzeData}")
       
@@ -22,11 +21,7 @@ object SparkAmazonReviewsAnalyzer {
       .appName("SparkAmazonReviewsAnalyzer")
       .getOrCreate()
     
-    // Uncomment this to read parquet instead
-    //val dataset = spark.read.parquet(s3InputData)  
-
     val schema = StructType(Array(
-//        StructField("is_positive_sentiment", IntegerType, true),
         StructField("marketplace", StringType, true),
         StructField("customer_id", StringType, true),
         StructField("review_id", StringType, true),
@@ -43,17 +38,16 @@ object SparkAmazonReviewsAnalyzer {
         StructField("review_body", StringType, true),
         StructField("review_date", StringType, true)
     ))
-
+      
     val dataset = spark.read.option("sep", "\t")
                             .option("header", "true")
                             .option("quote", "")
                             .schema(schema)
                             .csv(s3InputData)
 
+    // define analyzers that compute metrics
     val analysisResult: AnalyzerContext = { AnalysisRunner
-          // data to run the analysis on
           .onData(dataset)
-          // define analyzers that compute metrics
           .addAnalyzer(Size())
           .addAnalyzer(Completeness("review_id"))
           .addAnalyzer(ApproxCountDistinct("review_id"))
@@ -76,12 +70,12 @@ object SparkAmazonReviewsAnalyzer {
       .option("delimiter", "\t")
       .csv(s"${s3OutputAnalyzeData}/dataset-metrics")
 
+    // define data quality checks,
+    // compute metrics 
+    // verify check conditions
     val verificationResult: VerificationResult = { VerificationSuite()
           // data to run the verification on
           .onData(dataset)
-          // define data quality checks,
-          // compute metrics 
-          //verify check conditions
           .addCheck(
             Check(CheckLevel.Error, "Review Check") 
               .hasSize(_ >= 200000) // at least 200.000 rows
@@ -90,10 +84,7 @@ object SparkAmazonReviewsAnalyzer {
               .isComplete("review_id") // should never be NULL
               .isUnique("review_id") // should not contain duplicates
               .isComplete("marketplace") // should never be NULL
-              // contains only the listed values
-              .isContainedIn("marketplace", Array("US", "UK", "DE", "JP", "FR"))
-//  TODO:  This is not working in deequ-1.0.1.jar
-//              .isNonNegative("year")) // should not contain negative values  
+              .isContainedIn("marketplace", Array("US", "UK", "DE", "JP", "FR")) 
               )
           .run()
     }
@@ -109,6 +100,7 @@ object SparkAmazonReviewsAnalyzer {
       .option("delimiter", "\t")
       .csv(s"${s3OutputAnalyzeData}/constraint-checks")
     
+    // generate the success metrics as a dataframe
     val verificationSuccessMetricsDataFrame = VerificationResult
       .successMetricsAsDataFrame(spark, verificationResult)
 
@@ -122,12 +114,10 @@ object SparkAmazonReviewsAnalyzer {
       .csv(s"${s3OutputAnalyzeData}/success-metrics")      
 
     // We ask deequ to compute constraint suggestions for us on the data
+    // using a default set of rules for constraint suggestion
     val suggestionsResult = { ConstraintSuggestionRunner()
-          // data to suggest constraints for
           .onData(dataset)
-          // default set of rules for constraint suggestion
           .addConstraintRules(Rules.DEFAULT)
-          // run data profiling and constraint suggestion
           .run()
     }
 
