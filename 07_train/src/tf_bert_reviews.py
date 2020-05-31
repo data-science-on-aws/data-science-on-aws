@@ -97,10 +97,10 @@ def file_based_input_dataset_builder(channel,
 
 def load_checkpoint_model(checkpoint_path):
     # TODO:  find the latest checkpoint file
-    max_epoch_filename = None
-    max_epoch_number = None
-    
-    loaded_model = load_model('{}/{}'.format(checkpoint_path, max_epoch_filename))
+    max_epoch_filename = 1 
+    max_epoch_number = 1 
+
+    loaded_model = load_model('{}/bert-checkpoint-001.h5'.format(checkpoint_path))
 
     return loaded_model, max_epoch_number
 
@@ -323,10 +323,11 @@ if __name__ == '__main__':
 
         os.makedirs(checkpoint_path, exist_ok=True)
         
-#         if os.listdir(checkpoint_path):
-#             print('***** Found checkpoint *****')
-#             model, epoch_number = load_checkpoint_model(checkpoint_path)
-#             print('***** Using checkpoint model {} *****'.format(model))
+#        if os.listdir(checkpoint_path):
+#            print('***** Found checkpoint *****')
+#            print(checkpoint_path)
+#            model, epoch_number = load_checkpoint_model(checkpoint_path)
+#            print('***** Using checkpoint model {} *****'.format(model))
 
         if not tokenizer or not model or not config:
             print('Not properly initialized...')
@@ -353,9 +354,11 @@ if __name__ == '__main__':
                                                     log_dir=tensorboard_logs_path)
         callbacks.append(tensorboard_callback)
         
-        checkpoint_callback = ModelCheckpoint(filepath='/opt/ml/checkpoints/bert-checkpoint-{epoch:03d}.h5',
-                                      save_weights_only=False,
-                                      monitor='val_accuracy')
+        checkpoint_callback = ModelCheckpoint(
+            filepath=checkpoint_path + '/bert-checkpoint-{epoch:03d}.h5',
+            save_weights_only=False,
+            verbose=1,
+            monitor='val_acc')
         callbacks.append(checkpoint_callback)
 
         print('*** OPTIMIZER {} ***'.format(optimizer))
