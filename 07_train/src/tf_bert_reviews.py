@@ -17,6 +17,9 @@ from transformers import DistilBertTokenizer
 from transformers import TFDistilBertForSequenceClassification
 from transformers import TextClassificationPipeline
 from transformers.configuration_distilbert import DistilBertConfig
+from tensorflow.keras.callbacks import ModelCheckpoint
+from tensorflow.keras.models import load_model
+
 
 
 CLASSES = [1, 2, 3, 4, 5]
@@ -92,6 +95,16 @@ def file_based_input_dataset_builder(channel,
     return dataset
 
 
+def load_checkpoint_model(checkpoint_path):
+    # TODO:  find the latest checkpoint file
+    max_epoch_filename = None
+    max_epoch_number = None
+    
+    loaded_model = load_model('{}/{}'.format(checkpoint_path, max_epoch_filename))
+
+    return loaded_model, max_epoch_number
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
@@ -125,6 +138,9 @@ if __name__ == '__main__':
     parser.add_argument('--num_gpus', 
                         type=int, 
                         default=os.environ['SM_NUM_GPUS'])
+    parser.add_argument('--checkpoint_path', 
+                        type=str, 
+                        default='/opt/ml/checkpoints')
     parser.add_argument('--use_xla',
                         type=eval,
                         default=False)
@@ -243,6 +259,9 @@ if __name__ == '__main__':
     run_sample_predictions = args.run_sample_predictions
     print('run_sample_predictions {}'.format(run_sample_predictions))    
 
+    checkpoint_path = args.checkpoint_path
+    print('checkpoint_path {}'.format(checkpoint_path))
+    
     # Determine if PipeMode is enabled 
     pipe_mode_str = os.environ.get('SM_INPUT_DATA_CONFIG', '')
     pipe_mode = (pipe_mode_str.find('Pipe') >= 0)
@@ -302,6 +321,13 @@ if __name__ == '__main__':
                 print('Retry #{}.  Sleeping for {} seconds'.format(retries, random_sleep))
                 time.sleep(random_sleep)
 
+        os.makedirs(checkpoint_path, exist_ok=True)
+        
+#         if os.listdir(checkpoint_path):
+#             print('***** Found checkpoint *****')
+#             model, epoch_number = load_checkpoint_model(checkpoint_path)
+#             print('***** Using checkpoint model {} *****'.format(model))
+
         if not tokenizer or not model or not config:
             print('Not properly initialized...')
 
@@ -323,16 +349,14 @@ if __name__ == '__main__':
             callbacks.append(callback)
             optimizer = callback.wrap_optimizer(optimizer)
 
-        tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=tensorboard_logs_path)
+        tensorboard_callback = tf.keras.callbacks.TensorBoard(
+                                                    log_dir=tensorboard_logs_path)
         callbacks.append(tensorboard_callback)
         
-#        checkpoint_path  = "/opt/ml/checkpoints"
-#        checkpoint_names = 'cifar10-' + model_type + '.{epoch:03d}.h5'
-#        f'{checkpoint_path}', # /{checkpoint_names}',
-#        checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
-#                                                                 save_weights_only=False,
-#                                                                 monitor='val_accuracy')
-#        callbacks.append(checkpoint_callback)
+        checkpoint_callback = ModelCheckpoint(filepath='/opt/ml/checkpoints/bert-checkpoint-{epoch:03d}.h5',
+                                      save_weights_only=False,
+                                      monitor='val_accuracy')
+        callbacks.append(checkpoint_callback)
 
         print('*** OPTIMIZER {} ***'.format(optimizer))
         
@@ -341,6 +365,7 @@ if __name__ == '__main__':
 
         model.compile(optimizer=optimizer, loss=loss, metrics=[metric])
         print('Trained model {}'.format(model))
+                    
         print(model.summary())
 
         if run_validation:
