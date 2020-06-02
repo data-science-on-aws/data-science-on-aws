@@ -95,9 +95,22 @@ def file_based_input_dataset_builder(channel,
 
 
 def load_checkpoint_model(checkpoint_path):
+
+    import glob
+    import os
+    
+    glob_pattern = os.path.join(checkpoint_path, '*.h5')
+    print('glob pattern {}'.format(glob_pattern))
+
+    list_of_checkpoint_files = glob.glob(glob_pattern)
+    print('List of checkpoint files {}'.format(list_of_checkpoint_files))
+    
+    latest_checkpoint_file = max(list_of_checkpoint_files)
+    print('Latest checkpoint file {}'.format(latest_checkpoint_file))
+    
     loaded_model = TFDistilBertForSequenceClassification.from_pretrained(
-                                                                  checkpoint_path,
-                                                                  config=config)
+                                               latest_checkpoint_file,
+                                               config=config)
 
     return loaded_model
 
@@ -348,7 +361,7 @@ if __name__ == '__main__':
         callbacks.append(tensorboard_callback)
         
         checkpoint_callback = ModelCheckpoint(
-            filepath=os.path.join(checkpoint_path, 'tf_model.h5'),
+            filepath=os.path.join(checkpoint_path, 'tf_model_{epoch:05d}.h5'),
             save_weights_only=False,
             save_best_only=True,
             verbose=1,
