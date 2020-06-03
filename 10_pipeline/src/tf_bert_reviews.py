@@ -12,11 +12,13 @@ import tensorflow as tf
 #subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow==2.1.0'])
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'transformers==2.8.0'])
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'sagemaker-tensorflow==2.1.0.1.0.0'])
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'smdebug==0.7.2'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'smdebug==0.8.0'])
 from transformers import DistilBertTokenizer
 from transformers import TFDistilBertForSequenceClassification
 from transformers import TextClassificationPipeline
 from transformers.configuration_distilbert import DistilBertConfig
+from tensorflow.keras.callbacks import ModelCheckpoint
+from tensorflow.keras.models import load_model
 
 
 CLASSES = [1, 2, 3, 4, 5]
@@ -56,7 +58,7 @@ def file_based_input_dataset_builder(channel,
         print('***** Using input_filenames {}'.format(input_filenames))
         dataset = tf.data.TFRecordDataset(input_filenames)
 
-    dataset = dataset.repeat(epochs * steps_per_epoch)
+    dataset = dataset.repeat(epochs * steps_per_epoch * 100)
     dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
 
     name_to_features = {
@@ -86,10 +88,30 @@ def file_based_input_dataset_builder(channel,
 
     if is_training:
         dataset = dataset.shuffle(seed=42,
-                                  buffer_size=1000,
+                                  buffer_size=steps_per_epoch * batch_size,
                                   reshuffle_each_iteration=True)
 
     return dataset
+
+
+def load_checkpoint_model(checkpoint_path):
+    import glob
+    import os
+    
+    glob_pattern = os.path.join(checkpoint_path, '*.h5')
+    print('glob pattern {}'.format(glob_pattern))
+
+    list_of_checkpoint_files = glob.glob(glob_pattern)
+    print('List of checkpoint files {}'.format(list_of_checkpoint_files))
+    
+    latest_checkpoint_file = max(list_of_checkpoint_files)
+    print('Latest checkpoint file {}'.format(latest_checkpoint_file))
+    
+    loaded_model = TFDistilBertForSequenceClassification.from_pretrained(
+                                               latest_checkpoint_file,
+                                               config=config)
+
+    return loaded_model
 
 
 if __name__ == '__main__':
@@ -104,18 +126,9 @@ if __name__ == '__main__':
     parser.add_argument('--test_data',
                         type=str,
                         default=os.environ['SM_CHANNEL_TEST'])
-    # This points to the S3 location - this should not be used by our code
-    # We should use /opt/ml/model/ instead
-#     parser.add_argument('--model_dir', 
-#                         type=str, 
-#                         default=os.environ['SM_MODEL_DIR'])
     parser.add_argument('--output_dir',
                         type=str,
                         default=os.environ['SM_OUTPUT_DIR'])
-    # This is unused
-    parser.add_argument('--output_data_dir',
-                        type=str,
-                        default=os.environ['SM_OUTPUT_DATA_DIR'])
     parser.add_argument('--hosts', 
                         type=list, 
                         default=json.loads(os.environ['SM_HOSTS']))
@@ -125,6 +138,9 @@ if __name__ == '__main__':
     parser.add_argument('--num_gpus', 
                         type=int, 
                         default=os.environ['SM_NUM_GPUS'])
+    parser.add_argument('--checkpoint_base_path', 
+                        type=str, 
+                        default='/opt/ml/checkpoints')
     parser.add_argument('--use_xla',
                         type=eval,
                         default=False)
@@ -176,7 +192,15 @@ if __name__ == '__main__':
     parser.add_argument('--run_sample_predictions',
                         type=eval,
                         default=False)
-    
+    parser.add_argument('--output_data_dir', # This is unused
+                        type=str,
+                        default=os.environ['SM_OUTPUT_DATA_DIR'])    
+    # This points to the S3 location - this should not be used by our code
+    # We should use /opt/ml/model/ instead
+    # parser.add_argument('--model_dir', 
+    #                     type=str, 
+    #                     default=os.environ['SM_MODEL_DIR'])
+     
     args, _ = parser.parse_known_args()
     print("Args:") 
     print(args)
@@ -185,29 +209,28 @@ if __name__ == '__main__':
     print("Environment Variables:") 
     pprint.pprint(dict(env_var), width = 1) 
 
+    print('SM_TRAINING_ENV {}'.format(env_var['SM_TRAINING_ENV']))
+    sm_training_env_json = json.loads(env_var['SM_TRAINING_ENV'])
+    is_master = sm_training_env_json['is_master']
+    print('is_master {}'.format(is_master))
+    
     train_data = args.train_data
     print('train_data {}'.format(train_data))
     validation_data = args.validation_data
     print('validation_data {}'.format(validation_data))
     test_data = args.test_data
     print('test_data {}'.format(test_data))    
-
-#    model_dir = args.model_dir
-#    print('model_dir {}'.format(model_dir))    
     local_model_dir = os.environ['SM_MODEL_DIR']
-
     output_dir = args.output_dir
     print('output_dir {}'.format(output_dir))    
-
-    # This is unused
-#    output_data_dir = args.output_data_dir
-#    print('output_data_dir {}'.format(output_data_dir))    
     hosts = args.hosts
     print('hosts {}'.format(hosts))    
     current_host = args.current_host
     print('current_host {}'.format(current_host))    
     num_gpus = args.num_gpus
     print('num_gpus {}'.format(num_gpus))
+    job_name = os.environ['SAGEMAKER_JOB_NAME']
+    print('job_name {}'.format(job_name))    
     use_xla = args.use_xla
     print('use_xla {}'.format(use_xla))    
     use_amp = args.use_amp
@@ -243,6 +266,16 @@ if __name__ == '__main__':
     run_sample_predictions = args.run_sample_predictions
     print('run_sample_predictions {}'.format(run_sample_predictions))    
 
+    checkpoint_base_path = args.checkpoint_base_path
+    print('checkpoint_base_path {}'.format(checkpoint_base_path))
+
+    if is_master:
+        checkpoint_path = checkpoint_base_path
+    else:
+        checkpoint_path = '/tmp/checkpoints'
+        
+    print('checkpoint_path {}'.format(checkpoint_path))
+    
     # Determine if PipeMode is enabled 
     pipe_mode_str = os.environ.get('SM_INPUT_DATA_CONFIG', '')
     pipe_mode = (pipe_mode_str.find('Pipe') >= 0)
@@ -261,8 +294,8 @@ if __name__ == '__main__':
     os.makedirs(tensorboard_logs_path, exist_ok=True)
 
     distributed_strategy = tf.distribute.MirroredStrategy()
-    # smdebug currently (0.7.2) does not support MultiWorkerMirroredStrategy()
-    # distributed_strategy = tf.distribute.experimental.MultiWorkerMirroredStrategy()
+    # Commented out because smdebug does not support MultiWorkerMirroredStrategy() as of smdebug 0.8.0
+    #distributed_strategy = tf.distribute.experimental.MultiWorkerMirroredStrategy()
     with distributed_strategy.scope():
         tf.config.optimizer.set_jit(use_xla)
         tf.config.optimizer.set_experimental_options({"auto_mixed_precision": use_amp})
@@ -302,6 +335,14 @@ if __name__ == '__main__':
                 print('Retry #{}.  Sleeping for {} seconds'.format(retries, random_sleep))
                 time.sleep(random_sleep)
 
+        os.makedirs(checkpoint_path, exist_ok=True)
+        
+        if os.listdir(checkpoint_path):
+            print('***** Found checkpoint *****')
+            print(checkpoint_path)
+            model = load_checkpoint_model(checkpoint_path)
+            print('***** Using checkpoint model {} *****'.format(model))
+
         if not tokenizer or not model or not config:
             print('Not properly initialized...')
 
@@ -323,16 +364,16 @@ if __name__ == '__main__':
             callbacks.append(callback)
             optimizer = callback.wrap_optimizer(optimizer)
 
-        tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=tensorboard_logs_path)
+        tensorboard_callback = tf.keras.callbacks.TensorBoard(
+                                                    log_dir=tensorboard_logs_path)
         callbacks.append(tensorboard_callback)
         
-#        checkpoint_path  = "/opt/ml/checkpoints"
-#        checkpoint_names = 'cifar10-' + model_type + '.{epoch:03d}.h5'
-#        f'{checkpoint_path}', # /{checkpoint_names}',
-#        checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
-#                                                                 save_weights_only=False,
-#                                                                 monitor='val_accuracy')
-#        callbacks.append(checkpoint_callback)
+        checkpoint_callback = ModelCheckpoint(
+            filepath=os.path.join(checkpoint_path, 'tf_model_{epoch:05d}.h5'),
+            save_weights_only=False,
+            verbose=1,
+            monitor='val_accuracy')
+        callbacks.append(checkpoint_callback)
 
         print('*** OPTIMIZER {} ***'.format(optimizer))
         
@@ -341,6 +382,7 @@ if __name__ == '__main__':
 
         model.compile(optimizer=optimizer, loss=loss, metrics=[metric])
         print('Trained model {}'.format(model))
+        model.layers[0].trainable = freeze_bert_layer
         print(model.summary())
 
         if run_validation:

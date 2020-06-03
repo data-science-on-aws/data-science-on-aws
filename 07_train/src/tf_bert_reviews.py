@@ -58,7 +58,7 @@ def file_based_input_dataset_builder(channel,
         print('***** Using input_filenames {}'.format(input_filenames))
         dataset = tf.data.TFRecordDataset(input_filenames)
 
-    dataset = dataset.repeat(epochs * steps_per_epoch)
+    dataset = dataset.repeat(epochs * steps_per_epoch * 100)
     dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
 
     name_to_features = {
@@ -88,7 +88,7 @@ def file_based_input_dataset_builder(channel,
 
     if is_training:
         dataset = dataset.shuffle(seed=42,
-                                  buffer_size=1000,
+                                  buffer_size=steps_per_epoch * batch_size,
                                   reshuffle_each_iteration=True)
 
     return dataset
@@ -382,7 +382,7 @@ if __name__ == '__main__':
 
         model.compile(optimizer=optimizer, loss=loss, metrics=[metric])
         print('Trained model {}'.format(model))
-                    
+        model.layers[0].trainable = freeze_bert_layer
         print(model.summary())
 
         if run_validation:
