@@ -381,8 +381,8 @@ if __name__ == '__main__':
         metric = tf.keras.metrics.SparseCategoricalAccuracy('accuracy')
 
         model.compile(optimizer=optimizer, loss=loss, metrics=[metric])
-        print('Trained model {}'.format(model))
-        model.layers[0].trainable = freeze_bert_layer
+        print('Compiled model {}'.format(model))          
+        model.layers[0].trainable = not freeze_bert_layer
         print(model.summary())
 
         if run_validation:
