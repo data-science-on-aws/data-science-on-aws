@@ -95,7 +95,6 @@ def file_based_input_dataset_builder(channel,
 
 
 def load_checkpoint_model(checkpoint_path):
-
     import glob
     import os
     
@@ -210,6 +209,11 @@ if __name__ == '__main__':
     print("Environment Variables:") 
     pprint.pprint(dict(env_var), width = 1) 
 
+    print('SM_TRAINING_ENV {}'.format(env_var['SM_TRAINING_ENV']))
+    sm_training_env_json = json.loads(env_var['SM_TRAINING_ENV'])
+    is_master = sm_training_env_json['is_master']
+    print('is_master {}'.format(is_master))
+    
     train_data = args.train_data
     print('train_data {}'.format(train_data))
     validation_data = args.validation_data
@@ -265,7 +269,11 @@ if __name__ == '__main__':
     checkpoint_base_path = args.checkpoint_base_path
     print('checkpoint_base_path {}'.format(checkpoint_base_path))
 
-    checkpoint_path = os.path.join(checkpoint_base_path, job_name) 
+    if is_master:
+        checkpoint_path = checkpoint_base_path
+    else:
+        checkpoint_path = '/tmp/checkpoints'
+        
     print('checkpoint_path {}'.format(checkpoint_path))
     
     # Determine if PipeMode is enabled 
@@ -363,7 +371,6 @@ if __name__ == '__main__':
         checkpoint_callback = ModelCheckpoint(
             filepath=os.path.join(checkpoint_path, 'tf_model_{epoch:05d}.h5'),
             save_weights_only=False,
-            save_best_only=True,
             verbose=1,
             monitor='val_accuracy')
         callbacks.append(checkpoint_callback)
