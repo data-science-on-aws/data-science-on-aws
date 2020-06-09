@@ -1,3 +1,6 @@
+batch_prediction_output/
+metrics/
+tensorboard/
 model.tar.gz.*
 model1.tar.gz
 model2.tar.gz
