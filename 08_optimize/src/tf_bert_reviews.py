@@ -91,7 +91,7 @@ def file_based_input_dataset_builder(channel,
 
     if is_training:
         dataset = dataset.shuffle(seed=42,
-                                  buffer_size=1000,
+                                  buffer_size=100,
                                   reshuffle_each_iteration=True)
 
     return dataset
@@ -319,9 +319,9 @@ if __name__ == '__main__':
 #    policy = mixed_precision.Policy(mixed_precision_policy)
 #    mixed_precision.set_policy(policy)    
     
-    #distributed_strategy = tf.distribute.MirroredStrategy()
+    distributed_strategy = tf.distribute.MirroredStrategy()
     # Comment out when using smdebug as smdebug does not support MultiWorkerMirroredStrategy() as of smdebug 0.8.0
-    distributed_strategy = tf.distribute.experimental.MultiWorkerMirroredStrategy()
+    #distributed_strategy = tf.distribute.experimental.MultiWorkerMirroredStrategy()
     with distributed_strategy.scope():
         tf.config.optimizer.set_jit(use_xla)
         tf.config.optimizer.set_experimental_options({"auto_mixed_precision": use_amp})
@@ -400,7 +400,7 @@ if __name__ == '__main__':
             debugger_callback = smd.KerasHook.create_from_json_file()
             print('*** DEBUGGER CALLBACK {} ***'.format(debugger_callback))            
             callbacks.append(debugger_callback)
-            optimizer = callback.wrap_optimizer(optimizer)
+            optimizer = debugger_callback.wrap_optimizer(optimizer)
 
         if enable_tensorboard:            
             tensorboard_callback = tf.keras.callbacks.TensorBoard(
