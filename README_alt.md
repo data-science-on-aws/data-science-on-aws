@@ -43,8 +43,6 @@ If not, please logout of your AWS Console in all browser tabs and re-run the ste
 
 ![Create Notebook](img/alt_create_notebook_11.png)
 
-![Create Notebook](img/alt_create_notebook_12.png)
-
 ## 3. Launch an Amazon SageMaker Notebook Instance
 
 Open the [AWS Management Console](https://console.aws.amazon.com/console/home)
