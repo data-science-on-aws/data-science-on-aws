@@ -79,7 +79,7 @@ Click on the IAM role link and navigate to the IAM Management Console.
 
 Click `Attach Policies`.
 
-![IAM Policy](img/view_policies.png)
+![IAM Policy](img/alt_view_policies.png)
               
 Select `AmazonS3FullAccess` and click on `Attach Policy`.
 
