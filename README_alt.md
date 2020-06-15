@@ -7,17 +7,43 @@ _Influence the book by filling out our [**quick survey**](https://www.surveymonk
 
 # Workshop Instructions
 
-## Click on AWS Console
-
-![Event Engine AWS Console](img/alt_aws_console.png)
+## 1. Click on AWS Console
 
 Take the defaults and click on **Open AWS Console**. This will open AWS Console in a new browser tab.
+
+![AWS Console](img/alt_aws_console.png)
 
 Double-check that your account name is something like `IibsAdminAccess-DO-NOT-DELETE...` as follows:
 
 ![IAM Role](img/alt_iibsadminaccess.png)
 
 If not, please logout of your AWS Console in all browser tabs and re-run the steps above!
+
+## 2. Create `TeamRole` IAM Role
+
+![IAM](img/alt_iam_1.png)
+
+![Roles](img/alt_roles_2.png)
+
+![Create Role](img/alt_create_role_3.png)
+
+![Select Service](img/alt_select_service_4.png)
+
+![Select Policy](img/alt_select_policy_5.png)
+
+![Add Tags](img/alt_add_tags_6.png)
+
+![Review Name](img/alt_review_name_7.png)
+
+![Back to SageMaker](img/alt_back_to_sagemaker_8.png)
+
+![Notebook Instances](img/alt_notebook_instances_9.png)
+
+![Create Notebook](img/alt_create_notebook_10.png)
+
+![Create Notebook](img/alt_create_notebook_11.png)
+
+![Create Notebook](img/alt_create_notebook_12.png)
 
 ## 3. Launch an Amazon SageMaker Notebook Instance
 
