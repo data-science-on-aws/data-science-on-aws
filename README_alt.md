@@ -75,7 +75,7 @@ Click on the `notebook` instance to see the instance details.
 
 Click on the IAM role link and navigate to the IAM Management Console.
 
-![IAM Role](img/update_iam.png)
+![IAM Role](img/alt_update_iam.png)
 
 Click `Attach Policies`.
 
