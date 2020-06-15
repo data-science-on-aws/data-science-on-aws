@@ -35,25 +35,17 @@ If not, please logout of your AWS Console in all browser tabs and re-run the ste
 
 ![Review Name](img/alt_review_name_7.png)
 
-![Back to SageMaker](img/alt_back_to_sagemaker_8.png)
-
-![Notebook Instances](img/alt_notebook_instances_9.png)
-
-![Create Notebook Part 1](img/alt_create_notebook_10.png)
-
-![Create Notebook Part 2](img/alt_create_notebook_11.png)
-
 ## 3. Launch an Amazon SageMaker Notebook Instance
 
 Open the [AWS Management Console](https://console.aws.amazon.com/console/home)
 
+![Back to SageMaker](img/alt_back_to_sagemaker_8.png)
+
 In the AWS Console search bar, type `SageMaker` and select `Amazon SageMaker` to open the service console.
 
-![SageMaker Console](img/setup_aws_console.png)
+![Notebook Instances](img/alt_notebook_instances_9.png)
 
-Select `Create notebook instance`.
-
-![SageMaker Console](img/setup_aws_console_2.png)
+![Create Notebook Part 1](img/alt_create_notebook_10.png)
 
 In the Notebook instance name text box, enter `workshop`.
 
@@ -61,7 +53,7 @@ Choose `ml.t3.medium`. We'll only be using this instance to launch jobs. The tra
 
 Volume size `250` - this is needed to explore datasets, build docker containers, and more.  During training data is copied directly from Amazon S3 to the training cluster when using SageMaker.  When using Amazon EKS, we'll setup a distributed file system that worker nodes will use to get access to training data.
 
-![Fill notebook instance](img/notebook-setup01.png)
+![Fill notebook instance](img/alt-notebook-setup01.png)
 
 In the IAM role box, select the default `TeamRole`.
 
@@ -71,7 +63,7 @@ You must select the default `VPC`, `Subnet`, and `Security group` as shown in th
 
 Keep the default settings for the other options not highlighted in red, and click `Create notebook instance`.  On the `Notebook instances` section you should see the status change from `Pending` -> `InService`
 
-![Fill notebook instance](img/notebook-setup03.png)
+![Fill notebook instance](img/alt-notebook-setup03.png)
 
 While the notebook spins up, continue to work on the next section.  We'll come back to the notebook when it's ready.
 
@@ -124,3 +116,4 @@ cd ~/SageMaker && git clone https://github.com/data-science-on-aws/workshop
 Navigate to `01_intro/` in your Jupyter notebook and start the workshop!
 
 ![Start Workshop](img/start_workshop.png)
+
