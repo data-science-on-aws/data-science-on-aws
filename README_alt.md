@@ -95,7 +95,7 @@ Select `AmazonS3FullAccess` and click on `Attach Policy`.
 
 _Note:  Reminder that you should allow access only to the resources that you need._ 
 
-![Attach Admin Policy](img/attach_policies.png)
+![Attach Admin Policy](img/alt_attach_policies.png)
 
 ## 4. Start the Jupyter notebook
 
