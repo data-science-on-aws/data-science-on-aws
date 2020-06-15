@@ -57,7 +57,7 @@ Volume size `250` - this is needed to explore datasets, build docker containers,
 
 In the IAM role box, select the default `TeamRole`.
 
-![Fill notebook instance](img/alt-notebook-setup02.png)
+![Fill notebook instance](img/notebook-setup02.png)
 
 You must select the default `VPC`, `Subnet`, and `Security group` as shown in the screenshow.  Your values will likely be different.  This is OK.
 
