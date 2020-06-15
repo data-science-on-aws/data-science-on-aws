@@ -3,7 +3,6 @@ output/
 tensorboard/
 amazon-reviews-spark-processor-*/
 cache/
-data/
 outputs/
 models/
 generated_module/
