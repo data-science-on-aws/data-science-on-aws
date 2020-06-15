@@ -39,9 +39,9 @@ If not, please logout of your AWS Console in all browser tabs and re-run the ste
 
 ![Notebook Instances](img/alt_notebook_instances_9.png)
 
-![Create Notebook](img/alt_create_notebook_10.png)
+![Create Notebook Part 1](img/alt_create_notebook_10.png)
 
-![Create Notebook](img/alt_create_notebook_11.png)
+![Create Notebook Part 2](img/alt_create_notebook_11.png)
 
 ## 3. Launch an Amazon SageMaker Notebook Instance
 
