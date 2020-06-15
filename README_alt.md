@@ -91,7 +91,7 @@ _Note:  Reminder that you should allow access only to the resources that you nee
 
 _Note:  Proceed when the status of the notebook instance changes from `Pending` to `InService`._
 
-![Start Jupyter](img/start_jupyter.png)
+![Start Jupyter](img/alt_start_jupyter.png)
 
 ## 5. Launch a new Terminal within the Jupyter notebook
 
