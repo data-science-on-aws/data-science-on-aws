@@ -81,7 +81,7 @@ Click `Attach Policies`.
 
 ![IAM Policy](img/alt_view_policies.png)
               
-Select `AdministratorAccess` and click on `Attach Policy`.
+Select `IAMFullAccess` and click on `Attach Policy`.
 
 _Note:  Reminder that you should allow access only to the resources that you need._ 
 
