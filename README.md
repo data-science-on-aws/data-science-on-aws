@@ -10,6 +10,11 @@ _Influence the book by filling out our [**quick survey**](https://www.surveymonk
 
 [![Data Science on Amazon Web Services](img/data-science-on-aws-book.png)](https://datascienceonaws.com)
 
+# Workshop Cost - FREE
+Normally, this workshop would cost <10 USD.  This workshop is FREE, but we are showing you the cost breakdown to be transparent.
+
+![Workshop Cost](img/billing.png)
+
 # Workshop Agenda
 [![Workshop Agenda](img/outline.png)](https://www.eventbrite.com/e/full-day-workshop-kubeflow-gpu-kerastensorflow-20-tf-extended-tfx-kubernetes-pytorch-xgboost-tickets-63362929227)
 
