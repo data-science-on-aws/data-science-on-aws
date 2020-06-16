@@ -21,6 +21,7 @@ If you do not logout of existing AWS Consoles, things will not work properly.
 
 _Please logout of all AWS Console sessions in all browser tabs._
 
+
 ## 2. Login to the Workshop Portal (aka Event Engine)
 
 **If you are registered on Eventbrite, you will receive a link to the Workshop 1 hour before the event.**  
@@ -42,6 +43,7 @@ Double-check that your account name is something like `TeamRole/MasterKey` as fo
 ![IAM Role](img/teamrole-masterkey.png)
 
 If not, please logout of your AWS Console in all browser tabs and re-run the steps above!
+
 
 ## 3. Launch an Amazon SageMaker Notebook Instance
 
@@ -75,27 +77,6 @@ Keep the default settings for the other options not highlighted in red, and clic
 
 ![Fill notebook instance](img/notebook-setup03.png)
 
-While the notebook spins up, continue to work on the next section.  We'll come back to the notebook when it's ready.
-
-## 4. Update IAM Role Policy
-
-Click on the `notebook` instance to see the instance details.
-`
-![Notebook Instance Details](img/click_notebook_instance.png)
-
-Click on the IAM role link and navigate to the IAM Management Console.
-
-![IAM Role](img/update_iam.png)
-
-Click `Attach Policies`.
-
-![IAM Policy](img/view_policies.png)
-              
-Select `AmazonS3FullAccess` and click on `Attach Policy`.
-
-_Note:  Reminder that you should allow access only to the resources that you need._ 
-
-![Attach Admin Policy](img/attach_policies.png)
 
 ## 4. Start the Jupyter notebook
 
@@ -103,11 +84,13 @@ _Note:  Proceed when the status of the notebook instance changes from `Pending` 
 
 ![Start Jupyter](img/start_jupyter.png)
 
+
 ## 5. Launch a new Terminal within the Jupyter notebook
 
 Click `File` > `New` > `Terminal` to launch a terminal in your Jupyter instance.
 
 ![](img/launch_jupyter_terminal.png)
+
 
 ## 6. Clone this GitHub Repo in the Terminal
 
@@ -118,9 +101,11 @@ cd ~/SageMaker && git clone https://github.com/data-science-on-aws/workshop
 
 ![](img/clone-workshop-repo.png)
 
+
 ## 7. Navigate Back to Notebook View
 
 ![](img/back-to-jupyter-notebook.png)
+
 
 ## 8. Start the Workshop!
 Navigate to `01_intro/` in your Jupyter notebook and start the workshop!
