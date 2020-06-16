@@ -71,17 +71,17 @@ While the notebook spins up, continue to work on the next section.  We'll come b
 
 Click on the `notebook` instance to see the instance details.
 `
-![Notebook Instance Details](img/click_notebook_instance.png)
+![Notebook Instance Details](img/alt_click_notebook_instance.png)
 
 Click on the IAM role link and navigate to the IAM Management Console.
 
-![IAM Role](img/update_iam.png)
+![IAM Role](img/alt_update_iam.png)
 
 Click `Attach Policies`.
 
-![IAM Policy](img/view_policies.png)
+![IAM Policy](img/alt_view_policies.png)
               
-Select `AmazonS3FullAccess` and click on `Attach Policy`.
+Select `AdministratorAccess` and click on `Attach Policy`.
 
 _Note:  Reminder that you should allow access only to the resources that you need._ 
 
@@ -91,7 +91,7 @@ _Note:  Reminder that you should allow access only to the resources that you nee
 
 _Note:  Proceed when the status of the notebook instance changes from `Pending` to `InService`._
 
-![Start Jupyter](img/start_jupyter.png)
+![Start Jupyter](img/alt_start_jupyter.png)
 
 ## 5. Launch a new Terminal within the Jupyter notebook
 
