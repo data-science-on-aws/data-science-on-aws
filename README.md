@@ -11,7 +11,7 @@ _Influence the book by filling out our [**quick survey**](https://www.surveymonk
 [![Data Science on Amazon Web Services](img/data-science-on-aws-book.png)](https://datascienceonaws.com)
 
 # Workshop Cost - FREE
-Normally, this workshop would cost <10 USD.  This workshop is FREE, but we are showing you the cost breakdown to be transparent.
+This workshop is FREE, but otherwise cost <10 USD.
 
 ![Workshop Cost](img/billing.png)
 
