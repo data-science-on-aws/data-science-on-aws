@@ -43,29 +43,21 @@ Open the [AWS Management Console](https://console.aws.amazon.com/console/home)
 
 In the AWS Console search bar, type `SageMaker` and select `Amazon SageMaker` to open the service console.
 
-![Notebook Instances](img/alt_notebook_instances_9.png)
+![Notebook Instances](img/stu_notebook_instances_9.png)
 
-![Create Notebook Part 1](img/alt_create_notebook_10.png)
+![Create Studio](img/studio_create.png)
 
-In the Notebook instance name text box, enter `workshop`.
+![Pending Studio](img/studio_pending.png)
 
-Choose `ml.t3.medium`. We'll only be using this instance to launch jobs. The training job themselves will run either on a SageMaker managed cluster or an Amazon EKS cluster.
+![Open Studio](img/studio_open.png)
 
-Volume size `250` - this is needed to explore datasets, build docker containers, and more.  During training data is copied directly from Amazon S3 to the training cluster when using SageMaker.  When using Amazon EKS, we'll setup a distributed file system that worker nodes will use to get access to training data.
+![Loading Studio](img/studio_loading.png)
 
-![Fill notebook instance](img/alt-notebook-setup01.png)
+![Terminal Studio](img/studio_terminal.png)
 
-In the IAM role box, select the default `TeamRole`.
+![Select Workshop](img/studio_select_workshop.png)
 
-![Fill notebook instance](img/notebook-setup02.png)
-
-You must select the default `VPC`, `Subnet`, and `Security group` as shown in the screenshow.  Your values will likely be different.  This is OK.
-
-Keep the default settings for the other options not highlighted in red, and click `Create notebook instance`.  On the `Notebook instances` section you should see the status change from `Pending` -> `InService`
-
-![Fill notebook instance](img/alt-notebook-setup03.png)
-
-While the notebook spins up, continue to work on the next section.  We'll come back to the notebook when it's ready.
+![Start Workshop](img/studio_start_workshop.png)
 
 ## 4. Update IAM Role Policy
 
