@@ -92,6 +92,10 @@ _Note:  Reminder that you should allow access only to the resources that you nee
 
 ![Attach Admin Policy](img/alt_attach_policies.png)
 
+Confirm the Policies
+
+![Confirm Policies](img/alt_confirm_policies.png)
+
 ## 4. Start the Jupyter notebook
 
 _Note:  Proceed when the status of the notebook instance changes from `Pending` to `InService`._
