@@ -61,13 +61,11 @@ In the AWS Console search bar, type `SageMaker` and select `Amazon SageMaker` to
 
 ## 4. Update IAM Role Policy
 
-Click on the `notebook` instance to see the instance details.
-`
-![Notebook Instance Details](img/click_notebook_instance.png)
+![Select IAM](img/studio_select_iam.png)
 
-Click on the IAM role link and navigate to the IAM Management Console.
+![Select Roles](img/studio_select_roles.png)
 
-![IAM Role](img/update_iam.png)
+![Edit TeamRole](img/studio_edit_teamrole.png)
 
 Click `Attach Policies`.
 
