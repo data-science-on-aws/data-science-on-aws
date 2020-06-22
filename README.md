@@ -24,11 +24,17 @@ Double-check that your account name is something like `IibsAdminAccess-DO-NOT-DE
 
 If not, please logout of your AWS Console in all browser tabs and re-run the steps above!
 
-## 2. Create `TeamRole` IAM Role
+## 2. Update Admin Role and Create `TeamRole` IAM Role
 
 ![IAM](img/alt_iam_1.png)
 
 ![Roles](img/alt_roles_2.png)
+
+Increase the `Maximum CLI/API session duration` of your Admin role `IAM > Roles > IibsAdminAccess-DO-NOT-DELETE...`. Change the session duration to avoid being logged out of the AWS Console after 1 hour: 
+
+![IAM Role](img/cli_session_duration.png)
+
+Then, create a new IAM role `TeamRole`:
 
 ![Create Role](img/alt_create_role_3.png)
 
