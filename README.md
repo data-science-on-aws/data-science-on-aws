@@ -24,7 +24,7 @@ Double-check that your account name is something like `IibsAdminAccess-DO-NOT-DE
 
 If not, please logout of your AWS Console in all browser tabs and re-run the steps above!
 
-## 2. Update Admin Role and Create `TeamRole` IAM Role
+## 2. Create `TeamRole` IAM Role
 
 ![IAM](img/alt_iam_1.png)
 
