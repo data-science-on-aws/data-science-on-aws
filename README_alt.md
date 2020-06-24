@@ -10,6 +10,10 @@ This workshop is FREE, but would otherwise cost <25 USD.
 
 ![Workshop Cost](img/billing.png)
 
+# Workshop Agenda
+
+![Workshop Agenda](img/outline_updated.png)
+
 # Workshop Instructions
 
 ## 1. Click on AWS Console
