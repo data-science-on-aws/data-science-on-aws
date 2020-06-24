@@ -5,6 +5,9 @@ _Influence the book by filling out our [**quick survey**](https://www.surveymonk
 
 [![Data Science on Amazon Web Services](img/data-science-on-aws-book.png)](https://datascienceonaws.com)
 
+# Workshop Agenda
+![Workshop Agenda](img/outline_updated.png)
+
 # Workshop Instructions
 
 ## 1. Click on AWS Console
