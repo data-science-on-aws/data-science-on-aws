@@ -17,7 +17,7 @@ This workshop is FREE, but would otherwise cost <25 USD.
 ![Workshop Cost](img/billing.png)
 
 # Workshop Agenda
-[![Workshop Agenda](img/outline.png)](https://www.eventbrite.com/e/full-day-workshop-kubeflow-gpu-kerastensorflow-20-tf-extended-tfx-kubernetes-pytorch-xgboost-tickets-63362929227)
+[![Workshop Agenda](img/outline_updated.png)](https://www.eventbrite.com/e/full-day-workshop-kubeflow-gpu-kerastensorflow-20-tf-extended-tfx-kubernetes-pytorch-xgboost-tickets-63362929227)
 
 # Workshop Instructions
 _Note:  This workshop will create an ephemeral AWS acccount for each attendee.  This ephemeral account is not accessible after the workshop.  You can, of course, clone this GitHub repo and reproduce the entire workshop in your own AWS Account._
