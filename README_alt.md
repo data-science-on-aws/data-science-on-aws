@@ -12,7 +12,7 @@ This workshop is FREE, but would otherwise cost <25 USD.
 
 # Workshop Agenda
 
-![Workshop Agenda](img/outline_updated.png)
+![Workshop Agenda](img/outline.png)
 
 # Workshop Instructions
 
