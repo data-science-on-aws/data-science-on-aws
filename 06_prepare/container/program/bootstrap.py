@@ -8,8 +8,8 @@ import time
 from shutil import copyfile
 
 HADOOP_CONFIG_PATH = '/opt/hadoop-config/'
-HADOOP_PATH = '/usr/hadoop-3.0.0'
-SPARK_PATH = '/usr/spark-2.4.5'
+HADOOP_PATH = '/usr/hadoop-3.1.3'
+SPARK_PATH = '/usr/spark-2.4.6'
 
 # HACK
 EXTRA_JARS_PATH = '/usr/jars'
@@ -37,8 +37,8 @@ def copy_aws_jars():
     dst = HADOOP_PATH + "/share/hadoop/common/lib/aws-java-sdk-bundle-1.11.199.jar"
     copyfile(src, dst)
 
-    src = HADOOP_PATH + "/share/hadoop/tools/lib/hadoop-aws-3.0.0.jar"
-    dst = HADOOP_PATH + "/share/hadoop/common/lib/hadoop-aws-3.0.0.jar"
+    src = HADOOP_PATH + "/share/hadoop/tools/lib/hadoop-aws-3.1.3.jar"
+    dst = HADOOP_PATH + "/share/hadoop/common/lib/hadoop-aws-3.1.3.jar"
     copyfile(src, dst)
 
     # Add Deequ Jars

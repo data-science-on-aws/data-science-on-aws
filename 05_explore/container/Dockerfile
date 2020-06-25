@@ -12,7 +12,7 @@ ENV PYTHONIOENCODING UTF-8
 ENV PIP_DISABLE_PIP_VERSION_CHECK 1
 
 # Install Hadoop
-ENV HADOOP_VERSION 3.1.3
+ENV HADOOP_VERSION 3.0.0
 ENV HADOOP_HOME /usr/hadoop-$HADOOP_VERSION
 ENV HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
 ENV PATH $PATH:$HADOOP_HOME/bin
@@ -24,28 +24,18 @@ RUN curl -sL --retry 3 \
  && chown -R root:root $HADOOP_HOME
 
 # Install Spark
-ENV SPARK_VERSION 2.4.6
-#ENV SPARK_PACKAGE spark-${SPARK_VERSION}-bin-without-hadoop
-ENV SPARK_PACKAGE spark-${SPARK_VERSION}-hadoop-3.1.3
+ENV SPARK_VERSION 2.4.5
+ENV SPARK_PACKAGE spark-${SPARK_VERSION}-bin-without-hadoop
 ENV SPARK_HOME /usr/spark-${SPARK_VERSION}
 ENV SPARK_DIST_CLASSPATH="$HADOOP_HOME/etc/hadoop/*:$HADOOP_HOME/share/hadoop/common/lib/*:$HADOOP_HOME/share/hadoop/common/*:$HADOOP_HOME/share/hadoop/hdfs/*:$HADOOP_HOME/share/hadoop/hdfs/lib/*:$HADOOP_HOME/share/hadoop/hdfs/*:$HADOOP_HOME/share/hadoop/yarn/lib/*:$HADOOP_HOME/share/hadoop/yarn/*:$HADOOP_HOME/share/hadoop/mapreduce/lib/*:$HADOOP_HOME/share/hadoop/mapreduce/*:$HADOOP_HOME/share/hadoop/tools/lib/*"
 ENV PATH $PATH:${SPARK_HOME}/bin
-#RUN curl -sL --retry 3 \
-#  "https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/${SPARK_PACKAGE}.tgz" \
-#  | gunzip \
-#  | tar x -C /usr/ \
-# && mv /usr/$SPARK_PACKAGE $SPARK_HOME \
-# && chown -R root:root $SPARK_HOME
-
-RUN curl --retry 3 -O https://s3.amazonaws.com/fluxcapacitor.com/packages/spark-2.4.6-hadoop-3.1.3.tar.gz
-
-RUN mkdir -p /usr/$SPARK_PACKAGE/ \
-  && tar -C /usr/$SPARK_PACKAGE/ -xzv -f spark-2.4.6-hadoop-3.1.3.tar.gz -C /usr/$SPARK_PACKAGE/ \
+RUN curl -sL --retry 3 \
+  "https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/${SPARK_PACKAGE}.tgz" \
+  | gunzip \
+  | tar x -C /usr/ \
  && mv /usr/$SPARK_PACKAGE $SPARK_HOME \
  && chown -R root:root $SPARK_HOME
-
-RUN echo $SPARK_HOME && ls -al $SPARK_HOME
-
+ 
 # Point Spark at proper python binary
 ENV PYSPARK_PYTHON=/usr/bin/python3
 
@@ -56,7 +46,6 @@ ENV YARN_NODEMANAGER_USER="root"
 ENV HDFS_NAMENODE_USER="root"
 ENV HDFS_DATANODE_USER="root"
 ENV HDFS_SECONDARYNAMENODE_USER="root"
-ENV HDFS_DATANODE_SECURE_USER="root"
 
 # Set up bootstrapping program and Spark configuration
 COPY program /opt/program
@@ -64,27 +53,6 @@ RUN chmod +x /opt/program/submit
 COPY hadoop-config /opt/hadoop-config
 
 COPY jars /usr/jars
-
-RUN ls -al $HADOOP_HOME/share/hadoop/tools/lib/
-
-RUN echo "blah"
-
-RUN ls -al $HADOOP_HOME/bin/
-
-RUN ls -al $HADOOP_HOME/sbin/
-
-RUN cat $HADOOP_HOME/sbin/hadoop-daemon.sh
-RUN cat $HADOOP_HOME/sbin/hadoop-daemons.sh
-
-RUN ls -al $HADOOP_HOME/libexec/
-RUN cat $HADOOP_HOME/libexec/hadoop-functions.sh
-
-RUN echo $HDFS_NAMENODE_USER
-RUN echo $HDFS_DATANODE_SECURE_USER
-
-#RUN ssh localhost ls
-
-#RUN which start-all.sh
 
 WORKDIR $SPARK_HOME
 
