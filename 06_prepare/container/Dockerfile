@@ -56,4 +56,10 @@ COPY jars /usr/jars
 
 WORKDIR $SPARK_HOME
 
+# Install Transformers and TensorFlow
+RUN pip3 install -q pip --upgrade
+RUN pip3 install -q wrapt --upgrade --ignore-installed
+RUN pip3 install -q transformers==2.8.0
+RUN pip3 install -q tensorflow==2.1.0 --upgrade --ignore-installed
+
 ENTRYPOINT ["/opt/program/submit"]
