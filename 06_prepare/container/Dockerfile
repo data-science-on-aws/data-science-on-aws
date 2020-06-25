@@ -56,6 +56,7 @@ ENV YARN_NODEMANAGER_USER="root"
 ENV HDFS_NAMENODE_USER="root"
 ENV HDFS_DATANODE_USER="root"
 ENV HDFS_SECONDARYNAMENODE_USER="root"
+ENV HDFS_DATANODE_SECURE_USER="root"
 
 # Set up bootstrapping program and Spark configuration
 COPY program /opt/program
@@ -63,6 +64,27 @@ RUN chmod +x /opt/program/submit
 COPY hadoop-config /opt/hadoop-config
 
 COPY jars /usr/jars
+
+RUN ls -al $HADOOP_HOME/share/hadoop/tools/lib/
+
+RUN echo "blah"
+
+RUN ls -al $HADOOP_HOME/bin/
+
+RUN ls -al $HADOOP_HOME/sbin/
+
+RUN cat $HADOOP_HOME/sbin/hadoop-daemon.sh
+RUN cat $HADOOP_HOME/sbin/hadoop-daemons.sh
+
+RUN ls -al $HADOOP_HOME/libexec/
+RUN cat $HADOOP_HOME/libexec/hadoop-functions.sh
+
+RUN echo $HDFS_NAMENODE_USER
+RUN echo $HDFS_DATANODE_SECURE_USER
+
+#RUN ssh localhost ls
+
+#RUN which start-all.sh
 
 WORKDIR $SPARK_HOME
 
