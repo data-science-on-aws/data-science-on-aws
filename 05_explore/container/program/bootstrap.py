@@ -8,8 +8,8 @@ import time
 from shutil import copyfile
 
 HADOOP_CONFIG_PATH = '/opt/hadoop-config/'
-HADOOP_PATH = '/usr/hadoop-3.0.0'
-SPARK_PATH = '/usr/spark-2.4.5'
+HADOOP_PATH = '/usr/hadoop-3.2.1'
+SPARK_PATH = '/usr/spark-2.4.6'
 
 # HACK
 EXTRA_JARS_PATH = '/usr/jars'
@@ -33,15 +33,16 @@ def copy_cluster_config():
 
 
 def copy_aws_jars():
-    src = HADOOP_PATH + "/share/hadoop/tools/lib/aws-java-sdk-bundle-1.11.199.jar"
-    dst = HADOOP_PATH + "/share/hadoop/common/lib/aws-java-sdk-bundle-1.11.199.jar"
+    src = HADOOP_PATH + "/share/hadoop/tools/lib/aws-java-sdk-bundle-1.11.375.jar"
+    dst = HADOOP_PATH + "/share/hadoop/common/lib/aws-java-sdk-bundle-1.11.375.jar"
     copyfile(src, dst)
 
-    src = HADOOP_PATH + "/share/hadoop/tools/lib/hadoop-aws-3.0.0.jar"
-    dst = HADOOP_PATH + "/share/hadoop/common/lib/hadoop-aws-3.0.0.jar"
+    src = HADOOP_PATH + "/share/hadoop/tools/lib/hadoop-aws-3.2.1.jar"
+    dst = HADOOP_PATH + "/share/hadoop/common/lib/hadoop-aws-3.2.1.jar"
     copyfile(src, dst)
 
-    # HACK
+    # Add Deequ Jars
+    #    https://github.com/awslabs/deequ
     src = EXTRA_JARS_PATH + "/deequ-1.0.1.jar"
     dst = SPARK_PATH + "/jars/deequ-1.0.1.jar"
     copyfile(src, dst)
@@ -49,6 +50,12 @@ def copy_aws_jars():
     src = EXTRA_JARS_PATH + "/preprocess-deequ.jar"
     dst = SPARK_PATH + "/jars/preprocess-deequ.jar"
     copyfile(src, dst)
+
+    # Add Spark-TFRecord Jars
+    #     https://github.com/linkedin/spark-tfrecord
+#    src = EXTRA_JARS_PATH + "/spark-tfrecord_2.11-0.1.1.jar"
+#    dst = SPARK_PATH + "/jars/spark-tfrecord_2.11-0.1.1.jar"
+#    copyfile(src, dst)
 
     
 def get_resource_config():

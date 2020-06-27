@@ -206,7 +206,7 @@ def transform(spark, s3_input_data, s3_output_train_data, s3_output_validation_d
     validation_df.write.format('tfrecord').option('recordType', 'Example').save(path=s3_output_validation_data)
     print('Wrote to output file:  {}'.format(s3_output_validation_data))
 
-    test_df.write.format('tfrecord').option('recordType', 'Example').save(path=s3_output_test_data)
+    test_df.write.format('tfrecord').option('recordType', 'Example').save(path=s3_output_test_data)    
     print('Wrote to output file:  {}'.format(s3_output_test_data))
 
     restored_test_df = spark.read.format('tfrecord').option('recordType', 'Example').load(path=s3_output_test_data)
