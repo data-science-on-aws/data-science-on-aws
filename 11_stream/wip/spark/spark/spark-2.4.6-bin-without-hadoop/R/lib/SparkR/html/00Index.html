@@ -1,0 +1,1949 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>R: R Front End for 'Apache Spark'</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+<h1> R Front End for 'Apache Spark'
+<img class="toplogo" src="../../../doc/html/Rlogo.svg" alt="[R logo]" />
+</h1>
+<hr/>
+<div style="text-align: center;">
+<a href="../../../doc/html/packages.html"><img class="arrow" src="../../../doc/html/left.jpg" alt="[Up]" /></a>
+<a href="../../../doc/html/index.html"><img class="arrow" src="../../../doc/html/up.jpg" alt="[Top]" /></a>
+</div><h2>Documentation for package &lsquo;SparkR&rsquo; version 2.4.6</h2>
+
+<ul><li><a href="../DESCRIPTION">DESCRIPTION file</a>.</li>
+</ul>
+
+<h2>Help Pages</h2>
+
+
+<p style="text-align: center;">
+<a href="#A">A</a>
+<a href="#B">B</a>
+<a href="#C">C</a>
+<a href="#D">D</a>
+<a href="#E">E</a>
+<a href="#F">F</a>
+<a href="#G">G</a>
+<a href="#H">H</a>
+<a href="#I">I</a>
+<a href="#J">J</a>
+<a href="#K">K</a>
+<a href="#L">L</a>
+<a href="#M">M</a>
+<a href="#N">N</a>
+<a href="#O">O</a>
+<a href="#P">P</a>
+<a href="#Q">Q</a>
+<a href="#R">R</a>
+<a href="#S">S</a>
+<a href="#T">T</a>
+<a href="#U">U</a>
+<a href="#V">V</a>
+<a href="#W">W</a>
+<a href="#Y">Y</a>
+<a href="#misc">misc</a>
+</p>
+
+
+<h2><a name="A">-- A --</a></h2>
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="column_math_functions.html">abs</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">abs-method</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">acos</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">acos-method</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_diff_functions.html">add_months</a></td>
+<td>Date time arithmetic functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_diff_functions.html">add_months-method</a></td>
+<td>Date time arithmetic functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="AFTSurvivalRegressionModel-class.html">AFTSurvivalRegressionModel-class</a></td>
+<td>S4 class that represents a AFTSurvivalRegressionModel</td></tr>
+<tr><td style="width: 25%;"><a href="summarize.html">agg</a></td>
+<td>summarize</td></tr>
+<tr><td style="width: 25%;"><a href="summarize.html">agg-method</a></td>
+<td>summarize</td></tr>
+<tr><td style="width: 25%;"><a href="alias.html">alias</a></td>
+<td>alias</td></tr>
+<tr><td style="width: 25%;"><a href="alias.html">alias-method</a></td>
+<td>alias</td></tr>
+<tr><td style="width: 25%;"><a href="ALSModel-class.html">ALSModel-class</a></td>
+<td>S4 class that represents an ALSModel</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">approxCountDistinct</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">approxCountDistinct-method</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="approxQuantile.html">approxQuantile</a></td>
+<td>Calculates the approximate quantiles of numerical columns of a SparkDataFrame</td></tr>
+<tr><td style="width: 25%;"><a href="approxQuantile.html">approxQuantile-method</a></td>
+<td>Calculates the approximate quantiles of numerical columns of a SparkDataFrame</td></tr>
+<tr><td style="width: 25%;"><a href="arrange.html">arrange</a></td>
+<td>Arrange Rows by Variables</td></tr>
+<tr><td style="width: 25%;"><a href="arrange.html">arrange-method</a></td>
+<td>Arrange Rows by Variables</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">arrays_overlap</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">arrays_overlap-method</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">arrays_zip</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">arrays_zip-method</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">array_contains</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">array_contains-method</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">array_distinct</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">array_distinct-method</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">array_except</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">array_except-method</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">array_intersect</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">array_intersect-method</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">array_join</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">array_join-method</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">array_max</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">array_max-method</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">array_min</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">array_min-method</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">array_position</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">array_position-method</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">array_remove</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">array_remove-method</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">array_repeat</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">array_repeat-method</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">array_sort</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">array_sort-method</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">array_union</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">array_union-method</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="as.data.frame.html">as.data.frame</a></td>
+<td>Download data from a SparkDataFrame into a R data.frame</td></tr>
+<tr><td style="width: 25%;"><a href="as.data.frame.html">as.data.frame-method</a></td>
+<td>Download data from a SparkDataFrame into a R data.frame</td></tr>
+<tr><td style="width: 25%;"><a href="createDataFrame.html">as.DataFrame</a></td>
+<td>Create a SparkDataFrame</td></tr>
+<tr><td style="width: 25%;"><a href="createDataFrame.html">as.DataFrame.default</a></td>
+<td>Create a SparkDataFrame</td></tr>
+<tr><td style="width: 25%;"><a href="columnfunctions.html">asc</a></td>
+<td>A set of operations working with SparkDataFrame columns</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">ascii</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">ascii-method</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">asin</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">asin-method</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="spark.fpGrowth.html">associationRules-method</a></td>
+<td>FP-growth</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">atan</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">atan-method</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">atan2</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">atan2-method</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="attach.html">attach</a></td>
+<td>Attach SparkDataFrame to R search path</td></tr>
+<tr><td style="width: 25%;"><a href="attach.html">attach-method</a></td>
+<td>Attach SparkDataFrame to R search path</td></tr>
+<tr><td style="width: 25%;"><a href="avg.html">avg</a></td>
+<td>avg</td></tr>
+<tr><td style="width: 25%;"><a href="avg.html">avg-method</a></td>
+<td>avg</td></tr>
+<tr><td style="width: 25%;"><a href="awaitTermination.html">awaitTermination</a></td>
+<td>awaitTermination</td></tr>
+<tr><td style="width: 25%;"><a href="awaitTermination.html">awaitTermination-method</a></td>
+<td>awaitTermination</td></tr>
+</table>
+
+<h2><a name="B">-- B --</a></h2>
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="column_string_functions.html">base64</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">base64-method</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="between.html">between</a></td>
+<td>between</td></tr>
+<tr><td style="width: 25%;"><a href="between.html">between-method</a></td>
+<td>between</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">bin</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">bin-method</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="BisectingKMeansModel-class.html">BisectingKMeansModel-class</a></td>
+<td>S4 class that represents a BisectingKMeansModel</td></tr>
+<tr><td style="width: 25%;"><a href="column_nonaggregate_functions.html">bitwiseNOT</a></td>
+<td>Non-aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_nonaggregate_functions.html">bitwiseNOT-method</a></td>
+<td>Non-aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="broadcast.html">broadcast</a></td>
+<td>broadcast</td></tr>
+<tr><td style="width: 25%;"><a href="broadcast.html">broadcast-method</a></td>
+<td>broadcast</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">bround</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">bround-method</a></td>
+<td>Math functions for Column operations</td></tr>
+</table>
+
+<h2><a name="C">-- C --</a></h2>
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="cache.html">cache</a></td>
+<td>Cache</td></tr>
+<tr><td style="width: 25%;"><a href="cache.html">cache-method</a></td>
+<td>Cache</td></tr>
+<tr><td style="width: 25%;"><a href="cacheTable.html">cacheTable</a></td>
+<td>Cache Table</td></tr>
+<tr><td style="width: 25%;"><a href="cacheTable.html">cacheTable.default</a></td>
+<td>Cache Table</td></tr>
+<tr><td style="width: 25%;"><a href="cancelJobGroup.html">cancelJobGroup</a></td>
+<td>Cancel active jobs for the specified group</td></tr>
+<tr><td style="width: 25%;"><a href="cancelJobGroup.html">cancelJobGroup.default</a></td>
+<td>Cancel active jobs for the specified group</td></tr>
+<tr><td style="width: 25%;"><a href="cast.html">cast</a></td>
+<td>Casts the column to a different data type.</td></tr>
+<tr><td style="width: 25%;"><a href="cast.html">cast-method</a></td>
+<td>Casts the column to a different data type.</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">cbrt</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">cbrt-method</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">ceil</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">ceil-method</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">ceiling</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">ceiling-method</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="checkpoint.html">checkpoint</a></td>
+<td>checkpoint</td></tr>
+<tr><td style="width: 25%;"><a href="checkpoint.html">checkpoint-method</a></td>
+<td>checkpoint</td></tr>
+<tr><td style="width: 25%;"><a href="clearCache.html">clearCache</a></td>
+<td>Clear Cache</td></tr>
+<tr><td style="width: 25%;"><a href="clearCache.html">clearCache.default</a></td>
+<td>Clear Cache</td></tr>
+<tr><td style="width: 25%;"><a href="clearJobGroup.html">clearJobGroup</a></td>
+<td>Clear current job group ID and its description</td></tr>
+<tr><td style="width: 25%;"><a href="clearJobGroup.html">clearJobGroup.default</a></td>
+<td>Clear current job group ID and its description</td></tr>
+<tr><td style="width: 25%;"><a href="coalesce.html">coalesce</a></td>
+<td>Coalesce</td></tr>
+<tr><td style="width: 25%;"><a href="coalesce.html">coalesce-method</a></td>
+<td>Coalesce</td></tr>
+<tr><td style="width: 25%;"><a href="column_nonaggregate_functions.html">coalesce-method</a></td>
+<td>Non-aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="collect.html">collect</a></td>
+<td>Collects all the elements of a SparkDataFrame and coerces them into an R data.frame.</td></tr>
+<tr><td style="width: 25%;"><a href="collect.html">collect-method</a></td>
+<td>Collects all the elements of a SparkDataFrame and coerces them into an R data.frame.</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">collect_list</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">collect_list-method</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">collect_set</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">collect_set-method</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="columns.html">colnames</a></td>
+<td>Column Names of SparkDataFrame</td></tr>
+<tr><td style="width: 25%;"><a href="columns.html">colnames-method</a></td>
+<td>Column Names of SparkDataFrame</td></tr>
+<tr><td style="width: 25%;"><a href="columns.html">colnames&lt;-</a></td>
+<td>Column Names of SparkDataFrame</td></tr>
+<tr><td style="width: 25%;"><a href="columns.html">colnames&lt;--method</a></td>
+<td>Column Names of SparkDataFrame</td></tr>
+<tr><td style="width: 25%;"><a href="coltypes.html">coltypes</a></td>
+<td>coltypes</td></tr>
+<tr><td style="width: 25%;"><a href="coltypes.html">coltypes-method</a></td>
+<td>coltypes</td></tr>
+<tr><td style="width: 25%;"><a href="coltypes.html">coltypes&lt;-</a></td>
+<td>coltypes</td></tr>
+<tr><td style="width: 25%;"><a href="coltypes.html">coltypes&lt;--method</a></td>
+<td>coltypes</td></tr>
+<tr><td style="width: 25%;"><a href="column.html">column</a></td>
+<td>S4 class that represents a SparkDataFrame column</td></tr>
+<tr><td style="width: 25%;"><a href="column.html">Column-class</a></td>
+<td>S4 class that represents a SparkDataFrame column</td></tr>
+<tr><td style="width: 25%;"><a href="column.html">column-method</a></td>
+<td>S4 class that represents a SparkDataFrame column</td></tr>
+<tr><td style="width: 25%;"><a href="columnfunctions.html">columnfunctions</a></td>
+<td>A set of operations working with SparkDataFrame columns</td></tr>
+<tr><td style="width: 25%;"><a href="columns.html">columns</a></td>
+<td>Column Names of SparkDataFrame</td></tr>
+<tr><td style="width: 25%;"><a href="columns.html">columns-method</a></td>
+<td>Column Names of SparkDataFrame</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">column_aggregate_functions</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">column_collection_functions</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_diff_functions.html">column_datetime_diff_functions</a></td>
+<td>Date time arithmetic functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_functions.html">column_datetime_functions</a></td>
+<td>Date time functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">column_math_functions</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_misc_functions.html">column_misc_functions</a></td>
+<td>Miscellaneous functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_nonaggregate_functions.html">column_nonaggregate_functions</a></td>
+<td>Non-aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">column_string_functions</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_window_functions.html">column_window_functions</a></td>
+<td>Window functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">concat</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">concat-method</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">concat_ws</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">concat_ws-method</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="columnfunctions.html">contains</a></td>
+<td>A set of operations working with SparkDataFrame columns</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">conv</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">conv-method</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="corr.html">corr</a></td>
+<td>corr</td></tr>
+<tr><td style="width: 25%;"><a href="corr.html">corr-method</a></td>
+<td>corr</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">cos</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">cos-method</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">cosh</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">cosh-method</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="count.html">count</a></td>
+<td>Count</td></tr>
+<tr><td style="width: 25%;"><a href="count.html">count-method</a></td>
+<td>Count</td></tr>
+<tr><td style="width: 25%;"><a href="nrow.html">count-method</a></td>
+<td>Returns the number of rows in a SparkDataFrame</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">countDistinct</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">countDistinct-method</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="cov.html">cov</a></td>
+<td>cov</td></tr>
+<tr><td style="width: 25%;"><a href="cov.html">cov-method</a></td>
+<td>cov</td></tr>
+<tr><td style="width: 25%;"><a href="cov.html">covar_pop</a></td>
+<td>cov</td></tr>
+<tr><td style="width: 25%;"><a href="cov.html">covar_pop-method</a></td>
+<td>cov</td></tr>
+<tr><td style="width: 25%;"><a href="cov.html">covar_samp</a></td>
+<td>cov</td></tr>
+<tr><td style="width: 25%;"><a href="cov.html">covar_samp-method</a></td>
+<td>cov</td></tr>
+<tr><td style="width: 25%;"><a href="column_misc_functions.html">crc32</a></td>
+<td>Miscellaneous functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_misc_functions.html">crc32-method</a></td>
+<td>Miscellaneous functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="createDataFrame.html">createDataFrame</a></td>
+<td>Create a SparkDataFrame</td></tr>
+<tr><td style="width: 25%;"><a href="createDataFrame.html">createDataFrame.default</a></td>
+<td>Create a SparkDataFrame</td></tr>
+<tr><td style="width: 25%;"><a href="createExternalTable-deprecated.html">createExternalTable</a></td>
+<td>(Deprecated) Create an external table</td></tr>
+<tr><td style="width: 25%;"><a href="createExternalTable-deprecated.html">createExternalTable.default</a></td>
+<td>(Deprecated) Create an external table</td></tr>
+<tr><td style="width: 25%;"><a href="createOrReplaceTempView.html">createOrReplaceTempView</a></td>
+<td>Creates a temporary view using the given name.</td></tr>
+<tr><td style="width: 25%;"><a href="createOrReplaceTempView.html">createOrReplaceTempView-method</a></td>
+<td>Creates a temporary view using the given name.</td></tr>
+<tr><td style="width: 25%;"><a href="createTable.html">createTable</a></td>
+<td>Creates a table based on the dataset in a data source</td></tr>
+<tr><td style="width: 25%;"><a href="column_nonaggregate_functions.html">create_array</a></td>
+<td>Non-aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_nonaggregate_functions.html">create_array-method</a></td>
+<td>Non-aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_nonaggregate_functions.html">create_map</a></td>
+<td>Non-aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_nonaggregate_functions.html">create_map-method</a></td>
+<td>Non-aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="crossJoin.html">crossJoin</a></td>
+<td>CrossJoin</td></tr>
+<tr><td style="width: 25%;"><a href="crossJoin.html">crossJoin-method</a></td>
+<td>CrossJoin</td></tr>
+<tr><td style="width: 25%;"><a href="crosstab.html">crosstab</a></td>
+<td>Computes a pair-wise frequency table of the given columns</td></tr>
+<tr><td style="width: 25%;"><a href="crosstab.html">crosstab-method</a></td>
+<td>Computes a pair-wise frequency table of the given columns</td></tr>
+<tr><td style="width: 25%;"><a href="cube.html">cube</a></td>
+<td>cube</td></tr>
+<tr><td style="width: 25%;"><a href="cube.html">cube-method</a></td>
+<td>cube</td></tr>
+<tr><td style="width: 25%;"><a href="column_window_functions.html">cume_dist</a></td>
+<td>Window functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_window_functions.html">cume_dist-method</a></td>
+<td>Window functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="currentDatabase.html">currentDatabase</a></td>
+<td>Returns the current default database</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_functions.html">current_date</a></td>
+<td>Date time functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_functions.html">current_date-method</a></td>
+<td>Date time functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_functions.html">current_timestamp</a></td>
+<td>Date time functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_functions.html">current_timestamp-method</a></td>
+<td>Date time functions for Column operations</td></tr>
+</table>
+
+<h2><a name="D">-- D --</a></h2>
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="dapply.html">dapply</a></td>
+<td>dapply</td></tr>
+<tr><td style="width: 25%;"><a href="dapply.html">dapply-method</a></td>
+<td>dapply</td></tr>
+<tr><td style="width: 25%;"><a href="dapplyCollect.html">dapplyCollect</a></td>
+<td>dapplyCollect</td></tr>
+<tr><td style="width: 25%;"><a href="dapplyCollect.html">dapplyCollect-method</a></td>
+<td>dapplyCollect</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_diff_functions.html">datediff</a></td>
+<td>Date time arithmetic functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_diff_functions.html">datediff-method</a></td>
+<td>Date time arithmetic functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_diff_functions.html">date_add</a></td>
+<td>Date time arithmetic functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_diff_functions.html">date_add-method</a></td>
+<td>Date time arithmetic functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_diff_functions.html">date_format</a></td>
+<td>Date time arithmetic functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_diff_functions.html">date_format-method</a></td>
+<td>Date time arithmetic functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_diff_functions.html">date_sub</a></td>
+<td>Date time arithmetic functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_diff_functions.html">date_sub-method</a></td>
+<td>Date time arithmetic functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_functions.html">date_trunc</a></td>
+<td>Date time functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_functions.html">date_trunc-method</a></td>
+<td>Date time functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_functions.html">dayofmonth</a></td>
+<td>Date time functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_functions.html">dayofmonth-method</a></td>
+<td>Date time functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_functions.html">dayofweek</a></td>
+<td>Date time functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_functions.html">dayofweek-method</a></td>
+<td>Date time functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_functions.html">dayofyear</a></td>
+<td>Date time functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_functions.html">dayofyear-method</a></td>
+<td>Date time functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="DecisionTreeClassificationModel-class.html">DecisionTreeClassificationModel-class</a></td>
+<td>S4 class that represents a DecisionTreeClassificationModel</td></tr>
+<tr><td style="width: 25%;"><a href="DecisionTreeRegressionModel-class.html">DecisionTreeRegressionModel-class</a></td>
+<td>S4 class that represents a DecisionTreeRegressionModel</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">decode</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">decode-method</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_window_functions.html">dense_rank</a></td>
+<td>Window functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_window_functions.html">dense_rank-method</a></td>
+<td>Window functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="columnfunctions.html">desc</a></td>
+<td>A set of operations working with SparkDataFrame columns</td></tr>
+<tr><td style="width: 25%;"><a href="describe.html">describe</a></td>
+<td>describe</td></tr>
+<tr><td style="width: 25%;"><a href="describe.html">describe-method</a></td>
+<td>describe</td></tr>
+<tr><td style="width: 25%;"><a href="dim.html">dim</a></td>
+<td>Returns the dimensions of SparkDataFrame</td></tr>
+<tr><td style="width: 25%;"><a href="dim.html">dim-method</a></td>
+<td>Returns the dimensions of SparkDataFrame</td></tr>
+<tr><td style="width: 25%;"><a href="distinct.html">distinct</a></td>
+<td>Distinct</td></tr>
+<tr><td style="width: 25%;"><a href="distinct.html">distinct-method</a></td>
+<td>Distinct</td></tr>
+<tr><td style="width: 25%;"><a href="drop.html">drop</a></td>
+<td>drop</td></tr>
+<tr><td style="width: 25%;"><a href="drop.html">drop-method</a></td>
+<td>drop</td></tr>
+<tr><td style="width: 25%;"><a href="dropDuplicates.html">dropDuplicates</a></td>
+<td>dropDuplicates</td></tr>
+<tr><td style="width: 25%;"><a href="dropDuplicates.html">dropDuplicates-method</a></td>
+<td>dropDuplicates</td></tr>
+<tr><td style="width: 25%;"><a href="nafunctions.html">dropna</a></td>
+<td>A set of SparkDataFrame functions working with NA values</td></tr>
+<tr><td style="width: 25%;"><a href="nafunctions.html">dropna-method</a></td>
+<td>A set of SparkDataFrame functions working with NA values</td></tr>
+<tr><td style="width: 25%;"><a href="dropTempTable-deprecated.html">dropTempTable</a></td>
+<td>(Deprecated) Drop Temporary Table</td></tr>
+<tr><td style="width: 25%;"><a href="dropTempTable-deprecated.html">dropTempTable.default</a></td>
+<td>(Deprecated) Drop Temporary Table</td></tr>
+<tr><td style="width: 25%;"><a href="dropTempView.html">dropTempView</a></td>
+<td>Drops the temporary view with the given view name in the catalog.</td></tr>
+<tr><td style="width: 25%;"><a href="dtypes.html">dtypes</a></td>
+<td>DataTypes</td></tr>
+<tr><td style="width: 25%;"><a href="dtypes.html">dtypes-method</a></td>
+<td>DataTypes</td></tr>
+</table>
+
+<h2><a name="E">-- E --</a></h2>
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">element_at</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">element_at-method</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">encode</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">encode-method</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="endsWith.html">endsWith</a></td>
+<td>endsWith</td></tr>
+<tr><td style="width: 25%;"><a href="endsWith.html">endsWith-method</a></td>
+<td>endsWith</td></tr>
+<tr><td style="width: 25%;"><a href="except.html">except</a></td>
+<td>except</td></tr>
+<tr><td style="width: 25%;"><a href="except.html">except-method</a></td>
+<td>except</td></tr>
+<tr><td style="width: 25%;"><a href="exceptAll.html">exceptAll</a></td>
+<td>exceptAll</td></tr>
+<tr><td style="width: 25%;"><a href="exceptAll.html">exceptAll-method</a></td>
+<td>exceptAll</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">exp</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">exp-method</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="explain.html">explain</a></td>
+<td>Explain</td></tr>
+<tr><td style="width: 25%;"><a href="explain.html">explain-method</a></td>
+<td>Explain</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">explode</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">explode-method</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">explode_outer</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">explode_outer-method</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">expm1</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">expm1-method</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_nonaggregate_functions.html">expr</a></td>
+<td>Non-aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_nonaggregate_functions.html">expr-method</a></td>
+<td>Non-aggregate functions for Column operations</td></tr>
+</table>
+
+<h2><a name="F">-- F --</a></h2>
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="column_math_functions.html">factorial</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">factorial-method</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="nafunctions.html">fillna</a></td>
+<td>A set of SparkDataFrame functions working with NA values</td></tr>
+<tr><td style="width: 25%;"><a href="nafunctions.html">fillna-method</a></td>
+<td>A set of SparkDataFrame functions working with NA values</td></tr>
+<tr><td style="width: 25%;"><a href="filter.html">filter</a></td>
+<td>Filter</td></tr>
+<tr><td style="width: 25%;"><a href="filter.html">filter-method</a></td>
+<td>Filter</td></tr>
+<tr><td style="width: 25%;"><a href="first.html">first</a></td>
+<td>Return the first row of a SparkDataFrame</td></tr>
+<tr><td style="width: 25%;"><a href="first.html">first-method</a></td>
+<td>Return the first row of a SparkDataFrame</td></tr>
+<tr><td style="width: 25%;"><a href="fitted.html">fitted</a></td>
+<td>Get fitted result from a k-means model</td></tr>
+<tr><td style="width: 25%;"><a href="fitted.html">fitted-method</a></td>
+<td>Get fitted result from a k-means model</td></tr>
+<tr><td style="width: 25%;"><a href="spark.bisectingKmeans.html">fitted-method</a></td>
+<td>Bisecting K-Means Clustering Model</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">flatten</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">flatten-method</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">floor</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">floor-method</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">format_number</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">format_number-method</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">format_string</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">format_string-method</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="FPGrowthModel-class.html">FPGrowthModel-class</a></td>
+<td>S4 class that represents a FPGrowthModel</td></tr>
+<tr><td style="width: 25%;"><a href="freqItems.html">freqItems</a></td>
+<td>Finding frequent items for columns, possibly with false positives</td></tr>
+<tr><td style="width: 25%;"><a href="freqItems.html">freqItems-method</a></td>
+<td>Finding frequent items for columns, possibly with false positives</td></tr>
+<tr><td style="width: 25%;"><a href="spark.fpGrowth.html">freqItemsets-method</a></td>
+<td>FP-growth</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">from_json</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">from_json-method</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_functions.html">from_unixtime</a></td>
+<td>Date time functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_functions.html">from_unixtime-method</a></td>
+<td>Date time functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_diff_functions.html">from_utc_timestamp</a></td>
+<td>Date time arithmetic functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_diff_functions.html">from_utc_timestamp-method</a></td>
+<td>Date time arithmetic functions for Column operations</td></tr>
+</table>
+
+<h2><a name="G">-- G --</a></h2>
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="gapply.html">gapply</a></td>
+<td>gapply</td></tr>
+<tr><td style="width: 25%;"><a href="gapply.html">gapply-method</a></td>
+<td>gapply</td></tr>
+<tr><td style="width: 25%;"><a href="gapplyCollect.html">gapplyCollect</a></td>
+<td>gapplyCollect</td></tr>
+<tr><td style="width: 25%;"><a href="gapplyCollect.html">gapplyCollect-method</a></td>
+<td>gapplyCollect</td></tr>
+<tr><td style="width: 25%;"><a href="GaussianMixtureModel-class.html">GaussianMixtureModel-class</a></td>
+<td>S4 class that represents a GaussianMixtureModel</td></tr>
+<tr><td style="width: 25%;"><a href="GBTClassificationModel-class.html">GBTClassificationModel-class</a></td>
+<td>S4 class that represents a GBTClassificationModel</td></tr>
+<tr><td style="width: 25%;"><a href="GBTRegressionModel-class.html">GBTRegressionModel-class</a></td>
+<td>S4 class that represents a GBTRegressionModel</td></tr>
+<tr><td style="width: 25%;"><a href="GeneralizedLinearRegressionModel-class.html">GeneralizedLinearRegressionModel-class</a></td>
+<td>S4 class that represents a generalized linear model</td></tr>
+<tr><td style="width: 25%;"><a href="columnfunctions.html">getField</a></td>
+<td>A set of operations working with SparkDataFrame columns</td></tr>
+<tr><td style="width: 25%;"><a href="columnfunctions.html">getItem</a></td>
+<td>A set of operations working with SparkDataFrame columns</td></tr>
+<tr><td style="width: 25%;"><a href="getLocalProperty.html">getLocalProperty</a></td>
+<td>Get a local property set in this thread, or 'NULL' if it is missing. See 'setLocalProperty'.</td></tr>
+<tr><td style="width: 25%;"><a href="getNumPartitions.html">getNumPartitions</a></td>
+<td>getNumPartitions</td></tr>
+<tr><td style="width: 25%;"><a href="getNumPartitions.html">getNumPartitions-method</a></td>
+<td>getNumPartitions</td></tr>
+<tr><td style="width: 25%;"><a href="glm.html">glm</a></td>
+<td>Generalized Linear Models (R-compliant)</td></tr>
+<tr><td style="width: 25%;"><a href="glm.html">glm-method</a></td>
+<td>Generalized Linear Models (R-compliant)</td></tr>
+<tr><td style="width: 25%;"><a href="column_nonaggregate_functions.html">greatest</a></td>
+<td>Non-aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_nonaggregate_functions.html">greatest-method</a></td>
+<td>Non-aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="groupBy.html">groupBy</a></td>
+<td>GroupBy</td></tr>
+<tr><td style="width: 25%;"><a href="groupBy.html">groupBy-method</a></td>
+<td>GroupBy</td></tr>
+<tr><td style="width: 25%;"><a href="GroupedData.html">groupedData</a></td>
+<td>S4 class that represents a GroupedData</td></tr>
+<tr><td style="width: 25%;"><a href="GroupedData.html">GroupedData-class</a></td>
+<td>S4 class that represents a GroupedData</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">grouping_bit</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">grouping_bit-method</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">grouping_id</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">grouping_id-method</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="groupBy.html">group_by</a></td>
+<td>GroupBy</td></tr>
+<tr><td style="width: 25%;"><a href="groupBy.html">group_by-method</a></td>
+<td>GroupBy</td></tr>
+</table>
+
+<h2><a name="H">-- H --</a></h2>
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="column_misc_functions.html">hash</a></td>
+<td>Miscellaneous functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_misc_functions.html">hash-method</a></td>
+<td>Miscellaneous functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="hashCode.html">hashCode</a></td>
+<td>Compute the hashCode of an object</td></tr>
+<tr><td style="width: 25%;"><a href="head.html">head</a></td>
+<td>Head</td></tr>
+<tr><td style="width: 25%;"><a href="head.html">head-method</a></td>
+<td>Head</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">hex</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">hex-method</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="hint.html">hint</a></td>
+<td>hint</td></tr>
+<tr><td style="width: 25%;"><a href="hint.html">hint-method</a></td>
+<td>hint</td></tr>
+<tr><td style="width: 25%;"><a href="histogram.html">histogram</a></td>
+<td>Compute histogram statistics for given column</td></tr>
+<tr><td style="width: 25%;"><a href="histogram.html">histogram-method</a></td>
+<td>Compute histogram statistics for given column</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_functions.html">hour</a></td>
+<td>Date time functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_functions.html">hour-method</a></td>
+<td>Date time functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">hypot</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">hypot-method</a></td>
+<td>Math functions for Column operations</td></tr>
+</table>
+
+<h2><a name="I">-- I --</a></h2>
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="column_nonaggregate_functions.html">ifelse</a></td>
+<td>Non-aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_nonaggregate_functions.html">ifelse-method</a></td>
+<td>Non-aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">initcap</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">initcap-method</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_nonaggregate_functions.html">input_file_name</a></td>
+<td>Non-aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_nonaggregate_functions.html">input_file_name-method</a></td>
+<td>Non-aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="insertInto.html">insertInto</a></td>
+<td>insertInto</td></tr>
+<tr><td style="width: 25%;"><a href="insertInto.html">insertInto-method</a></td>
+<td>insertInto</td></tr>
+<tr><td style="width: 25%;"><a href="install.spark.html">install.spark</a></td>
+<td>Download and Install Apache Spark to a Local Directory</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">instr</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">instr-method</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="intersect.html">intersect</a></td>
+<td>Intersect</td></tr>
+<tr><td style="width: 25%;"><a href="intersect.html">intersect-method</a></td>
+<td>Intersect</td></tr>
+<tr><td style="width: 25%;"><a href="intersectAll.html">intersectAll</a></td>
+<td>intersectAll</td></tr>
+<tr><td style="width: 25%;"><a href="intersectAll.html">intersectAll-method</a></td>
+<td>intersectAll</td></tr>
+<tr><td style="width: 25%;"><a href="column_nonaggregate_functions.html">is.nan</a></td>
+<td>Non-aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_nonaggregate_functions.html">is.nan-method</a></td>
+<td>Non-aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="isActive.html">isActive</a></td>
+<td>isActive</td></tr>
+<tr><td style="width: 25%;"><a href="isActive.html">isActive-method</a></td>
+<td>isActive</td></tr>
+<tr><td style="width: 25%;"><a href="isLocal.html">isLocal</a></td>
+<td>isLocal</td></tr>
+<tr><td style="width: 25%;"><a href="isLocal.html">isLocal-method</a></td>
+<td>isLocal</td></tr>
+<tr><td style="width: 25%;"><a href="columnfunctions.html">isNaN</a></td>
+<td>A set of operations working with SparkDataFrame columns</td></tr>
+<tr><td style="width: 25%;"><a href="column_nonaggregate_functions.html">isnan</a></td>
+<td>Non-aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_nonaggregate_functions.html">isnan-method</a></td>
+<td>Non-aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="columnfunctions.html">isNotNull</a></td>
+<td>A set of operations working with SparkDataFrame columns</td></tr>
+<tr><td style="width: 25%;"><a href="columnfunctions.html">isNull</a></td>
+<td>A set of operations working with SparkDataFrame columns</td></tr>
+<tr><td style="width: 25%;"><a href="IsotonicRegressionModel-class.html">IsotonicRegressionModel-class</a></td>
+<td>S4 class that represents an IsotonicRegressionModel</td></tr>
+<tr><td style="width: 25%;"><a href="isStreaming.html">isStreaming</a></td>
+<td>isStreaming</td></tr>
+<tr><td style="width: 25%;"><a href="isStreaming.html">isStreaming-method</a></td>
+<td>isStreaming</td></tr>
+</table>
+
+<h2><a name="J">-- J --</a></h2>
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="join.html">join</a></td>
+<td>Join</td></tr>
+<tr><td style="width: 25%;"><a href="join.html">join-method</a></td>
+<td>Join</td></tr>
+<tr><td style="width: 25%;"><a href="read.json.html">jsonFile</a></td>
+<td>Create a SparkDataFrame from a JSON file.</td></tr>
+<tr><td style="width: 25%;"><a href="read.json.html">jsonFile.default</a></td>
+<td>Create a SparkDataFrame from a JSON file.</td></tr>
+</table>
+
+<h2><a name="K">-- K --</a></h2>
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="KMeansModel-class.html">KMeansModel-class</a></td>
+<td>S4 class that represents a KMeansModel</td></tr>
+<tr><td style="width: 25%;"><a href="KSTest-class.html">KSTest-class</a></td>
+<td>S4 class that represents an KSTest</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">kurtosis</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">kurtosis-method</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+</table>
+
+<h2><a name="L">-- L --</a></h2>
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="column_window_functions.html">lag</a></td>
+<td>Window functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_window_functions.html">lag-method</a></td>
+<td>Window functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="last.html">last</a></td>
+<td>last</td></tr>
+<tr><td style="width: 25%;"><a href="last.html">last-method</a></td>
+<td>last</td></tr>
+<tr><td style="width: 25%;"><a href="lastProgress.html">lastProgress</a></td>
+<td>lastProgress</td></tr>
+<tr><td style="width: 25%;"><a href="lastProgress.html">lastProgress-method</a></td>
+<td>lastProgress</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_functions.html">last_day</a></td>
+<td>Date time functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_functions.html">last_day-method</a></td>
+<td>Date time functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="LDAModel-class.html">LDAModel-class</a></td>
+<td>S4 class that represents an LDAModel</td></tr>
+<tr><td style="width: 25%;"><a href="column_window_functions.html">lead</a></td>
+<td>Window functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_window_functions.html">lead-method</a></td>
+<td>Window functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_nonaggregate_functions.html">least</a></td>
+<td>Non-aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_nonaggregate_functions.html">least-method</a></td>
+<td>Non-aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">length</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">length-method</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">levenshtein</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">levenshtein-method</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="columnfunctions.html">like</a></td>
+<td>A set of operations working with SparkDataFrame columns</td></tr>
+<tr><td style="width: 25%;"><a href="limit.html">limit</a></td>
+<td>Limit</td></tr>
+<tr><td style="width: 25%;"><a href="limit.html">limit-method</a></td>
+<td>Limit</td></tr>
+<tr><td style="width: 25%;"><a href="LinearSVCModel-class.html">LinearSVCModel-class</a></td>
+<td>S4 class that represents an LinearSVCModel</td></tr>
+<tr><td style="width: 25%;"><a href="listColumns.html">listColumns</a></td>
+<td>Returns a list of columns for the given table/view in the specified database</td></tr>
+<tr><td style="width: 25%;"><a href="listDatabases.html">listDatabases</a></td>
+<td>Returns a list of databases available</td></tr>
+<tr><td style="width: 25%;"><a href="listFunctions.html">listFunctions</a></td>
+<td>Returns a list of functions registered in the specified database</td></tr>
+<tr><td style="width: 25%;"><a href="listTables.html">listTables</a></td>
+<td>Returns a list of tables or views in the specified database</td></tr>
+<tr><td style="width: 25%;"><a href="column_nonaggregate_functions.html">lit</a></td>
+<td>Non-aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_nonaggregate_functions.html">lit-method</a></td>
+<td>Non-aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="read.df.html">loadDF</a></td>
+<td>Load a SparkDataFrame</td></tr>
+<tr><td style="width: 25%;"><a href="read.df.html">loadDF.default</a></td>
+<td>Load a SparkDataFrame</td></tr>
+<tr><td style="width: 25%;"><a href="localCheckpoint.html">localCheckpoint</a></td>
+<td>localCheckpoint</td></tr>
+<tr><td style="width: 25%;"><a href="localCheckpoint.html">localCheckpoint-method</a></td>
+<td>localCheckpoint</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">locate</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">locate-method</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">log</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">log-method</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">log10</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">log10-method</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">log1p</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">log1p-method</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">log2</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">log2-method</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="LogisticRegressionModel-class.html">LogisticRegressionModel-class</a></td>
+<td>S4 class that represents an LogisticRegressionModel</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">lower</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">lower-method</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">lpad</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">lpad-method</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">ltrim</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">ltrim-method</a></td>
+<td>String functions for Column operations</td></tr>
+</table>
+
+<h2><a name="M">-- M --</a></h2>
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">map_from_arrays</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">map_from_arrays-method</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">map_keys</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">map_keys-method</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">map_values</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">map_values-method</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">max</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">max-method</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_misc_functions.html">md5</a></td>
+<td>Miscellaneous functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_misc_functions.html">md5-method</a></td>
+<td>Miscellaneous functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">mean</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">mean-method</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="merge.html">merge</a></td>
+<td>Merges two data frames</td></tr>
+<tr><td style="width: 25%;"><a href="merge.html">merge-method</a></td>
+<td>Merges two data frames</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">min</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">min-method</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_functions.html">minute</a></td>
+<td>Date time functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_functions.html">minute-method</a></td>
+<td>Date time functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_nonaggregate_functions.html">monotonically_increasing_id</a></td>
+<td>Non-aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_nonaggregate_functions.html">monotonically_increasing_id-method</a></td>
+<td>Non-aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_functions.html">month</a></td>
+<td>Date time functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_functions.html">month-method</a></td>
+<td>Date time functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_diff_functions.html">months_between</a></td>
+<td>Date time arithmetic functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_diff_functions.html">months_between-method</a></td>
+<td>Date time arithmetic functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="MultilayerPerceptronClassificationModel-class.html">MultilayerPerceptronClassificationModel-class</a></td>
+<td>S4 class that represents a MultilayerPerceptronClassificationModel</td></tr>
+<tr><td style="width: 25%;"><a href="mutate.html">mutate</a></td>
+<td>Mutate</td></tr>
+<tr><td style="width: 25%;"><a href="mutate.html">mutate-method</a></td>
+<td>Mutate</td></tr>
+</table>
+
+<h2><a name="N">-- N --</a></h2>
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="count.html">n</a></td>
+<td>Count</td></tr>
+<tr><td style="width: 25%;"><a href="count.html">n-method</a></td>
+<td>Count</td></tr>
+<tr><td style="width: 25%;"><a href="nafunctions.html">na.omit</a></td>
+<td>A set of SparkDataFrame functions working with NA values</td></tr>
+<tr><td style="width: 25%;"><a href="nafunctions.html">na.omit-method</a></td>
+<td>A set of SparkDataFrame functions working with NA values</td></tr>
+<tr><td style="width: 25%;"><a href="NaiveBayesModel-class.html">NaiveBayesModel-class</a></td>
+<td>S4 class that represents a NaiveBayesModel</td></tr>
+<tr><td style="width: 25%;"><a href="columns.html">names</a></td>
+<td>Column Names of SparkDataFrame</td></tr>
+<tr><td style="width: 25%;"><a href="columns.html">names-method</a></td>
+<td>Column Names of SparkDataFrame</td></tr>
+<tr><td style="width: 25%;"><a href="columns.html">names&lt;-</a></td>
+<td>Column Names of SparkDataFrame</td></tr>
+<tr><td style="width: 25%;"><a href="columns.html">names&lt;--method</a></td>
+<td>Column Names of SparkDataFrame</td></tr>
+<tr><td style="width: 25%;"><a href="column_nonaggregate_functions.html">nanvl</a></td>
+<td>Non-aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_nonaggregate_functions.html">nanvl-method</a></td>
+<td>Non-aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="ncol.html">ncol</a></td>
+<td>Returns the number of columns in a SparkDataFrame</td></tr>
+<tr><td style="width: 25%;"><a href="ncol.html">ncol-method</a></td>
+<td>Returns the number of columns in a SparkDataFrame</td></tr>
+<tr><td style="width: 25%;"><a href="column_nonaggregate_functions.html">negate</a></td>
+<td>Non-aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_nonaggregate_functions.html">negate-method</a></td>
+<td>Non-aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_diff_functions.html">next_day</a></td>
+<td>Date time arithmetic functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_diff_functions.html">next_day-method</a></td>
+<td>Date time arithmetic functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="not.html">not</a></td>
+<td>!</td></tr>
+<tr><td style="width: 25%;"><a href="not.html">not-method</a></td>
+<td>!</td></tr>
+<tr><td style="width: 25%;"><a href="nrow.html">nrow</a></td>
+<td>Returns the number of rows in a SparkDataFrame</td></tr>
+<tr><td style="width: 25%;"><a href="nrow.html">nrow-method</a></td>
+<td>Returns the number of rows in a SparkDataFrame</td></tr>
+<tr><td style="width: 25%;"><a href="column_window_functions.html">ntile</a></td>
+<td>Window functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_window_functions.html">ntile-method</a></td>
+<td>Window functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">n_distinct</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">n_distinct-method</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+</table>
+
+<h2><a name="O">-- O --</a></h2>
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="orderBy.html">orderBy</a></td>
+<td>Ordering Columns in a WindowSpec</td></tr>
+<tr><td style="width: 25%;"><a href="arrange.html">orderBy-method</a></td>
+<td>Arrange Rows by Variables</td></tr>
+<tr><td style="width: 25%;"><a href="orderBy.html">orderBy-method</a></td>
+<td>Ordering Columns in a WindowSpec</td></tr>
+<tr><td style="width: 25%;"><a href="otherwise.html">otherwise</a></td>
+<td>otherwise</td></tr>
+<tr><td style="width: 25%;"><a href="otherwise.html">otherwise-method</a></td>
+<td>otherwise</td></tr>
+<tr><td style="width: 25%;"><a href="over.html">over</a></td>
+<td>over</td></tr>
+<tr><td style="width: 25%;"><a href="over.html">over-method</a></td>
+<td>over</td></tr>
+</table>
+
+<h2><a name="P">-- P --</a></h2>
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="read.parquet.html">parquetFile</a></td>
+<td>Create a SparkDataFrame from a Parquet file.</td></tr>
+<tr><td style="width: 25%;"><a href="read.parquet.html">parquetFile.default</a></td>
+<td>Create a SparkDataFrame from a Parquet file.</td></tr>
+<tr><td style="width: 25%;"><a href="partitionBy.html">partitionBy</a></td>
+<td>partitionBy</td></tr>
+<tr><td style="width: 25%;"><a href="partitionBy.html">partitionBy-method</a></td>
+<td>partitionBy</td></tr>
+<tr><td style="width: 25%;"><a href="column_window_functions.html">percent_rank</a></td>
+<td>Window functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_window_functions.html">percent_rank-method</a></td>
+<td>Window functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="persist.html">persist</a></td>
+<td>Persist</td></tr>
+<tr><td style="width: 25%;"><a href="persist.html">persist-method</a></td>
+<td>Persist</td></tr>
+<tr><td style="width: 25%;"><a href="pivot.html">pivot</a></td>
+<td>Pivot a column of the GroupedData and perform the specified aggregation.</td></tr>
+<tr><td style="width: 25%;"><a href="pivot.html">pivot-method</a></td>
+<td>Pivot a column of the GroupedData and perform the specified aggregation.</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">pmod</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">pmod-method</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">posexplode</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">posexplode-method</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">posexplode_outer</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">posexplode_outer-method</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="predict.html">predict</a></td>
+<td>Makes predictions from a MLlib model</td></tr>
+<tr><td style="width: 25%;"><a href="spark.als.html">predict-method</a></td>
+<td>Alternating Least Squares (ALS) for Collaborative Filtering</td></tr>
+<tr><td style="width: 25%;"><a href="spark.bisectingKmeans.html">predict-method</a></td>
+<td>Bisecting K-Means Clustering Model</td></tr>
+<tr><td style="width: 25%;"><a href="spark.decisionTree.html">predict-method</a></td>
+<td>Decision Tree Model for Regression and Classification</td></tr>
+<tr><td style="width: 25%;"><a href="spark.fpGrowth.html">predict-method</a></td>
+<td>FP-growth</td></tr>
+<tr><td style="width: 25%;"><a href="spark.gaussianMixture.html">predict-method</a></td>
+<td>Multivariate Gaussian Mixture Model (GMM)</td></tr>
+<tr><td style="width: 25%;"><a href="spark.gbt.html">predict-method</a></td>
+<td>Gradient Boosted Tree Model for Regression and Classification</td></tr>
+<tr><td style="width: 25%;"><a href="spark.glm.html">predict-method</a></td>
+<td>Generalized Linear Models</td></tr>
+<tr><td style="width: 25%;"><a href="spark.isoreg.html">predict-method</a></td>
+<td>Isotonic Regression Model</td></tr>
+<tr><td style="width: 25%;"><a href="spark.kmeans.html">predict-method</a></td>
+<td>K-Means Clustering Model</td></tr>
+<tr><td style="width: 25%;"><a href="spark.logit.html">predict-method</a></td>
+<td>Logistic Regression Model</td></tr>
+<tr><td style="width: 25%;"><a href="spark.mlp.html">predict-method</a></td>
+<td>Multilayer Perceptron Classification Model</td></tr>
+<tr><td style="width: 25%;"><a href="spark.naiveBayes.html">predict-method</a></td>
+<td>Naive Bayes Models</td></tr>
+<tr><td style="width: 25%;"><a href="spark.randomForest.html">predict-method</a></td>
+<td>Random Forest Model for Regression and Classification</td></tr>
+<tr><td style="width: 25%;"><a href="spark.survreg.html">predict-method</a></td>
+<td>Accelerated Failure Time (AFT) Survival Regression Model</td></tr>
+<tr><td style="width: 25%;"><a href="spark.svmLinear.html">predict-method</a></td>
+<td>Linear SVM Model</td></tr>
+<tr><td style="width: 25%;"><a href="print.jobj.html">print.jobj</a></td>
+<td>Print a JVM object reference.</td></tr>
+<tr><td style="width: 25%;"><a href="print.structField.html">print.structField</a></td>
+<td>Print a Spark StructField.</td></tr>
+<tr><td style="width: 25%;"><a href="print.structType.html">print.structType</a></td>
+<td>Print a Spark StructType.</td></tr>
+<tr><td style="width: 25%;"><a href="spark.decisionTree.html">print.summary.DecisionTreeClassificationModel</a></td>
+<td>Decision Tree Model for Regression and Classification</td></tr>
+<tr><td style="width: 25%;"><a href="spark.decisionTree.html">print.summary.DecisionTreeRegressionModel</a></td>
+<td>Decision Tree Model for Regression and Classification</td></tr>
+<tr><td style="width: 25%;"><a href="spark.gbt.html">print.summary.GBTClassificationModel</a></td>
+<td>Gradient Boosted Tree Model for Regression and Classification</td></tr>
+<tr><td style="width: 25%;"><a href="spark.gbt.html">print.summary.GBTRegressionModel</a></td>
+<td>Gradient Boosted Tree Model for Regression and Classification</td></tr>
+<tr><td style="width: 25%;"><a href="spark.glm.html">print.summary.GeneralizedLinearRegressionModel</a></td>
+<td>Generalized Linear Models</td></tr>
+<tr><td style="width: 25%;"><a href="spark.kstest.html">print.summary.KSTest</a></td>
+<td>(One-Sample) Kolmogorov-Smirnov Test</td></tr>
+<tr><td style="width: 25%;"><a href="spark.randomForest.html">print.summary.RandomForestClassificationModel</a></td>
+<td>Random Forest Model for Regression and Classification</td></tr>
+<tr><td style="width: 25%;"><a href="spark.randomForest.html">print.summary.RandomForestRegressionModel</a></td>
+<td>Random Forest Model for Regression and Classification</td></tr>
+<tr><td style="width: 25%;"><a href="printSchema.html">printSchema</a></td>
+<td>Print Schema of a SparkDataFrame</td></tr>
+<tr><td style="width: 25%;"><a href="printSchema.html">printSchema-method</a></td>
+<td>Print Schema of a SparkDataFrame</td></tr>
+</table>
+
+<h2><a name="Q">-- Q --</a></h2>
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="column_datetime_functions.html">quarter</a></td>
+<td>Date time functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_functions.html">quarter-method</a></td>
+<td>Date time functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="queryName.html">queryName</a></td>
+<td>queryName</td></tr>
+<tr><td style="width: 25%;"><a href="queryName.html">queryName-method</a></td>
+<td>queryName</td></tr>
+</table>
+
+<h2><a name="R">-- R --</a></h2>
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="column_nonaggregate_functions.html">rand</a></td>
+<td>Non-aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_nonaggregate_functions.html">rand-method</a></td>
+<td>Non-aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_nonaggregate_functions.html">randn</a></td>
+<td>Non-aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_nonaggregate_functions.html">randn-method</a></td>
+<td>Non-aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="RandomForestClassificationModel-class.html">RandomForestClassificationModel-class</a></td>
+<td>S4 class that represents a RandomForestClassificationModel</td></tr>
+<tr><td style="width: 25%;"><a href="RandomForestRegressionModel-class.html">RandomForestRegressionModel-class</a></td>
+<td>S4 class that represents a RandomForestRegressionModel</td></tr>
+<tr><td style="width: 25%;"><a href="randomSplit.html">randomSplit</a></td>
+<td>randomSplit</td></tr>
+<tr><td style="width: 25%;"><a href="randomSplit.html">randomSplit-method</a></td>
+<td>randomSplit</td></tr>
+<tr><td style="width: 25%;"><a href="rangeBetween.html">rangeBetween</a></td>
+<td>rangeBetween</td></tr>
+<tr><td style="width: 25%;"><a href="rangeBetween.html">rangeBetween-method</a></td>
+<td>rangeBetween</td></tr>
+<tr><td style="width: 25%;"><a href="column_window_functions.html">rank</a></td>
+<td>Window functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_window_functions.html">rank-method</a></td>
+<td>Window functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="rbind.html">rbind</a></td>
+<td>Union two or more SparkDataFrames</td></tr>
+<tr><td style="width: 25%;"><a href="rbind.html">rbind-method</a></td>
+<td>Union two or more SparkDataFrames</td></tr>
+<tr><td style="width: 25%;"><a href="read.df.html">read.df</a></td>
+<td>Load a SparkDataFrame</td></tr>
+<tr><td style="width: 25%;"><a href="read.df.html">read.df.default</a></td>
+<td>Load a SparkDataFrame</td></tr>
+<tr><td style="width: 25%;"><a href="read.jdbc.html">read.jdbc</a></td>
+<td>Create a SparkDataFrame representing the database table accessible via JDBC URL</td></tr>
+<tr><td style="width: 25%;"><a href="read.json.html">read.json</a></td>
+<td>Create a SparkDataFrame from a JSON file.</td></tr>
+<tr><td style="width: 25%;"><a href="read.json.html">read.json.default</a></td>
+<td>Create a SparkDataFrame from a JSON file.</td></tr>
+<tr><td style="width: 25%;"><a href="read.ml.html">read.ml</a></td>
+<td>Load a fitted MLlib model from the input path.</td></tr>
+<tr><td style="width: 25%;"><a href="read.orc.html">read.orc</a></td>
+<td>Create a SparkDataFrame from an ORC file.</td></tr>
+<tr><td style="width: 25%;"><a href="read.parquet.html">read.parquet</a></td>
+<td>Create a SparkDataFrame from a Parquet file.</td></tr>
+<tr><td style="width: 25%;"><a href="read.parquet.html">read.parquet.default</a></td>
+<td>Create a SparkDataFrame from a Parquet file.</td></tr>
+<tr><td style="width: 25%;"><a href="read.stream.html">read.stream</a></td>
+<td>Load a streaming SparkDataFrame</td></tr>
+<tr><td style="width: 25%;"><a href="read.text.html">read.text</a></td>
+<td>Create a SparkDataFrame from a text file.</td></tr>
+<tr><td style="width: 25%;"><a href="read.text.html">read.text.default</a></td>
+<td>Create a SparkDataFrame from a text file.</td></tr>
+<tr><td style="width: 25%;"><a href="recoverPartitions.html">recoverPartitions</a></td>
+<td>Recovers all the partitions in the directory of a table and update the catalog</td></tr>
+<tr><td style="width: 25%;"><a href="refreshByPath.html">refreshByPath</a></td>
+<td>Invalidates and refreshes all the cached data and metadata for SparkDataFrame containing path</td></tr>
+<tr><td style="width: 25%;"><a href="refreshTable.html">refreshTable</a></td>
+<td>Invalidates and refreshes all the cached data and metadata of the given table</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">regexp_extract</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">regexp_extract-method</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">regexp_replace</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">regexp_replace-method</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="registerTempTable-deprecated.html">registerTempTable</a></td>
+<td>(Deprecated) Register Temporary Table</td></tr>
+<tr><td style="width: 25%;"><a href="registerTempTable-deprecated.html">registerTempTable-method</a></td>
+<td>(Deprecated) Register Temporary Table</td></tr>
+<tr><td style="width: 25%;"><a href="rename.html">rename</a></td>
+<td>rename</td></tr>
+<tr><td style="width: 25%;"><a href="rename.html">rename-method</a></td>
+<td>rename</td></tr>
+<tr><td style="width: 25%;"><a href="repartition.html">repartition</a></td>
+<td>Repartition</td></tr>
+<tr><td style="width: 25%;"><a href="repartition.html">repartition-method</a></td>
+<td>Repartition</td></tr>
+<tr><td style="width: 25%;"><a href="repartitionByRange.html">repartitionByRange</a></td>
+<td>Repartition by range</td></tr>
+<tr><td style="width: 25%;"><a href="repartitionByRange.html">repartitionByRange-method</a></td>
+<td>Repartition by range</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">repeat_string</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">repeat_string-method</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">reverse</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">reverse-method</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">rint</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">rint-method</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="columnfunctions.html">rlike</a></td>
+<td>A set of operations working with SparkDataFrame columns</td></tr>
+<tr><td style="width: 25%;"><a href="rollup.html">rollup</a></td>
+<td>rollup</td></tr>
+<tr><td style="width: 25%;"><a href="rollup.html">rollup-method</a></td>
+<td>rollup</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">round</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">round-method</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="rowsBetween.html">rowsBetween</a></td>
+<td>rowsBetween</td></tr>
+<tr><td style="width: 25%;"><a href="rowsBetween.html">rowsBetween-method</a></td>
+<td>rowsBetween</td></tr>
+<tr><td style="width: 25%;"><a href="column_window_functions.html">row_number</a></td>
+<td>Window functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_window_functions.html">row_number-method</a></td>
+<td>Window functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">rpad</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">rpad-method</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">rtrim</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">rtrim-method</a></td>
+<td>String functions for Column operations</td></tr>
+</table>
+
+<h2><a name="S">-- S --</a></h2>
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="sample.html">sample</a></td>
+<td>Sample</td></tr>
+<tr><td style="width: 25%;"><a href="sample.html">sample-method</a></td>
+<td>Sample</td></tr>
+<tr><td style="width: 25%;"><a href="sampleBy.html">sampleBy</a></td>
+<td>Returns a stratified sample without replacement</td></tr>
+<tr><td style="width: 25%;"><a href="sampleBy.html">sampleBy-method</a></td>
+<td>Returns a stratified sample without replacement</td></tr>
+<tr><td style="width: 25%;"><a href="sample.html">sample_frac</a></td>
+<td>Sample</td></tr>
+<tr><td style="width: 25%;"><a href="sample.html">sample_frac-method</a></td>
+<td>Sample</td></tr>
+<tr><td style="width: 25%;"><a href="write.parquet.html">saveAsParquetFile</a></td>
+<td>Save the contents of SparkDataFrame as a Parquet file, preserving the schema.</td></tr>
+<tr><td style="width: 25%;"><a href="write.parquet.html">saveAsParquetFile-method</a></td>
+<td>Save the contents of SparkDataFrame as a Parquet file, preserving the schema.</td></tr>
+<tr><td style="width: 25%;"><a href="saveAsTable.html">saveAsTable</a></td>
+<td>Save the contents of the SparkDataFrame to a data source as a table</td></tr>
+<tr><td style="width: 25%;"><a href="saveAsTable.html">saveAsTable-method</a></td>
+<td>Save the contents of the SparkDataFrame to a data source as a table</td></tr>
+<tr><td style="width: 25%;"><a href="write.df.html">saveDF</a></td>
+<td>Save the contents of SparkDataFrame to a data source.</td></tr>
+<tr><td style="width: 25%;"><a href="write.df.html">saveDF-method</a></td>
+<td>Save the contents of SparkDataFrame to a data source.</td></tr>
+<tr><td style="width: 25%;"><a href="schema.html">schema</a></td>
+<td>Get schema object</td></tr>
+<tr><td style="width: 25%;"><a href="schema.html">schema-method</a></td>
+<td>Get schema object</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">sd</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">sd-method</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_functions.html">second</a></td>
+<td>Date time functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_functions.html">second-method</a></td>
+<td>Date time functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="select.html">select</a></td>
+<td>Select</td></tr>
+<tr><td style="width: 25%;"><a href="select.html">select-method</a></td>
+<td>Select</td></tr>
+<tr><td style="width: 25%;"><a href="selectExpr.html">selectExpr</a></td>
+<td>SelectExpr</td></tr>
+<tr><td style="width: 25%;"><a href="selectExpr.html">selectExpr-method</a></td>
+<td>SelectExpr</td></tr>
+<tr><td style="width: 25%;"><a href="setCheckpointDir.html">setCheckpointDir</a></td>
+<td>Set checkpoint directory</td></tr>
+<tr><td style="width: 25%;"><a href="setCurrentDatabase.html">setCurrentDatabase</a></td>
+<td>Sets the current default database</td></tr>
+<tr><td style="width: 25%;"><a href="setJobDescription.html">setJobDescription</a></td>
+<td>Set a human readable description of the current job.</td></tr>
+<tr><td style="width: 25%;"><a href="setJobGroup.html">setJobGroup</a></td>
+<td>Assigns a group ID to all the jobs started by this thread until the group ID is set to a different value or cleared.</td></tr>
+<tr><td style="width: 25%;"><a href="setJobGroup.html">setJobGroup.default</a></td>
+<td>Assigns a group ID to all the jobs started by this thread until the group ID is set to a different value or cleared.</td></tr>
+<tr><td style="width: 25%;"><a href="setLocalProperty.html">setLocalProperty</a></td>
+<td>Set a local property that affects jobs submitted from this thread, such as the Spark fair scheduler pool.</td></tr>
+<tr><td style="width: 25%;"><a href="setLogLevel.html">setLogLevel</a></td>
+<td>Set new log level</td></tr>
+<tr><td style="width: 25%;"><a href="column_misc_functions.html">sha1</a></td>
+<td>Miscellaneous functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_misc_functions.html">sha1-method</a></td>
+<td>Miscellaneous functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_misc_functions.html">sha2</a></td>
+<td>Miscellaneous functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_misc_functions.html">sha2-method</a></td>
+<td>Miscellaneous functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">shiftLeft</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">shiftLeft-method</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">shiftRight</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">shiftRight-method</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">shiftRightUnsigned</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">shiftRightUnsigned-method</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="show.html">show</a></td>
+<td>show</td></tr>
+<tr><td style="width: 25%;"><a href="show.html">show-method</a></td>
+<td>show</td></tr>
+<tr><td style="width: 25%;"><a href="showDF.html">showDF</a></td>
+<td>showDF</td></tr>
+<tr><td style="width: 25%;"><a href="showDF.html">showDF-method</a></td>
+<td>showDF</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">shuffle</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">shuffle-method</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">sign</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">sign-method</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">signum</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">signum-method</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">sin</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">sin-method</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">sinh</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">sinh-method</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">size</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">size-method</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">skewness</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">skewness-method</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">slice</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">slice-method</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">sort_array</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">sort_array-method</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">soundex</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">soundex-method</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="spark.addFile.html">spark.addFile</a></td>
+<td>Add a file or directory to be downloaded with this Spark job on every node.</td></tr>
+<tr><td style="width: 25%;"><a href="spark.als.html">spark.als</a></td>
+<td>Alternating Least Squares (ALS) for Collaborative Filtering</td></tr>
+<tr><td style="width: 25%;"><a href="spark.als.html">spark.als-method</a></td>
+<td>Alternating Least Squares (ALS) for Collaborative Filtering</td></tr>
+<tr><td style="width: 25%;"><a href="spark.fpGrowth.html">spark.associationRules</a></td>
+<td>FP-growth</td></tr>
+<tr><td style="width: 25%;"><a href="spark.fpGrowth.html">spark.associationRules-method</a></td>
+<td>FP-growth</td></tr>
+<tr><td style="width: 25%;"><a href="spark.bisectingKmeans.html">spark.bisectingKmeans</a></td>
+<td>Bisecting K-Means Clustering Model</td></tr>
+<tr><td style="width: 25%;"><a href="spark.bisectingKmeans.html">spark.bisectingKmeans-method</a></td>
+<td>Bisecting K-Means Clustering Model</td></tr>
+<tr><td style="width: 25%;"><a href="spark.decisionTree.html">spark.decisionTree</a></td>
+<td>Decision Tree Model for Regression and Classification</td></tr>
+<tr><td style="width: 25%;"><a href="spark.decisionTree.html">spark.decisionTree-method</a></td>
+<td>Decision Tree Model for Regression and Classification</td></tr>
+<tr><td style="width: 25%;"><a href="spark.fpGrowth.html">spark.fpGrowth</a></td>
+<td>FP-growth</td></tr>
+<tr><td style="width: 25%;"><a href="spark.fpGrowth.html">spark.fpGrowth-method</a></td>
+<td>FP-growth</td></tr>
+<tr><td style="width: 25%;"><a href="spark.fpGrowth.html">spark.freqItemsets</a></td>
+<td>FP-growth</td></tr>
+<tr><td style="width: 25%;"><a href="spark.fpGrowth.html">spark.freqItemsets-method</a></td>
+<td>FP-growth</td></tr>
+<tr><td style="width: 25%;"><a href="spark.gaussianMixture.html">spark.gaussianMixture</a></td>
+<td>Multivariate Gaussian Mixture Model (GMM)</td></tr>
+<tr><td style="width: 25%;"><a href="spark.gaussianMixture.html">spark.gaussianMixture-method</a></td>
+<td>Multivariate Gaussian Mixture Model (GMM)</td></tr>
+<tr><td style="width: 25%;"><a href="spark.gbt.html">spark.gbt</a></td>
+<td>Gradient Boosted Tree Model for Regression and Classification</td></tr>
+<tr><td style="width: 25%;"><a href="spark.gbt.html">spark.gbt-method</a></td>
+<td>Gradient Boosted Tree Model for Regression and Classification</td></tr>
+<tr><td style="width: 25%;"><a href="spark.getSparkFiles.html">spark.getSparkFiles</a></td>
+<td>Get the absolute path of a file added through spark.addFile.</td></tr>
+<tr><td style="width: 25%;"><a href="spark.getSparkFilesRootDirectory.html">spark.getSparkFilesRootDirectory</a></td>
+<td>Get the root directory that contains files added through spark.addFile.</td></tr>
+<tr><td style="width: 25%;"><a href="spark.glm.html">spark.glm</a></td>
+<td>Generalized Linear Models</td></tr>
+<tr><td style="width: 25%;"><a href="spark.glm.html">spark.glm-method</a></td>
+<td>Generalized Linear Models</td></tr>
+<tr><td style="width: 25%;"><a href="spark.isoreg.html">spark.isoreg</a></td>
+<td>Isotonic Regression Model</td></tr>
+<tr><td style="width: 25%;"><a href="spark.isoreg.html">spark.isoreg-method</a></td>
+<td>Isotonic Regression Model</td></tr>
+<tr><td style="width: 25%;"><a href="spark.kmeans.html">spark.kmeans</a></td>
+<td>K-Means Clustering Model</td></tr>
+<tr><td style="width: 25%;"><a href="spark.kmeans.html">spark.kmeans-method</a></td>
+<td>K-Means Clustering Model</td></tr>
+<tr><td style="width: 25%;"><a href="spark.kstest.html">spark.kstest</a></td>
+<td>(One-Sample) Kolmogorov-Smirnov Test</td></tr>
+<tr><td style="width: 25%;"><a href="spark.kstest.html">spark.kstest-method</a></td>
+<td>(One-Sample) Kolmogorov-Smirnov Test</td></tr>
+<tr><td style="width: 25%;"><a href="spark.lapply.html">spark.lapply</a></td>
+<td>Run a function over a list of elements, distributing the computations with Spark</td></tr>
+<tr><td style="width: 25%;"><a href="spark.lda.html">spark.lda</a></td>
+<td>Latent Dirichlet Allocation</td></tr>
+<tr><td style="width: 25%;"><a href="spark.lda.html">spark.lda-method</a></td>
+<td>Latent Dirichlet Allocation</td></tr>
+<tr><td style="width: 25%;"><a href="spark.logit.html">spark.logit</a></td>
+<td>Logistic Regression Model</td></tr>
+<tr><td style="width: 25%;"><a href="spark.logit.html">spark.logit-method</a></td>
+<td>Logistic Regression Model</td></tr>
+<tr><td style="width: 25%;"><a href="spark.mlp.html">spark.mlp</a></td>
+<td>Multilayer Perceptron Classification Model</td></tr>
+<tr><td style="width: 25%;"><a href="spark.mlp.html">spark.mlp-method</a></td>
+<td>Multilayer Perceptron Classification Model</td></tr>
+<tr><td style="width: 25%;"><a href="spark.naiveBayes.html">spark.naiveBayes</a></td>
+<td>Naive Bayes Models</td></tr>
+<tr><td style="width: 25%;"><a href="spark.naiveBayes.html">spark.naiveBayes-method</a></td>
+<td>Naive Bayes Models</td></tr>
+<tr><td style="width: 25%;"><a href="spark.lda.html">spark.perplexity</a></td>
+<td>Latent Dirichlet Allocation</td></tr>
+<tr><td style="width: 25%;"><a href="spark.lda.html">spark.perplexity-method</a></td>
+<td>Latent Dirichlet Allocation</td></tr>
+<tr><td style="width: 25%;"><a href="spark.lda.html">spark.posterior</a></td>
+<td>Latent Dirichlet Allocation</td></tr>
+<tr><td style="width: 25%;"><a href="spark.lda.html">spark.posterior-method</a></td>
+<td>Latent Dirichlet Allocation</td></tr>
+<tr><td style="width: 25%;"><a href="spark.randomForest.html">spark.randomForest</a></td>
+<td>Random Forest Model for Regression and Classification</td></tr>
+<tr><td style="width: 25%;"><a href="spark.randomForest.html">spark.randomForest-method</a></td>
+<td>Random Forest Model for Regression and Classification</td></tr>
+<tr><td style="width: 25%;"><a href="spark.survreg.html">spark.survreg</a></td>
+<td>Accelerated Failure Time (AFT) Survival Regression Model</td></tr>
+<tr><td style="width: 25%;"><a href="spark.survreg.html">spark.survreg-method</a></td>
+<td>Accelerated Failure Time (AFT) Survival Regression Model</td></tr>
+<tr><td style="width: 25%;"><a href="spark.svmLinear.html">spark.svmLinear</a></td>
+<td>Linear SVM Model</td></tr>
+<tr><td style="width: 25%;"><a href="spark.svmLinear.html">spark.svmLinear-method</a></td>
+<td>Linear SVM Model</td></tr>
+<tr><td style="width: 25%;"><a href="SparkDataFrame.html">SparkDataFrame-class</a></td>
+<td>S4 class that represents a SparkDataFrame</td></tr>
+<tr><td style="width: 25%;"><a href="sparkR.callJMethod.html">sparkR.callJMethod</a></td>
+<td>Call Java Methods</td></tr>
+<tr><td style="width: 25%;"><a href="sparkR.callJStatic.html">sparkR.callJStatic</a></td>
+<td>Call Static Java Methods</td></tr>
+<tr><td style="width: 25%;"><a href="sparkR.conf.html">sparkR.conf</a></td>
+<td>Get Runtime Config from the current active SparkSession</td></tr>
+<tr><td style="width: 25%;"><a href="sparkR.init-deprecated.html">sparkR.init</a></td>
+<td>(Deprecated) Initialize a new Spark Context</td></tr>
+<tr><td style="width: 25%;"><a href="sparkR.newJObject.html">sparkR.newJObject</a></td>
+<td>Create Java Objects</td></tr>
+<tr><td style="width: 25%;"><a href="sparkR.session.html">sparkR.session</a></td>
+<td>Get the existing SparkSession or initialize a new SparkSession.</td></tr>
+<tr><td style="width: 25%;"><a href="sparkR.session.stop.html">sparkR.session.stop</a></td>
+<td>Stop the Spark Session and Spark Context</td></tr>
+<tr><td style="width: 25%;"><a href="sparkR.session.stop.html">sparkR.stop</a></td>
+<td>Stop the Spark Session and Spark Context</td></tr>
+<tr><td style="width: 25%;"><a href="sparkR.uiWebUrl.html">sparkR.uiWebUrl</a></td>
+<td>Get the URL of the SparkUI instance for the current active SparkSession</td></tr>
+<tr><td style="width: 25%;"><a href="sparkR.version.html">sparkR.version</a></td>
+<td>Get version of Spark on which this application is running</td></tr>
+<tr><td style="width: 25%;"><a href="sparkRHive.init-deprecated.html">sparkRHive.init</a></td>
+<td>(Deprecated) Initialize a new HiveContext</td></tr>
+<tr><td style="width: 25%;"><a href="sparkRSQL.init-deprecated.html">sparkRSQL.init</a></td>
+<td>(Deprecated) Initialize a new SQLContext</td></tr>
+<tr><td style="width: 25%;"><a href="column_nonaggregate_functions.html">spark_partition_id</a></td>
+<td>Non-aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_nonaggregate_functions.html">spark_partition_id-method</a></td>
+<td>Non-aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">split_string</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">split_string-method</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="sql.html">sql</a></td>
+<td>SQL Query</td></tr>
+<tr><td style="width: 25%;"><a href="sql.html">sql.default</a></td>
+<td>SQL Query</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">sqrt</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">sqrt-method</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="startsWith.html">startsWith</a></td>
+<td>startsWith</td></tr>
+<tr><td style="width: 25%;"><a href="startsWith.html">startsWith-method</a></td>
+<td>startsWith</td></tr>
+<tr><td style="width: 25%;"><a href="status.html">status</a></td>
+<td>status</td></tr>
+<tr><td style="width: 25%;"><a href="status.html">status-method</a></td>
+<td>status</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">stddev</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">stddev-method</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">stddev_pop</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">stddev_pop-method</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">stddev_samp</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">stddev_samp-method</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="stopQuery.html">stopQuery</a></td>
+<td>stopQuery</td></tr>
+<tr><td style="width: 25%;"><a href="stopQuery.html">stopQuery-method</a></td>
+<td>stopQuery</td></tr>
+<tr><td style="width: 25%;"><a href="storageLevel.html">storageLevel</a></td>
+<td>StorageLevel</td></tr>
+<tr><td style="width: 25%;"><a href="storageLevel.html">storageLevel-method</a></td>
+<td>StorageLevel</td></tr>
+<tr><td style="width: 25%;"><a href="str.html">str</a></td>
+<td>Compactly display the structure of a dataset</td></tr>
+<tr><td style="width: 25%;"><a href="str.html">str-method</a></td>
+<td>Compactly display the structure of a dataset</td></tr>
+<tr><td style="width: 25%;"><a href="StreamingQuery.html">StreamingQuery-class</a></td>
+<td>S4 class that represents a StreamingQuery</td></tr>
+<tr><td style="width: 25%;"><a href="column_nonaggregate_functions.html">struct</a></td>
+<td>Non-aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_nonaggregate_functions.html">struct-method</a></td>
+<td>Non-aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="structField.html">structField</a></td>
+<td>structField</td></tr>
+<tr><td style="width: 25%;"><a href="structField.html">structField.character</a></td>
+<td>structField</td></tr>
+<tr><td style="width: 25%;"><a href="structField.html">structField.jobj</a></td>
+<td>structField</td></tr>
+<tr><td style="width: 25%;"><a href="structType.html">structType</a></td>
+<td>structType</td></tr>
+<tr><td style="width: 25%;"><a href="structType.html">structType.character</a></td>
+<td>structType</td></tr>
+<tr><td style="width: 25%;"><a href="structType.html">structType.jobj</a></td>
+<td>structType</td></tr>
+<tr><td style="width: 25%;"><a href="structType.html">structType.structField</a></td>
+<td>structType</td></tr>
+<tr><td style="width: 25%;"><a href="subset.html">subset</a></td>
+<td>Subset</td></tr>
+<tr><td style="width: 25%;"><a href="subset.html">subset-method</a></td>
+<td>Subset</td></tr>
+<tr><td style="width: 25%;"><a href="substr.html">substr</a></td>
+<td>substr</td></tr>
+<tr><td style="width: 25%;"><a href="substr.html">substr-method</a></td>
+<td>substr</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">substring_index</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">substring_index-method</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">sum</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">sum-method</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">sumDistinct</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">sumDistinct-method</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="summarize.html">summarize</a></td>
+<td>summarize</td></tr>
+<tr><td style="width: 25%;"><a href="summarize.html">summarize-method</a></td>
+<td>summarize</td></tr>
+<tr><td style="width: 25%;"><a href="summary.html">summary</a></td>
+<td>summary</td></tr>
+<tr><td style="width: 25%;"><a href="spark.als.html">summary-method</a></td>
+<td>Alternating Least Squares (ALS) for Collaborative Filtering</td></tr>
+<tr><td style="width: 25%;"><a href="spark.bisectingKmeans.html">summary-method</a></td>
+<td>Bisecting K-Means Clustering Model</td></tr>
+<tr><td style="width: 25%;"><a href="spark.decisionTree.html">summary-method</a></td>
+<td>Decision Tree Model for Regression and Classification</td></tr>
+<tr><td style="width: 25%;"><a href="spark.gaussianMixture.html">summary-method</a></td>
+<td>Multivariate Gaussian Mixture Model (GMM)</td></tr>
+<tr><td style="width: 25%;"><a href="spark.gbt.html">summary-method</a></td>
+<td>Gradient Boosted Tree Model for Regression and Classification</td></tr>
+<tr><td style="width: 25%;"><a href="spark.glm.html">summary-method</a></td>
+<td>Generalized Linear Models</td></tr>
+<tr><td style="width: 25%;"><a href="spark.isoreg.html">summary-method</a></td>
+<td>Isotonic Regression Model</td></tr>
+<tr><td style="width: 25%;"><a href="spark.kmeans.html">summary-method</a></td>
+<td>K-Means Clustering Model</td></tr>
+<tr><td style="width: 25%;"><a href="spark.kstest.html">summary-method</a></td>
+<td>(One-Sample) Kolmogorov-Smirnov Test</td></tr>
+<tr><td style="width: 25%;"><a href="spark.lda.html">summary-method</a></td>
+<td>Latent Dirichlet Allocation</td></tr>
+<tr><td style="width: 25%;"><a href="spark.logit.html">summary-method</a></td>
+<td>Logistic Regression Model</td></tr>
+<tr><td style="width: 25%;"><a href="spark.mlp.html">summary-method</a></td>
+<td>Multilayer Perceptron Classification Model</td></tr>
+<tr><td style="width: 25%;"><a href="spark.naiveBayes.html">summary-method</a></td>
+<td>Naive Bayes Models</td></tr>
+<tr><td style="width: 25%;"><a href="spark.randomForest.html">summary-method</a></td>
+<td>Random Forest Model for Regression and Classification</td></tr>
+<tr><td style="width: 25%;"><a href="spark.survreg.html">summary-method</a></td>
+<td>Accelerated Failure Time (AFT) Survival Regression Model</td></tr>
+<tr><td style="width: 25%;"><a href="spark.svmLinear.html">summary-method</a></td>
+<td>Linear SVM Model</td></tr>
+<tr><td style="width: 25%;"><a href="summary.html">summary-method</a></td>
+<td>summary</td></tr>
+</table>
+
+<h2><a name="T">-- T --</a></h2>
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="tableNames.html">tableNames</a></td>
+<td>Table Names</td></tr>
+<tr><td style="width: 25%;"><a href="tableNames.html">tableNames.default</a></td>
+<td>Table Names</td></tr>
+<tr><td style="width: 25%;"><a href="tables.html">tables</a></td>
+<td>Tables</td></tr>
+<tr><td style="width: 25%;"><a href="tables.html">tables.default</a></td>
+<td>Tables</td></tr>
+<tr><td style="width: 25%;"><a href="tableToDF.html">tableToDF</a></td>
+<td>Create a SparkDataFrame from a SparkSQL table or view</td></tr>
+<tr><td style="width: 25%;"><a href="take.html">take</a></td>
+<td>Take the first NUM rows of a SparkDataFrame and return the results as a R data.frame</td></tr>
+<tr><td style="width: 25%;"><a href="take.html">take-method</a></td>
+<td>Take the first NUM rows of a SparkDataFrame and return the results as a R data.frame</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">tan</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">tan-method</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">tanh</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">tanh-method</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">toDegrees</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">toDegrees-method</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="toJSON.html">toJSON</a></td>
+<td>toJSON</td></tr>
+<tr><td style="width: 25%;"><a href="toJSON.html">toJSON-method</a></td>
+<td>toJSON</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">toRadians</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">toRadians-method</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_functions.html">to_date</a></td>
+<td>Date time functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_functions.html">to_date-method</a></td>
+<td>Date time functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">to_json</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_collection_functions.html">to_json-method</a></td>
+<td>Collection functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_functions.html">to_timestamp</a></td>
+<td>Date time functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_functions.html">to_timestamp-method</a></td>
+<td>Date time functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_diff_functions.html">to_utc_timestamp</a></td>
+<td>Date time arithmetic functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_diff_functions.html">to_utc_timestamp-method</a></td>
+<td>Date time arithmetic functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="mutate.html">transform</a></td>
+<td>Mutate</td></tr>
+<tr><td style="width: 25%;"><a href="mutate.html">transform-method</a></td>
+<td>Mutate</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">translate</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">translate-method</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">trim</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">trim-method</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_functions.html">trunc</a></td>
+<td>Date time functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_functions.html">trunc-method</a></td>
+<td>Date time functions for Column operations</td></tr>
+</table>
+
+<h2><a name="U">-- U --</a></h2>
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="column_string_functions.html">unbase64</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">unbase64-method</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="uncacheTable.html">uncacheTable</a></td>
+<td>Uncache Table</td></tr>
+<tr><td style="width: 25%;"><a href="uncacheTable.html">uncacheTable.default</a></td>
+<td>Uncache Table</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">unhex</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_math_functions.html">unhex-method</a></td>
+<td>Math functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="union.html">union</a></td>
+<td>Return a new SparkDataFrame containing the union of rows</td></tr>
+<tr><td style="width: 25%;"><a href="union.html">union-method</a></td>
+<td>Return a new SparkDataFrame containing the union of rows</td></tr>
+<tr><td style="width: 25%;"><a href="union.html">unionAll</a></td>
+<td>Return a new SparkDataFrame containing the union of rows</td></tr>
+<tr><td style="width: 25%;"><a href="union.html">unionAll-method</a></td>
+<td>Return a new SparkDataFrame containing the union of rows</td></tr>
+<tr><td style="width: 25%;"><a href="unionByName.html">unionByName</a></td>
+<td>Return a new SparkDataFrame containing the union of rows, matched by column names</td></tr>
+<tr><td style="width: 25%;"><a href="unionByName.html">unionByName-method</a></td>
+<td>Return a new SparkDataFrame containing the union of rows, matched by column names</td></tr>
+<tr><td style="width: 25%;"><a href="distinct.html">unique</a></td>
+<td>Distinct</td></tr>
+<tr><td style="width: 25%;"><a href="distinct.html">unique-method</a></td>
+<td>Distinct</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_functions.html">unix_timestamp</a></td>
+<td>Date time functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_functions.html">unix_timestamp-method</a></td>
+<td>Date time functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="unpersist.html">unpersist</a></td>
+<td>Unpersist</td></tr>
+<tr><td style="width: 25%;"><a href="unpersist.html">unpersist-method</a></td>
+<td>Unpersist</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">upper</a></td>
+<td>String functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_string_functions.html">upper-method</a></td>
+<td>String functions for Column operations</td></tr>
+</table>
+
+<h2><a name="V">-- V --</a></h2>
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">var</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">var-method</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">variance</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">variance-method</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">var_pop</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">var_pop-method</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">var_samp</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_aggregate_functions.html">var_samp-method</a></td>
+<td>Aggregate functions for Column operations</td></tr>
+</table>
+
+<h2><a name="W">-- W --</a></h2>
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="column_datetime_functions.html">weekofyear</a></td>
+<td>Date time functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_functions.html">weekofyear-method</a></td>
+<td>Date time functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_nonaggregate_functions.html">when</a></td>
+<td>Non-aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_nonaggregate_functions.html">when-method</a></td>
+<td>Non-aggregate functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="filter.html">where</a></td>
+<td>Filter</td></tr>
+<tr><td style="width: 25%;"><a href="filter.html">where-method</a></td>
+<td>Filter</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_functions.html">window</a></td>
+<td>Date time functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_functions.html">window-method</a></td>
+<td>Date time functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="windowOrderBy.html">windowOrderBy</a></td>
+<td>windowOrderBy</td></tr>
+<tr><td style="width: 25%;"><a href="windowOrderBy.html">windowOrderBy-method</a></td>
+<td>windowOrderBy</td></tr>
+<tr><td style="width: 25%;"><a href="windowPartitionBy.html">windowPartitionBy</a></td>
+<td>windowPartitionBy</td></tr>
+<tr><td style="width: 25%;"><a href="windowPartitionBy.html">windowPartitionBy-method</a></td>
+<td>windowPartitionBy</td></tr>
+<tr><td style="width: 25%;"><a href="WindowSpec.html">WindowSpec-class</a></td>
+<td>S4 class that represents a WindowSpec</td></tr>
+<tr><td style="width: 25%;"><a href="with.html">with</a></td>
+<td>Evaluate a R expression in an environment constructed from a SparkDataFrame</td></tr>
+<tr><td style="width: 25%;"><a href="with.html">with-method</a></td>
+<td>Evaluate a R expression in an environment constructed from a SparkDataFrame</td></tr>
+<tr><td style="width: 25%;"><a href="withColumn.html">withColumn</a></td>
+<td>WithColumn</td></tr>
+<tr><td style="width: 25%;"><a href="withColumn.html">withColumn-method</a></td>
+<td>WithColumn</td></tr>
+<tr><td style="width: 25%;"><a href="rename.html">withColumnRenamed</a></td>
+<td>rename</td></tr>
+<tr><td style="width: 25%;"><a href="rename.html">withColumnRenamed-method</a></td>
+<td>rename</td></tr>
+<tr><td style="width: 25%;"><a href="withWatermark.html">withWatermark</a></td>
+<td>withWatermark</td></tr>
+<tr><td style="width: 25%;"><a href="withWatermark.html">withWatermark-method</a></td>
+<td>withWatermark</td></tr>
+<tr><td style="width: 25%;"><a href="write.df.html">write.df</a></td>
+<td>Save the contents of SparkDataFrame to a data source.</td></tr>
+<tr><td style="width: 25%;"><a href="write.df.html">write.df-method</a></td>
+<td>Save the contents of SparkDataFrame to a data source.</td></tr>
+<tr><td style="width: 25%;"><a href="write.jdbc.html">write.jdbc</a></td>
+<td>Save the content of SparkDataFrame to an external database table via JDBC.</td></tr>
+<tr><td style="width: 25%;"><a href="write.jdbc.html">write.jdbc-method</a></td>
+<td>Save the content of SparkDataFrame to an external database table via JDBC.</td></tr>
+<tr><td style="width: 25%;"><a href="write.json.html">write.json</a></td>
+<td>Save the contents of SparkDataFrame as a JSON file</td></tr>
+<tr><td style="width: 25%;"><a href="write.json.html">write.json-method</a></td>
+<td>Save the contents of SparkDataFrame as a JSON file</td></tr>
+<tr><td style="width: 25%;"><a href="write.ml.html">write.ml</a></td>
+<td>Saves the MLlib model to the input path</td></tr>
+<tr><td style="width: 25%;"><a href="spark.als.html">write.ml-method</a></td>
+<td>Alternating Least Squares (ALS) for Collaborative Filtering</td></tr>
+<tr><td style="width: 25%;"><a href="spark.bisectingKmeans.html">write.ml-method</a></td>
+<td>Bisecting K-Means Clustering Model</td></tr>
+<tr><td style="width: 25%;"><a href="spark.decisionTree.html">write.ml-method</a></td>
+<td>Decision Tree Model for Regression and Classification</td></tr>
+<tr><td style="width: 25%;"><a href="spark.fpGrowth.html">write.ml-method</a></td>
+<td>FP-growth</td></tr>
+<tr><td style="width: 25%;"><a href="spark.gaussianMixture.html">write.ml-method</a></td>
+<td>Multivariate Gaussian Mixture Model (GMM)</td></tr>
+<tr><td style="width: 25%;"><a href="spark.gbt.html">write.ml-method</a></td>
+<td>Gradient Boosted Tree Model for Regression and Classification</td></tr>
+<tr><td style="width: 25%;"><a href="spark.glm.html">write.ml-method</a></td>
+<td>Generalized Linear Models</td></tr>
+<tr><td style="width: 25%;"><a href="spark.isoreg.html">write.ml-method</a></td>
+<td>Isotonic Regression Model</td></tr>
+<tr><td style="width: 25%;"><a href="spark.kmeans.html">write.ml-method</a></td>
+<td>K-Means Clustering Model</td></tr>
+<tr><td style="width: 25%;"><a href="spark.lda.html">write.ml-method</a></td>
+<td>Latent Dirichlet Allocation</td></tr>
+<tr><td style="width: 25%;"><a href="spark.logit.html">write.ml-method</a></td>
+<td>Logistic Regression Model</td></tr>
+<tr><td style="width: 25%;"><a href="spark.mlp.html">write.ml-method</a></td>
+<td>Multilayer Perceptron Classification Model</td></tr>
+<tr><td style="width: 25%;"><a href="spark.naiveBayes.html">write.ml-method</a></td>
+<td>Naive Bayes Models</td></tr>
+<tr><td style="width: 25%;"><a href="spark.randomForest.html">write.ml-method</a></td>
+<td>Random Forest Model for Regression and Classification</td></tr>
+<tr><td style="width: 25%;"><a href="spark.survreg.html">write.ml-method</a></td>
+<td>Accelerated Failure Time (AFT) Survival Regression Model</td></tr>
+<tr><td style="width: 25%;"><a href="spark.svmLinear.html">write.ml-method</a></td>
+<td>Linear SVM Model</td></tr>
+<tr><td style="width: 25%;"><a href="write.orc.html">write.orc</a></td>
+<td>Save the contents of SparkDataFrame as an ORC file, preserving the schema.</td></tr>
+<tr><td style="width: 25%;"><a href="write.orc.html">write.orc-method</a></td>
+<td>Save the contents of SparkDataFrame as an ORC file, preserving the schema.</td></tr>
+<tr><td style="width: 25%;"><a href="write.parquet.html">write.parquet</a></td>
+<td>Save the contents of SparkDataFrame as a Parquet file, preserving the schema.</td></tr>
+<tr><td style="width: 25%;"><a href="write.parquet.html">write.parquet-method</a></td>
+<td>Save the contents of SparkDataFrame as a Parquet file, preserving the schema.</td></tr>
+<tr><td style="width: 25%;"><a href="write.stream.html">write.stream</a></td>
+<td>Write the streaming SparkDataFrame to a data source.</td></tr>
+<tr><td style="width: 25%;"><a href="write.stream.html">write.stream-method</a></td>
+<td>Write the streaming SparkDataFrame to a data source.</td></tr>
+<tr><td style="width: 25%;"><a href="write.text.html">write.text</a></td>
+<td>Save the content of SparkDataFrame in a text file at the specified path.</td></tr>
+<tr><td style="width: 25%;"><a href="write.text.html">write.text-method</a></td>
+<td>Save the content of SparkDataFrame in a text file at the specified path.</td></tr>
+</table>
+
+<h2><a name="Y">-- Y --</a></h2>
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="column_datetime_functions.html">year</a></td>
+<td>Date time functions for Column operations</td></tr>
+<tr><td style="width: 25%;"><a href="column_datetime_functions.html">year-method</a></td>
+<td>Date time functions for Column operations</td></tr>
+</table>
+
+<h2><a name="misc">-- misc --</a></h2>
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="not.html">!-method</a></td>
+<td>!</td></tr>
+<tr><td style="width: 25%;"><a href="select.html">$</a></td>
+<td>Select</td></tr>
+<tr><td style="width: 25%;"><a href="select.html">$-method</a></td>
+<td>Select</td></tr>
+<tr><td style="width: 25%;"><a href="select.html">$&lt;-</a></td>
+<td>Select</td></tr>
+<tr><td style="width: 25%;"><a href="select.html">$&lt;--method</a></td>
+<td>Select</td></tr>
+<tr><td style="width: 25%;"><a href="eq_null_safe.html">%&lt;=&gt;%</a></td>
+<td>%&lt;=&gt;%</td></tr>
+<tr><td style="width: 25%;"><a href="eq_null_safe.html">%&lt;=&gt;%-method</a></td>
+<td>%&lt;=&gt;%</td></tr>
+<tr><td style="width: 25%;"><a href="match.html">%in%</a></td>
+<td>Match a column with given values.</td></tr>
+<tr><td style="width: 25%;"><a href="match.html">%in%-method</a></td>
+<td>Match a column with given values.</td></tr>
+<tr><td style="width: 25%;"><a href="subset.html">[</a></td>
+<td>Subset</td></tr>
+<tr><td style="width: 25%;"><a href="subset.html">[-method</a></td>
+<td>Subset</td></tr>
+<tr><td style="width: 25%;"><a href="subset.html">[[</a></td>
+<td>Subset</td></tr>
+<tr><td style="width: 25%;"><a href="subset.html">[[-method</a></td>
+<td>Subset</td></tr>
+<tr><td style="width: 25%;"><a href="subset.html">[[&lt;-</a></td>
+<td>Subset</td></tr>
+<tr><td style="width: 25%;"><a href="subset.html">[[&lt;--method</a></td>
+<td>Subset</td></tr>
+</table>
+</body></html>
