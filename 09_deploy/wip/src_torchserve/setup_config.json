@@ -1,7 +1,7 @@
 {
- "model_name":"bert-base-uncased",
+ "model_name":"distilbert-base-uncased",
  "mode":"sequence_classification",
- "do_lower_case":"False",
+ "do_lower_case":"True",
  "num_labels":"5",
  "save_mode":"pretrained",
  "max_length":"128"
