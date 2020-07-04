@@ -52,12 +52,12 @@ def copy_aws_jars():
     copyfile(src, dst)
 
     # Add Spark-TFRecord Jars
-    #     https://github.com/linkedin/spark-tfrecord
-    src = EXTRA_JARS_PATH + "/spark-tfrecord_2.11-0.1.1.jar"
-    dst = SPARK_PATH + "/jars/spark-tfrecord_2.11-0.1.1.jar"
+    #     https://github.com/tensorflow/ecosystem/tree/master/spark/spark-tensorflow-connector#usage-examples 
+    src = EXTRA_JARS_PATH + "/spark-tensorflow-connector_2.11-1.15.0.jar"
+    dst = SPARK_PATH + "/jars/spark-tensorflow-connector_2.11-1.15.0.jar"
     copyfile(src, dst)
 
-    
+
 def get_resource_config():
     resource_config_path = '/opt/ml/config/resourceconfig.json'
     with open(resource_config_path, 'r') as f:
