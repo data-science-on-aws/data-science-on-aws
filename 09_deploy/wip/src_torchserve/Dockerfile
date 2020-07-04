@@ -21,11 +21,15 @@ RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 RUN update-alternatives --install /usr/local/bin/pip pip /usr/local/bin/pip3 1
 
 RUN pip install --no-cache-dir psutil \
-                --no-cache-dir torch \
+                --no-cache-dir torch==1.5.0 \
                 --no-cache-dir torchvision
+
+RUN pip install --no-cache-dir transformers==2.8.0
                 
 ADD serve serve
 RUN pip install ../serve/
+
+RUN pip list
 
 COPY dockerd-entrypoint.sh /usr/local/bin/dockerd-entrypoint.sh
 RUN chmod +x /usr/local/bin/dockerd-entrypoint.sh
