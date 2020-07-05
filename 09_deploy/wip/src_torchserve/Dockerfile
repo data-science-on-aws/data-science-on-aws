@@ -22,12 +22,9 @@ RUN update-alternatives --install /usr/local/bin/pip pip /usr/local/bin/pip3 1
 
 RUN pip install --no-cache-dir psutil \
                 --no-cache-dir torch==1.5.0 \
-                --no-cache-dir torchvision
+                --no-cache-dir torchserve==0.1.1 
 
 RUN pip install --no-cache-dir transformers==2.8.0
-                
-ADD serve serve
-RUN pip install ../serve/
 
 RUN pip list
 
