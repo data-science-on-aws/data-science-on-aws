@@ -22,6 +22,7 @@ FROM ${BASE_IMAGE} AS compile-image
 
 ENV PYTHONUNBUFFERED TRUE
 
+# RUN --mount=type=cache,id=apt-dev,target=/var/cache/apt 
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
     ca-certificates \
@@ -62,6 +63,7 @@ FROM ${BASE_IMAGE} AS runtime-image
 
 ENV PYTHONUNBUFFERED TRUE
 
+# RUN --mount=type=cache,id=apt-dev,target=/var/cache/apt 
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
     python3 \
