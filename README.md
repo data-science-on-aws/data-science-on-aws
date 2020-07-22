@@ -18,17 +18,37 @@ This workshop is FREE, but would otherwise cost <25 USD.
 
 # Workshop Instructions
 
-## 1. Click on AWS Console
+## 0. Click on AWS Console
+
+Please logout of your AWS Console in all browser tabs before you continue.
 
 Take the defaults and click on **Open AWS Console**. This will open AWS Console in a new browser tab.
 
 ![AWS Console](img/alt_aws_console.png)
 
-Double-check that your account name is something like `IibsAdminAccess-DO-NOT-DELETE...` as follows:
+_Double-check that your account name is something like `IibsAdminAccess-DO-NOT-DELETE...` as follows:_
 
 ![IAM Role](img/alt_iibsadminaccess.png)
 
-If not, please logout of your AWS Console in all browser tabs and re-run the steps above!
+_If not, please logout of your AWS Console in all browser tabs and re-run the steps above!_
+
+## 1. [REQUIRED] Click the Following Link 
+
+Use the following link to access the region allocated to you:
+
+```
+TODO:  Link posted right before the event
+```
+
+This will choose one of the following regions:
+
+![Region 1](img/aws-region-ireland.png)
+
+![Region 2](img/aws-region-mumbai.png)
+
+![Region 3](img/aws-region-oregon.png)
+
+![Region 4](img/aws-region-virginia.png)
 
 ## 2. Create `TeamRole` IAM Role
 
