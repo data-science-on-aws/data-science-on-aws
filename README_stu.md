@@ -90,7 +90,7 @@ _Note:  Proceed when the status of the notebook instance changes from `Pending` 
 
 ## 5. Launch a new Terminal within the Jupyter notebook
 
-Click `File` > `New` > `Terminal` to launch a terminal in your Jupyter instance.
+Click `File` > `New` > [...scroll down...] `Terminal` to launch a terminal in your Jupyter instance.
 
 ![](img/launch_jupyter_terminal.png)
 
