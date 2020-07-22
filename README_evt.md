@@ -122,4 +122,6 @@ cd ~/SageMaker && git clone https://github.com/data-science-on-aws/workshop
 ## 8. Start the Workshop!
 Navigate to `01_intro/` in your Jupyter notebook and start the workshop!
 
+_You may need to refresh your browser if you don't see the new `workshop/` directory._
+
 ![Start Workshop](img/start_workshop.png)
