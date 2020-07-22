@@ -32,23 +32,9 @@ _Double-check that your account name is something like `IibsAdminAccess-DO-NOT-D
 
 _If not, please logout of your AWS Console in all browser tabs and re-run the steps above!_
 
-## 1. [REQUIRED] Click the Following Link 
+## 1. Select Region Closest to You
 
-Use the following link to access the region allocated to you:
-
-```
-TODO:  Link posted right before the event
-```
-
-This will choose one of the following regions:
-
-![Region 1](img/aws-region-ireland.png)
-
-![Region 2](img/aws-region-mumbai.png)
-
-![Region 3](img/aws-region-oregon.png)
-
-![Region 4](img/aws-region-virginia.png)
+![](img/select-region.png)
 
 ## 2. Create `TeamRole` IAM Role
 
