@@ -137,11 +137,16 @@ Click `File` > `New` > `Terminal` to launch a terminal in your Jupyter instance.
 ## 6. Clone this GitHub Repo in the Terminal
 
 Within the Jupyter terminal, run the following:
+
 ```
 cd ~/SageMaker && git clone https://github.com/data-science-on-aws/workshop
 ```
 
 ![](img/clone-workshop-repo.png)
+
+```
+cd ~/SageMaker && git clone https://github.com/data-science-on-aws/workshop
+```
 
 ## 7. Navigate Back to Notebook View
 
