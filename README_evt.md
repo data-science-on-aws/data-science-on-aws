@@ -103,12 +103,16 @@ Click `File` > `New` > `Terminal` to launch a terminal in your Jupyter instance.
 ## 6. Clone this GitHub Repo in the Terminal
 
 Within the Jupyter terminal, run the following:
+
 ```
 cd ~/SageMaker && git clone https://github.com/data-science-on-aws/workshop
 ```
 
 ![](img/clone-workshop-repo.png)
 
+```
+cd ~/SageMaker && git clone https://github.com/data-science-on-aws/workshop
+```
 
 ## 7. Navigate Back to Notebook View
 
@@ -117,5 +121,7 @@ cd ~/SageMaker && git clone https://github.com/data-science-on-aws/workshop
 
 ## 8. Start the Workshop!
 Navigate to `01_intro/` in your Jupyter notebook and start the workshop!
+
+_You may need to refresh your browser if you don't see the new `workshop/` directory._
 
 ![Start Workshop](img/start_workshop.png)
