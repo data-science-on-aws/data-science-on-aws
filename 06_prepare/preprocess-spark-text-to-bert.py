@@ -233,7 +233,13 @@ def main():
     s3_output_test_data = args['s3_output_test_data'].replace('s3://', 's3a://')
     print(s3_output_test_data)
 
-    transform(spark, s3_input_data, s3_output_train_data, s3_output_validation_data, s3_output_test_data)
+    transform(spark, 
+              s3_input_data, 
+              '/opt/ml/processing/output/bert/train', 
+              '/opt/ml/processing/output/bert/validation', 
+              '/opt/ml/processing/output/bert/test',
+        # s3_output_train_data, s3_output_validation_data, s3_output_test_data
+    )
 
 
 if __name__ == "__main__":
