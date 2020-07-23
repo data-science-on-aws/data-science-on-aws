@@ -22,6 +22,8 @@ This workshop is FREE, but would otherwise cost <25 USD.
 
 Please logout of your AWS Console in all browser tabs before you continue.
 
+![AWS Console](img/account-settings.png)
+
 Take the defaults and click on **Open AWS Console**. This will open AWS Console in a new browser tab.
 
 ![AWS Console](img/alt_aws_console.png)
