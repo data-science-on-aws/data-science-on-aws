@@ -10,19 +10,39 @@ import * as logs from "@aws-cdk/aws-logs";
 import * as s3 from "@aws-cdk/aws-s3";
 import * as sns from "@aws-cdk/aws-sns";
 import * as sqs from "@aws-cdk/aws-sqs";
+import { IUser } from "@aws-cdk/aws-iam";
+
+interface CdkSetupStackProps extends cdk.StackProps {
+  createUser?:boolean
+  userName?:string
+  explicitAccessPolicy?:boolean
+}
 export class CdkSetupStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+  user:IUser;
+  constructor(scope: cdk.Construct, id: string, props?: CdkSetupStackProps) {
     super(scope, id, props);
 
     // The code that defines your stack goes here
 
     const accountId = props?.env?.account!;
-    // not required for the demo possibly, admin account    
-    const user = new iam.User(this, 'User', {
-      userName:'EEOverlord', 
-    });
+    // not required for the demo possibly, admin account
+    const createUser = props?.createUser || true;
+    const userName = props?.userName || 'EEOverlord';
+    if(createUser) {
+      this.user = iam.User.fromUserName(this, 'AdminUser', userName);
+    } else {
+      this.user = new iam.User(this, 'User', {
+        userName:userName, 
+      });
+      const AdministratorAccess = iam.ManagedPolicy.fromAwsManagedPolicyName('AdministratorAccess');
+      this.user.addManagedPolicy(AdministratorAccess);
+    }
 
-
+    let managedPolicies: iam.ManagedPolicy[]|undefined = undefined;
+    
+     // limitation of the number of policies we can attach
+    const explicitAccessPolicy = props?.explicitAccessPolicy || true;
+    if (explicitAccessPolicy) {
     const iamFullAccess = new iam.ManagedPolicy(this, " IAMFullAccess", {
       statements: [
         new iam.PolicyStatement({
@@ -342,10 +362,14 @@ export class CdkSetupStack extends cdk.Stack {
         }),
       ],
     });
+    managedPolicies = [iamFullAccess, teamDefaultPolicy];
 
+  } else {
+
+  }
     const role = new iam.Role(this, "Role", {
       assumedBy:new iam.CompositePrincipal(
-          new iam.ArnPrincipal(user.userArn),
+          new iam.ArnPrincipal(this.user.userArn),
           new iam.ServicePrincipal('lambda.amazonaws.com'),
           new iam.ServicePrincipal('glue.amazonaws.com'),
           new iam.ServicePrincipal('cloudwatch.amazonaws.com'),
@@ -364,7 +388,7 @@ export class CdkSetupStack extends cdk.Stack {
           new iam.ServicePrincipal('robomaker.amazonaws.com'),
           new iam.ServicePrincipal('cloud9.amazonaws.com'),
       ),
-      managedPolicies: [iamFullAccess, teamDefaultPolicy],
+      managedPolicies,
       roleName:'TeamRole',
     });
 
@@ -385,10 +409,13 @@ export class CdkSetupStack extends cdk.Stack {
     role.addManagedPolicy(SecretsManagerReadWrite);
     const AmazonRedshiftFullAccess = iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonRedshiftFullAccess');
     role.addManagedPolicy(AmazonRedshiftFullAccess);
-    const AmazonEC2ContainerRegistryFullAccess = iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonEC2ContainerRegistryFullAccess');
-    role.addManagedPolicy(AmazonEC2ContainerRegistryFullAccess);
-    const AWSStepFunctionsFullAccess = iam.ManagedPolicy.fromAwsManagedPolicyName('AWSStepFunctionsFullAccess');
-    role.addManagedPolicy(AWSStepFunctionsFullAccess);
+
+    if(!explicitAccessPolicy) {
+      const AmazonEC2ContainerRegistryFullAccess = iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonEC2ContainerRegistryFullAccess');
+      role.addManagedPolicy(AmazonEC2ContainerRegistryFullAccess);
+      const AWSStepFunctionsFullAccess = iam.ManagedPolicy.fromAwsManagedPolicyName('AWSStepFunctionsFullAccess');
+      role.addManagedPolicy(AWSStepFunctionsFullAccess);
+    }
 
     const roleArn = role.roleArn;
     const instance = new sagemaker.CfnNotebookInstance(this, "Instance", {

@@ -5,8 +5,9 @@ import { CdkSetupStack } from '../lib/cdk-setup-stack';
 import { Environment } from '@aws-cdk/core';
 
 const app = new cdk.App();
+
 const env: Environment = {
-    account:'514975741450',
-    region:'us-east-2'
+    account:'REPLACE_ME',
+    region:'us-west-2',
 }
-new CdkSetupStack(app, 'CdkSetupStack', {env});
+new CdkSetupStack(app, 'CdkSetupStack', {env, createUser: true, explicitAccessPolicy:true, userName: 'REPLACE_ME'});

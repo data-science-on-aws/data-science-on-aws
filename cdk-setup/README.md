@@ -4,6 +4,12 @@ This is a blank project for TypeScript development with CDK.
 
 The `cdk.json` file tells the CDK Toolkit how to execute your app.
 
+## Settings
+
+Make sure you change [setup](./bin/cdk-setup.ts) REPLACE_ME with the account id and user name you want for the admin account.
+If you already have a user, specify the name of the user and set createUser to false
+If you don't want to use explicit access policies set explicitAccessPolicy to false
+
 ## Useful commands
 
  * `npm run build`   compile typescript to js
