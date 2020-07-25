@@ -5,6 +5,8 @@
     "cdk-setup": "bin/cdk-setup.js"
   },
   "scripts": {
+    "clean-linux": "rm -rf dist",
+    "clean-windows": "rmdir /s /q dist",
     "build": "tsc",
     "watch": "tsc -w",
     "test": "jest",

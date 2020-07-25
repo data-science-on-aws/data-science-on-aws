@@ -16,6 +16,13 @@ export class CdkSetupStack extends cdk.Stack {
 
     // The code that defines your stack goes here
 
+    const accountId = props?.env?.account!;
+    // not required for the demo possibly, admin account    
+    const user = new iam.User(this, 'User', {
+      userName:'EEOverlord', 
+    });
+
+
     const iamFullAccess = new iam.ManagedPolicy(this, " IAMFullAccess", {
       statements: [
         new iam.PolicyStatement({
@@ -58,7 +65,7 @@ export class CdkSetupStack extends cdk.Stack {
         new iam.PolicyStatement({
           effect: iam.Effect.ALLOW,
           actions: ["iam:PassRole"],
-          resources: ["arn:aws:iam::514975741450:role/TeamRole"],
+          resources: [`arn:aws:iam::${accountId}:role/TeamRole`],
         }),
         new iam.PolicyStatement({
           effect: iam.Effect.DENY,
@@ -329,20 +336,16 @@ export class CdkSetupStack extends cdk.Stack {
           },
         }),
         new iam.PolicyStatement({
-          resources: ["arn:aws:iam::514975741450:role/TeamRole"],
+          resources: [`arn:aws:iam::${accountId}:role/TeamRole`],
           effect: iam.Effect.ALLOW,
           actions: ["iam:PassRole"],
         }),
       ],
     });
 
-    const user = new iam.User(this, 'User', {
-      userName:'EEOverlord', 
-    });
-
     const role = new iam.Role(this, "Role", {
       assumedBy:new iam.CompositePrincipal(
-          new iam.ArnPrincipal('arn:aws:iam::514975741450:user/EEOverlord'),
+          new iam.ArnPrincipal(user.userArn),
           new iam.ServicePrincipal('lambda.amazonaws.com'),
           new iam.ServicePrincipal('glue.amazonaws.com'),
           new iam.ServicePrincipal('cloudwatch.amazonaws.com'),
@@ -365,12 +368,37 @@ export class CdkSetupStack extends cdk.Stack {
       roleName:'TeamRole',
     });
 
+    // workshop 1 attempts to attach these anyway
+    const AmazonSageMakerFullAccess = iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonSageMakerFullAccess');
+    role.addManagedPolicy(AmazonSageMakerFullAccess);
+    const AdministratorAccess = iam.ManagedPolicy.fromAwsManagedPolicyName('AdministratorAccess');
+    role.addManagedPolicy(AdministratorAccess);
+    const IAMFullAccess = iam.ManagedPolicy.fromAwsManagedPolicyName('IAMFullAccess');
+    role.addManagedPolicy(IAMFullAccess);
+    const AmazonS3FullAccess = iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonS3FullAccess');
+    role.addManagedPolicy(AmazonS3FullAccess);
+    const ComprehendFullAccess = iam.ManagedPolicy.fromAwsManagedPolicyName('ComprehendFullAccess');
+    role.addManagedPolicy(ComprehendFullAccess);
+    const AmazonAthenaFullAccess = iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonAthenaFullAccess');
+    role.addManagedPolicy(AmazonAthenaFullAccess);
+    const SecretsManagerReadWrite = iam.ManagedPolicy.fromAwsManagedPolicyName('SecretsManagerReadWrite');
+    role.addManagedPolicy(SecretsManagerReadWrite);
+    const AmazonRedshiftFullAccess = iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonRedshiftFullAccess');
+    role.addManagedPolicy(AmazonRedshiftFullAccess);
+    const AmazonEC2ContainerRegistryFullAccess = iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonEC2ContainerRegistryFullAccess');
+    role.addManagedPolicy(AmazonEC2ContainerRegistryFullAccess);
+    const AWSStepFunctionsFullAccess = iam.ManagedPolicy.fromAwsManagedPolicyName('AWSStepFunctionsFullAccess');
+    role.addManagedPolicy(AWSStepFunctionsFullAccess);
+
     const roleArn = role.roleArn;
     const instance = new sagemaker.CfnNotebookInstance(this, "Instance", {
       instanceType: "ml.c5.2xlarge",
       roleArn,
       volumeSizeInGb: 250,
       notebookInstanceName: "workshop",
+      // subnetId,
+      // securityGroupIds,
+
     });
   }
 }
