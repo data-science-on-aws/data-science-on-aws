@@ -22,6 +22,8 @@ This workshop is FREE, but would otherwise cost <25 USD.
 
 Please logout of your AWS Console in all browser tabs before you continue.
 
+![AWS Console](img/account-settings.png)
+
 Take the defaults and click on **Open AWS Console**. This will open AWS Console in a new browser tab.
 
 ![AWS Console](img/alt_aws_console.png)
@@ -66,7 +68,7 @@ In the AWS Console search bar, type `SageMaker` and select `Amazon SageMaker` to
 
 In the Notebook instance name text box, enter `workshop`.
 
-Choose `ml.t3.medium`. We'll only be using this instance to launch jobs. The training job themselves will run either on a SageMaker managed cluster or an Amazon EKS cluster.
+Choose `ml.t3.medium` (or alternatively `ml.t2.medium`). We'll only be using this instance to launch jobs. The training job themselves will run either on a SageMaker managed cluster or an Amazon EKS cluster.
 
 Volume size `250` - this is needed to explore datasets, build docker containers, and more.  During training data is copied directly from Amazon S3 to the training cluster when using SageMaker.  When using Amazon EKS, we'll setup a distributed file system that worker nodes will use to get access to training data.
 
