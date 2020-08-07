@@ -87,14 +87,16 @@ def convert_input(text_input, max_seq_length):
                                                pad_to_max_length=True,
                                                max_length=max_seq_length)
 
-    # Convert the text-based tokens to ids from the pre-trained BERT vocabulary
+    # The id from the pre-trained BERT vocabulary that represents the token.  (Padding of 0 will be used if the # of tokens is less than `max_seq_length`)
     input_ids = encode_plus_tokens['input_ids']
-    # Specifies which tokens BERT should pay attention to (0 or 1)
+    
+    # Specifies which tokens BERT should pay attention to (0 or 1).  Padded `input_ids` will have 0 in each of these vector elements.    
     input_mask = encode_plus_tokens['attention_mask']
-    # Segment Ids are always 0 for single-sequence tasks (or 1 if two-sequence tasks)
+
+    # Segment ids are always 0 for single-sequence tasks such as text classification.  1 is used for two-sequence tasks such as question/answer and next sentence prediction.
     segment_ids = [0] * max_seq_length
 
-    # Label for our training data (star_rating 1 through 5)
+    # Label for each training row (`star_rating` 1 through 5)
     label_id = label_map[text_input.label]
 
     features = InputFeatures(
