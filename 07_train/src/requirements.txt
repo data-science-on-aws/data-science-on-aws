@@ -1,10 +1,5 @@
-# Add python dependencies here...
-# SageMaker bug that requires us to do this in the code directly.
-#scikit-learn==0.20.3
-#tensorflow-hub==0.7.0
-#bert-tensorflow==1.0.2
+# This doesn't actually work, so use subprocess.check_call in your .py
 #tensorflow==2.1.0
-#grpcio
-#tqdm
-#bert-for-tf2
-#sentencepiece
+#transformers==2.8.0
+#scikit-learn==0.23.1
+#matplotlib==3.2.1
