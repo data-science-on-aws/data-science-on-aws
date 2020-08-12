@@ -1,6 +1,7 @@
 import json
 import tensorflow as tf
 from transformers import DistilBertTokenizer
+from datetime import datetime
 
 review_body_column_idx_tsv = 13
 
@@ -11,10 +12,12 @@ max_seq_length=128
 tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
 
 def input_handler(data, context):
+    start_time = datetime.utcnow()    
+    print('input_handler() START: ' + start_time.strftime("%m/%d/%Y, %H:%M:%S"))
+
     transformed_instances = []
 
-    for instance in data:
-
+    for instance in data:        
         data_str = instance.decode('utf-8')
 
         data_str_split = data_str.split('\t')
@@ -46,14 +49,18 @@ def input_handler(data, context):
 
     transformed_data = {"instances": transformed_instances}
 
+    end_time = datetime.utcnow()    
+    print('input_handler() END: ' + end_time.strftime("%m/%d/%Y, %H:%M:%S"))    
+    print('input_handler() TOTAL TIME: ' + str(end_time - start_time))
+
     return json.dumps(transformed_data)
 
 
 def output_handler(response, context):
+    start_time = datetime.utcnow()
+    print('output_handler() START: ' + start_time.strftime("%m/%d/%Y, %H:%M:%S"))
+    
     response_json = response.json()
-
-#     print(type(response_json))
-#     print(response_json)
 
     log_probabilities = response_json["predictions"]
 
@@ -70,5 +77,9 @@ def output_handler(response, context):
 
     response_content_type = context.accept_header
 
+    end_time = datetime.utcnow()
+    print('output_handler() END: ' + end_time.strftime("%m/%d/%Y, %H:%M:%S"))
+    print('output_handler() TOTAL TIME: ' + str(end_time - start_time))
+        
     return predicted_classes_json, response_content_type
 

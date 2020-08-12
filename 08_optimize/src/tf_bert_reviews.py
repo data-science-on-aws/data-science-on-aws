@@ -481,7 +481,17 @@ if __name__ == '__main__':
         # Save the TensorFlow SavedModel for Serving Predictions
         print('tensorflow_saved_model_path {}'.format(tensorflow_saved_model_path))   
         model.save(tensorflow_saved_model_path, save_format='tf')
-
+                
+        # Copy inference.py and requirements.txt to the code/ directory
+        #   Note: This is required for the SageMaker Endpoint to pick them up.
+        #         This appears to be hard-coded and must be called code/
+        inference_path = os.path.join(local_model_dir, 'code/')
+        print('Copying inference source files to {}'.format(inference_path))
+        os.makedirs(inference_path, exist_ok=True)               
+        os.system('cp inference.py {}'.format(inference_path))
+        print(glob(inference_path))        
+#        os.system('cp requirements.txt {}/code'.format(inference_path))
+        
     if run_sample_predictions:
         loaded_model = TFDistilBertForSequenceClassification.from_pretrained(transformer_fine_tuned_model_path,
                                                                        id2label={

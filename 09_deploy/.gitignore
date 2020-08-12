@@ -1,3 +1,10 @@
+MAR-INF/
+Transformer_handler_generalized.py
+code/
+config.json
+index_to_name.json
+pytorch_model.bin
+setup_config.json
 model_store/
 serve/
 Transformer_model/
