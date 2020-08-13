@@ -29,7 +29,7 @@ algor:
     exploration_policy: "egreedy" # supports "egreedy", "bag", "cover"
     epsilon: 0.001 # used if egreedy is the exploration policy
     num_policies: 3 # used if bag or cover is the exploration policy
-    num_arms: 7
+    num_arms: 5
     cfa_type: "dr" # supports "dr", "ips"
 # use local mode?
 local_mode: true
