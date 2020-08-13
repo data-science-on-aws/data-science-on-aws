@@ -32,7 +32,7 @@ algor:
     num_arms: 7
     cfa_type: "dr" # supports "dr", "ips"
 # use local mode?
-local_mode: false
+local_mode: true
 # if true, use the same endpoint with updated model
 soft_deployment: true
  
