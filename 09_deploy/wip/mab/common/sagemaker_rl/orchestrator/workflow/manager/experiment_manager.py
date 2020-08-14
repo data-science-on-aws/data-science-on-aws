@@ -708,6 +708,7 @@ class ExperimentManager():
         # load configs
         self.config = config
         self.image = self.config.get("image", None).replace("{AWS_REGION}", self._region_name)
+        
         self.algor_config = self.config.get("algor", {})
         self.local_mode = self.config.get("local_mode", True)
         if self.local_mode:
@@ -732,7 +733,7 @@ class ExperimentManager():
             self._region_name
             )
         self.sagemaker_client = self.sagemaker_session.sagemaker_client
-
+        
         # init s3 client for rewards upload
         self.s3_client = self.boto_session.client('s3')
 
@@ -1123,8 +1124,8 @@ class ExperimentManager():
             wait (bool): Whether to wait until the deployment finish
         """
         # TODO: add validation/instructions if multiple deployment
-        # request happened in th same experiment
-
+        # request happened in th same experiment        
+        
         # Sync experiment state if required
         self._sync_experiment_state_with_ddb()
 
@@ -1162,25 +1163,27 @@ class ExperimentManager():
             self.exp_db_client.update_experiment_hosting_state(
                 self.experiment_id, HostingState.PENDING
             )
-
+            
             # starting hosting endpoint
             try:
                 self._setup_hosting_endpoint(model_id, wait=wait, **kwargs)
             except Exception as e:
                 logger.error(e)
                 pass
+            
         else:
             if self.experiment_record._hosting_state.endswith("ING"):
                 logger.warning("Some deployment request is in progress, canceled this one")
                 return
             elif self.experiment_record._hosting_state.endswith("ED"):
                 self._update_model_in_endpoint(self.soft_deployment, model_id, wait=wait)
-
+                                
         # wait until exp ddb table updated
         if self.local_mode or wait:
             deployed_state = self.experiment_record._hosting_state == HostingState.DEPLOYED \
                              and self.experiment_record._last_hosted_model_id == model_id \
                              and self.experiment_record._next_model_to_host_id is None
+            
             num_retries = 0
             num_retries_blue_green_deployment = 0
             
@@ -1189,7 +1192,7 @@ class ExperimentManager():
                 # local mode is fast, 'num_retries' increases exponentially
                 self._sync_experiment_state_with_ddb()
                 logger.debug("Waiting for experiment table hosting status to be updated...")
-                
+                                
                 if self.soft_deployment:
                     time.sleep(2 * (2**num_retries))
                     deployed_state = self.experiment_record._hosting_state == HostingState.DEPLOYED \
@@ -1201,6 +1204,7 @@ class ExperimentManager():
                         f"'{self.experiment_record._next_model_to_host_id}' was in "
                         f"state of '{self.experiment_record._hosting_state}'. Failed "
                         "to sync table status.")
+                                        
                 else:
                     # blue-green deployment takes ~8 min, retry every 30 seconds
                     time.sleep(30)
@@ -1218,13 +1222,13 @@ class ExperimentManager():
                         f"'{self.experiment_record._next_model_to_host_id}' was in "
                         f"state of '{self.experiment_record._hosting_state}'. Failed "
                         "to sync table status.")
-
+                        
                 if self.experiment_record._hosting_state == HostingState.FAILED:
                     raise SageMakerHostingException("Deployment with model "
                     f"'{self.experiment_record._next_model_to_host_id}' ended "
                     f"with state '{self.experiment_record._hosting_state}'. "
                     "Please check Sagemaker log for more information.")
-
+                    
     @property
     def predictor(self):
         if self.experiment_record._hosting_endpoint:
