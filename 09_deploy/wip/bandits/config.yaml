@@ -26,8 +26,8 @@ image: "462105765813.dkr.ecr.{AWS_REGION}.amazonaws.com/sagemaker-rl-vw-containe
 # Vowpal Wabbit algorithm parameters
 algor:
   algorithms_parameters:
-    exploration_policy: "egreedy" # supports "egreedy", "bag", "cover"
-    epsilon: 0.001 # used if egreedy is the exploration policy
+    exploration_policy: "cover" # supports "egreedy", "bag", "cover"
+    epsilon: 0.2 # used if egreedy is the exploration policy
     num_policies: 3 # used if bag or cover is the exploration policy
     num_arms: 2
     cfa_type: "dr" # supports "dr", "ips"
