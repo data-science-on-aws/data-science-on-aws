@@ -8,7 +8,7 @@ from transformers import DistilBertTokenizer
 
 classes=[1, 2, 3, 4, 5]
 
-max_seq_length=128
+max_seq_length=64
 
 tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
 
@@ -50,17 +50,17 @@ def input_handler(data, context):
 
 
 def output_handler(response, context):
-#    response_json = response.json()
+    response_json = response.json()
 
-#    log_probabilities = response_json["predictions"]
+    log_probabilities = response_json["predictions"]
 
-    predicted_classes = [1, 1, 1, 1, 1]
-
-#    for log_probability in log_probabilities:
+    predicted_classes = []
+    for log_probability in log_probabilities:
+        predicted_class = 1
 #        softmax = tf.nn.softmax(log_probability)    
 #        predicted_class_idx = tf.argmax(softmax, axis=-1, output_type=tf.int32)
 #        predicted_class = classes[predicted_class_idx]
-#        predicted_classes.append(predicted_class)
+        predicted_classes.append(predicted_class)
     
     predicted_classes_json = json.dumps(predicted_classes)    
  

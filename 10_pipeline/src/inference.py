@@ -8,7 +8,7 @@ from transformers import DistilBertTokenizer
 
 classes=[1, 2, 3, 4, 5]
 
-max_seq_length=128
+max_seq_length=64
 
 tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
 

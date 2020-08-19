@@ -1,9 +1,9 @@
-code/
+#code/
 policy.json
-metrics/
-model.tar.gz
-tensorflow/
-transformers/
+#metrics/
+#model.tar.gz
+#tensorflow/
+#transformers/
 __pycache__/
 content/
 data/

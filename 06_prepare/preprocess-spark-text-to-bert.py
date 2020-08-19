@@ -29,7 +29,7 @@ from pyspark.sql.types import *
 tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
 
 # We set sequences to be at most 128 tokens long.
-MAX_SEQ_LENGTH = 128
+MAX_SEQ_LENGTH = 64
 DATA_COLUMN = 'review_body'
 LABEL_COLUMN = 'star_rating'
 LABEL_VALUES = [1, 2, 3, 4, 5]
