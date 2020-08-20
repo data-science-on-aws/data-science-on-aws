@@ -1,16 +1,12 @@
 resource:
   shared_resource:
-    # cloud formation stack
-    resources_cf_stack_name: "BanditsSharedResourceStack"
-    # Dynamo table for status of an experiment
+    resources_cf_stack_name: "BanditsSharedResourceStack" # cloud formation stack
     experiment_db:
-      table_name: "BanditsExperimentTable"
-    # Dynamo table for status of all models trained
+      table_name: "BanditsExperimentTable" # Dynamo table for status of an experiment
     model_db:
-      table_name: "BanditsModelTable"
-    # Dynamo table for status of all joining job for reward ingestion
+      table_name: "BanditsModelTable" # Dynamo table for status of all models trained
     join_db:
-      table_name: "BanditsJoinTable"
+      table_name: "BanditsJoinTable" # Dynamo table for status of all joining job for reward ingestion
     iam_role:
       role_name: "BanditsIAMRole"
   private_resource:
@@ -21,18 +17,14 @@ resource:
       instance_type: "ml.c5.4xlarge"
     evaluation_fleet:
       instance_type: "ml.c5.4xlarge"
-# Vowpal Wabbit container
-image: "462105765813.dkr.ecr.{AWS_REGION}.amazonaws.com/sagemaker-rl-vw-container:vw-8.7.0-cpu"
-# Vowpal Wabbit algorithm parameters
-algor:
+image: "462105765813.dkr.ecr.{AWS_REGION}.amazonaws.com/sagemaker-rl-vw-container:vw-8.7.0-cpu" # Vowpal Wabbit container
+algor: # Vowpal Wabbit algorithm parameters
   algorithms_parameters:
     exploration_policy: "cover" # supports "egreedy", "bag", "cover"
-    epsilon: 0.2 # used if egreedy is the exploration policy
-    num_policies: 3 # used if bag or cover is the exploration policy
+    epsilon: 0.10 # percent to explore with egreedy exploration policy
+    num_policies: 3 # number of nested policies to create when using bag or cover exploration policy
     num_arms: 2
     cfa_type: "dr" # supports "dr", "ips"
-# use local mode?
-local_mode: true
-# if true, use the same endpoint with updated model
-soft_deployment: true
+local_mode: true # use local mode?
+soft_deployment: true # use the same endpoint with updated model using a blue-green deployment?
  
