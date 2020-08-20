@@ -114,6 +114,8 @@ Confirm the Policies
 
 _Note:  Proceed when the status of the notebook instance changes from `Pending` to `InService`._
 
+![Back to SageMaker Notebooks](img/alt_back_to_sagemaker_8.png)
+
 ![Start Jupyter](img/alt_start_jupyter.png)
 
 ## 5. Launch a new Terminal within the Jupyter notebook
@@ -123,6 +125,10 @@ Click `File` > `New` > [...scroll down...] `Terminal` to launch a terminal in yo
 ![](img/launch_jupyter_terminal.png)
 
 ## 6. Clone this GitHub Repo in the Terminal
+
+```
+cd ~/SageMaker && git clone https://github.com/data-science-on-aws/workshop
+```
 
 ![](img/clone-workshop-repo.png)
 
