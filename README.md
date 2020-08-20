@@ -114,6 +114,8 @@ Confirm the Policies
 
 _Note:  Proceed when the status of the notebook instance changes from `Pending` to `InService`._
 
+![Back to SageMaker Notebooks](img/alt_back_to_sagemaker_8.png)
+
 ![Start Jupyter](img/alt_start_jupyter.png)
 
 ## 5. Launch a new Terminal within the Jupyter notebook
