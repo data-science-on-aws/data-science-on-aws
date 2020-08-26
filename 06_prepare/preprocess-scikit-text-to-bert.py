@@ -254,8 +254,11 @@ def _transform_tsv_to_tfrecord(file,
                                random_state = 27)
 
         df_balanced = pd.concat([five_star_df, four_star_df, three_star_df, two_star_df, one_star_df])
+
         df_balanced = df_balanced.reset_index(drop=True)        
         print('Shape of balanced dataframe {}'.format(df_balanced.shape))
+        print(df_balanced['star_rating'].head(100))
+
         df = df_balanced
         
     print('Shape of dataframe before splitting {}'.format(df.shape))

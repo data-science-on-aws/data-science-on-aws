@@ -62,7 +62,7 @@ def file_based_input_dataset_builder(channel,
         dataset = tf.data.TFRecordDataset(input_filenames)
 
     dataset = dataset.repeat(epochs * steps_per_epoch * 100)
-    dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
+#    dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
 
     name_to_features = {
       "input_ids": tf.io.FixedLenFeature([max_seq_length], tf.int64),
@@ -87,12 +87,18 @@ def file_based_input_dataset_builder(channel,
           drop_remainder=drop_remainder,
           num_parallel_calls=tf.data.experimental.AUTOTUNE))
 
-    dataset.cache()
+#    dataset.cache()
 
-    if is_training:
-        dataset = dataset.shuffle(seed=42,
-                                  buffer_size=100,
-                                  reshuffle_each_iteration=True)
+    dataset = dataset.shuffle(buffer_size=1000,
+                              reshuffle_each_iteration=True)
+
+    row_count = 0
+    print('**************** {} *****************'.format(channel))
+    for row in dataset.as_numpy_iterator():
+        print(row)
+        if row_count == 5:
+            break
+        row_count = row_count + 1
 
     return dataset
 
