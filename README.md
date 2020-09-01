@@ -1,50 +1,32 @@
-# Attend our Free, Online, Full-Day Workshop!
-You must register on [**Eventbrite**](https://www.eventbrite.com/e/full-day-workshop-kubeflow-gpu-kerastensorflow-20-tf-extended-tfx-kubernetes-pytorch-xgboost-tickets-63362929227).  
-
-_All instructions will come through Eventbrite.  Please make sure your Eventbrite email address is up to date._
-
 # Upcoming O'Reilly Book:  _Data Science on AWS_
 Register for early access directly on our [**website**](https://datascienceonaws.com).
 
-Request one of our [**talks**](https://datascienceonaws.com) for your conference or meetup.
-
-_Influence the book by filling out our [**quick survey**](https://www.surveymonkey.com/r/798CMZ3)._
-
 [![Data Science on AWS](img/data-science-on-aws-book.png)](https://datascienceonaws.com)
-
-# Workshop Cost - FREE
-
-This workshop is FREE, but would otherwise cost <25 USD.
-
-![Workshop Cost](img/billing.png)
-
-# Workshop Agenda
-[![Workshop Agenda](img/outline.png)](https://www.eventbrite.com/e/full-day-workshop-kubeflow-gpu-kerastensorflow-20-tf-extended-tfx-kubernetes-pytorch-xgboost-tickets-63362929227)
 
 # Workshop Instructions
 _Note:  This workshop will create an ephemeral AWS acccount for each attendee.  This ephemeral account is not accessible after the workshop.  You can, of course, clone this GitHub repo and reproduce the entire workshop in your own AWS Account._
 
-## 1. Logout of All AWS Consoles Across All Browser Tabs
-If you do not logout of existing AWS Consoles, things will not work properly.
 
-_Please logout of all AWS Console sessions in all browser tabs._
+## 1. Login to the Workshop Portal (aka Event Engine). 
 
+![Event Box Account](img/eb-aws-account.png). 
 
-## 2. Login to the Workshop Portal (aka Event Engine)
+![Event Box Account](img/ee-accept.png). 
 
-**If you are registered on Eventbrite, you will receive a link to the Workshop 1 hour before the event.**  
+![Event Engine Dashboard](img/event-engine-dashboard.png). 
 
-**The email with the link will come through Eventbrite.**
-
-**Please make sure your Eventbrite email is up to date.**
-
-![Event Engine Dashboard](img/event-engine-dashboard.png)
-
-Click on **AWS Console** on dashboard.
+## 2. Login to the **AWS Console**
 
 ![Event Engine AWS Console](img/event-engine-aws-console.png)
 
 Take the defaults and click on **Open AWS Console**. This will open AWS Console in a new browser tab.
+
+If you see this message, you need to logout from any previously used AWS accounts.
+
+![AWS Account Logout](img/aws-logout.png)
+
+_Please logout of all AWS Console sessions in all browser tabs._
+
 
 Double-check that your account name is something like `TeamRole/MasterKey` as follows:
 
@@ -53,7 +35,7 @@ Double-check that your account name is something like `TeamRole/MasterKey` as fo
 If not, please logout of your AWS Console in all browser tabs and re-run the steps above!
 
 
-## 3. Launch an Amazon SageMaker Notebook Instance
+## 3. Launch a SageMaker Notebook Instance
 
 Open the [AWS Management Console](https://console.aws.amazon.com/console/home)
 
@@ -61,11 +43,13 @@ Open the [AWS Management Console](https://console.aws.amazon.com/console/home)
 
 In the AWS Console search bar, type `SageMaker` and select `Amazon SageMaker` to open the service console.
 
-![SageMaker Console](img/setup_aws_console.png)
+![SageMaker Console](img/setup_aws_console.png). 
 
 Select `Create notebook instance`.
 
-![SageMaker Console](img/setup_aws_console_2.png)
+![SageMaker Console](img/aws-sagemaker-dashboard.png).
+
+![SageMaker Console](img/create-notebook-instance.png)
 
 In the Notebook instance name text box, enter `workshop`.
 
@@ -83,40 +67,42 @@ You must select the default `VPC`, `Subnet`, and `Security group` as shown in th
 
 Keep the default settings for the other options not highlighted in red, and click `Create notebook instance`.  On the `Notebook instances` section you should see the status change from `Pending` -> `InService`
 
-![Fill notebook instance](img/notebook-setup03.png)
+![Fill notebook instance](img/notebook-setup03-olt.png)
 
 
-## 4. Start the Jupyter notebook
+## 4. Start the Jupyter Notebook
 
-_Note:  Proceed when the status of the notebook instance changes from `Pending` to `InService`._
+_Note:  Proceed when the status of the notebook instance changes from `Pending` to `InService` after a few minutes._
 
 ![Start Jupyter](img/start_jupyter.png)
 
 
-## 5. Launch a new Terminal within the Jupyter notebook
+## 5. Launch a New Terminal within the Jupyter Notebook
 
 Click `File` > `New` > [...scroll down...] `Terminal` to launch a terminal in your Jupyter instance.
 
 ![](img/launch_jupyter_terminal.png)
+
 
 ## 6. Clone this GitHub Repo in the Terminal
 
 Within the Jupyter terminal, run the following:
 
 ```
-cd ~/SageMaker && git clone https://github.com/data-science-on-aws/workshop
+cd ~/SageMaker && git clone https://github.com/data-science-on-aws/oreilly-aws-ai-olt
 ```
 
-![](img/clone-workshop-repo.png)
+![](img/clone-olt-repo.png)
+
 
 ## 7. Navigate Back to Notebook View
 
-![](img/back-to-jupyter-notebook.png)
+![](img/back-to-jupyter-notebook-olt.png)
 
 
 ## 8. Start the Workshop!
 Navigate to `01_intro/` in your Jupyter notebook and start the workshop!
 
-_You may need to refresh your browser if you don't see the new `workshop/` directory._
+_You may need to refresh your browser if you don't see the new `oreilly-aws-ai-olt/` directory._
 
-![Start Workshop](img/start_workshop.png)
+![Start Workshop](img/start-olt.png)
