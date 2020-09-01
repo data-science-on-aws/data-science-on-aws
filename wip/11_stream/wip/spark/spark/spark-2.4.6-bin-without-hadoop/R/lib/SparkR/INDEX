@@ -1,0 +1,318 @@
+%<=>%                   %<=>%
+%in%                    Match a column with given values.
+AFTSurvivalRegressionModel-class
+                        S4 class that represents a
+                        AFTSurvivalRegressionModel
+ALSModel-class          S4 class that represents an ALSModel
+BisectingKMeansModel-class
+                        S4 class that represents a BisectingKMeansModel
+DecisionTreeClassificationModel-class
+                        S4 class that represents a
+                        DecisionTreeClassificationModel
+DecisionTreeRegressionModel-class
+                        S4 class that represents a
+                        DecisionTreeRegressionModel
+FPGrowthModel-class     S4 class that represents a FPGrowthModel
+GBTClassificationModel-class
+                        S4 class that represents a
+                        GBTClassificationModel
+GBTRegressionModel-class
+                        S4 class that represents a GBTRegressionModel
+GaussianMixtureModel-class
+                        S4 class that represents a GaussianMixtureModel
+GeneralizedLinearRegressionModel-class
+                        S4 class that represents a generalized linear
+                        model
+GroupedData-class       S4 class that represents a GroupedData
+IsotonicRegressionModel-class
+                        S4 class that represents an
+                        IsotonicRegressionModel
+KMeansModel-class       S4 class that represents a KMeansModel
+KSTest-class            S4 class that represents an KSTest
+LDAModel-class          S4 class that represents an LDAModel
+LinearSVCModel-class    S4 class that represents an LinearSVCModel
+LogisticRegressionModel-class
+                        S4 class that represents an
+                        LogisticRegressionModel
+MultilayerPerceptronClassificationModel-class
+                        S4 class that represents a
+                        MultilayerPerceptronClassificationModel
+NaiveBayesModel-class   S4 class that represents a NaiveBayesModel
+RandomForestClassificationModel-class
+                        S4 class that represents a
+                        RandomForestClassificationModel
+RandomForestRegressionModel-class
+                        S4 class that represents a
+                        RandomForestRegressionModel
+SparkDataFrame-class    S4 class that represents a SparkDataFrame
+StreamingQuery-class    S4 class that represents a StreamingQuery
+WindowSpec-class        S4 class that represents a WindowSpec
+agg                     summarize
+alias                   alias
+approxQuantile          Calculates the approximate quantiles of
+                        numerical columns of a SparkDataFrame
+arrange                 Arrange Rows by Variables
+as.data.frame           Download data from a SparkDataFrame into a R
+                        data.frame
+asc                     A set of operations working with SparkDataFrame
+                        columns
+attach,SparkDataFrame-method
+                        Attach SparkDataFrame to R search path
+avg                     avg
+awaitTermination        awaitTermination
+between                 between
+broadcast               broadcast
+cache                   Cache
+cacheTable              Cache Table
+cancelJobGroup          Cancel active jobs for the specified group
+cast                    Casts the column to a different data type.
+checkpoint              checkpoint
+clearCache              Clear Cache
+clearJobGroup           Clear current job group ID and its description
+coalesce                Coalesce
+collect                 Collects all the elements of a SparkDataFrame
+                        and coerces them into an R data.frame.
+colnames                Column Names of SparkDataFrame
+coltypes                coltypes
+column                  S4 class that represents a SparkDataFrame
+                        column
+column_aggregate_functions
+                        Aggregate functions for Column operations
+column_collection_functions
+                        Collection functions for Column operations
+column_datetime_diff_functions
+                        Date time arithmetic functions for Column
+                        operations
+column_datetime_functions
+                        Date time functions for Column operations
+column_math_functions   Math functions for Column operations
+column_misc_functions   Miscellaneous functions for Column operations
+column_nonaggregate_functions
+                        Non-aggregate functions for Column operations
+column_string_functions
+                        String functions for Column operations
+column_window_functions
+                        Window functions for Column operations
+corr                    corr
+count                   Count
+cov                     cov
+createDataFrame         Create a SparkDataFrame
+createExternalTable     (Deprecated) Create an external table
+createOrReplaceTempView
+                        Creates a temporary view using the given name.
+createTable             Creates a table based on the dataset in a data
+                        source
+crossJoin               CrossJoin
+crosstab                Computes a pair-wise frequency table of the
+                        given columns
+cube                    cube
+currentDatabase         Returns the current default database
+dapply                  dapply
+dapplyCollect           dapplyCollect
+describe                describe
+dim                     Returns the dimensions of SparkDataFrame
+distinct                Distinct
+drop                    drop
+dropDuplicates          dropDuplicates
+dropTempTable           (Deprecated) Drop Temporary Table
+dropTempView            Drops the temporary view with the given view
+                        name in the catalog.
+dropna                  A set of SparkDataFrame functions working with
+                        NA values
+dtypes                  DataTypes
+endsWith                endsWith
+except                  except
+exceptAll               exceptAll
+explain                 Explain
+filter                  Filter
+first                   Return the first row of a SparkDataFrame
+fitted                  Get fitted result from a k-means model
+freqItems               Finding frequent items for columns, possibly
+                        with false positives
+gapply                  gapply
+gapplyCollect           gapplyCollect
+getLocalProperty        Get a local property set in this thread, or
+                        'NULL' if it is missing. See
+                        'setLocalProperty'.
+getNumPartitions        getNumPartitions
+glm,formula,ANY,SparkDataFrame-method
+                        Generalized Linear Models (R-compliant)
+group_by                GroupBy
+hashCode                Compute the hashCode of an object
+head                    Head
+hint                    hint
+histogram               Compute histogram statistics for given column
+insertInto              insertInto
+install.spark           Download and Install Apache Spark to a Local
+                        Directory
+intersect               Intersect
+intersectAll            intersectAll
+isActive                isActive
+isLocal                 isLocal
+isStreaming             isStreaming
+join                    Join
+last                    last
+lastProgress            lastProgress
+limit                   Limit
+listColumns             Returns a list of columns for the given
+                        table/view in the specified database
+listDatabases           Returns a list of databases available
+listFunctions           Returns a list of functions registered in the
+                        specified database
+listTables              Returns a list of tables or views in the
+                        specified database
+localCheckpoint         localCheckpoint
+merge                   Merges two data frames
+mutate                  Mutate
+ncol                    Returns the number of columns in a
+                        SparkDataFrame
+not                     !
+nrow                    Returns the number of rows in a SparkDataFrame
+orderBy                 Ordering Columns in a WindowSpec
+otherwise               otherwise
+over                    over
+partitionBy             partitionBy
+persist                 Persist
+pivot                   Pivot a column of the GroupedData and perform
+                        the specified aggregation.
+predict                 Makes predictions from a MLlib model
+print.jobj              Print a JVM object reference.
+print.structField       Print a Spark StructField.
+print.structType        Print a Spark StructType.
+printSchema             Print Schema of a SparkDataFrame
+queryName               queryName
+randomSplit             randomSplit
+rangeBetween            rangeBetween
+rbind                   Union two or more SparkDataFrames
+read.df                 Load a SparkDataFrame
+read.jdbc               Create a SparkDataFrame representing the
+                        database table accessible via JDBC URL
+read.json               Create a SparkDataFrame from a JSON file.
+read.ml                 Load a fitted MLlib model from the input path.
+read.orc                Create a SparkDataFrame from an ORC file.
+read.parquet            Create a SparkDataFrame from a Parquet file.
+read.stream             Load a streaming SparkDataFrame
+read.text               Create a SparkDataFrame from a text file.
+recoverPartitions       Recovers all the partitions in the directory of
+                        a table and update the catalog
+refreshByPath           Invalidates and refreshes all the cached data
+                        and metadata for SparkDataFrame containing path
+refreshTable            Invalidates and refreshes all the cached data
+                        and metadata of the given table
+registerTempTable       (Deprecated) Register Temporary Table
+rename                  rename
+repartition             Repartition
+repartitionByRange      Repartition by range
+rollup                  rollup
+rowsBetween             rowsBetween
+sample                  Sample
+sampleBy                Returns a stratified sample without replacement
+saveAsTable             Save the contents of the SparkDataFrame to a
+                        data source as a table
+schema                  Get schema object
+select                  Select
+selectExpr              SelectExpr
+setCheckpointDir        Set checkpoint directory
+setCurrentDatabase      Sets the current default database
+setJobDescription       Set a human readable description of the current
+                        job.
+setJobGroup             Assigns a group ID to all the jobs started by
+                        this thread until the group ID is set to a
+                        different value or cleared.
+setLocalProperty        Set a local property that affects jobs
+                        submitted from this thread, such as the Spark
+                        fair scheduler pool.
+setLogLevel             Set new log level
+show                    show
+showDF                  showDF
+spark.addFile           Add a file or directory to be downloaded with
+                        this Spark job on every node.
+spark.als               Alternating Least Squares (ALS) for
+                        Collaborative Filtering
+spark.bisectingKmeans   Bisecting K-Means Clustering Model
+spark.decisionTree      Decision Tree Model for Regression and
+                        Classification
+spark.fpGrowth          FP-growth
+spark.gaussianMixture   Multivariate Gaussian Mixture Model (GMM)
+spark.gbt               Gradient Boosted Tree Model for Regression and
+                        Classification
+spark.getSparkFiles     Get the absolute path of a file added through
+                        spark.addFile.
+spark.getSparkFilesRootDirectory
+                        Get the root directory that contains files
+                        added through spark.addFile.
+spark.glm               Generalized Linear Models
+spark.isoreg            Isotonic Regression Model
+spark.kmeans            K-Means Clustering Model
+spark.kstest            (One-Sample) Kolmogorov-Smirnov Test
+spark.lapply            Run a function over a list of elements,
+                        distributing the computations with Spark
+spark.lda               Latent Dirichlet Allocation
+spark.logit             Logistic Regression Model
+spark.mlp               Multilayer Perceptron Classification Model
+spark.naiveBayes        Naive Bayes Models
+spark.randomForest      Random Forest Model for Regression and
+                        Classification
+spark.survreg           Accelerated Failure Time (AFT) Survival
+                        Regression Model
+spark.svmLinear         Linear SVM Model
+sparkR.callJMethod      Call Java Methods
+sparkR.callJStatic      Call Static Java Methods
+sparkR.conf             Get Runtime Config from the current active
+                        SparkSession
+sparkR.init             (Deprecated) Initialize a new Spark Context
+sparkR.newJObject       Create Java Objects
+sparkR.session          Get the existing SparkSession or initialize a
+                        new SparkSession.
+sparkR.session.stop     Stop the Spark Session and Spark Context
+sparkR.uiWebUrl         Get the URL of the SparkUI instance for the
+                        current active SparkSession
+sparkR.version          Get version of Spark on which this application
+                        is running
+sparkRHive.init         (Deprecated) Initialize a new HiveContext
+sparkRSQL.init          (Deprecated) Initialize a new SQLContext
+sql                     SQL Query
+startsWith              startsWith
+status                  status
+stopQuery               stopQuery
+storageLevel            StorageLevel
+str                     Compactly display the structure of a dataset
+structField             structField
+structType              structType
+subset                  Subset
+substr                  substr
+summary                 summary
+tableNames              Table Names
+tableToDF               Create a SparkDataFrame from a SparkSQL table
+                        or view
+tables                  Tables
+take                    Take the first NUM rows of a SparkDataFrame and
+                        return the results as a R data.frame
+toJSON                  toJSON
+uncacheTable            Uncache Table
+union                   Return a new SparkDataFrame containing the
+                        union of rows
+unionByName             Return a new SparkDataFrame containing the
+                        union of rows, matched by column names
+unpersist               Unpersist
+windowOrderBy           windowOrderBy
+windowPartitionBy       windowPartitionBy
+with                    Evaluate a R expression in an environment
+                        constructed from a SparkDataFrame
+withColumn              WithColumn
+withWatermark           withWatermark
+write.df                Save the contents of SparkDataFrame to a data
+                        source.
+write.jdbc              Save the content of SparkDataFrame to an
+                        external database table via JDBC.
+write.json              Save the contents of SparkDataFrame as a JSON
+                        file
+write.ml                Saves the MLlib model to the input path
+write.orc               Save the contents of SparkDataFrame as an ORC
+                        file, preserving the schema.
+write.parquet           Save the contents of SparkDataFrame as a
+                        Parquet file, preserving the schema.
+write.stream            Write the streaming SparkDataFrame to a data
+                        source.
+write.text              Save the content of SparkDataFrame in a text
+                        file at the specified path.
