@@ -5,7 +5,7 @@ Request one of our [**talks**](https://datascienceonaws.com) for your conference
 
 _Influence the book by filling out our [**quick survey**](https://www.surveymonkey.com/r/798CMZ3)._
 
-[![Data Science on Amazon Web Services](img/data-science-on-aws-book.png)](https://datascienceonaws.com)
+[![Data Science on AWS](img/data-science-on-aws-book.png)](https://datascienceonaws.com)
 
 # Workshop Cost
 This workshop is FREE, but would otherwise cost <25 USD.
