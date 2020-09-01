@@ -3,7 +3,7 @@ You must register on [**Eventbrite**](https://www.eventbrite.com/e/full-day-work
 
 _All instructions will come through Eventbrite.  Please make sure your Eventbrite email address is up to date._
 
-# Upcoming O'Reilly Book:  _Data Science on Amazon Web Services_
+# Upcoming O'Reilly Book:  _Data Science on AWS_
 Register for early access directly on our [**website**](https://datascienceonaws.com).
 
 Request one of our [**talks**](https://datascienceonaws.com) for your conference or meetup.
