@@ -9,7 +9,7 @@ _Note:  This workshop will create an ephemeral AWS acccount for each attendee.  
 
 ## 1. Login to the Workshop Portal (aka Event Engine). 
 
-![Event Box Account](img/eb-aws-account.png). 
+![Event Box Account](img/eb-aws-account-clean.png). 
 
 ![Event Box Account](img/ee-accept.png). 
 
@@ -89,20 +89,20 @@ Click `File` > `New` > [...scroll down...] `Terminal` to launch a terminal in yo
 Within the Jupyter terminal, run the following:
 
 ```
-cd ~/SageMaker && git clone https://github.com/data-science-on-aws/oreilly-aws-ai-olt
+cd ~/SageMaker && git clone https://github.com/data-science-on-aws/workshop
 ```
 
-![](img/clone-olt-repo.png)
+![](img/clone-workshop-repo.png)
 
 
 ## 7. Navigate Back to Notebook View
 
-![](img/back-to-jupyter-notebook-olt.png)
+![](img/back-to-jupyter-notebook.png)
 
 
 ## 8. Start the Workshop!
 Navigate to `01_intro/` in your Jupyter notebook and start the workshop!
 
-_You may need to refresh your browser if you don't see the new `oreilly-aws-ai-olt/` directory._
+_You may need to refresh your browser if you don't see the new `workshop/` directory._
 
-![Start Workshop](img/start-olt.png)
+![Start Workshop](img/start_workshop.png)
