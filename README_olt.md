@@ -69,6 +69,10 @@ Keep the default settings for the other options not highlighted in red, and clic
 
 ![Fill notebook instance](img/notebook-setup03-olt.png)
 
+In case you see a message like the following please delete the notebook instance and re-create the notebook instance selecting the subnet-a in the VPC settings. 
+
+![Wrong subnet](img/wrong_subnet.png)
+
 
 ## 4. Start the Jupyter Notebook
 
