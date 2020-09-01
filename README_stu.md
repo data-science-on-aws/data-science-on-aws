@@ -1,11 +1,11 @@
-# Upcoming O'Reilly Book:  _Data Science on Amazon Web Services_
+# Upcoming O'Reilly Book:  _Data Science on AWS_
 Register for early access directly on our [**website**](https://datascienceonaws.com).
 
 Request one of our [**talks**](https://datascienceonaws.com) for your conference or meetup.
 
 _Influence the book by filling out our [**quick survey**](https://www.surveymonkey.com/r/798CMZ3)._
 
-[![Data Science on Amazon Web Services](img/data-science-on-aws-book.png)](https://datascienceonaws.com)
+[![Data Science on AWS](img/data-science-on-aws-book.png)](https://datascienceonaws.com)
 
 # Workshop Agenda
 ![Workshop Agenda](img/outline.png)
