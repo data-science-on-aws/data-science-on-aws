@@ -9,7 +9,7 @@ _Note:  This workshop will create an ephemeral AWS acccount for each attendee.  
 
 ## 1. Login to the Workshop Portal (aka Event Engine). 
 
-![Event Box Account](img/eb-aws-account.png). 
+![Event Box Account](img/eb-aws-account-clean.png). 
 
 ![Event Box Account](img/ee-accept.png). 
 
