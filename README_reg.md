@@ -3,8 +3,6 @@ Register for early access directly on our [**website**](https://datascienceonaws
 
 Request one of our [**talks**](https://datascienceonaws.com) for your conference or meetup.
 
-_Influence the book by filling out our [**quick survey**](https://www.surveymonkey.com/r/798CMZ3)._
-
 [![Data Science on AWS](img/data-science-on-aws-book.png)](https://datascienceonaws.com)
 
 
@@ -21,7 +19,8 @@ This workshop is FREE, but would otherwise cost <25 USD.
 
 # Workshop Instructions
 
-## 0. Click on AWS Console
+
+## 1. Click on AWS Console
 
 Please logout of your AWS Console in all browser tabs before you continue.
 
@@ -36,10 +35,6 @@ _Double-check that your account name is something like `IibsAdminAccess-DO-NOT-D
 ![IAM Role](img/alt_iibsadminaccess.png)
 
 _If not, please logout of your AWS Console in all browser tabs and re-run the steps above!_
-
-## 1. Select Region Closest to You
-
-![](img/select-region.png)
 
 
 ## 2. Create `TeamRole` IAM Role
@@ -117,6 +112,7 @@ Confirm the Policies
 ![Confirm Policies](img/alt_confirm_policies.png)
 
 
+
 ## 5. Start the Jupyter notebook
 
 _Note:  Proceed when the status of the notebook instance changes from `Pending` to `InService`._
@@ -146,7 +142,6 @@ Within the Jupyter terminal, run the following:
 ```
 cd ~/SageMaker && git clone https://github.com/data-science-on-aws/workshop
 ```
-
 
 ## 8. Navigate Back to Notebook View
 
