@@ -17,7 +17,7 @@ spec:
       - name: "random_state"
         value: "10"
   parallelTrialCount: 3
-  maxTrialCount: 12
+  maxTrialCount: 3
   maxFailedTrialCount: 3
   parameters:
     - name: --lr
