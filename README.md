@@ -1,32 +1,50 @@
+# Attend our Free, Online, Full-Day Workshop!
+You must register on [**Eventbrite**](https://www.eventbrite.com/e/full-day-workshop-kubeflow-gpu-kerastensorflow-20-tf-extended-tfx-kubernetes-pytorch-xgboost-tickets-63362929227).  
+
+_All instructions will come through Eventbrite.  Please make sure your Eventbrite email address is up to date._
+
 # Upcoming O'Reilly Book:  _Data Science on AWS_
 Register for early access directly on our [**website**](https://datascienceonaws.com).
 
+Request one of our [**talks**](https://datascienceonaws.com) for your conference or meetup.
+
+_Influence the book by filling out our [**quick survey**](https://www.surveymonkey.com/r/798CMZ3)._
+
 [![Data Science on AWS](img/data-science-on-aws-book.png)](https://datascienceonaws.com)
+
+# Workshop Cost - FREE
+
+This workshop is FREE, but would otherwise cost <25 USD.
+
+![Workshop Cost](img/billing.png)
+
+# Workshop Agenda
+[![Workshop Agenda](img/outline.png)](https://www.eventbrite.com/e/full-day-workshop-kubeflow-gpu-kerastensorflow-20-tf-extended-tfx-kubernetes-pytorch-xgboost-tickets-63362929227)
 
 # Workshop Instructions
 _Note:  This workshop will create an ephemeral AWS acccount for each attendee.  This ephemeral account is not accessible after the workshop.  You can, of course, clone this GitHub repo and reproduce the entire workshop in your own AWS Account._
 
+## 1. Logout of All AWS Consoles Across All Browser Tabs
+If you do not logout of existing AWS Consoles, things will not work properly.
 
-## 1. Login to the Workshop Portal (aka Event Engine). 
+_Please logout of all AWS Console sessions in all browser tabs._
 
-![Event Box Account](img/eb-aws-account-clean.png). 
 
-![Event Box Account](img/ee-accept.png). 
+## 2. Login to the Workshop Portal (aka Event Engine)
 
-![Event Engine Dashboard](img/event-engine-dashboard.png). 
+**If you are registered on Eventbrite, you will receive a link to the Workshop 1 hour before the event.**  
 
-## 2. Login to the **AWS Console**
+**The email with the link will come through Eventbrite.**
+
+**Please make sure your Eventbrite email is up to date.**
+
+![Event Engine Dashboard](img/event-engine-dashboard.png)
+
+Click on **AWS Console** on dashboard.
 
 ![Event Engine AWS Console](img/event-engine-aws-console.png)
 
 Take the defaults and click on **Open AWS Console**. This will open AWS Console in a new browser tab.
-
-If you see this message, you need to logout from any previously used AWS accounts.
-
-![AWS Account Logout](img/aws-logout.png)
-
-_Please logout of all AWS Console sessions in all browser tabs._
-
 
 Double-check that your account name is something like `TeamRole/MasterKey` as follows:
 
@@ -35,7 +53,7 @@ Double-check that your account name is something like `TeamRole/MasterKey` as fo
 If not, please logout of your AWS Console in all browser tabs and re-run the steps above!
 
 
-## 3. Launch a SageMaker Notebook Instance
+## 3. Launch an Amazon SageMaker Notebook Instance
 
 Open the [AWS Management Console](https://console.aws.amazon.com/console/home)
 
@@ -43,13 +61,11 @@ Open the [AWS Management Console](https://console.aws.amazon.com/console/home)
 
 In the AWS Console search bar, type `SageMaker` and select `Amazon SageMaker` to open the service console.
 
-![SageMaker Console](img/setup_aws_console.png). 
+![SageMaker Console](img/setup_aws_console.png)
 
 Select `Create notebook instance`.
 
-![SageMaker Console](img/aws-sagemaker-dashboard.png).
-
-![SageMaker Console](img/create-notebook-instance.png)
+![SageMaker Console](img/setup_aws_console_2.png)
 
 In the Notebook instance name text box, enter `workshop`.
 
@@ -67,26 +83,21 @@ You must select the default `VPC`, `Subnet`, and `Security group` as shown in th
 
 Keep the default settings for the other options not highlighted in red, and click `Create notebook instance`.  On the `Notebook instances` section you should see the status change from `Pending` -> `InService`
 
-![Fill notebook instance](img/notebook-setup03-olt.png)
-
-In case you see a message like the following please delete the notebook instance and re-create the notebook instance selecting the subnet-a in the VPC settings. 
-
-![Wrong subnet](img/wrong_subnet.png)
+![Fill notebook instance](img/notebook-setup03.png)
 
 
-## 4. Start the Jupyter Notebook
+## 4. Start the Jupyter notebook
 
-_Note:  Proceed when the status of the notebook instance changes from `Pending` to `InService` after a few minutes._
+_Note:  Proceed when the status of the notebook instance changes from `Pending` to `InService`._
 
 ![Start Jupyter](img/start_jupyter.png)
 
 
-## 5. Launch a New Terminal within the Jupyter Notebook
+## 5. Launch a new Terminal within the Jupyter notebook
 
 Click `File` > `New` > [...scroll down...] `Terminal` to launch a terminal in your Jupyter instance.
 
 ![](img/launch_jupyter_terminal.png)
-
 
 ## 6. Clone this GitHub Repo in the Terminal
 
