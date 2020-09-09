@@ -45,4 +45,4 @@ spec:
         name: tf-resnet50-horovod-job
         resources:
           limits:
-            nvidia.com/gpu: 4
+            nvidia.com/gpu: 4eiifccrchtulvrrici

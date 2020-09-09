@@ -1,0 +1,8 @@
+Copyright 2020 LinkedIn Corporation
+All Rights Reserved.
+
+Licensed under the BSD 2-Clause License (the "License").
+See LICENSE in the project root for license information.
+
+This product includes:
+- spark-tensorflow-connector: Apache 2.0 License, available at https://github.com/tensorflow/ecosystem/blob/master/LICENSE

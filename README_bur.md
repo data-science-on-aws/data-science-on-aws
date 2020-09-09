@@ -1,20 +1,23 @@
-# Upcoming O'Reilly Book:  _Data Science on Amazon Web Services_
+# Upcoming O'Reilly Book:  _Data Science on AWS_
 Register for early access directly on our [**website**](https://datascienceonaws.com).
 
 Request one of our [**talks**](https://datascienceonaws.com) for your conference or meetup.
 
 _Influence the book by filling out our [**quick survey**](https://www.surveymonkey.com/r/798CMZ3)._
 
-[![Data Science on Amazon Web Services](img/data-science-on-aws-book.png)](https://datascienceonaws.com)
+[![Data Science on AWS](img/data-science-on-aws-book.png)](https://datascienceonaws.com)
+
 
 # Workshop Cost
 This workshop is FREE, but would otherwise cost <25 USD.
 
 ![Workshop Cost](img/billing.png)
 
+
 # Workshop Agenda
 
 ![Workshop Agenda](img/outline.png)
+
 
 # Workshop Instructions
 
@@ -38,6 +41,7 @@ _If not, please logout of your AWS Console in all browser tabs and re-run the st
 
 ![](img/select-region.png)
 
+
 ## 2. Create `TeamRole` IAM Role
 
 ![IAM](img/alt_iam_1.png)
@@ -53,6 +57,7 @@ _If not, please logout of your AWS Console in all browser tabs and re-run the st
 ![Add Tags](img/alt_add_tags_6.png)
 
 ![Review Name](img/alt_review_name_7.png)
+
 
 ## 3. Launch an Amazon SageMaker Notebook Instance
 
@@ -86,10 +91,11 @@ Keep the default settings for the other options not highlighted in red, and clic
 
 While the notebook spins up, continue to work on the next section.  We'll come back to the notebook when it's ready.
 
+
 ## 4. Update IAM Role Policy
 
 Click on the `notebook` instance to see the instance details.
-`
+
 ![Notebook Instance Details](img/alt_click_notebook_instance.png)
 
 Click on the IAM role link and navigate to the IAM Management Console.
@@ -110,7 +116,8 @@ Confirm the Policies
 
 ![Confirm Policies](img/alt_confirm_policies.png)
 
-## 4. Start the Jupyter notebook
+
+## 5. Start the Jupyter notebook
 
 _Note:  Proceed when the status of the notebook instance changes from `Pending` to `InService`._
 
@@ -118,13 +125,15 @@ _Note:  Proceed when the status of the notebook instance changes from `Pending` 
 
 ![Start Jupyter](img/alt_start_jupyter.png)
 
-## 5. Launch a new Terminal within the Jupyter notebook
+
+## 6. Launch a new Terminal within the Jupyter notebook
 
 Click `File` > `New` > [...scroll down...] `Terminal` to launch a terminal in your Jupyter instance.
 
 ![](img/launch_jupyter_terminal.png)
 
-## 6. Clone this GitHub Repo in the Terminal
+
+## 7. Clone this GitHub Repo in the Terminal
 
 ```
 cd ~/SageMaker && git clone https://github.com/data-science-on-aws/workshop
@@ -138,11 +147,13 @@ Within the Jupyter terminal, run the following:
 cd ~/SageMaker && git clone https://github.com/data-science-on-aws/workshop
 ```
 
-## 7. Navigate Back to Notebook View
+
+## 8. Navigate Back to Notebook View
 
 ![](img/back-to-jupyter-notebook.png)
 
-## 8. Start the Workshop!
+
+## 9. Start the Workshop!
 Navigate to `01_intro/` in your Jupyter notebook and start the workshop!
 
 _You may need to refresh your browser if you don't see the new `workshop/` directory._

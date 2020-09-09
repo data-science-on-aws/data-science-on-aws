@@ -3,8 +3,8 @@ kind: Experiment
 metadata:
   name: hyperband-example
 spec:
-  parallelTrialCount: 9
-  maxTrialCount: 9
+  parallelTrialCount: 3
+  maxTrialCount: 3
   objective:
     type: maximize
     goal: 0.99
@@ -20,7 +20,7 @@ spec:
         value: "3"
       - name: "r_l"
         value: "9"
-  maxFailedTrialCount: 9
+  maxFailedTrialCount: 3
   parameters:
     - name: --lr
       parameterType: double
