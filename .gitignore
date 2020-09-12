@@ -1,3 +1,4 @@
+tmp/
 wip/bert.py
 wip/trainer.py
 wip/transform.py

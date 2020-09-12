@@ -5,6 +5,6 @@ amazon_reviews_us_Digital_Software_v1_00_personalize_user.csv
 amazon_reviews_us_Digital_Software_v1_00_personalize_user_item.csv
 output.tar.gz
 output/
-data/
 generated_module/
 notebooks/
+tmp/
