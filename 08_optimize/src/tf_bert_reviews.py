@@ -10,9 +10,9 @@ import sys
 import os
 import tensorflow as tf
 #subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow==2.1.0'])
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'transformers==2.8.0'])
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'sagemaker-tensorflow==2.1.0.1.0.0'])
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'smdebug==0.8.0'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'transformers==3.1.0'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'sagemaker-tensorflow==2.3.0.1.0.0'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'smdebug==0.9.3'])
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'scikit-learn==0.23.1'])
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'matplotlib==3.2.1'])
 from transformers import DistilBertTokenizer
@@ -546,7 +546,7 @@ if __name__ == '__main__':
         import pandas as pd
 
         def predict(review_body):
-            prediction_map = inference_pipeline(review_body)
+            prediction_map = inference_pipeline(review_body[0:512])
             return prediction_map[0]['label']
 
         y_test = df_test_reviews['review_body'].map(predict)

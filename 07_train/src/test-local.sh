@@ -1,6 +1,6 @@
 pip install -q scikit-learn==0.20.0
-pip install -q tensorflow==2.1.0
-pip install -q transformers==2.8.0
+pip install -q tensorflow==2.3.0
+pip install -q transformers==3.1.0
 
 rm -rf model/
 rm -rf output/

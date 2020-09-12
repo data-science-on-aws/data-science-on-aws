@@ -7,10 +7,10 @@ import pandas as pd
 from datetime import datetime
 import subprocess
 import sys
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow==2.1.0'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow==2.3.0'])
 import tensorflow as tf
 print(tf.__version__)
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'transformers==2.8.0'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'transformers==3.1.0'])
 from transformers import DistilBertTokenizer
 from tensorflow import keras
 import os
