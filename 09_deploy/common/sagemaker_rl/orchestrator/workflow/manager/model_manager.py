@@ -205,22 +205,22 @@ class ModelManager():
                 'Name': 'average_loss',
                 'Regex': 'average loss = ([-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?).*$'
             }
-        ]
+        ]       
 
         args = dict(entry_point=entry_point,
                     source_dir='src',
                     dependencies=["common/sagemaker_rl"],
-                    image_name=self.image,
+                    image_uri=self.image,
                     role=self.role,
                     sagemaker_session=self.sagemaker_session,
-                    train_instance_type=self.instance_type,
-                    train_instance_count=self.instance_count,
+                    instance_type=self.instance_type,
+                    instance_count=self.instance_count,
                     metric_definitions=metric_definitions,
                     hyperparameters=self.algor_params,
                     output_path=output_path,
                     code_location=output_path.strip('/')
                     )
-
+            
         if self.instance_type == 'local':
             logger.info(f"{estimator_type} job will be executed in 'local' mode")
         else:
@@ -231,6 +231,8 @@ class ModelManager():
         """
         A Estimator fit() call to initiate the first model of the experiment
         """
+        
+        
         rl_estimator_args = self._get_rl_estimator_args()
         self.rl_estimator = RLEstimator(**rl_estimator_args)
 

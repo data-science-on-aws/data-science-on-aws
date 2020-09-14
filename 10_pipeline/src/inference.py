@@ -1,8 +1,8 @@
 import json
 import subprocess
 import sys
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow==2.3.0'])
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'transformers==3.1.0'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow==2.1.0'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'transformers==2.8.0'])
 import tensorflow as tf
 from transformers import DistilBertTokenizer
 
@@ -26,7 +26,9 @@ def input_handler(data, context):
 
         encode_plus_tokens = tokenizer.encode_plus(data_str,
                                                    pad_to_max_length=True,
-                                                   max_length=max_seq_length)
+                                                   max_length=max_seq_length,
+#                                                   truncation=True
+                                                  )
 
         # Convert the text-based tokens to ids from the pre-trained BERT vocabulary
         input_ids = encode_plus_tokens['input_ids']
@@ -43,15 +45,21 @@ def input_handler(data, context):
     
         transformed_instances.append(transformed_instance)
 
+    print(transformed_instances)
+    
     transformed_data = {"instances": transformed_instances}
-    print('transformed_data {}'.format(transformed_data))
+    print(transformed_data)
 
-    return json.dumps(transformed_data)
+    transformed_data_json = json.dumps(transformed_data)
+    print(transformed_data_json)
+    
+    return transformed_data_json
 
 
 def output_handler(response, context):
     response_json = response.json()
-
+    print('response_json: {}'.format(response_json))
+    
     log_probabilities = response_json["predictions"]
 
     predicted_classes = []

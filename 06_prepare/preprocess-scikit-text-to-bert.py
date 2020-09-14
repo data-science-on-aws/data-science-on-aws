@@ -7,10 +7,10 @@ import pandas as pd
 from datetime import datetime
 import subprocess
 import sys
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow==2.3.0'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow==2.1.0'])
 import tensorflow as tf
 print(tf.__version__)
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'transformers==3.1.0'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'transformers==2.8.0'])
 from transformers import DistilBertTokenizer
 from tensorflow import keras
 import os
@@ -85,7 +85,9 @@ def convert_input(text_input, max_seq_length):
     #
     encode_plus_tokens = tokenizer.encode_plus(text_input.text,
                                                pad_to_max_length=True,
-                                               max_length=max_seq_length)
+                                               max_length=max_seq_length,
+#                                               truncation=True
+                                              )
 
     # The id from the pre-trained BERT vocabulary that represents the token.  (Padding of 0 will be used if the # of tokens is less than `max_seq_length`)
     input_ids = encode_plus_tokens['input_ids']

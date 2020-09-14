@@ -997,10 +997,10 @@ class ExperimentManager():
             environ_vars["FIREHOSE_STREAM"] = stream_name
 
         sagemaker_model = sagemaker.model.Model(
-            image=self.image,
+            model_data=model_record["s3_model_output_path"],
+            image_uri=self.image,
             role=self.resource_manager.iam_role_arn,
             name=model_id,
-            model_data=model_record["s3_model_output_path"],
             sagemaker_session=self.sagemaker_session,
             env=environ_vars,
             **kwargs)
@@ -1058,10 +1058,10 @@ class ExperimentManager():
 
             model_record = self.model_db_client.get_model_record(self.experiment_id, model_id)
             sagemaker_model = sagemaker.model.Model(
-                image=self.image,
+                model_data=model_record["s3_model_output_path"],
+                image_uri=self.image,
                 role=self.resource_manager.iam_role_arn,
                 name=model_id,
-                model_data=model_record["s3_model_output_path"],
                 sagemaker_session=self.sagemaker_session,
                 env=environ_vars)
             hosting_instance_count = self.resource_manager.hosting_fleet_config.get("instance_count", 1)
