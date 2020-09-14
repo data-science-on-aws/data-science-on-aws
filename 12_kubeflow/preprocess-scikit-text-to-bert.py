@@ -85,7 +85,9 @@ def convert_input(text_input, max_seq_length):
     #
     encode_plus_tokens = tokenizer.encode_plus(text_input.text,
                                                pad_to_max_length=True,
-                                               max_length=max_seq_length)
+                                               max_length=max_seq_length,
+#                                               truncation=True
+                                              )
 
     # The id from the pre-trained BERT vocabulary that represents the token.  (Padding of 0 will be used if the # of tokens is less than `max_seq_length`)
     input_ids = encode_plus_tokens['input_ids']
