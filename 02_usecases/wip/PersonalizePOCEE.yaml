@@ -1,0 +1,67 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: IAM Policies, and SageMaker Notebook to work with Amazon Forecast, it will also clone the POC codebase into the Notebook before you get started.
+
+Parameters:
+
+  NotebookName:
+    Type: String
+    Default: PersonalizePOCNotebook
+    Description: Enter the name of the SageMaker notebook instance. Deafault is PersonalizePOCNotebook.
+
+  DefaultCodeRepo:
+    Type: String
+    Default: https://github.com/chrisking/PersonalizePOC.git
+    Description: Enter the url of a git code repository for this lab
+    
+  InstanceType:
+    Type: String
+    Default: ml.t2.medium
+    AllowedValues:
+      - ml.t2.medium
+      - ml.m4.xlarge
+      - ml.c5.xlarge
+      - ml.p2.xlarge
+      - ml.p3.2xlarge
+    Description: Enter instance type. Default is ml.t2.medium.
+
+  VolumeSize:
+    Type: Number
+    Default: 10
+    MinValue: 5
+    MaxValue: 16384
+    ConstraintDescription: Must be an integer between 5 (GB) and 16384 (16 TB).
+    Description: Enter the size of the EBS volume in GB. Default is 10 GB.
+
+Resources:
+  # SageMaker Execution Role
+  SageMakerIamRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: Allow
+            Principal:
+              Service: sagemaker.amazonaws.com
+            Action: sts:AssumeRole
+      Path: "/"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/AmazonSageMakerFullAccess"
+        - "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+        - "arn:aws:iam::aws:policy/service-role/AmazonPersonalizeFullAccess"
+        - "arn:aws:iam::aws:policy/IAMFullAccess"
+
+        
+  # SageMaker notebook
+  NotebookInstance:
+    Type: "AWS::SageMaker::NotebookInstance"
+    Properties:
+      InstanceType: "ml.t2.medium"
+      NotebookInstanceName: !Ref NotebookName
+      RoleArn: !GetAtt SageMakerIamRole.Arn
+      VolumeSizeInGB: !Ref VolumeSize
+      DefaultCodeRepository: !Ref DefaultCodeRepo
+
