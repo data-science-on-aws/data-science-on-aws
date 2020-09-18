@@ -18,3 +18,4 @@ amazon_reviews_us_Digital_Software_v1_00.tsv
 *.tar
 04_explore/*.png
 model.tar.gz
+.gitignore
