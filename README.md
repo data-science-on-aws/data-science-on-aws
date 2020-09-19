@@ -109,4 +109,4 @@ Navigate to `01_setup/` in your Jupyter notebook and start the workshop!
 
 _You may need to refresh your browser if you don't see the new `workshop/` directory._
 
-![Start Workshop](img/start_workshop.png)
+![Start Workshop](img/start_workshop_short.png)
