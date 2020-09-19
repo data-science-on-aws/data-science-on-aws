@@ -1,17 +1,26 @@
 # Upcoming O'Reilly Book:  _Data Science on AWS_
 Register for early access directly on our [**website**](https://datascienceonaws.com).
 
+Request one of our [**talks**](https://datascienceonaws.com) for your conference or meetup.
+
 [![Data Science on AWS](img/data-science-on-aws-book.png)](https://datascienceonaws.com)
+
+# Workshop Cost - FREE
+This workshop is FREE, but would otherwise cost <25 USD.
+
+![Workshop Cost](img/billing.png)
+
+# Workshop Agenda
+![Workshop Agenda](img/outline.png)
 
 # Workshop Instructions
 _Note:  This workshop will create an ephemeral AWS acccount for each attendee.  This ephemeral account is not accessible after the workshop.  You can, of course, clone this GitHub repo and reproduce the entire workshop in your own AWS Account._
-
 
 ## 1. Login to the Workshop Portal (aka Event Engine). 
 
 ![Event Box Account](img/eb-aws-account-clean.png). 
 
-![Event Box Account](img/ee-accept.png). 
+![Event Box Account](img/launch.png). 
 
 ![Event Engine Dashboard](img/event-engine-dashboard.png). 
 
@@ -105,8 +114,8 @@ cd ~/SageMaker && git clone https://github.com/data-science-on-aws/workshop
 
 
 ## 8. Start the Workshop!
-Navigate to `01_intro/` in your Jupyter notebook and start the workshop!
+Navigate to `01_setup/` in your Jupyter notebook and start the workshop!
 
 _You may need to refresh your browser if you don't see the new `workshop/` directory._
 
-![Start Workshop](img/start_workshop.png)
+![Start Workshop](img/start_workshop_short.png)
