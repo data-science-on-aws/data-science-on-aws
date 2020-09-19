@@ -1,11 +1,20 @@
 # Upcoming O'Reilly Book:  _Data Science on AWS_
 Register for early access directly on our [**website**](https://datascienceonaws.com).
 
+Request one of our [**talks**](https://datascienceonaws.com) for your conference or meetup.
+
 [![Data Science on AWS](img/data-science-on-aws-book.png)](https://datascienceonaws.com)
+
+# Workshop Cost - FREE
+This workshop is FREE, but would otherwise cost <25 USD.
+
+![Workshop Cost](img/billing.png)
+
+# Workshop Agenda
+![Workshop Agenda](img/outline.png)
 
 # Workshop Instructions
 _Note:  This workshop will create an ephemeral AWS acccount for each attendee.  This ephemeral account is not accessible after the workshop.  You can, of course, clone this GitHub repo and reproduce the entire workshop in your own AWS Account._
-
 
 ## 1. Login to the Workshop Portal (aka Event Engine). 
 
