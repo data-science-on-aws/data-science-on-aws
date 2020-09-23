@@ -18,4 +18,6 @@ amazon_reviews_us_Digital_Software_v1_00.tsv
 *.tar
 04_explore/*.png
 model.tar.gz
-.gitignore
+wip/99_usecases/amazon_reviews_us_Digital_Software_v1_00_comprehend.csv
+wip/99_usecases/output.tar.gz
+wip/99_usecases/output/
