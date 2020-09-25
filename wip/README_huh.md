@@ -1,8 +1,3 @@
-# Attend our Free, Online, Full-Day Workshop!
-You must register on [**Eventbrite**](https://www.eventbrite.com/e/full-day-workshop-kubeflow-gpu-kerastensorflow-20-tf-extended-tfx-kubernetes-pytorch-xgboost-tickets-63362929227).  
-
-_All instructions will come through Eventbrite.  Please make sure your Eventbrite email address is up to date._
-
 # Upcoming O'Reilly Book:  _Data Science on AWS_
 Register for early access directly on our [**website**](https://datascienceonaws.com).
 
@@ -16,17 +11,10 @@ This workshop is FREE, but would otherwise cost <25 USD.
 ![Workshop Cost](img/billing.png)
 
 # Workshop Agenda
-[![Workshop Agenda](img/outline.png)](https://www.eventbrite.com/e/full-day-workshop-kubeflow-gpu-kerastensorflow-20-tf-extended-tfx-kubernetes-pytorch-xgboost-tickets-63362929227)
+![Workshop Agenda](img/outline.png)
 
 # Workshop Instructions
 _Note:  This workshop will create an ephemeral AWS acccount for each attendee.  This ephemeral account is not accessible after the workshop.  You can, of course, clone this GitHub repo and reproduce the entire workshop in your own AWS Account._
-
-## 0. Logout of All AWS Consoles Across All Browser Tabs
-If you do not logout of existing AWS Consoles, things will not work properly.
-
-![AWS Account Logout](img/aws-logout.png)
-
-_Please logout of all AWS Console sessions in all browser tabs._
 
 ## 1. Login to the Workshop Portal (aka Event Engine). 
 
@@ -37,7 +25,6 @@ _Please logout of all AWS Console sessions in all browser tabs._
 ![Event Engine Terms and Conditions](img/event-engine-terms.png)
 
 ![Event Engine Dashboard](img/event-engine-dashboard.png)
-
 
 ## 2. Login to the **AWS Console**
 
@@ -51,7 +38,8 @@ If you see this message, you need to logout from any previously used AWS account
 
 _Please logout of all AWS Console sessions in all browser tabs._
 
-Double-check that your account name is similar to `TeamRole/MasterKey` as follows:
+
+Double-check that your account name is something like `TeamRole/MasterKey` as follows:
 
 ![IAM Role](img/teamrole-masterkey.png)
 
@@ -86,6 +74,16 @@ In the IAM role box, select the default `TeamRole`.
 
 ![Fill notebook instance](img/notebook-setup02.png)
 
+You must select the default `VPC`, `Subnet`, and `Security group` as shown in the screenshow.  Your values will likely be different.  This is OK.
+
+Keep the default settings for the other options not highlighted in red, and click `Create notebook instance`.  On the `Notebook instances` section you should see the status change from `Pending` -> `InService`
+
+![Fill notebook instance](img/alt-notebook-setup03.png)
+
+In case you see a message like the following please delete the notebook instance and re-create the notebook instance selecting the subnet-a in the VPC settings. 
+
+![Wrong subnet](img/wrong_subnet.png)
+
 
 ## 4. Start the Jupyter Notebook
 
@@ -110,11 +108,6 @@ cd ~/SageMaker && git clone https://github.com/data-science-on-aws/workshop
 ```
 
 ![](img/clone-workshop-repo.png)
-
-**REPEATING AGAIN - THIS IS IMPORTANT - MAKE SURE YOU RUN THIS IN THE JUPYTER TERMINAL**
-```
-cd ~/SageMaker && git clone https://github.com/data-science-on-aws/workshop
-```
 
 
 ## 7. Navigate Back to Notebook View

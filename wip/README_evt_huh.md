@@ -8,9 +8,12 @@ Register for early access directly on our [**website**](https://datascienceonaws
 
 Request one of our [**talks**](https://datascienceonaws.com) for your conference or meetup.
 
+_Influence the book by filling out our [**quick survey**](https://www.surveymonkey.com/r/798CMZ3)._
+
 [![Data Science on AWS](img/data-science-on-aws-book.png)](https://datascienceonaws.com)
 
 # Workshop Cost - FREE
+
 This workshop is FREE, but would otherwise cost <25 USD.
 
 ![Workshop Cost](img/billing.png)
@@ -21,44 +24,36 @@ This workshop is FREE, but would otherwise cost <25 USD.
 # Workshop Instructions
 _Note:  This workshop will create an ephemeral AWS acccount for each attendee.  This ephemeral account is not accessible after the workshop.  You can, of course, clone this GitHub repo and reproduce the entire workshop in your own AWS Account._
 
-## 0. Logout of All AWS Consoles Across All Browser Tabs
+## 1. Logout of All AWS Consoles Across All Browser Tabs
 If you do not logout of existing AWS Consoles, things will not work properly.
-
-![AWS Account Logout](img/aws-logout.png)
 
 _Please logout of all AWS Console sessions in all browser tabs._
 
-## 1. Login to the Workshop Portal (aka Event Engine). 
 
-![Event Box Event Engine Account](img/eb-aws-account-clean.png) 
+## 2. Login to the Workshop Portal (aka Event Engine)
 
-![Event Box Launch](img/launch.png)
+**If you are registered on Eventbrite, you will receive a link to the Workshop 1 hour before the event.**  
 
-![Event Engine Terms and Conditions](img/event-engine-terms.png)
+**The email with the link will come through Eventbrite.**
+
+**Please make sure your Eventbrite email is up to date.**
 
 ![Event Engine Dashboard](img/event-engine-dashboard.png)
 
-
-## 2. Login to the **AWS Console**
+Click on **AWS Console** on dashboard.
 
 ![Event Engine AWS Console](img/event-engine-aws-console.png)
 
 Take the defaults and click on **Open AWS Console**. This will open AWS Console in a new browser tab.
 
-If you see this message, you need to logout from any previously used AWS accounts.
-
-![AWS Account Logout](img/aws-logout.png)
-
-_Please logout of all AWS Console sessions in all browser tabs._
-
-Double-check that your account name is similar to `TeamRole/MasterKey` as follows:
+Double-check that your account name is something like `TeamRole/MasterKey` as follows:
 
 ![IAM Role](img/teamrole-masterkey.png)
 
 If not, please logout of your AWS Console in all browser tabs and re-run the steps above!
 
 
-## 3. Launch a SageMaker Notebook Instance
+## 3. Launch an Amazon SageMaker Notebook Instance
 
 Open the [AWS Management Console](https://console.aws.amazon.com/console/home)
 
@@ -66,13 +61,11 @@ Open the [AWS Management Console](https://console.aws.amazon.com/console/home)
 
 In the AWS Console search bar, type `SageMaker` and select `Amazon SageMaker` to open the service console.
 
-![SageMaker Console](img/setup_aws_console.png). 
+![SageMaker Console](img/setup_aws_console.png)
 
 Select `Create notebook instance`.
 
-![SageMaker Console](img/aws-sagemaker-dashboard.png).
-
-![SageMaker Console](img/create-notebook-instance.png)
+![SageMaker Console](img/setup_aws_console_2.png)
 
 In the Notebook instance name text box, enter `workshop`.
 
@@ -86,20 +79,25 @@ In the IAM role box, select the default `TeamRole`.
 
 ![Fill notebook instance](img/notebook-setup02.png)
 
+You must select the default `VPC`, `Subnet`, and `Security group` as shown in the screenshow.  Your values will likely be different.  This is OK.
 
-## 4. Start the Jupyter Notebook
+Keep the default settings for the other options not highlighted in red, and click `Create notebook instance`.  On the `Notebook instances` section you should see the status change from `Pending` -> `InService`
 
-_Note:  Proceed when the status of the notebook instance changes from `Pending` to `InService` after a few minutes._
+![Fill notebook instance](img/notebook-setup03.png)
+
+
+## 4. Start the Jupyter notebook
+
+_Note:  Proceed when the status of the notebook instance changes from `Pending` to `InService`._
 
 ![Start Jupyter](img/start_jupyter.png)
 
 
-## 5. Launch a New Terminal within the Jupyter Notebook
+## 5. Launch a new Terminal within the Jupyter notebook
 
 Click `File` > `New` > [...scroll down...] `Terminal` to launch a terminal in your Jupyter instance.
 
 ![](img/launch_jupyter_terminal.png)
-
 
 ## 6. Clone this GitHub Repo in the Terminal
 
@@ -110,11 +108,6 @@ cd ~/SageMaker && git clone https://github.com/data-science-on-aws/workshop
 ```
 
 ![](img/clone-workshop-repo.png)
-
-**REPEATING AGAIN - THIS IS IMPORTANT - MAKE SURE YOU RUN THIS IN THE JUPYTER TERMINAL**
-```
-cd ~/SageMaker && git clone https://github.com/data-science-on-aws/workshop
-```
 
 
 ## 7. Navigate Back to Notebook View
