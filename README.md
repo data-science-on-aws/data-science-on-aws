@@ -86,6 +86,8 @@ In the IAM role box, select the default `TeamRole`.
 
 ![Fill notebook instance](img/notebook-setup02.png)
 
+![Fill notebook instance](img/notebook-setup03-no-vpc.png)
+
 
 ## 4. Start the Jupyter Notebook
 
