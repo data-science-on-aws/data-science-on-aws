@@ -164,7 +164,7 @@ if __name__ == '__main__':
                         default=False)
     parser.add_argument('--max_seq_length',
                         type=int,
-                        default=128)
+                        default=64)
     parser.add_argument('--train_batch_size',
                         type=int,
                         default=128)
