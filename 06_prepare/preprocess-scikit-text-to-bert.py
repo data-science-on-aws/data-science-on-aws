@@ -188,7 +188,7 @@ def parse_args():
         default=False
     )
     parser.add_argument('--max-seq-length', type=int,
-        default=128,
+        default=64,
     )  
     
     return parser.parse_args()
