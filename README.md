@@ -76,7 +76,7 @@ You must select the default `VPC`, `Subnet`, and `Security group` as shown in th
 
 Keep the default settings for the other options not highlighted in red, and click `Create notebook instance`.  On the `Notebook instances` section you should see the status change from `Pending` -> `InService`
 
-![Fill notebook instance](img/notebook-setup03-olt.png)
+![Fill notebook instance](img/alt-notebook-setup03.png)
 
 In case you see a message like the following please delete the notebook instance and re-create the notebook instance selecting the subnet-a in the VPC settings. 
 
