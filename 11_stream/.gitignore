@@ -1,2 +1,3 @@
+src/InvokeSageMakerEndpointFromKinesis.zip
 src/DeliverKinesisAnalyticsToCloudWatch.zip
 spark-2.4.6-bin-pipelineai/
