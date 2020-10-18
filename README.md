@@ -84,15 +84,11 @@ Volume size `250` - this is needed to explore datasets, build docker containers,
 
 ![Fill notebook instance](img/alt-notebook-setup01.png)
 
-In the IAM role box, select the default `TeamRole`.
+In the IAM role box, select the default `TeamRole`, leave the rest to its defaults, and then click `Create notebook instance`.
 
-![Fill notebook instance](img/notebook-setup02.png)
+![Fill notebook instance](img/permissions.png)
 
-You must select the default `VPC`, `Subnet`, and `Security group` as shown in the screenshow.  Your values will likely be different.  This is OK.
-
-Keep the default settings for the other options not highlighted in red, and click `Create notebook instance`.  On the `Notebook instances` section you should see the status change from `Pending` -> `InService`
-
-![Fill notebook instance](img/alt-notebook-setup03.png)
+On the `Notebook instances` section you should see the status change from `Pending` -> `InService`
 
 While the notebook spins up, continue to work on the next section.  We'll come back to the notebook when it's ready.
 
