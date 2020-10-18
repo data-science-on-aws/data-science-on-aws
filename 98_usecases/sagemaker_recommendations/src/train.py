@@ -184,10 +184,10 @@ if __name__ == '__main__':
 #             steps_per_epoch=train_steps_per_epoch,
 #             max_seq_length=max_seq_length).map(select_data_and_label_from_record)
 
-        ratings = tfds.load('movie_lens/100k-ratings', split="train")
+        ratings = tfds.load('movielens/100k-ratings', split="train")
         print(ratings)
 
-        movies = tfds.load('movie_lens/100k-movies', split="train")
+        movies = tfds.load('movielens/100k-movies', split="train")
         print(movies)
 
         ratings = ratings.map(lambda x: {
@@ -243,10 +243,19 @@ if __name__ == '__main__':
 
         print('Compiled model {}'.format(model))          
         print(model.summary())
-        
+
+        index = tfrs.layers.ann.BruteForce(model.user_model)
+        index.index(movies.batch(100).map(model.movie_model), movies)
+
+        # Get some recommendations.
+        _, titles = index(np.array(["42"]))
+        print(f"Top 10 recommendations for user 42: {titles[0, :10]}")
+
         # Save the TensorFlow SavedModel for Serving Predictions
+        # Note:  We must call index() above before we save().
+        #        See https://github.com/tensorflow/tensorflow/issues/31057 for more details.
         print('tensorflow_saved_model_path {}'.format(tensorflow_saved_model_path))   
-        model.save(tensorflow_saved_model_path, save_format='tf')
+        index.save(tensorflow_saved_model_path, save_format='tf')
                 
         # Copy inference.py and requirements.txt to the code/ directory
         #   Note: This is required for the SageMaker Endpoint to pick them up.
@@ -258,9 +267,5 @@ if __name__ == '__main__':
         print(glob(inference_path))        
 #        os.system('cp requirements.txt {}/code'.format(inference_path))
         
-    index = tfrs.layers.ann.BruteForce(model.user_model)
-    index.index(movies.batch(100).map(model.movie_model), movies)
 
-    # Get some recommendations.
-    _, titles = index(np.array(["42"]))
-    print(f"Top 10 recommendations for user 42: {titles[0, :10]}")
+    
