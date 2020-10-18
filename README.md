@@ -42,7 +42,7 @@ _Double-check that your account name is something like `IibsAdminAccess-DO-NOT-D
 
 _If not, please logout of your AWS Console in all browser tabs and re-run the steps above!_
 
-## 1. Select either us-east-1, us-west-2, or eu-west-1 as your region
+## 1. Select either `us-east-1`, `us-west-2`, or `eu-west-1` as your region
 
 ![](img/select-one-from-3-regions.png)
 
