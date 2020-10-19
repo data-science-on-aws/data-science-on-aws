@@ -38,8 +38,8 @@ def lambda_handler(event, context):
         
         response = runtime.invoke_endpoint(
             EndpointName=ENDPOINT_NAME,
-            ContentType='text/csv',
-            Body=review_body)
+            # ContentType='text/csv',
+            Body=review_body.encode('utf-8'))
         print('response: {}'.format(response))
                                        
         result = json.loads(response['Body'].read().decode())
@@ -47,7 +47,7 @@ def lambda_handler(event, context):
         
         # Built output_record
         # review_id, star_rating, product_category, review_body
-        output_data = '{}\t{}\t{}\t{}'.format(split_inputs[0], str(result[0]), split_inputs[1], review_body)
+        output_data = '{}\t{}\t{}\t{}'.format(split_inputs[0], str(result), split_inputs[1], review_body)
         print('output_data: {}'.format(output_data))
         output_data_encoded = output_data.encode('utf-8')
 
