@@ -1,4 +1,5 @@
 tmp/
+pytorch_model.tar.gz
 wip/bert.py
 wip/trainer.py
 wip/transform.py

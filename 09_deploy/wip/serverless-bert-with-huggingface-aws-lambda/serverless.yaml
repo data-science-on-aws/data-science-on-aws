@@ -1,0 +1,58 @@
+service: serverless-qa-bert
+
+provider:
+  name: aws
+  runtime: python3.8
+  region: us-east-1
+  timeout: 60
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - s3:getObject
+      Resource: arn:aws:s3:::sagemaker-us-east-1-835319576252/serverless-bert/*
+
+custom:
+  pythonRequirements:
+    dockerizePip: true
+    zip: true
+    slim: true
+    strip: false
+    noDeploy:
+      - docutils
+      - jmespath
+      - pip
+      - python-dateutil
+      - setuptools
+      - six
+      - tensorboard
+    useStaticCache: true
+    useDownloadCache: true
+    cacheLocation: "./cache"
+package:
+  individually: false
+  exclude:
+    - package.json
+    - package-log.json
+    - node_modules/**
+    - cache/**
+    - test/**
+    - __pycache__/**
+    - .pytest_cache/**
+    - model/pytorch_model.bin
+    - raw/**
+    - .vscode/**
+    - .ipynb_checkpoints/**
+
+functions:
+  predict_answer:
+    handler: handler.predict_answer
+    memorySize: 3008
+    timeout: 60
+    events:
+      - http:
+          path: ask
+          method: post
+          cors: true
+
+plugins:
+  - serverless-python-requirements

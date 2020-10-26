@@ -1,0 +1,13 @@
+{
+  "name": "serverless-bert-with-huggingface-aws-lambda",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "deploy": "serverless deploy"
+  },
+  "devDependencies": {
+    "serverless": "^1.67.0",
+    "serverless-python-requirements": "^5.1.0"
+  }
+}
