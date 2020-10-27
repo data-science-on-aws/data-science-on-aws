@@ -185,10 +185,10 @@ def parse_args():
         default=0.05,
     )
     parser.add_argument('--balance-dataset', type=eval,
-        default=False
+        default=True
     )
     parser.add_argument('--max-seq-length', type=int,
-        default=128,
+        default=64,
     )  
     
     return parser.parse_args()
