@@ -20,7 +20,6 @@ from transformers import DistilBertTokenizer
 from transformers import TFDistilBertForSequenceClassification
 from transformers import TextClassificationPipeline
 from transformers.configuration_distilbert import DistilBertConfig
-from tensorflow.keras.callbacks import ModelCheckpoint
 from tensorflow.keras.models import load_model
 #from tensorflow.keras.mixed_precision import experimental as mixed_precision
 
@@ -96,32 +95,6 @@ def file_based_input_dataset_builder(channel,
     return dataset
 
 
-def load_checkpoint_model(checkpoint_path):
-    import glob
-    import os
-    
-    glob_pattern = os.path.join(checkpoint_path, '*.h5')
-    print('glob pattern {}'.format(glob_pattern))
-
-    list_of_checkpoint_files = glob.glob(glob_pattern)
-    print('List of checkpoint files {}'.format(list_of_checkpoint_files))
-    
-    latest_checkpoint_file = max(list_of_checkpoint_files)
-    print('Latest checkpoint file {}'.format(latest_checkpoint_file))
-
-    initial_epoch_number_str = latest_checkpoint_file.rsplit('_', 1)[-1].split('.h5')[0]
-    initial_epoch_number = int(initial_epoch_number_str)
-
-    loaded_model = TFDistilBertForSequenceClassification.from_pretrained(
-                                               latest_checkpoint_file,
-                                               config=config)
-
-    print('loaded_model {}'.format(loaded_model))
-    print('initial_epoch_number {}'.format(initial_epoch_number))
-    
-    return loaded_model, initial_epoch_number
-
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
@@ -143,9 +116,6 @@ if __name__ == '__main__':
     parser.add_argument('--num_gpus', 
                         type=int, 
                         default=None)
-    parser.add_argument('--checkpoint_base_path', 
-                        type=str, 
-                        default='/opt/ml/checkpoints')
     parser.add_argument('--use_xla',
                         type=eval,
                         default=False)
@@ -193,13 +163,7 @@ if __name__ == '__main__':
                         default=False)    
     parser.add_argument('--run_sample_predictions',
                         type=eval,
-                        default=False)
-    parser.add_argument('--enable_tensorboard',
-                        type=eval,
-                        default=False)        
-    parser.add_argument('--enable_checkpointing',
-                        type=eval,
-                        default=False)    
+                        default=False)           
     parser.add_argument('--output_dir', 
                         type=str,
                         default=os.getcwd())
@@ -265,15 +229,7 @@ if __name__ == '__main__':
     run_test = args.run_test
     print('run_test {}'.format(run_test))    
     run_sample_predictions = args.run_sample_predictions
-    print('run_sample_predictions {}'.format(run_sample_predictions))
-    enable_tensorboard = args.enable_tensorboard
-    print('enable_tensorboard {}'.format(enable_tensorboard))       
-    enable_checkpointing = args.enable_checkpointing
-    print('enable_checkpointing {}'.format(enable_checkpointing))    
-
-    checkpoint_base_path = args.checkpoint_base_path
-    print('checkpoint_base_path {}'.format(checkpoint_base_path))
-
+    print('run_sample_predictions {}'.format(run_sample_predictions))         
  
     # Model Output 
     transformer_fine_tuned_model_path = os.path.join(model_dir, 'transformers/fine-tuned/')
@@ -282,10 +238,6 @@ if __name__ == '__main__':
     # SavedModel Output
     tensorflow_saved_model_path = os.path.join(model_dir, 'tensorflow/saved_model/0')
     os.makedirs(tensorflow_saved_model_path, exist_ok=True)
-
-    # Tensorboard Logs 
-    tensorboard_logs_path = os.path.join(model_dir, 'tensorboard/')
-    os.makedirs(tensorboard_logs_path, exist_ok=True)
 
     # Commented out due to incompatibility with transformers library (possibly)
     # Set the global precision mixed_precision policy to "mixed_float16"    
@@ -348,11 +300,6 @@ if __name__ == '__main__':
             # loss scaling is currently required when using mixed precision
             optimizer = tf.keras.mixed_precision.experimental.LossScaleOptimizer(optimizer, 'dynamic')
 
-        if enable_tensorboard:            
-            tensorboard_callback = tf.keras.callbacks.TensorBoard(
-                                                        log_dir=tensorboard_logs_path)
-            print('*** TENSORBOARD CALLBACK {} ***'.format(tensorboard_callback))
-            callbacks.append(tensorboard_callback)
   
         print('*** OPTIMIZER {} ***'.format(optimizer))
         
