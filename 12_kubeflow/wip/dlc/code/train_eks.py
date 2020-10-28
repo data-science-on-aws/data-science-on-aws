@@ -1,3 +1,10 @@
+#subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow==2.1.0'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'transformers==2.8.0'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'sagemaker-tensorflow==2.1.0.1.0.0'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'scikit-learn==0.23.1'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'matplotlib==3.2.1'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'boto3==1.14.60'])
+
 import time
 import random
 import pandas as pd
@@ -9,19 +16,13 @@ import subprocess
 import sys
 import os
 import tensorflow as tf
-#subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow==2.1.0'])
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'transformers==2.8.0'])
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'sagemaker-tensorflow==2.1.0.1.0.0'])
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'smdebug==0.9.3'])
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'scikit-learn==0.23.1'])
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'matplotlib==3.2.1'])
+import boto3
 
 from transformers import DistilBertTokenizer
 from transformers import TFDistilBertForSequenceClassification
 from transformers import TextClassificationPipeline
 from transformers.configuration_distilbert import DistilBertConfig
 from tensorflow.keras.models import load_model
-#from tensorflow.keras.mixed_precision import experimental as mixed_precision
 
 
 CLASSES = [1, 2, 3, 4, 5]
@@ -54,7 +55,6 @@ def file_based_input_dataset_builder(channel,
     dataset = tf.data.TFRecordDataset(input_filenames)
 
     dataset = dataset.repeat(epochs * steps_per_epoch * 100)
-#    dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
 
     name_to_features = {
       "input_ids": tf.io.FixedLenFeature([max_seq_length], tf.int64),
@@ -79,8 +79,6 @@ def file_based_input_dataset_builder(channel,
           drop_remainder=drop_remainder,
           num_parallel_calls=tf.data.experimental.AUTOTUNE))
 
-#    dataset.cache()
-
     dataset = dataset.shuffle(buffer_size=1000,
                               reshuffle_each_iteration=True)
 
@@ -94,142 +92,36 @@ def file_based_input_dataset_builder(channel,
 
     return dataset
 
+def upload_model_to_s3(file, bucket):
+    s3 = boto3.client('s3')
+    with open(file, "rb") as f:
+    s3.upload_fileobj(f, bucket, file)
+    print('Model file {} uploaded to {}'.format(file, bucket))
+
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
 
-    parser.add_argument('--train_data', 
-                        type=str, 
-                        default=None)
-    parser.add_argument('--validation_data', 
-                        type=str, 
-                        default=None)
-    parser.add_argument('--test_data',
-                        type=str,
-                        default=None)
-    parser.add_argument('--hosts', 
-                        type=list, 
-                        default=None)
-    parser.add_argument('--current_host', 
-                        type=str, 
-                        default=None)    
-    parser.add_argument('--num_gpus', 
-                        type=int, 
-                        default=None)
-    parser.add_argument('--use_xla',
-                        type=eval,
-                        default=False)
-    parser.add_argument('--use_amp',
-                        type=eval,
-                        default=False)
-    parser.add_argument('--max_seq_length',
-                        type=int,
-                        default=64)
-    parser.add_argument('--train_batch_size',
-                        type=int,
-                        default=128)
-    parser.add_argument('--validation_batch_size',
-                        type=int,
-                        default=256)
-    parser.add_argument('--test_batch_size',
-                        type=int,
-                        default=256)
-    parser.add_argument('--epochs',
-                        type=int,
-                        default=2)
-    parser.add_argument('--learning_rate',
-                        type=float,
-                        default=0.00003)
-    parser.add_argument('--epsilon',
-                        type=float,
-                        default=0.00000001)
-    parser.add_argument('--train_steps_per_epoch',
-                        type=int,
-                        default=None)
-    parser.add_argument('--validation_steps',
-                        type=int,
-                        default=None)
-    parser.add_argument('--test_steps',
-                        type=int,
-                        default=None)
-    parser.add_argument('--freeze_bert_layer',
-                        type=eval,
-                        default=True)
-    parser.add_argument('--run_validation',
-                        type=eval,
-                        default=False)    
-    parser.add_argument('--run_test',
-                        type=eval,
-                        default=False)    
-    parser.add_argument('--run_sample_predictions',
-                        type=eval,
-                        default=False)           
-    parser.add_argument('--output_dir', 
-                        type=str,
-                        default=os.getcwd())
-    
-    # This points to the S3 location - this should not be used by our code
-    # We should use /opt/ml/model/ instead
-    parser.add_argument('--model_dir', 
-                         type=str, 
-                         default=os.getcwd())
-     
-    args, _ = parser.parse_known_args()
-    print("Args:") 
-    print(args)
-    
-    env_var = os.environ 
-    print("Environment Variables:") 
-    pprint.pprint(dict(env_var), width = 1) 
-    
-    model_dir = args.model_dir
-    print('model_dir {}'.format(model_dir))
-    train_data = args.train_data
-    print('train_data {}'.format(train_data))
-    validation_data = args.validation_data
-    print('validation_data {}'.format(validation_data))
-    test_data = args.test_data
-    print('test_data {}'.format(test_data))    
-    output_dir = args.output_dir
-    print('output_dir {}'.format(output_dir))    
-    hosts = args.hosts
-    print('hosts {}'.format(hosts))    
-    current_host = args.current_host
-    print('current_host {}'.format(current_host))    
-    num_gpus = args.num_gpus
-    print('num_gpus {}'.format(num_gpus))
-    use_xla = args.use_xla
-    print('use_xla {}'.format(use_xla))    
-    use_amp = args.use_amp
-    print('use_amp {}'.format(use_amp))    
-    max_seq_length = args.max_seq_length
-    print('max_seq_length {}'.format(max_seq_length))    
-    train_batch_size = args.train_batch_size
-    print('train_batch_size {}'.format(train_batch_size))    
-    validation_batch_size = args.validation_batch_size
-    print('validation_batch_size {}'.format(validation_batch_size))    
-    test_batch_size = args.test_batch_size
-    print('test_batch_size {}'.format(test_batch_size))    
-    epochs = args.epochs
-    print('epochs {}'.format(epochs))    
-    learning_rate = args.learning_rate
-    print('learning_rate {}'.format(learning_rate))    
-    epsilon = args.epsilon
-    print('epsilon {}'.format(epsilon))    
-    train_steps_per_epoch = args.train_steps_per_epoch
-    print('train_steps_per_epoch {}'.format(train_steps_per_epoch))    
-    validation_steps = args.validation_steps
-    print('validation_steps {}'.format(validation_steps))    
-    test_steps = args.test_steps
-    print('test_steps {}'.format(test_steps))    
-    freeze_bert_layer = args.freeze_bert_layer
-    print('freeze_bert_layer {}'.format(freeze_bert_layer))      
-    run_validation = args.run_validation
-    print('run_validation {}'.format(run_validation))    
-    run_test = args.run_test
-    print('run_test {}'.format(run_test))    
-    run_sample_predictions = args.run_sample_predictions
-    print('run_sample_predictions {}'.format(run_sample_predictions))         
+    train_data='s3://sagemaker-us-west-2-231218423789/training-pipeline-2020-09-05-16-19-31/processing/output/bert-train'
+    test_data='s3://sagemaker-us-west-2-231218423789/training-pipeline-2020-09-05-16-19-31/processing/output/bert-test'
+    validation_data='s3://sagemaker-us-west-2-231218423789/training-pipeline-2020-09-05-16-19-31/processing/output/bert-validation'
+    model_dir='opt/ml/model'
+    output_dir='s3://sagemaker-us-west-2-231218423789/dlc/output'
+    use_xla=False
+    use_amp=False
+    max_seq_length=64
+    train_batch_size=64
+    validation_batch_size=64
+    test_batch_size=64
+    epochs=1
+    learning_rate=0.00003
+    epsilon=0.00000001
+    train_steps_per_epoch=50
+    validation_steps=10
+    test_steps=10
+    freeze_bert_layer=True
+    run_validation=False
+    run_test=False
+    run_sample_predictions=False
  
     # Model Output 
     transformer_fine_tuned_model_path = os.path.join(model_dir, 'transformers/fine-tuned/')
@@ -238,17 +130,9 @@ if __name__ == '__main__':
     # SavedModel Output
     tensorflow_saved_model_path = os.path.join(model_dir, 'tensorflow/saved_model/0')
     os.makedirs(tensorflow_saved_model_path, exist_ok=True)
-
-    # Commented out due to incompatibility with transformers library (possibly)
-    # Set the global precision mixed_precision policy to "mixed_float16"    
-#    mixed_precision_policy = 'mixed_float16'
-#    print('Mixed precision policy {}'.format(mixed_precision_policy))
-#    policy = mixed_precision.Policy(mixed_precision_policy)
-#    mixed_precision.set_policy(policy)    
     
     distributed_strategy = tf.distribute.MirroredStrategy()
-    # Comment out when using smdebug as smdebug does not support MultiWorkerMirroredStrategy() as of smdebug 0.8.0
-    #distributed_strategy = tf.distribute.experimental.MultiWorkerMirroredStrategy()
+    
     with distributed_strategy.scope():
         tf.config.optimizer.set_jit(use_xla)
         tf.config.optimizer.set_experimental_options({"auto_mixed_precision": use_amp})
@@ -300,7 +184,6 @@ if __name__ == '__main__':
             # loss scaling is currently required when using mixed precision
             optimizer = tf.keras.mixed_precision.experimental.LossScaleOptimizer(optimizer, 'dynamic')
 
-  
         print('*** OPTIMIZER {} ***'.format(optimizer))
         
         loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
@@ -368,10 +251,13 @@ if __name__ == '__main__':
         # Save the Fine-Yuned Transformers Model as a New "Pre-Trained" Model
         print('transformer_fine_tuned_model_path {}'.format(transformer_fine_tuned_model_path))   
         model.save_pretrained(transformer_fine_tuned_model_path)
+        upload_model_to_s3(transformer_fine_tuned_model_path, output_dir)
 
         # Save the TensorFlow SavedModel for Serving Predictions
         print('tensorflow_saved_model_path {}'.format(tensorflow_saved_model_path))   
         model.save(tensorflow_saved_model_path, save_format='tf')
+        upload_model_to_s3(tensorflow_saved_model_path, output_dir)
+
                 
         # Copy inference.py and requirements.txt to the code/ directory
         #   Note: This is required for the SageMaker Endpoint to pick them up.
