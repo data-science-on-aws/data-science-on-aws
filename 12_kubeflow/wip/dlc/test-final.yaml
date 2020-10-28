@@ -13,9 +13,9 @@ spec:
         - --epochs=1
         - --learning_rate=0.00001
         - --epsilon=0.00000001
-        - --train_batch_size=64
-        - --validation_batch_size=64
-        - --test_batch_size=64
+        - --train_batch_size=36
+        - --validation_batch_size=18
+        - --test_batch_size=18
         - --train_steps_per_epoch=1
         - --validation_steps=1
         - --test_steps=1
@@ -28,7 +28,7 @@ spec:
         - --enable_tensorboard=False
         - --run_validation=True
         - --run_test=False
-        - --run_sample_predictions=False
+        - --run_sample_predictions=True
       image: "231218423789.dkr.ecr.us-west-2.amazonaws.com/dlc-demo:bert"
       imagePullPolicy: Always
       env: 
