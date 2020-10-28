@@ -134,9 +134,6 @@ if __name__ == '__main__':
     parser.add_argument('--test_data',
                         type=str,
                         default=None)
-    parser.add_argument('--output_dir',
-                        type=str,
-                        default=None)
     parser.add_argument('--hosts', 
                         type=list, 
                         default=None)
