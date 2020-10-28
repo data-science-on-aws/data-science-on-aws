@@ -15,6 +15,7 @@ subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'sagemaker-tensor
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'smdebug==0.9.3'])
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'scikit-learn==0.23.1'])
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'matplotlib==3.2.1'])
+
 from transformers import DistilBertTokenizer
 from transformers import TFDistilBertForSequenceClassification
 from transformers import TextClassificationPipeline
@@ -41,7 +42,6 @@ def select_data_and_label_from_record(record):
 
 def file_based_input_dataset_builder(channel,
                                      input_filenames,
-                                     pipe_mode,
                                      is_training,
                                      drop_remainder,
                                      batch_size,
@@ -51,15 +51,8 @@ def file_based_input_dataset_builder(channel,
 
     # For training, we want a lot of parallel reading and shuffling.
     # For eval, we want no shuffling and parallel reading doesn't matter.
-
-    if pipe_mode:
-        print('***** Using pipe_mode with channel {}'.format(channel))
-        from sagemaker_tensorflow import PipeModeDataset
-        dataset = PipeModeDataset(channel=channel,
-                                  record_format='TFRecord')
-    else:
-        print('***** Using input_filenames {}'.format(input_filenames))
-        dataset = tf.data.TFRecordDataset(input_filenames)
+    print('***** Using input_filenames {}'.format(input_filenames))
+    dataset = tf.data.TFRecordDataset(input_filenames)
 
     dataset = dataset.repeat(epochs * steps_per_epoch * 100)
 #    dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
@@ -134,25 +127,25 @@ if __name__ == '__main__':
 
     parser.add_argument('--train_data', 
                         type=str, 
-                        default=os.environ['SM_CHANNEL_TRAIN'])
+                        default=None)
     parser.add_argument('--validation_data', 
                         type=str, 
-                        default=os.environ['SM_CHANNEL_VALIDATION'])
+                        default=None)
     parser.add_argument('--test_data',
                         type=str,
-                        default=os.environ['SM_CHANNEL_TEST'])
+                        default=None)
     parser.add_argument('--output_dir',
                         type=str,
-                        default=os.environ['SM_OUTPUT_DIR'])
+                        default=None)
     parser.add_argument('--hosts', 
                         type=list, 
-                        default=json.loads(os.environ['SM_HOSTS']))
+                        default=None)
     parser.add_argument('--current_host', 
                         type=str, 
-                        default=os.environ['SM_CURRENT_HOST'])    
+                        default=None)    
     parser.add_argument('--num_gpus', 
                         type=int, 
-                        default=os.environ['SM_NUM_GPUS'])
+                        default=None)
     parser.add_argument('--checkpoint_base_path', 
                         type=str, 
                         default='/opt/ml/checkpoints')
@@ -194,10 +187,7 @@ if __name__ == '__main__':
                         default=None)
     parser.add_argument('--freeze_bert_layer',
                         type=eval,
-                        default=False)
-    parser.add_argument('--enable_sagemaker_debugger',
-                        type=eval,
-                        default=False)
+                        default=True)
     parser.add_argument('--run_validation',
                         type=eval,
                         default=False)    
@@ -213,15 +203,15 @@ if __name__ == '__main__':
     parser.add_argument('--enable_checkpointing',
                         type=eval,
                         default=False)    
-    parser.add_argument('--output_data_dir', # This is unused
+    parser.add_argument('--output_dir', 
                         type=str,
-                        default=os.environ['SM_OUTPUT_DATA_DIR'])
+                        default=os.getcwd())
     
     # This points to the S3 location - this should not be used by our code
     # We should use /opt/ml/model/ instead
-    # parser.add_argument('--model_dir', 
-    #                     type=str, 
-    #                     default=os.environ['SM_MODEL_DIR'])
+    parser.add_argument('--model_dir', 
+                         type=str, 
+                         default=os.getcwd())
      
     args, _ = parser.parse_known_args()
     print("Args:") 
@@ -230,19 +220,15 @@ if __name__ == '__main__':
     env_var = os.environ 
     print("Environment Variables:") 
     pprint.pprint(dict(env_var), width = 1) 
-
-    print('SM_TRAINING_ENV {}'.format(env_var['SM_TRAINING_ENV']))
-    sm_training_env_json = json.loads(env_var['SM_TRAINING_ENV'])
-    is_master = sm_training_env_json['is_master']
-    print('is_master {}'.format(is_master))
     
+    model_dir = args.model_dir
+    print('model_dir {}'.format(model_dir))
     train_data = args.train_data
     print('train_data {}'.format(train_data))
     validation_data = args.validation_data
     print('validation_data {}'.format(validation_data))
     test_data = args.test_data
     print('test_data {}'.format(test_data))    
-    local_model_dir = os.environ['SM_MODEL_DIR']
     output_dir = args.output_dir
     print('output_dir {}'.format(output_dir))    
     hosts = args.hosts
@@ -251,8 +237,6 @@ if __name__ == '__main__':
     print('current_host {}'.format(current_host))    
     num_gpus = args.num_gpus
     print('num_gpus {}'.format(num_gpus))
-    job_name = os.environ['SAGEMAKER_JOB_NAME']
-    print('job_name {}'.format(job_name))    
     use_xla = args.use_xla
     print('use_xla {}'.format(use_xla))    
     use_amp = args.use_amp
@@ -278,9 +262,7 @@ if __name__ == '__main__':
     test_steps = args.test_steps
     print('test_steps {}'.format(test_steps))    
     freeze_bert_layer = args.freeze_bert_layer
-    print('freeze_bert_layer {}'.format(freeze_bert_layer))    
-    enable_sagemaker_debugger = args.enable_sagemaker_debugger
-    print('enable_sagemaker_debugger {}'.format(enable_sagemaker_debugger))    
+    print('freeze_bert_layer {}'.format(freeze_bert_layer))      
     run_validation = args.run_validation
     print('run_validation {}'.format(run_validation))    
     run_test = args.run_test
@@ -295,27 +277,17 @@ if __name__ == '__main__':
     checkpoint_base_path = args.checkpoint_base_path
     print('checkpoint_base_path {}'.format(checkpoint_base_path))
 
-    if is_master:
-        checkpoint_path = checkpoint_base_path
-    else:
-        checkpoint_path = '/tmp/checkpoints'        
-    print('checkpoint_path {}'.format(checkpoint_path))
-    
-    # Determine if PipeMode is enabled 
-    pipe_mode_str = os.environ.get('SM_INPUT_DATA_CONFIG', '')
-    pipe_mode = (pipe_mode_str.find('Pipe') >= 0)
-    print('Using pipe_mode: {}'.format(pipe_mode))
  
     # Model Output 
-    transformer_fine_tuned_model_path = os.path.join(local_model_dir, 'transformers/fine-tuned/')
+    transformer_fine_tuned_model_path = os.path.join(model_dir, 'transformers/fine-tuned/')
     os.makedirs(transformer_fine_tuned_model_path, exist_ok=True)
 
     # SavedModel Output
-    tensorflow_saved_model_path = os.path.join(local_model_dir, 'tensorflow/saved_model/0')
+    tensorflow_saved_model_path = os.path.join(model_dir, 'tensorflow/saved_model/0')
     os.makedirs(tensorflow_saved_model_path, exist_ok=True)
 
     # Tensorboard Logs 
-    tensorboard_logs_path = os.path.join(local_model_dir, 'tensorboard/')
+    tensorboard_logs_path = os.path.join(model_dir, 'tensorboard/')
     os.makedirs(tensorboard_logs_path, exist_ok=True)
 
     # Commented out due to incompatibility with transformers library (possibly)
@@ -337,7 +309,6 @@ if __name__ == '__main__':
         train_dataset = file_based_input_dataset_builder(
             channel='train',
             input_filenames=train_data_filenames,
-            pipe_mode=pipe_mode,
             is_training=True,
             drop_remainder=False,
             batch_size=train_batch_size,
@@ -371,24 +342,6 @@ if __name__ == '__main__':
 
         initial_epoch_number = 0 
 
-        if enable_checkpointing:
-            print('***** Checkpoint enabled *****')
-            
-            os.makedirs(checkpoint_path, exist_ok=True)        
-            if os.listdir(checkpoint_path):
-                print('***** Found checkpoint *****')
-                print(checkpoint_path)
-                model, initial_epoch_number = load_checkpoint_model(checkpoint_path)
-                print('***** Using checkpoint model {} *****'.format(model))
-                
-            checkpoint_callback = ModelCheckpoint(
-                    filepath=os.path.join(checkpoint_path, 'tf_model_{epoch:05d}.h5'),
-                    save_weights_only=False,
-                    verbose=1,
-                    monitor='val_accuracy')
-            print('*** CHECKPOINT CALLBACK {} ***'.format(checkpoint_callback))
-            callbacks.append(checkpoint_callback)
-
         if not tokenizer or not model or not config:
             print('Not properly initialized...')
 
@@ -397,16 +350,6 @@ if __name__ == '__main__':
         if use_amp:
             # loss scaling is currently required when using mixed precision
             optimizer = tf.keras.mixed_precision.experimental.LossScaleOptimizer(optimizer, 'dynamic')
-
-        print('enable_sagemaker_debugger {}'.format(enable_sagemaker_debugger))
-        if enable_sagemaker_debugger:
-            print('*** DEBUGGING ***')
-            import smdebug.tensorflow as smd
-            # This assumes that we specified debugger_hook_config
-            debugger_callback = smd.KerasHook.create_from_json_file()
-            print('*** DEBUGGER CALLBACK {} ***'.format(debugger_callback))            
-            callbacks.append(debugger_callback)
-            optimizer = debugger_callback.wrap_optimizer(optimizer)
 
         if enable_tensorboard:            
             tensorboard_callback = tf.keras.callbacks.TensorBoard(
@@ -430,7 +373,6 @@ if __name__ == '__main__':
             validation_dataset = file_based_input_dataset_builder(
                 channel='validation',
                 input_filenames=validation_data_filenames,
-                pipe_mode=pipe_mode,
                 is_training=False,
                 drop_remainder=False,
                 batch_size=validation_batch_size,
@@ -465,7 +407,6 @@ if __name__ == '__main__':
             test_dataset = file_based_input_dataset_builder(
                 channel='test',
                 input_filenames=test_data_filenames,
-                pipe_mode=pipe_mode,
                 is_training=False,
                 drop_remainder=False,
                 batch_size=test_batch_size,
@@ -517,16 +458,10 @@ if __name__ == '__main__':
 
         tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
 
-        if num_gpus >= 1:
-            inference_device = 0 # GPU 0
-        else:
-            inference_device = -1 # CPU
-        print('inference_device {}'.format(inference_device))
-
         inference_pipeline = TextClassificationPipeline(model=loaded_model, 
                                                         tokenizer=tokenizer,
                                                         framework='tf',
-                                                        device=inference_device)  
+                                                        device=-1)  
 
         print("""I loved it!  I will recommend this to everyone.""", inference_pipeline("""I loved it!  I will recommend this to everyone."""))
         print("""It's OK.""", inference_pipeline("""It's OK."""))
