@@ -11,5 +11,4 @@ spec:
       - "/bin/sh"
       - "-c"
     args:
-      - "git clone "
-      - "python train.py"
+      - ["curl https://raw.githubusercontent.com/data-science-on-aws/workshop/master/12_kubeflow/wip/dlc/code/train.py && python train.py"]
