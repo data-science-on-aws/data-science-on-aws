@@ -3,3 +3,6 @@ trainer.py
 transformer.py
 __pycache__/
 content/
+dlc/deep-learning-containers
+dlc/aws-ebs-csi-driver
+
