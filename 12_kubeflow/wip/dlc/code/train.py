@@ -135,6 +135,12 @@ if __name__ == '__main__':
     print("Environment Variables:") 
     pprint.pprint(dict(env_var), width = 1)
     
+    print('Listing /opt...')
+    for root, subFolder, files in os.walk('/opt'):
+        for item in files:
+            print('{},{},{}'.format(root, subFolder, item))
+    print('Done.')
+    
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--train_data', 
@@ -536,78 +542,3 @@ if __name__ == '__main__':
         print("""I loved it!  I will recommend this to everyone.""", inference_pipeline("""I loved it!  I will recommend this to everyone."""))
         print("""It's OK.""", inference_pipeline("""It's OK."""))
         print("""Really bad.  I hope they don't make this anymore.""", inference_pipeline("""Really bad.  I hope they don't make this anymore."""))
-
-        import csv
-
-        df_test_reviews = pd.read_csv('/opt/ml/input/amazon_reviews_us_Digital_Software_v1_00.tsv.gz', 
-                                        delimiter='\t', 
-                                        quoting=csv.QUOTE_NONE,
-                                        compression='gzip')[['review_body', 'star_rating']]
-
-        df_test_reviews = df_test_reviews.sample(n=100)
-        df_test_reviews.shape
-        df_test_reviews.head()
-        
-        import pandas as pd
-
-        def predict(review_body):
-            prediction_map = inference_pipeline(review_body)
-            return prediction_map[0]['label']
-
-        y_test = df_test_reviews['review_body'].map(predict)
-        y_test
-        
-        y_actual = df_test_reviews['star_rating']
-        y_actual
-
-        from sklearn.metrics import classification_report
-        print(classification_report(y_true=y_test, y_pred=y_actual))
-        
-        from sklearn.metrics import accuracy_score
-        print('Accuracy: ', accuracy_score(y_true=y_test, y_pred=y_actual))
-        
-        import matplotlib.pyplot as plt
-        import pandas as pd
-
-        def plot_conf_mat(cm, classes, title, cmap = plt.cm.Greens):
-            print(cm)
-            plt.imshow(cm, interpolation='nearest', cmap=cmap)
-            plt.title(title)
-            plt.colorbar()
-            tick_marks = np.arange(len(classes))
-            plt.xticks(tick_marks, classes, rotation=45)
-            plt.yticks(tick_marks, classes)
-
-            fmt = 'd'
-            thresh = cm.max() / 2.
-            for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
-                plt.text(j, i, format(cm[i, j], fmt),
-                horizontalalignment="center",
-                color="black" if cm[i, j] > thresh else "black")
-
-                plt.tight_layout()
-                plt.ylabel('True label')
-                plt.xlabel('Predicted label')
-                
-        import itertools
-        import numpy as np
-        from sklearn.metrics import confusion_matrix
-        import matplotlib.pyplot as plt
-        #%matplotlib inline
-        #%config InlineBackend.figure_format='retina'
-
-        cm = confusion_matrix(y_true=y_test, y_pred=y_actual)
-
-        plt.figure()
-        fig, ax = plt.subplots(figsize=(10,5))
-        plot_conf_mat(cm, 
-                      classes=['1', '2', '3', '4', '5'], 
-                      title='Confusion Matrix')
-
-        # Save the confusion matrix        
-        plt.show()
-        
-        # Model Output 
-        metrics_path = os.path.join(local_model_dir, 'metrics/')
-        os.makedirs(metrics_path, exist_ok=True)
-        plt.savefig('{}/confusion_matrix.png'.format(metrics_path))

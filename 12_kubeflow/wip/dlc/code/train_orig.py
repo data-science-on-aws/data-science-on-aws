@@ -130,6 +130,8 @@ def load_checkpoint_model(checkpoint_path):
 
 
 if __name__ == '__main__':
+    
+    
     parser = argparse.ArgumentParser()
 
     
