@@ -11,14 +11,15 @@ import os
 
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'scikit-learn==0.23.1'])
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'sagemaker-tensorflow==2.3.0.1.0.0'])
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow-recommenders==0.1.3'])
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow-datasets==4.0.1'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow-recommenders==0.2.0'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow-datasets==4.0.0'])
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'matplotlib==3.2.1'])
-
+        
 from typing import Dict, Text
 import tensorflow as tf
 import tensorflow_datasets as tfds
 import tensorflow_recommenders as tfrs
+import numpy as np
 
 class MovieLensModel(tfrs.Model):
   # We derive from a custom base class to help reduce boilerplate. Under the hood,
@@ -49,9 +50,9 @@ class MovieLensModel(tfrs.Model):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
-#     parser.add_argument('--train_data', 
-#                         type=str, 
-#                         default=os.environ['SM_CHANNEL_TRAIN'])
+    parser.add_argument('--train_data', 
+                        type=str, 
+                        default=os.environ['SM_CHANNEL_TRAIN'])
 #     parser.add_argument('--validation_data', 
 #                         type=str, 
 #                         default=os.environ['SM_CHANNEL_VALIDATION'])
@@ -78,7 +79,7 @@ if __name__ == '__main__':
                         default=False)
     parser.add_argument('--epochs',
                         type=int,
-                        default=100)
+                        default=1)
     parser.add_argument('--learning_rate',
                         type=float,
                         default=0.5)
@@ -103,10 +104,10 @@ if __name__ == '__main__':
     print("Environment Variables:") 
     pprint.pprint(dict(env_var), width = 1) 
 
-    print('SM_TRAINING_ENV {}'.format(env_var['SM_TRAINING_ENV']))
-    sm_training_env_json = json.loads(env_var['SM_TRAINING_ENV'])
-    is_master = sm_training_env_json['is_master']
-    print('is_master {}'.format(is_master))
+#     print('SM_TRAINING_ENV {}'.format(env_var['SM_TRAINING_ENV']))
+#     sm_training_env_json = json.loads(env_var['SM_TRAINING_ENV'])
+#     is_master = sm_training_env_json['is_master']
+#     print('is_master {}'.format(is_master))
     
 #     train_data = args.train_data
 #     print('train_data {}'.format(train_data))
@@ -124,8 +125,8 @@ if __name__ == '__main__':
     print('current_host {}'.format(current_host))    
     num_gpus = args.num_gpus
     print('num_gpus {}'.format(num_gpus))
-    job_name = os.environ['SAGEMAKER_JOB_NAME']
-    print('job_name {}'.format(job_name))    
+#    job_name = os.environ['SAGEMAKER_JOB_NAME']
+#    print('job_name {}'.format(job_name))    
 
     use_xla = args.use_xla
     print('use_xla {}'.format(use_xla))    
@@ -158,18 +159,18 @@ if __name__ == '__main__':
 #    policy = mixed_precision.Policy(mixed_precision_policy)
 #    mixed_precision.set_policy(policy)    
     
-    from typing import Dict, Text
+#     from typing import Dict, Text
 
-    import numpy as np
-    import tensorflow as tf
+#     import numpy as np
+#     import tensorflow as tf
 
-    import tensorflow_datasets as tfds
-    import tensorflow_recommenders as tfrs
+#     import tensorflow_datasets as tfds
+#     import tensorflow_recommenders as tfrs
 
-    distributed_strategy = tf.distribute.experimental.MultiWorkerMirroredStrategy()
-    with distributed_strategy.scope():
-        tf.config.optimizer.set_jit(use_xla)
-        tf.config.optimizer.set_experimental_options({"auto_mixed_precision": use_amp})
+#    distributed_strategy = tf.distribute.experimental.MultiWorkerMirroredStrategy()
+#    with distributed_strategy.scope():
+#    tf.config.optimizer.set_jit(use_xla)
+#    tf.config.optimizer.set_experimental_options({"auto_mixed_precision": use_amp})
 
 #         train_data_filenames = glob(os.path.join(train_data, '*.tfrecord'))
 #         print('train_data_filenames {}'.format(train_data_filenames))
@@ -184,88 +185,108 @@ if __name__ == '__main__':
 #             steps_per_epoch=train_steps_per_epoch,
 #             max_seq_length=max_seq_length).map(select_data_and_label_from_record)
 
-        ratings = tfds.load('movielens/100k-ratings', split="train")
-        print(ratings)
+#     for dirName, subdirList, fileList in os.walk('/opt/ml/'):
+#         print('Found directory /opt/ml/: %s' % dirName)
+#         for fname in fileList:
+#             print('\t%s' % fname) 
+            
+#     for dirName, subdirList, fileList in os.walk('/opt/ml/input/data/train/'):
+#         print('Found directory BEFORE: %s' % dirName)
+#         for fname in fileList:
+#             print('\t%s' % fname) 
+            
+    for dirName, subdirList, fileList in os.walk(args.train_data):
+        print('Found directory BEFORE: %s' % dirName)
+        for fname in fileList:
+            print('\t%s' % fname)         
 
-        movies = tfds.load('movielens/100k-movies', split="train")
-        print(movies)
+    ratings = tfds.load('movielens/25m-ratings', 
+                        download=False,
+                        data_dir=args.train_data,
+                        split="train")
+    print('Ratings BEFORE', ratings)
+    
+    ratings = ratings.map(lambda x: {
+        "movie_title": x["movie_title"],
+        "user_id": x["user_id"]
+    })
+    print('Ratings AFTER', ratings)    
 
-        ratings = ratings.map(lambda x: {
-            "movie_title": x["movie_title"],
-            "user_id": x["user_id"]
-        })
-        print(ratings)
+    movies = tfds.load('movielens/25m-movies',
+                       download=False,
+                       data_dir=args.train_data,
+                       split="train")
+    print('Movies BEFORE', movies)
+    
+    movies = movies.map(lambda x: x["movie_title"])
+    print('Movies AFTER', movies)
 
-        movies = movies.map(lambda x: x["movie_title"])
-        print(movies)
+    user_ids_vocabulary = tf.keras.layers.experimental.preprocessing.StringLookup(mask_token=None)
+    user_ids_vocabulary.adapt(ratings.map(lambda x: x["user_id"]))
 
-        user_ids_vocabulary = tf.keras.layers.experimental.preprocessing.StringLookup(mask_token=None)
-        user_ids_vocabulary.adapt(ratings.map(lambda x: x["user_id"]))
+    movie_titles_vocabulary = tf.keras.layers.experimental.preprocessing.StringLookup(mask_token=None)
+    movie_titles_vocabulary.adapt(movies)
 
-        movie_titles_vocabulary = tf.keras.layers.experimental.preprocessing.StringLookup(mask_token=None)
-        movie_titles_vocabulary.adapt(movies)
+    user_model = tf.keras.Sequential([
+        user_ids_vocabulary,
+        tf.keras.layers.Embedding(user_ids_vocabulary.vocab_size(), 128)
+    ])
 
-        user_model = tf.keras.Sequential([
-            user_ids_vocabulary,
-            tf.keras.layers.Embedding(user_ids_vocabulary.vocab_size(), 128)
-        ])
+    movie_model = tf.keras.Sequential([
+        movie_titles_vocabulary,
+        tf.keras.layers.Embedding(movie_titles_vocabulary.vocab_size(), 128)
+    ])
 
-        movie_model = tf.keras.Sequential([
-            movie_titles_vocabulary,
-            tf.keras.layers.Embedding(movie_titles_vocabulary.vocab_size(), 128)
-        ])
+    task = tfrs.tasks.Retrieval(metrics=tfrs.metrics.FactorizedTopK(
+        movies.batch(128).map(movie_model)
+      )
+    )        
 
-        task = tfrs.tasks.Retrieval(metrics=tfrs.metrics.FactorizedTopK(
-            movies.batch(128).map(movie_model)
-          )
-        )        
+    optimizer = tf.keras.optimizers.Adagrad(learning_rate)
+    print('** use_amp {}'.format(use_amp))        
+    if use_amp:
+        # loss scaling is currently required when using mixed precision
+        optimizer = tf.keras.mixed_precision.experimental.LossScaleOptimizer(optimizer, 'dynamic')
 
-        optimizer = tf.keras.optimizers.Adagrad(learning_rate)
-        print('** use_amp {}'.format(use_amp))        
-        if use_amp:
-            # loss scaling is currently required when using mixed precision
-            optimizer = tf.keras.mixed_precision.experimental.LossScaleOptimizer(optimizer, 'dynamic')
+    callbacks = []
 
-        callbacks = []
-        
-        if enable_tensorboard:            
-            tensorboard_callback = tf.keras.callbacks.TensorBoard(
-                                                        log_dir=tensorboard_logs_path)
-            print('*** TENSORBOARD CALLBACK {} ***'.format(tensorboard_callback))
-            callbacks.append(tensorboard_callback)
-  
-        print('*** OPTIMIZER {} ***'.format(optimizer))
-        
-        model = MovieLensModel(user_model, movie_model, task)          
-        model.compile(optimizer=optimizer)
+    if enable_tensorboard:            
+        tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=tensorboard_logs_path)
+        print('*** TENSORBOARD CALLBACK {} ***'.format(tensorboard_callback))
+        callbacks.append(tensorboard_callback)
 
-        model.fit(ratings.batch(4096), epochs=epochs)
+    print('*** OPTIMIZER {} ***'.format(optimizer))
 
-        print('Compiled model {}'.format(model))          
-        print(model.summary())
+    model = MovieLensModel(user_model, movie_model, task)          
+    model.compile(optimizer=optimizer)
 
-        index = tfrs.layers.ann.BruteForce(model.user_model)
-        index.index(movies.batch(100).map(model.movie_model), movies)
+    model.fit(ratings.batch(4096), epochs=epochs)
 
-        # Get some recommendations.
-        _, titles = index(np.array(["42"]))
-        print(f"Top 10 recommendations for user 42: {titles[0, :10]}")
+    index = tfrs.layers.factorized_top_k.BruteForce(model.user_model)
+    index.index(movies.batch(100).map(model.movie_model), movies)
 
-        # Save the TensorFlow SavedModel for Serving Predictions
-        # Note:  We must call index() above before we save().
-        #        See https://github.com/tensorflow/tensorflow/issues/31057 for more details.
-        print('tensorflow_saved_model_path {}'.format(tensorflow_saved_model_path))   
-        index.save(tensorflow_saved_model_path, save_format='tf')
-                
-        # Copy inference.py and requirements.txt to the code/ directory
-        #   Note: This is required for the SageMaker Endpoint to pick them up.
-        #         This appears to be hard-coded and must be called code/
-        inference_path = os.path.join(local_model_dir, 'code/')
-        print('Copying inference source files to {}'.format(inference_path))
-        os.makedirs(inference_path, exist_ok=True)               
-        os.system('cp inference.py {}'.format(inference_path))
-        print(glob(inference_path))        
-#        os.system('cp requirements.txt {}/code'.format(inference_path))
+    # Must make a prediction before we can save the model.
+    _, titles = index(np.array(["42"]))
+    print(f"Top 10 recommendations for user 42: {titles[0, :10]}")
+
+    print('Compiled model {}'.format(index))
+    print(index.summary())
+
+    # Save the TensorFlow SavedModel for Serving Predictions
+    # Note:  We must call index() above before we save().
+    #        See https://github.com/tensorflow/tensorflow/issues/31057 for more details.
+    print('tensorflow_saved_model_path {}'.format(tensorflow_saved_model_path))   
+    index.save(tensorflow_saved_model_path, save_format='tf')
+
+    # Copy inference.py and requirements.txt to the code/ directory
+    #   Note: This is required for the SageMaker Endpoint to pick them up.
+    #         This appears to be hard-coded and must be called code/
+    inference_path = os.path.join(local_model_dir, 'code/')
+    print('Copying inference source files to {}'.format(inference_path))
+    os.makedirs(inference_path, exist_ok=True)               
+    os.system('cp inference.py {}'.format(inference_path))
+    print(glob(inference_path))        
+#    os.system('cp requirements.txt {}/code'.format(inference_path))
         
 
     
