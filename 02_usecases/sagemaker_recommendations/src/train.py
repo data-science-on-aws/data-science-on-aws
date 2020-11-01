@@ -27,38 +27,35 @@ class MovieLensModel(tfrs.Model):
 
   def __init__(
       self,
-      user_model: tf.keras.Model,
-      movie_model: tf.keras.Model,
+      user_embedding: tf.keras.Model,
+      movie_embeddings: tf.keras.Model,
       task: tfrs.tasks.Retrieval):
     super().__init__()
 
     # Set up user and movie representations.
-    self.user_model = user_model
-    self.movie_model = movie_model
+    self.user_embeddings = user_embeddings
+    self.movie_embeddings = movie_embeddings
 
     # Set up a retrieval task.
     self.task = task
 
   def compute_loss(self, features: Dict[Text, tf.Tensor], training=False) -> tf.Tensor:
-    # Define how the loss is computed.
-
-    user_embeddings = self.user_model(features["user_id"])
-    movie_embeddings = self.movie_model(features["movie_title"])
+    # Define how the loss is computed using the retrieval task
+    user_embeddings = self.user_embeddings(features['user_id'])
+    movie_embeddings = self.movie_embeddings(features['movie_title'])
 
     return self.task(user_embeddings, movie_embeddings)
 
-if __name__ == '__main__':
+if __name__ == '__main__':    
+    env_var = os.environ 
+    print('Environment Variables:') 
+    pprint.pprint(dict(env_var), width = 1) 
+    
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--train_data', 
                         type=str, 
                         default=os.environ['SM_CHANNEL_TRAIN'])
-#     parser.add_argument('--validation_data', 
-#                         type=str, 
-#                         default=os.environ['SM_CHANNEL_VALIDATION'])
-#     parser.add_argument('--test_data',
-#                         type=str,
-#                         default=os.environ['SM_CHANNEL_TEST'])
     parser.add_argument('--output_dir',
                         type=str,
                         default=os.environ['SM_OUTPUT_DIR'])
@@ -89,34 +86,20 @@ if __name__ == '__main__':
     parser.add_argument('--output_data_dir', # This is unused
                         type=str,
                         default=os.environ['SM_OUTPUT_DATA_DIR'])
+    parser.add_argument('--dataset_variant', 
+                        type=str, 
+                        default='100k')
+    parser.add_argument('--embedding_dimension', 
+                        type=str, 
+                        default=256)
     
-    # This points to the S3 location - this should not be used by our code
-    # We should use /opt/ml/model/ instead
-    # parser.add_argument('--model_dir', 
-    #                     type=str, 
-    #                     default=os.environ['SM_MODEL_DIR'])
-     
     args, _ = parser.parse_known_args()
-    print("Args:") 
+    print('command line args:') 
     print(args)
-    
-    env_var = os.environ 
-    print("Environment Variables:") 
-    pprint.pprint(dict(env_var), width = 1) 
-
-#     print('SM_TRAINING_ENV {}'.format(env_var['SM_TRAINING_ENV']))
-#     sm_training_env_json = json.loads(env_var['SM_TRAINING_ENV'])
-#     is_master = sm_training_env_json['is_master']
-#     print('is_master {}'.format(is_master))
-    
-#     train_data = args.train_data
-#     print('train_data {}'.format(train_data))
-#     validation_data = args.validation_data
-#     print('validation_data {}'.format(validation_data))
-#     test_data = args.test_data
-#     print('test_data {}'.format(test_data))    
-
+    train_data = args.train_data
+    print('train_data {}'.format(train_data))
     local_model_dir = os.environ['SM_MODEL_DIR']
+    print('local_model_dir {}'.format(local_model_dir))
     output_dir = args.output_dir
     print('output_dir {}'.format(output_dir))    
     hosts = args.hosts
@@ -125,168 +108,128 @@ if __name__ == '__main__':
     print('current_host {}'.format(current_host))    
     num_gpus = args.num_gpus
     print('num_gpus {}'.format(num_gpus))
-#    job_name = os.environ['SAGEMAKER_JOB_NAME']
-#    print('job_name {}'.format(job_name))    
-
     use_xla = args.use_xla
-    print('use_xla {}'.format(use_xla))    
+    print('use_xla {}'.format(use_xla))
     use_amp = args.use_amp
-    print('use_amp {}'.format(use_amp))    
+    print('use_amp {}'.format(use_amp))
     epochs = args.epochs
-    print('epochs {}'.format(epochs))    
+    print('epochs {}'.format(epochs))
     learning_rate = args.learning_rate
-    print('learning_rate {}'.format(learning_rate))    
+    print('learning_rate {}'.format(learning_rate))
     enable_tensorboard = args.enable_tensorboard
-    print('enable_tensorboard {}'.format(enable_tensorboard))       
-
-    # Determine if PipeMode is enabled 
-#     pipe_mode_str = os.environ.get('SM_INPUT_DATA_CONFIG', '')
-#     pipe_mode = (pipe_mode_str.find('Pipe') >= 0)
-#     print('Using pipe_mode: {}'.format(pipe_mode))
- 
-    # SavedModel Output
-    tensorflow_saved_model_path = os.path.join(local_model_dir, 'tensorflow/saved_model/0')
-    os.makedirs(tensorflow_saved_model_path, exist_ok=True)
-
-    # Tensorboard Logs 
-    tensorboard_logs_path = os.path.join(local_model_dir, 'tensorboard/')
-    os.makedirs(tensorboard_logs_path, exist_ok=True)
-
-    # Commented out due to incompatibility with transformers library (possibly)
-    # Set the global precision mixed_precision policy to "mixed_float16"    
-#    mixed_precision_policy = 'mixed_float16'
-#    print('Mixed precision policy {}'.format(mixed_precision_policy))
-#    policy = mixed_precision.Policy(mixed_precision_policy)
-#    mixed_precision.set_policy(policy)    
-    
-#     from typing import Dict, Text
-
-#     import numpy as np
-#     import tensorflow as tf
-
-#     import tensorflow_datasets as tfds
-#     import tensorflow_recommenders as tfrs
-
-#    distributed_strategy = tf.distribute.experimental.MultiWorkerMirroredStrategy()
-#    with distributed_strategy.scope():
-#    tf.config.optimizer.set_jit(use_xla)
-#    tf.config.optimizer.set_experimental_options({"auto_mixed_precision": use_amp})
-
-#         train_data_filenames = glob(os.path.join(train_data, '*.tfrecord'))
-#         print('train_data_filenames {}'.format(train_data_filenames))
-#         train_dataset = file_based_input_dataset_builder(
-#             channel='train',
-#             input_filenames=train_data_filenames,
-#             pipe_mode=pipe_mode,
-#             is_training=True,
-#             drop_remainder=False,
-#             batch_size=train_batch_size,
-#             epochs=epochs,
-#             steps_per_epoch=train_steps_per_epoch,
-#             max_seq_length=max_seq_length).map(select_data_and_label_from_record)
-
-#     for dirName, subdirList, fileList in os.walk('/opt/ml/'):
-#         print('Found directory /opt/ml/: %s' % dirName)
-#         for fname in fileList:
-#             print('\t%s' % fname) 
-            
-#     for dirName, subdirList, fileList in os.walk('/opt/ml/input/data/train/'):
-#         print('Found directory BEFORE: %s' % dirName)
-#         for fname in fileList:
-#             print('\t%s' % fname) 
-            
-    for dirName, subdirList, fileList in os.walk(args.train_data):
-        print('Found directory BEFORE: %s' % dirName)
-        for fname in fileList:
-            print('\t%s' % fname)         
-
-    ratings = tfds.load('movielens/25m-ratings', 
+    print('enable_tensorboard {}'.format(enable_tensorboard))
+    dataset_variant = args.dataset_variant
+    print('dataset_variant {}'.format(dataset_variant))
+    embedding_dimension = int(args.embedding_dimension)
+    print('embedding_dimension {}'.format(embedding_dimension))    
+             
+    # Load the ratings data to use for training
+    ratings = tfds.load('movielens/{}-ratings'.format(dataset_variant), 
                         download=False,
-                        data_dir=args.train_data,
-                        split="train")
-    print('Ratings BEFORE', ratings)
-    
+                        data_dir=train_data,
+                        split='train')
+    print('Ratings raw', ratings)
+
+    # Transform the ratings data specific to our training task
     ratings = ratings.map(lambda x: {
-        "movie_title": x["movie_title"],
-        "user_id": x["user_id"]
+        'movie_title': x['movie_title'],
+        'user_id': x['user_id']
     })
-    print('Ratings AFTER', ratings)    
+    print('Ratings transformed', ratings)    
 
-    movies = tfds.load('movielens/25m-movies',
+    # Load the movies data to use for training
+    movies = tfds.load('movielens/{}-movies'.format(dataset_variant),
                        download=False,
-                       data_dir=args.train_data,
-                       split="train")
-    print('Movies BEFORE', movies)
+                       data_dir=train_data,
+                       split='train')
+    print('Movies raw', movies)
     
-    movies = movies.map(lambda x: x["movie_title"])
-    print('Movies AFTER', movies)
+    # Transform the movies data specific to our training task
+    movies = movies.map(lambda x: x['movie_title'])
+    print('Movies transformed', movies)
 
+    # Create the user vocabulary and user embeddings
     user_ids_vocabulary = tf.keras.layers.experimental.preprocessing.StringLookup(mask_token=None)
-    user_ids_vocabulary.adapt(ratings.map(lambda x: x["user_id"]))
+    user_ids_vocabulary.adapt(ratings.map(lambda x: x['user_id']))
 
+    user_embeddings = tf.keras.Sequential([
+        user_ids_vocabulary,
+        tf.keras.layers.Embedding(user_ids_vocabulary.vocab_size(),
+                                  embedding_dimension)
+    ])
+
+    # Create the movie vocabulary and movie embeddings
     movie_titles_vocabulary = tf.keras.layers.experimental.preprocessing.StringLookup(mask_token=None)
     movie_titles_vocabulary.adapt(movies)
 
-    user_model = tf.keras.Sequential([
-        user_ids_vocabulary,
-        tf.keras.layers.Embedding(user_ids_vocabulary.vocab_size(), 128)
-    ])
-
-    movie_model = tf.keras.Sequential([
+    movie_embeddings = tf.keras.Sequential([
         movie_titles_vocabulary,
-        tf.keras.layers.Embedding(movie_titles_vocabulary.vocab_size(), 128)
+        tf.keras.layers.Embedding(movie_titles_vocabulary.vocab_size(),
+                                  embedding_dimension)
     ])
 
+    # Specify the task and the top-k metric to optimize during model training
     task = tfrs.tasks.Retrieval(metrics=tfrs.metrics.FactorizedTopK(
-        movies.batch(128).map(movie_model)
-      )
-    )        
+        movies.batch(128).map(movie_embeddings)
+    ))
 
+    # Define the optimizer and hyper-parameters
     optimizer = tf.keras.optimizers.Adagrad(learning_rate)
-    print('** use_amp {}'.format(use_amp))        
-    if use_amp:
-        # loss scaling is currently required when using mixed precision
-        optimizer = tf.keras.mixed_precision.experimental.LossScaleOptimizer(optimizer, 'dynamic')
+    print('Optimizer:  {}'.format(optimizer))
 
+    # Setup the callbacks to use during training
     callbacks = []
 
-    if enable_tensorboard:            
+    # Setup the Tensorboard callback if Tensorboard is enabled
+    if enable_tensorboard: 
+        # Tensorboard Logs 
+        tensorboard_logs_path = os.path.join(local_model_dir, 'tensorboard/')
+        os.makedirs(tensorboard_logs_path, exist_ok=True)
+
         tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=tensorboard_logs_path)
-        print('*** TENSORBOARD CALLBACK {} ***'.format(tensorboard_callback))
+        print('Adding Tensorboard callback {}'.format(tensorboard_callback))
         callbacks.append(tensorboard_callback)
+    print('Callbacks: {}'.format(callbacks))
 
-    print('*** OPTIMIZER {} ***'.format(optimizer))
-
-    model = MovieLensModel(user_model, movie_model, task)          
+    # Create a custom Keras model with the user embeddings, movie embeddings, and optimization task
+    model = MovieLensModel(user_embeddings, movie_embeddings, task)
+    
+    # Compile the model and prepare for training
     model.compile(optimizer=optimizer)
 
+    # Train the model
     model.fit(ratings.batch(4096), epochs=epochs)
 
-    index = tfrs.layers.factorized_top_k.BruteForce(model.user_model)
-    index.index(movies.batch(100).map(model.movie_model), movies)
+    # Make some sample predictions to test our model
+    # Note:  This is required to save and server our model with TensorFlow Serving
+    #        See https://github.com/tensorflow/tensorflow/issues/31057 for more  details.
+    index = tfrs.layers.factorized_top_k.BruteForce(query_model=model.user_embeddings)
+    index.index(movies.batch(100).map(model.movie_embeddings), movies)
 
-    # Must make a prediction before we can save the model.
-    _, titles = index(np.array(["42"]))
-    print(f"Top 10 recommendations for user 42: {titles[0, :10]}")
+    user_id = '42'
+    _, titles = index(np.array([user_id]))
 
-    print('Compiled model {}'.format(index))
+    k = 10
+    print(f'Top {k} recommendations for user {user_id}: {titles[0, :k]}')
+
+    # Print a summary of our recommender model
+    print('Trained index {}'.format(index))
     print(index.summary())
 
     # Save the TensorFlow SavedModel for Serving Predictions
-    # Note:  We must call index() above before we save().
-    #        See https://github.com/tensorflow/tensorflow/issues/31057 for more details.
-    print('tensorflow_saved_model_path {}'.format(tensorflow_saved_model_path))   
+    # SavedModel Output
+    tensorflow_saved_model_path = os.path.join(local_model_dir,
+                                               'tensorflow/saved_model/0')
+    os.makedirs(tensorflow_saved_model_path, exist_ok=True)
+    
+    print('tensorflow_saved_model_path {}'.format(tensorflow_saved_model_path))
     index.save(tensorflow_saved_model_path, save_format='tf')
 
     # Copy inference.py and requirements.txt to the code/ directory
     #   Note: This is required for the SageMaker Endpoint to pick them up.
-    #         This appears to be hard-coded and must be called code/
+    #         This directory must be named `code/`
     inference_path = os.path.join(local_model_dir, 'code/')
-    print('Copying inference source files to {}'.format(inference_path))
+    print('Copying inference.py to {}'.format(inference_path))
     os.makedirs(inference_path, exist_ok=True)               
     os.system('cp inference.py {}'.format(inference_path))
-    print(glob(inference_path))        
-#    os.system('cp requirements.txt {}/code'.format(inference_path))
-        
-
-    
+    print(glob(inference_path))
