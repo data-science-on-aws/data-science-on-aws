@@ -54,7 +54,7 @@ def main():
     userRecs = model.recommendForAllUsers(10)
     userRecs.show()
     # Write top 10 movie recommendations for each user
-    userRecs.repartition(1).write.mode(SaveMode.Overwrite).option("header", true).option("delimiter", "\t").csv(f"{s3_output_data}/recommendations")
+#    userRecs.repartition(1).write.mode("overwrite").option("header", true).option("delimiter", "\t").csv(f"{s3_output_data}/recommendations")
         
     # Generate top 10 movie recommendations for a specified set of 3 users
     # TODO:  Just select user_id "42"    
