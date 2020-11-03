@@ -24,13 +24,13 @@ import numpy as np
 
 class MovielensModel(tfrs.models.Model):
 
-  def __init__(self, rating_weight: float, retrieval_weight: float) -> None:
+  def __init__(self, embedding_dimension: int, rating_weight: float, retrieval_weight: float) -> None:
     # We take the loss weights in the constructor: this allows us to instantiate
     # several model objects with different loss weights.
 
     super().__init__()
 
-    embedding_dimension = 32
+#    embedding_dimension = 32
 
     # User and movie models.
     self.movie_model: tf.keras.layers.Layer = tf.keras.Sequential([
@@ -182,8 +182,9 @@ if __name__ == '__main__':
 
     # Transform the ratings data specific to our training task
     ratings = ratings.map(lambda x: {
-        'movie_title': x['movie_title'],
-        'user_id': x['user_id']
+        "movie_title": x["movie_title"],
+        "user_id": x["user_id"],
+        "user_rating": x["user_rating"],
     })
     print('Ratings transformed', ratings)    
 
@@ -209,7 +210,7 @@ if __name__ == '__main__':
     cached_test = test.batch(4096).cache()
     
     movie_titles = movies.batch(1_000)
-    user_ids = ratings.batch(1_000_000).map(lambda x: x["user_id"])
+    user_ids = ratings.batch(100_000).map(lambda x: x["user_id"])
 
     unique_movie_titles = np.unique(np.concatenate(list(movie_titles)))
     unique_user_ids = np.unique(np.concatenate(list(user_ids)))
@@ -233,7 +234,9 @@ if __name__ == '__main__':
     print('Callbacks: {}'.format(callbacks))
 
     # Create and compile a custom Keras model specialized for rating
-    model = MovielensModel(rating_weight=1.0, retrieval_weight=0.0)
+    model = MovielensModel(embedding_dimension=embedding_dimension, 
+                           rating_weight=1.0, 
+                           retrieval_weight=0.0)
     model.compile(optimizer=optimizer)
 
     # Train the model
@@ -244,7 +247,9 @@ if __name__ == '__main__':
     print(f"ranking-rmse: {metrics['root_mean_squared_error']:.3f}.")
 
     # Create and compile a custom Keras model specialized for retrieval
-    model = MovielensModel(rating_weight=0.0, retrieval_weight=1.0)   
+    model = MovielensModel(embedding_dimension=embedding_dimension, 
+                           rating_weight=0.0, 
+                           retrieval_weight=1.0)   
     model.compile(optimizer=optimizer)
 
     model.fit(cached_train, epochs=epochs, callbacks=callbacks)
@@ -254,7 +259,9 @@ if __name__ == '__main__':
     print(f"ranking-rmse: {metrics['root_mean_squared_error']:.3f}.")
     
     # Create and compile a custom Keras model for both rating and retrieval
-    model = MovielensModel(rating_weight=1.0, retrieval_weight=1.0)
+    model = MovielensModel(embedding_dimension=embedding_dimension, 
+                           rating_weight=1.0, 
+                           retrieval_weight=1.0)
     model.compile(optimizer=optimizer)
     
     model.fit(cached_train, epochs=epochs, callbacks=callbacks)

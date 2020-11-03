@@ -31,14 +31,19 @@ def main():
 
     lines = spark.read.text(s3_input_data).rdd
     parts = lines.map(lambda row: row.value.split("::"))
-    ratingsRDD = parts.map(lambda p: Row(userId=int(p[0]), movieId=int(p[1]),
-                                         rating=float(p[2]), timestamp=int(p[3])))
+    ratingsRDD = parts.map(lambda p: Row(userId=int(p[0]), 
+                                         movieId=int(p[1]),
+                                         rating=float(p[2]), 
+                                         timestamp=int(p[3])))
     ratings = spark.createDataFrame(ratingsRDD)
     (training, test) = ratings.randomSplit([0.8, 0.2])
 
     # Build the recommendation model using ALS on the training data
-    # Note we set cold start strategy to 'drop' to ensure we don't get NaN evaluation metrics
-    als = ALS(maxIter=5, regParam=0.01, userCol="userId", itemCol="movieId", ratingCol="rating",
+    als = ALS(maxIter=5, 
+              regParam=0.01, 
+              userCol="userId", 
+              itemCol="movieId", 
+              ratingCol="rating",
               coldStartStrategy="drop")
     model = als.fit(training)
 
@@ -53,8 +58,11 @@ def main():
     # Generate top 10 movie recommendations for each user
     userRecs = model.recommendForAllUsers(10)
     userRecs.show()
+
     # Write top 10 movie recommendations for each user
-#    userRecs.repartition(1).write.mode("overwrite").option("header", true).option("delimiter", "\t").csv(f"{s3_output_data}/recommendations")
+    # Note:  This is commented out until we fix this: 
+    #    org.apache.spark.sql.AnalysisException: CSV data source does not support array<struct<movieId:int,rating:float>> data type.;
+#    userRecs.repartition(1).write.mode("overwrite").option("header", True).option("delimiter", "\t").csv(f"{s3_output_data}/recommendations")
         
     # Generate top 10 movie recommendations for a specified set of 3 users
     # TODO:  Just select user_id "42"    
@@ -69,8 +77,8 @@ def main():
 #     movieRecs.
 #       .repartition(1)
 #       .write
-#       .mode(SaveMode.Overwrite)
-#       .option("header", true)      
+#       .mode("overwrite")
+#       .option("header", True)      
 #       .option("delimiter", "\t")
 #       .csv(f"{s3_output_data}/movies")
   

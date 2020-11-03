@@ -21,30 +21,61 @@ import tensorflow_datasets as tfds
 import tensorflow_recommenders as tfrs
 import numpy as np
 
-class MovieLensModel(tfrs.Model):
-  # We derive from a custom base class to help reduce boilerplate. Under the hood,
-  # these are still plain Keras Models.
+class RankingModel(tf.keras.Model):
 
-  def __init__(
-      self,
-      user_embedding: tf.keras.Model,
-      movie_embeddings: tf.keras.Model,
-      task: tfrs.tasks.Retrieval):
+  def __init__(self, embedding_dimension, unique_user_ids, unique_movie_titles):
     super().__init__()
 
-    # Set up user and movie representations.
-    self.user_embeddings = user_embeddings
-    self.movie_embeddings = movie_embeddings
+    # Compute embeddings for users.
+    self.user_model = tf.keras.Sequential([
+      tf.keras.layers.experimental.preprocessing.StringLookup(
+        vocabulary=unique_user_ids, mask_token=None),
+      tf.keras.layers.Embedding(len(unique_user_ids) + 1, embedding_dimension)
+    ])
 
-    # Set up a retrieval task.
-    self.task = task
+    # Compute embeddings for movies.
+    self.movie_model = tf.keras.Sequential([
+      tf.keras.layers.experimental.preprocessing.StringLookup(
+        vocabulary=unique_movie_titles, mask_token=None),
+      tf.keras.layers.Embedding(len(unique_movie_titles) + 1, embedding_dimension)
+    ])
+
+    # Compute predictions.
+    self.ratings = tf.keras.Sequential([
+      # Learn multiple dense layers.
+      tf.keras.layers.Dense(256, activation="relu"),
+      tf.keras.layers.Dense(64, activation="relu"),
+      # Make rating predictions in the final layer.
+      tf.keras.layers.Dense(1)
+  ])
+    
+  def call(self, inputs):
+
+    user_id, movie_title = inputs
+
+    user_model = self.user_model(user_id)
+    movie_model = self.movie_model(movie_title)
+
+    return self.ratings(tf.concat([user_model, movie_model], axis=1))
+
+
+class MovielensModel(tfrs.models.Model):
+
+  def __init__(self, embedding_dimension, unique_user_ids, unique_movie_titles):
+    super().__init__()
+    self.ranking_model: tf.keras.Model = RankingModel(embedding_dimension, unique_user_ids, unique_movie_titles)
+    self.task: tf.keras.layers.Layer = tfrs.tasks.Ranking(
+      loss = tf.keras.losses.MeanSquaredError(),
+      metrics=[tf.keras.metrics.RootMeanSquaredError()]
+    )
 
   def compute_loss(self, features: Dict[Text, tf.Tensor], training=False) -> tf.Tensor:
-    # Define how the loss is computed using the retrieval task
-    user_embeddings = self.user_embeddings(features['user_id'])
-    movie_embeddings = self.movie_embeddings(features['movie_title'])
+    rating_predictions = self.ranking_model(
+        (features["user_id"], features["movie_title"]))
 
-    return self.task(user_embeddings, movie_embeddings)
+    # The task computes the loss and the metrics.
+    return self.task(labels=features["user_rating"], predictions=rating_predictions)
+
 
 if __name__ == '__main__':    
     env_var = os.environ 
@@ -68,12 +99,6 @@ if __name__ == '__main__':
     parser.add_argument('--num_gpus', 
                         type=int, 
                         default=os.environ['SM_NUM_GPUS'])
-    parser.add_argument('--use_xla',
-                        type=eval,
-                        default=False)
-    parser.add_argument('--use_amp',
-                        type=eval,
-                        default=False)
     parser.add_argument('--epochs',
                         type=int,
                         default=1)
@@ -108,10 +133,6 @@ if __name__ == '__main__':
     print('current_host {}'.format(current_host))    
     num_gpus = args.num_gpus
     print('num_gpus {}'.format(num_gpus))
-    use_xla = args.use_xla
-    print('use_xla {}'.format(use_xla))
-    use_amp = args.use_amp
-    print('use_amp {}'.format(use_amp))
     epochs = args.epochs
     print('epochs {}'.format(epochs))
     learning_rate = args.learning_rate
@@ -129,50 +150,36 @@ if __name__ == '__main__':
                         data_dir=train_data,
                         split='train')
     print('Ratings raw', ratings)
-
+    
     # Transform the ratings data specific to our training task
     ratings = ratings.map(lambda x: {
-        'movie_title': x['movie_title'],
-        'user_id': x['user_id']
+        "movie_title": x["movie_title"],
+        "user_id": x["user_id"],
+        "user_rating": x["user_rating"]
     })
     print('Ratings transformed', ratings)    
 
-    # Load the movies data to use for training
     movies = tfds.load('movielens/{}-movies'.format(dataset_variant),
                        download=False,
                        data_dir=train_data,
                        split='train')
     print('Movies raw', movies)
-    
-    # Transform the movies data specific to our training task
-    movies = movies.map(lambda x: x['movie_title'])
+
+    movies = movies.map(lambda x: x["movie_title"])
     print('Movies transformed', movies)
 
-    # Create the user vocabulary and user embeddings
-    user_ids_vocabulary = tf.keras.layers.experimental.preprocessing.StringLookup(mask_token=None)
-    user_ids_vocabulary.adapt(ratings.map(lambda x: x['user_id']))
+    tf.random.set_seed(42)
+    shuffled = ratings.shuffle(100_000, seed=42, reshuffle_each_iteration=False)
 
-    user_embeddings = tf.keras.Sequential([
-        user_ids_vocabulary,
-        tf.keras.layers.Embedding(user_ids_vocabulary.vocab_size(),
-                                  embedding_dimension)
-    ])
+    train = shuffled.take(80_000)
+    test = shuffled.skip(80_000).take(20_000)
 
-    # Create the movie vocabulary and movie embeddings
-    movie_titles_vocabulary = tf.keras.layers.experimental.preprocessing.StringLookup(mask_token=None)
-    movie_titles_vocabulary.adapt(movies)
+    movie_titles = ratings.batch(100_000).map(lambda x: x["movie_title"])
+    user_ids = ratings.batch(100_000).map(lambda x: x["user_id"])
 
-    movie_embeddings = tf.keras.Sequential([
-        movie_titles_vocabulary,
-        tf.keras.layers.Embedding(movie_titles_vocabulary.vocab_size(),
-                                  embedding_dimension)
-    ])
-
-    # Specify the task and the top-k metric to optimize during model training
-    task = tfrs.tasks.Retrieval(metrics=tfrs.metrics.FactorizedTopK(
-        movies.batch(128).map(movie_embeddings)
-    ))
-
+    unique_movie_titles = np.unique(np.concatenate(list(movie_titles)))
+    unique_user_ids = np.unique(np.concatenate(list(user_ids)))
+    
     # Define the optimizer and hyper-parameters
     optimizer = tf.keras.optimizers.Adagrad(learning_rate)
     print('Optimizer:  {}'.format(optimizer))
@@ -191,26 +198,32 @@ if __name__ == '__main__':
         callbacks.append(tensorboard_callback)
     print('Callbacks: {}'.format(callbacks))
 
-    # Create a custom Keras model with the user embeddings, movie embeddings, and optimization task
-    model = MovieLensModel(user_embeddings, movie_embeddings, task)
-    
-    # Compile the model and prepare for training
-    model.compile(optimizer=optimizer)
+    # Create and compile a custom Keras model specialized for rating
+    model = MovielensModel(embedding_dimension, unique_user_ids, unique_movie_titles)
+    model.compile(optimizer=tf.keras.optimizers.Adagrad(learning_rate=learning_rate))
+
+    cached_train = train.shuffle(100_000).batch(8192).cache()
+    cached_test = test.batch(4096).cache()
 
     # Train the model
-    model.fit(ratings.batch(4096), epochs=epochs, callbacks=callbacks)
+    model.fit(cached_train, epochs=epochs, callbacks=callbacks)
+    metrics = model.evaluate(cached_test, return_dict=True)
 
+    print(f"root_mean_squared_error: {metrics['root_mean_squared_error']:.3f}.")
+    
     # Make some sample predictions to test our model
     # Note:  This is required to save and server our model with TensorFlow Serving
     #        See https://github.com/tensorflow/tensorflow/issues/31057 for more  details.
-    index = tfrs.layers.factorized_top_k.BruteForce(query_model=model.user_embeddings)
-    index.index(movies.batch(100).map(model.movie_embeddings), movies)
+    # Create a model that takes in raw query features, and returns the predicted movie titles
+    index = tfrs.layers.factorized_top_k.BruteForce(model.ranking_model.user_model)
+    index.index(movies.batch(100).map(model.ranking_model.movie_model), movies)
 
-    user_id = '42'
+    k = 5
+    user_id = "42"
+
     _, titles = index(np.array([user_id]))
 
-    k = 10
-    print(f'Top {k} recommendations for user {user_id}: {titles[0, :k]}')
+    print(f"Top {k} recommendations for user {user_id}: {titles[0, :k]}")
 
     # Print a summary of our recommender model
     print('Trained index {}'.format(index))
