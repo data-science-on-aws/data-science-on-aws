@@ -24,11 +24,14 @@ _Note:  This workshop will create an ephemeral AWS acccount for each attendee.  
 
 ## 1. Login to the Workshop Portal (aka Event Engine). 
 
-![Event Box Account](img/eb-aws-account-clean.png). 
+![Event Box Event Engine Account](img/eb-aws-account-clean.png) 
 
-![Event Box Account](img/launch.png). 
+![Event Box Launch](img/launch.png)
 
-![Event Engine Dashboard](img/event-engine-dashboard.png). 
+![Event Engine Terms and Conditions](img/event-engine-terms.png)
+
+![Event Engine Dashboard](img/event-engine-dashboard.png)
+
 
 ## 2. Login to the **AWS Console**
 
@@ -42,8 +45,7 @@ If you see this message, you need to logout from any previously used AWS account
 
 _Please logout of all AWS Console sessions in all browser tabs._
 
-
-Double-check that your account name is something like `TeamRole/MasterKey` as follows:
+Double-check that your account name is similar to `TeamRole/MasterKey` as follows:
 
 ![IAM Role](img/teamrole-masterkey.png)
 
@@ -78,15 +80,9 @@ In the IAM role box, select the default `TeamRole`.
 
 ![Fill notebook instance](img/notebook-setup02.png)
 
-You must select the default `VPC`, `Subnet`, and `Security group` as shown in the screenshow.  Your values will likely be different.  This is OK.
+Click `Create notebook instance`.
 
-Keep the default settings for the other options not highlighted in red, and click `Create notebook instance`.  On the `Notebook instances` section you should see the status change from `Pending` -> `InService`
-
-![Fill notebook instance](img/notebook-setup03-olt.png)
-
-In case you see a message like the following please delete the notebook instance and re-create the notebook instance selecting the subnet-a in the VPC settings. 
-
-![Wrong subnet](img/wrong_subnet.png)
+![Fill notebook instance](img/notebook-setup03-no-vpc.png)
 
 
 ## 4. Start the Jupyter Notebook
@@ -112,6 +108,11 @@ cd ~/SageMaker && git clone https://github.com/data-science-on-aws/workshop
 ```
 
 ![](img/clone-workshop-repo.png)
+
+**REPEATING AGAIN - THIS IS IMPORTANT - MAKE SURE YOU RUN THIS IN THE JUPYTER TERMINAL**
+```
+cd ~/SageMaker && git clone https://github.com/data-science-on-aws/workshop
+```
 
 
 ## 7. Navigate Back to Notebook View
