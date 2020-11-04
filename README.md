@@ -26,6 +26,8 @@ _Note:  This workshop will create an ephemeral AWS acccount for each attendee.  
 
 ![Event Box Launch](img/launch.png)
 
+![Event Box Event Engine Account](img/eb-aws-account-clean.png) 
+
 ![Event Engine Terms and Conditions](img/event-engine-terms.png)
 
 ![Event Engine Dashboard](img/event-engine-dashboard.png)
