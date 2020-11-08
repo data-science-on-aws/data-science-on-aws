@@ -1,0 +1,42 @@
+{
+  "StartAt": "TransformReviews",
+  "States": {
+    "TransformReviews": {
+      "Resource": "arn:aws:lambda:us-east-1:835319576252:function:LaunchSageMakerProcessingJob",
+      "Type": "Task",
+      "End": true,
+      "Parameters": {
+        "OutputDataConfig": {
+          "S3OutputPath": "blah"
+        },
+        "StoppingCondition": {
+          "MaxRuntimeInSeconds": 86400
+        },
+        "ResourceConfig": {
+          "InstanceCount": 1,
+          "InstanceType": "blah",
+          "VolumeSizeInGB": 10
+        },
+        "RoleArn": "blah",
+        "InputDataConfig": [
+          {
+            "DataSource": {
+              "S3DataSource": {
+                "S3DataDistributionType": "ShardedByS3Key",
+                "S3DataType": "S3Prefix",
+                "S3Uri": "blah"
+              }
+            },
+            "ChannelName": "train",
+            "ContentType": "text/csv"
+          }
+        ],
+        "HyperParameters": {
+            "objective" : "reg:linear",
+            "eta" : ".2"
+        },
+        "TrainingJobName.$": "$$.Execution.Name"
+      }
+    }
+  }
+}

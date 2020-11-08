@@ -1,0 +1,17 @@
+--- 
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: bert
+spec: 
+  containers: 
+    - 
+      command: 
+        - /usr/local/bin/python3
+        - train_eks.py
+        - --batch_size=32
+        - --training_steps=1000
+      image: "231218423789.dkr.ecr.us-west-2.amazonaws.com/dlc-demo:bert"
+      imagePullPolicy: Always
+      name: bert1
+  restartPolicy: Never

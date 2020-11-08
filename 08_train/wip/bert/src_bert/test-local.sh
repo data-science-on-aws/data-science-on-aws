@@ -1,0 +1,1 @@
+SM_CURRENT_HOST=blah SM_NUM_GPUS=0 SM_HOSTS={\"hosts\":\"blah\"} SM_CHANNEL_TRAIN=data/train SM_CHANNEL_VALIDATION=data/validation SM_MODEL_DIR=. python bert_reviews.py --model-type=distilbert --model-name=distilbert-base-cased 

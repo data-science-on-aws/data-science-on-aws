@@ -1,0 +1,10 @@
+eval/
+tf_bert_model/
+__pycache__
+# keep the data/ until we switch to use SM_TRAIN_CHANNEL
+#data/
+output/
+cache/
+outputs/
+tensorboard/
+bert-model

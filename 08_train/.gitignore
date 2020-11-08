@@ -1,0 +1,16 @@
+__pycache__/
+tmp/
+#code/
+#metrics/
+#model.tar.gz
+#tensorflow/
+log/
+output/
+#tensorboard/
+amazon-reviews-spark-processor-*/
+cache/
+outputs/
+models/
+generated_module/
+notebooks/
+#fine-tuned/

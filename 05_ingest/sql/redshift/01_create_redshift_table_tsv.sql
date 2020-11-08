@@ -1,0 +1,17 @@
+CREATE TABLE IF NOT EXISTS redshift.amazon_reviews_tsv_2015( 
+             marketplace varchar(2) ENCODE zstd,
+             customer_id varchar(8) ENCODE zstd,
+             review_id varchar(14) ENCODE zstd,
+             product_id varchar(10) ENCODE zstd DISTKEY,
+             product_parent varchar(10) ENCODE zstd,
+             product_title varchar(400) ENCODE zstd,
+             product_category varchar(24) ENCODE raw,
+             star_rating int ENCODE az64,
+             helpful_votes int ENCODE zstd,
+             total_votes int ENCODE zstd,
+             vine varchar(1) ENCODE zstd,
+             verified_purchase varchar(1) ENCODE zstd,
+             review_headline varchar(128) ENCODE zstd,
+             review_body varchar(65535) ENCODE zstd,
+             review_date varchar(10) ENCODE bytedict,
+             year int ENCODE az64)  SORTKEY (product_category)
