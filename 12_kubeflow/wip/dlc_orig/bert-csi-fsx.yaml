@@ -1,0 +1,80 @@
+--- 
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bert-csi-fsx
+spec:
+  volumes:
+  - name: fsx-opt-ml
+    persistentVolumeClaim:
+      claimName: fsx-claim
+  containers: 
+    - name: bert
+      command: 
+        - python
+        - /opt/ml/code/train.py
+        - --train_steps_per_epoch=1
+        - --epochs=1
+        - --learning_rate=0.00001
+        - --epsilon=0.00000001
+        - --train_batch_size=36
+        - --validation_batch_size=18
+        - --test_batch_size=18
+        - --train_steps_per_epoch=1
+        - --validation_steps=1
+        - --test_steps=1
+        - --use_xla=True
+        - --use_amp=False
+        - --max_seq_length=64
+        - --freeze_bert_layer=True
+        - --enable_sagemaker_debugger=False
+        - --enable_checkpointing=False
+        - --enable_tensorboard=False
+        - --run_validation=True
+        - --run_test=False
+        - --run_sample_predictions=False
+#      image: "231218423789.dkr.ecr.us-west-2.amazonaws.com/dlc-demo:bert"
+      image: 763104351884.dkr.ecr.us-west-2.amazonaws.com/tensorflow-training:2.1.0-cpu-py36-ubuntu18.04
+      imagePullPolicy: Always
+      env: 
+        - name: SM_TRAINING_ENV
+          value: "{\"is_master\":true}"
+        - name: SAGEMAKER_JOB_NAME
+          value: "tf-bert-training-eks"
+        - name: SM_CURRENT_HOST
+          value: "localhost"
+        - name: SM_NUM_GPUS
+          value: "0"
+        - name: SM_HOSTS
+          value: "{\"hosts\":\"localhost\"}"
+        - name: SM_MODEL_DIR
+          value: "/opt/ml/model/"     
+        - name: SM_OUTPUT_DIR
+          value: "/opt/ml/output/"
+        - name: SM_OUTPUT_DATA_DIR
+          value: "/opt/ml/output/data/"
+        - name: SM_CHANNEL_TRAIN
+          value: "/opt/ml/input/data/train"
+        - name: SM_CHANNEL_VALIDATION
+          value: "/opt/ml/input/data/validation"     
+        - name: SM_CHANNEL_TEST
+          value: "/opt/ml/input/data/test"
+        - name: HDF5_USE_FILE_LOCKING
+          value: "FALSE"
+      securityContext:
+        privileged: true
+#       lifecycle:
+#         postStart:
+#           exec:
+#             command: ["amazon-linux-extras", "install", "lustre2.10", "-y"]
+#         preStop:
+#           exec:
+#             command: ["lfs", "hsm_archive", "/opt/ml/model"]
+      volumeMounts:
+      - mountPath: /opt/ml/
+        name: fsx-opt-ml
+  restartPolicy: Never 
+
+# OSError: Unable to create file (file locking disabled on this file system (use HDF5_USE_FILE_LOCKING environment variable to override), errno = 38, error message = 'Function not implemented')
+# - name: HDF5_USE_FILE_LOCKING
+#   value: "FALSE"
