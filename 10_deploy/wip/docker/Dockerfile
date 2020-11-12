@@ -48,6 +48,8 @@ RUN update-alternatives --install /usr/local/bin/pip pip /usr/local/bin/pip3 1
 # This is only useful for cuda env 
 RUN export USE_CUDA=1
 
+RUN pip install --no-cache-dir --upgrade pip
+
 RUN pip install --no-cache-dir torch==1.5.1 \
                 --no-cache-dir torchvision==0.6.1 \
                 --no-cache-dir torchtext==0.6.0 \
