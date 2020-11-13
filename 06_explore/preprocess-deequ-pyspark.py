@@ -109,21 +109,21 @@ checkResult_df = VerificationResult.checkResultsAsDataFrame(spark, checkResult)
 checkResult_df.show(truncate=False)
 #checkResult_df.repartition(1).write.format('csv').option('header',True).mode('overwrite').option('sep','\t').save('{}/constraint-checks'.format(s3_output_analyze_data))
 
-checkResult_df_pandas = VerificationResult.checkResultsAsDataFrame(spark, checkResult, pandas=True)
-csv_buffer = StringIO()
-checkResult_df_pandas.to_csv(csv_buffer)
-s3_resource = boto3.resource('s3')
-s3_resource.Object('sagemaker-us-east-1-835319576252', 'blahblah/output/constraint-checks').put(Body=csv_buffer.getvalue())
+# checkResult_df_pandas = VerificationResult.checkResultsAsDataFrame(spark, checkResult, pandas=True)
+# csv_buffer = StringIO()
+# checkResult_df_pandas.to_csv(csv_buffer)
+# s3_resource = boto3.resource('s3')
+# s3_resource.Object('sagemaker-us-east-1-835319576252', 'blahblah/output/constraint-checks').put(Body=csv_buffer.getvalue())
 
 checkResult_success_df = VerificationResult.successMetricsAsDataFrame(spark, checkResult)
 checkResult_success_df.show(truncate=False)
 #checkResult_success_df.repartition(1).write.format('csv').option('header',True).mode('overwrite').option('sep','\t').save('{}/success-metrics'.format(s3_output_analyze_data))
 
-checkResult_success_df_pandas = VerificationResult.successMetricsAsDataFrame(spark, checkResult, pandas=True)
-csv_buffer = StringIO()
-checkResult_success_df_pandas.to_csv(csv_buffer)
-s3_resource = boto3.resource('s3')
-s3_resource.Object('sagemaker-us-east-1-835319576252', 'blahblah/output/success-metrics').put(Body=csv_buffer.getvalue())
+# checkResult_success_df_pandas = VerificationResult.successMetricsAsDataFrame(spark, checkResult, pandas=True)
+# csv_buffer = StringIO()
+# checkResult_success_df_pandas.to_csv(csv_buffer)
+# s3_resource = boto3.resource('s3')
+# s3_resource.Object('sagemaker-us-east-1-835319576252', 'blahblah/output/success-metrics').put(Body=csv_buffer.getvalue())
 
 
 # Suggest new checks and constraints
