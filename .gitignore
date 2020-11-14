@@ -13,7 +13,7 @@ wip/transform.py
 bert.py
 trainer.py
 transform.py
-#data/
+04_automl/data/
 mnist.pkl.gz
 .DS_Store
 amazon-reviews-pds/
