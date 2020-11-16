@@ -155,6 +155,13 @@ train_task= PythonOperator(
     python_callable=preprocess.preprocess,
     op_kwargs=config["preprocess_data"])
 
+model_task= PythonOperator(
+    task_id='model',
+    dag=dag,
+    provide_context=False,
+    python_callable=preprocess.preprocess,
+    op_kwargs=config["preprocess_data"])
+
 deploy_task= PythonOperator(
     task_id='deploy',
     dag=dag,
@@ -166,5 +173,5 @@ deploy_task= PythonOperator(
 
 init.set_downstream(process_task)
 process_task.set_downstream(train_task)
-train_task.set_downstream(deploy_task)
-#deploy_task.set_downstream(cleanup_task)
+train_task.set_downstream(model_task)
+model_task.set_downstream(deploy_task)
