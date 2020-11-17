@@ -14,6 +14,7 @@ subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'sagemaker-tensor
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow-recommenders==0.2.0'])
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow-datasets==4.0.0'])
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'matplotlib==3.2.1'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'smdebug==0.9.5'])
         
 from typing import Dict, Text
 import tensorflow as tf
