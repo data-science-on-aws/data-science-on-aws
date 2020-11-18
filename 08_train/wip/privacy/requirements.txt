@@ -1,0 +1,5 @@
+tensorflow>=1.14
+tensorflow-estimator>=2.3.0
+mpmath
+scipy>=0.17
+dm-tree~=0.1.1
