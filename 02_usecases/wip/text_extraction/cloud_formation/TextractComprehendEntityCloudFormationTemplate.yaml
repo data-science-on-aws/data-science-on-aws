@@ -1,0 +1,62 @@
+Description: Basic NotebookInstance
+Resources:
+  BasicNotebookInstance:
+    Type: 'AWS::SageMaker::NotebookInstance'
+    Properties:
+      InstanceType: ml.m5.xlarge
+      RoleArn: !GetAtt ExecutionRole.Arn
+  ExecutionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+        AssumeRolePolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: ''
+                Effect: Allow
+                Principal:
+                  Service:
+                    - sagemaker.amazonaws.com
+                    - comprehend.amazonaws.com
+                Action:
+                  - 'sts:AssumeRole'
+
+        Policies:
+            -
+                PolicyName: "ner-policy-textract"
+                PolicyDocument: 
+                    Version: "2012-10-17"
+                    Statement: 
+                      - Effect: "Allow"
+                        Action: ["textract:StartDocumentTextDetection", "textract:GetDocumentTextDetection"]
+                        Resource: "*"
+            -
+                PolicyName: "ner-policy-comprehend"
+                PolicyDocument: 
+                    Version: "2012-10-17"
+                    Statement: 
+                      - Effect: "Allow"
+                        Action: ["comprehend:CreateEntityRecognizer", "comprehend:DescribeEntityRecognizer", "comprehend:StartEntitiesDetectionJob","comprehend:DescribeEntitiesDetectionJob"]
+                        Resource: "*"
+            -
+                PolicyName: "ner-policy-s3"
+                PolicyDocument: 
+                    Version: "2012-10-17"
+                    Statement: 
+                      - Effect: "Allow"
+                        Action: ["s3:PutObject", "s3:GetObject", "s3:CreateBucket", "s3:ListBucket","s3:DeleteObject"]
+                        Resource: "*"
+            -
+                PolicyName: "ner-policy-sagemaker"
+                PolicyDocument: 
+                    Version: "2012-10-17"
+                    Statement: 
+                      - Effect: "Allow"
+                        Action: ["iam:PassRole", "iam:GetRole"]
+                        Resource: "*"
+Outputs:  
+    NotebookInstanceName:
+        Value: !Join 
+          - ''
+          - - !Sub >-
+              https://console.aws.amazon.com/sagemaker/home?region=${AWS::Region}#/notebook-instances/
+            - !GetAtt BasicNotebookInstance.NotebookInstanceName
