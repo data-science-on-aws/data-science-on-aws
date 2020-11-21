@@ -36,4 +36,4 @@ spec:
       volumeMounts:
       - mountPath: /opt/ml/
         name: fsx-opt-ml
-  restartPolicy: Never 
+  restartPolicy: Never
