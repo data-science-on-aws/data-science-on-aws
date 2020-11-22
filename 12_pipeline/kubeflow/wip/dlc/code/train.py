@@ -13,7 +13,6 @@ import tensorflow as tf
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'transformers==2.8.0'])
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'sagemaker-tensorflow==2.1.0.1.0.0'])
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'scikit-learn==0.23.1'])
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'matplotlib==3.2.1'])
 
 from transformers import DistilBertTokenizer
 from transformers import TFDistilBertForSequenceClassification
@@ -21,7 +20,6 @@ from transformers import TextClassificationPipeline
 from transformers.configuration_distilbert import DistilBertConfig
 from tensorflow.keras.callbacks import ModelCheckpoint
 from tensorflow.keras.models import load_model
-
 
 CLASSES = [1, 2, 3, 4, 5]
 
@@ -87,12 +85,13 @@ def file_based_input_dataset_builder(channel,
     row_count = 0
     print('**************** {} *****************'.format(channel))
     for row in dataset.as_numpy_iterator():
-        print(row)
-        if row_count == 5:
+        if row_count == 1:
             break
+        print(row)
         row_count = row_count + 1
 
     return dataset
+
 
 if __name__ == '__main__':
     
@@ -116,16 +115,16 @@ if __name__ == '__main__':
                         default=os.environ['SM_CHANNEL_VALIDATION'])
     parser.add_argument('--test_data',
                         type=str,
-                        default=os.environ['SM_CHANNEL_TEST'])   
+                        default=os.environ['SM_CHANNEL_TEST'])  
     parser.add_argument('--num_gpus', 
                         type=int, 
                         default=os.environ['SM_NUM_GPUS'])
-    parser.add_argument('--model_dir', 
-                        type=str, 
-                        default=os.environ['SM_MODEL_DIR'])
     parser.add_argument('--input_data_config', 
                         type=str, 
                         default=os.environ['SM_INPUT_DATA_CONFIG'])
+    parser.add_argument('--local_model_dir', 
+                        type=str, 
+                        default=os.environ['SM_MODEL_DIR'])
     parser.add_argument('--use_xla',
                         type=eval,
                         default=False)
@@ -140,28 +139,28 @@ if __name__ == '__main__':
                         default=128)
     parser.add_argument('--validation_batch_size',
                         type=int,
-                        default=256)
+                        default=64)
     parser.add_argument('--test_batch_size',
                         type=int,
-                        default=256)
+                        default=64)
     parser.add_argument('--epochs',
                         type=int,
-                        default=2)
+                        default=3)
     parser.add_argument('--learning_rate',
                         type=float,
-                        default=0.00003)
+                        default=0.00001)
     parser.add_argument('--epsilon',
                         type=float,
                         default=0.00000001)
     parser.add_argument('--train_steps_per_epoch',
                         type=int,
-                        default=None)
+                        default=100)
     parser.add_argument('--validation_steps',
                         type=int,
-                        default=None)
+                        default=10)
     parser.add_argument('--test_steps',
                         type=int,
-                        default=None)
+                        default=10)
     parser.add_argument('--freeze_bert_layer',
                         type=eval,
                         default=False)
@@ -174,15 +173,10 @@ if __name__ == '__main__':
     parser.add_argument('--run_sample_predictions',
                         type=eval,
                         default=False)         
-
      
     args, _ = parser.parse_known_args()
     print("Args:") 
     print(args)
-    
-    env_var = os.environ 
-    print("Environment Variables:") 
-    pprint.pprint(dict(env_var), width = 1) 
     
     train_data = args.train_data
     print('train_data {}'.format(train_data))
@@ -190,10 +184,10 @@ if __name__ == '__main__':
     print('validation_data {}'.format(validation_data))
     test_data = args.test_data
     print('test_data {}'.format(test_data))    
-    local_model_dir = args.model_dir
-    print('local_model_dir {}'.format(local_model_dir))         
+    local_model_dir = args.local_model_dir
+    print('local_model_dir {}'.format(local_model_dir))            
     num_gpus = args.num_gpus
-    print('num_gpus {}'.format(num_gpus))
+    print('num_gpus {}'.format(num_gpus))   
     use_xla = args.use_xla
     print('use_xla {}'.format(use_xla))    
     use_amp = args.use_amp
@@ -219,15 +213,16 @@ if __name__ == '__main__':
     test_steps = args.test_steps
     print('test_steps {}'.format(test_steps))    
     freeze_bert_layer = args.freeze_bert_layer
-    print('freeze_bert_layer {}'.format(freeze_bert_layer))      
+    print('freeze_bert_layer {}'.format(freeze_bert_layer))       
     run_validation = args.run_validation
     print('run_validation {}'.format(run_validation))    
     run_test = args.run_test
     print('run_test {}'.format(run_test))    
     run_sample_predictions = args.run_sample_predictions
-    print('run_sample_predictions {}'.format(run_sample_predictions))
+    print('run_sample_predictions {}'.format(run_sample_predictions)) 
     input_data_config = args.input_data_config
     print('input_data_config {}'.format(input_data_config))
+
     
     # Determine if PipeMode is enabled 
     pipe_mode = (input_data_config.find('Pipe') >= 0)
@@ -239,10 +234,10 @@ if __name__ == '__main__':
 
     # SavedModel Output
     tensorflow_saved_model_path = os.path.join(local_model_dir, 'tensorflow/saved_model/0')
-    os.makedirs(tensorflow_saved_model_path, exist_ok=True)
- 
+    os.makedirs(tensorflow_saved_model_path, exist_ok=True) 
+    
     distributed_strategy = tf.distribute.MirroredStrategy()
-
+    
     with distributed_strategy.scope():
         tf.config.optimizer.set_jit(use_xla)
         tf.config.optimizer.set_experimental_options({"auto_mixed_precision": use_amp})
@@ -293,6 +288,7 @@ if __name__ == '__main__':
         if use_amp:
             # loss scaling is currently required when using mixed precision
             optimizer = tf.keras.mixed_precision.experimental.LossScaleOptimizer(optimizer, 'dynamic')
+
   
         print('*** OPTIMIZER {} ***'.format(optimizer))
         
@@ -366,8 +362,8 @@ if __name__ == '__main__':
 
         # Save the TensorFlow SavedModel for Serving Predictions
         print('tensorflow_saved_model_path {}'.format(tensorflow_saved_model_path))   
-        model.save(tensorflow_saved_model_path, save_format='tf')
-                
+        model.save(tensorflow_saved_model_path, save_format='tf')       
+        
     if run_sample_predictions:
         loaded_model = TFDistilBertForSequenceClassification.from_pretrained(transformer_fine_tuned_model_path,
                                                                        id2label={
