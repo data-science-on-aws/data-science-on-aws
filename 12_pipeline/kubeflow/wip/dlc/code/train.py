@@ -91,9 +91,8 @@ def file_based_input_dataset_builder(channel,
         if row_count == 5:
             break
         row_count = row_count + 1
+
     return dataset
-
-
 
 if __name__ == '__main__':
     
@@ -117,22 +116,10 @@ if __name__ == '__main__':
                         default=os.environ['SM_CHANNEL_VALIDATION'])
     parser.add_argument('--test_data',
                         type=str,
-                        default=os.environ['SM_CHANNEL_TEST'])
-    parser.add_argument('--output_dir',
-                        type=str,
-                        default=os.environ['SM_OUTPUT_DIR'])
-    parser.add_argument('--hosts', 
-                        type=list, 
-                        default=json.loads(os.environ['SM_HOSTS']))
-    parser.add_argument('--current_host', 
-                        type=str, 
-                        default=os.environ['SM_CURRENT_HOST'])    
+                        default=os.environ['SM_CHANNEL_TEST'])   
     parser.add_argument('--num_gpus', 
                         type=int, 
                         default=os.environ['SM_NUM_GPUS'])
-    parser.add_argument('--training_env', 
-                        type=str, 
-                        default=os.environ['SM_TRAINING_ENV'])
     parser.add_argument('--model_dir', 
                         type=str, 
                         default=os.environ['SM_MODEL_DIR'])
@@ -186,8 +173,7 @@ if __name__ == '__main__':
                         default=False)    
     parser.add_argument('--run_sample_predictions',
                         type=eval,
-                        default=False)          
-    
+                        default=False)         
 
      
     args, _ = parser.parse_known_args()
@@ -197,30 +183,17 @@ if __name__ == '__main__':
     env_var = os.environ 
     print("Environment Variables:") 
     pprint.pprint(dict(env_var), width = 1) 
-
-    training_env = args.training_env
-    print('training_env {}'.format(training_env))
-
-    sm_training_env_json = json.loads(training_env)
-    is_master = sm_training_env_json['is_master']
-    print('is_master {}'.format(is_master))
     
     train_data = args.train_data
     print('train_data {}'.format(train_data))
     validation_data = args.validation_data
     print('validation_data {}'.format(validation_data))
     test_data = args.test_data
-    print('test_data {}'.format(test_data))  
+    print('test_data {}'.format(test_data))    
     local_model_dir = args.model_dir
-    print('local_model_dir {}'.format(local_model_dir))   
-    output_dir = args.output_dir
-    print('output_dir {}'.format(output_dir))    
-    hosts = args.hosts
-    print('hosts {}'.format(hosts))    
-    current_host = args.current_host
-    print('current_host {}'.format(current_host))    
+    print('local_model_dir {}'.format(local_model_dir))         
     num_gpus = args.num_gpus
-    print('num_gpus {}'.format(num_gpus))   
+    print('num_gpus {}'.format(num_gpus))
     use_xla = args.use_xla
     print('use_xla {}'.format(use_xla))    
     use_amp = args.use_amp
@@ -253,10 +226,8 @@ if __name__ == '__main__':
     print('run_test {}'.format(run_test))    
     run_sample_predictions = args.run_sample_predictions
     print('run_sample_predictions {}'.format(run_sample_predictions))
-    enable_tensorboard = args.enable_tensorboard
-    print('enable_tensorboard {}'.format(enable_tensorboard)) 
     input_data_config = args.input_data_config
-    print('input_data_config {}'.format(input_data_config)) 
+    print('input_data_config {}'.format(input_data_config))
     
     # Determine if PipeMode is enabled 
     pipe_mode = (input_data_config.find('Pipe') >= 0)
@@ -269,13 +240,9 @@ if __name__ == '__main__':
     # SavedModel Output
     tensorflow_saved_model_path = os.path.join(local_model_dir, 'tensorflow/saved_model/0')
     os.makedirs(tensorflow_saved_model_path, exist_ok=True)
-
-    # Tensorboard Logs 
-    tensorboard_logs_path = os.path.join(local_model_dir, 'tensorboard/')
-    os.makedirs(tensorboard_logs_path, exist_ok=True) 
-    
+ 
     distributed_strategy = tf.distribute.MirroredStrategy()
-    
+
     with distributed_strategy.scope():
         tf.config.optimizer.set_jit(use_xla)
         tf.config.optimizer.set_experimental_options({"auto_mixed_precision": use_amp})
@@ -393,14 +360,14 @@ if __name__ == '__main__':
                                  
             print('Test history {}'.format(test_history))
             
-        # Save the Fine-Yuned Transformers Model as a New "Pre-Trained" Model
+        # Save the Fine-Tuned Transformers Model as a New "Pre-Trained" Model
         print('transformer_fine_tuned_model_path {}'.format(transformer_fine_tuned_model_path))   
         model.save_pretrained(transformer_fine_tuned_model_path)
 
         # Save the TensorFlow SavedModel for Serving Predictions
         print('tensorflow_saved_model_path {}'.format(tensorflow_saved_model_path))   
         model.save(tensorflow_saved_model_path, save_format='tf')
-        
+                
     if run_sample_predictions:
         loaded_model = TFDistilBertForSequenceClassification.from_pretrained(transformer_fine_tuned_model_path,
                                                                        id2label={
@@ -434,78 +401,3 @@ if __name__ == '__main__':
         print("""I loved it!  I will recommend this to everyone.""", inference_pipeline("""I loved it!  I will recommend this to everyone."""))
         print("""It's OK.""", inference_pipeline("""It's OK."""))
         print("""Really bad.  I hope they don't make this anymore.""", inference_pipeline("""Really bad.  I hope they don't make this anymore."""))
-
-                import csv
-
-        df_test_reviews = pd.read_csv('./test_data/amazon_reviews_us_Digital_Software_v1_00.tsv.gz', 
-                                        delimiter='\t', 
-                                        quoting=csv.QUOTE_NONE,
-                                        compression='gzip')[['review_body', 'star_rating']]
-
-        df_test_reviews = df_test_reviews.sample(n=100)
-        df_test_reviews.shape
-        df_test_reviews.head()
-        
-        import pandas as pd
-
-        def predict(review_body):
-            prediction_map = inference_pipeline(review_body)
-            return prediction_map[0]['label']
-
-        y_test = df_test_reviews['review_body'].map(predict)
-        y_test
-        
-        y_actual = df_test_reviews['star_rating']
-        y_actual
-
-        from sklearn.metrics import classification_report
-        print(classification_report(y_true=y_test, y_pred=y_actual))
-        
-        from sklearn.metrics import accuracy_score
-        print('Accuracy: ', accuracy_score(y_true=y_test, y_pred=y_actual))
-        
-        import matplotlib.pyplot as plt
-        import pandas as pd
-
-        def plot_conf_mat(cm, classes, title, cmap = plt.cm.Greens):
-            print(cm)
-            plt.imshow(cm, interpolation='nearest', cmap=cmap)
-            plt.title(title)
-            plt.colorbar()
-            tick_marks = np.arange(len(classes))
-            plt.xticks(tick_marks, classes, rotation=45)
-            plt.yticks(tick_marks, classes)
-
-            fmt = 'd'
-            thresh = cm.max() / 2.
-            for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
-                plt.text(j, i, format(cm[i, j], fmt),
-                horizontalalignment="center",
-                color="black" if cm[i, j] > thresh else "black")
-
-                plt.tight_layout()
-                plt.ylabel('True label')
-                plt.xlabel('Predicted label')
-                
-        import itertools
-        import numpy as np
-        from sklearn.metrics import confusion_matrix
-        import matplotlib.pyplot as plt
-        #%matplotlib inline
-        #%config InlineBackend.figure_format='retina'
-
-        cm = confusion_matrix(y_true=y_test, y_pred=y_actual)
-
-        plt.figure()
-        fig, ax = plt.subplots(figsize=(10,5))
-        plot_conf_mat(cm, 
-                      classes=['1', '2', '3', '4', '5'], 
-                      title='Confusion Matrix')
-
-        # Save the confusion matrix        
-        plt.show()
-        
-        # Model Output 
-        metrics_path = os.path.join(local_model_dir, 'metrics/')
-        os.makedirs(metrics_path, exist_ok=True)
-        plt.savefig('{}/confusion_matrix.png'.format(metrics_path))
