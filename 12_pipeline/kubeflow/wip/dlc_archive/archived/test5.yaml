@@ -1,0 +1,12 @@
+--- 
+apiVersion: batch/v1
+kind: Job
+metadata: 
+  name: tf-bert-training-job
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+       - name: tf-bert-training-job
+         image: 231218423789.dkr.ecr.us-west-2.amazonaws.com/dlc-demo:bert

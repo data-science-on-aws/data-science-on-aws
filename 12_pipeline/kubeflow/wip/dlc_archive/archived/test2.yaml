@@ -1,0 +1,15 @@
+--- 
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: tf-bert-training
+spec: 
+  containers: 
+    - 
+      args: 
+        - "--train_data=s3://sagemaker-us-west-2-231218423789/training-pipeline-2020-09-05-16-19-31/processing/output/bert-train"
+        - "--validation_data s3://sagemaker-us-west-2-231218423789/training-pipeline-2020-09-05-16-19-31/processing/output/bert-validation"
+        - "--test_data s3://sagemaker-us-west-2-231218423789/training-pipeline-2020-09-05-16-19-31/processing/output/bert-test"
+      image: "231218423789.dkr.ecr.us-west-2.amazonaws.com/dlc-demo:bert-tf-2.1.0-1.0.0"
+      name: tf-bert-training
+  restartPolicy: Never
