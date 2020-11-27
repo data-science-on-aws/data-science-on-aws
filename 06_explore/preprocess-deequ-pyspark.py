@@ -7,7 +7,7 @@ import os
 import shutil
 import csv
 import subprocess
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'pydeequ==0.1.2'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', '--no-deps', 'pydeequ==0.1.5'])
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'pandas==1.1.4'])
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'boto3==1.16.17'])
 
@@ -35,8 +35,8 @@ spark = SparkSession.builder \
      .appName("Amazon_Reviews_Spark_Analyzer") \
      .getOrCreate()
 
-spark.sparkContext._jsc.hadoopConfiguration().set("mapred.output.committer.class",
-                                                  "org.apache.hadoop.mapred.FileOutputCommitter")
+#spark.sparkContext._jsc.hadoopConfiguration().set("mapred.output.committer.class",
+#                                                  "org.apache.hadoop.mapred.FileOutputCommitter")
 
 schema = StructType([
     StructField("marketplace", StringType(), True),
@@ -107,23 +107,25 @@ checkResult = VerificationSuite(spark) \
 print(f"Verification Run Status: {checkResult.status}")
 checkResult_df = VerificationResult.checkResultsAsDataFrame(spark, checkResult)
 checkResult_df.show(truncate=False)
-# checkResult_df.repartition(1).write.format('csv').option('header',True).mode('overwrite').option('sep','\t').save('{}/constraint-checks'.format(s3_output_analyze_data))
+
+checkResult_df.repartition(1).write.format('csv').option('header',True).mode('overwrite').option('sep','\t').save('{}/constraint-checks'.format(s3_output_analyze_data))
 
 checkResult_df_pandas = VerificationResult.checkResultsAsDataFrame(spark, checkResult, pandas=True)
-csv_buffer = StringIO()
-checkResult_df_pandas.to_csv(csv_buffer)
-s3_resource = boto3.resource('s3')
-s3_resource.Object('sagemaker-us-east-1-835319576252', 'blahblah/output/constraint-checks').put(Body=csv_buffer.getvalue())
+# csv_buffer = StringIO()
+# checkResult_df_pandas.to_csv(csv_buffer)
+# s3_resource = boto3.resource('s3')
+# s3_resource.Object('sagemaker-us-east-1-835319576252', 'blahblah/output/constraint-checks').put(Body=csv_buffer.getvalue())
 
 checkResult_success_df = VerificationResult.successMetricsAsDataFrame(spark, checkResult)
 checkResult_success_df.show(truncate=False)
-# checkResult_success_df.repartition(1).write.format('csv').option('header',True).mode('overwrite').option('sep','\t').save('{}/success-metrics'.format(s3_output_analyze_data))
+
+checkResult_success_df.repartition(1).write.format('csv').option('header',True).mode('overwrite').option('sep','\t').save('{}/success-metrics'.format(s3_output_analyze_data))
 
 checkResult_success_df_pandas = VerificationResult.successMetricsAsDataFrame(spark, checkResult, pandas=True)
-csv_buffer = StringIO()
-checkResult_success_df_pandas.to_csv(csv_buffer)
-s3_resource = boto3.resource('s3')
-s3_resource.Object('sagemaker-us-east-1-835319576252', 'blahblah/output/success-metrics').put(Body=csv_buffer.getvalue())
+# csv_buffer = StringIO()
+# checkResult_success_df_pandas.to_csv(csv_buffer)
+# s3_resource = boto3.resource('s3')
+# s3_resource.Object('sagemaker-us-east-1-835319576252', 'blahblah/output/success-metrics').put(Body=csv_buffer.getvalue())
 
 
 # Suggest new checks and constraints
