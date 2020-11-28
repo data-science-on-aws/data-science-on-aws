@@ -138,6 +138,6 @@ object SparkAmazonReviewsAnalyzer {
       .mode(SaveMode.Overwrite)
       .option("header", true)  
       .option("delimiter", "\t")
-      .csv(s"${s3OutputAnalyzeData}/constraint-suggestions")      
+      .csv(s"${s3OutputAnalyzeData}/constraint-suggestions")
   }
 }

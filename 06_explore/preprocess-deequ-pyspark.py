@@ -128,8 +128,18 @@ def main():
                  .addConstraintRule(DEFAULT()) \
                  .run()
 
-    # Constraint Suggestions in JSON format
-    print(json.dumps(suggestionsResult, indent=2))    
+    suggestions = suggestionsResult["constraint_suggestions"]
+    parallelizedSuggestions = spark.sparkContext.parallelize(suggestions)
+    
+    suggestionsResultsDataFrame = spark.createDataFrame(parallelizedSuggestions)
+    suggestionsResultsDataFrame.show(truncate=False)
+    suggestionsResultsDataFrame \
+        .repartition(1) \
+        .write.format('csv') \
+        .mode('overwrite') \
+        .option('header', True) \
+        .option('sep', '\t') \
+        .save('{}/constraint-suggestions'.format(s3_output_analyze_data))
 
     # We can now review the constraints that Deequ suggested after seeing the latest dataset.
     #     suggestionsDataFrame = suggestionsResult['constraint_suggestions'].flatMap(lambda row: row { 
@@ -139,7 +149,13 @@ def main():
     #             } 
     #     }.toSeq.toDS()
     
+#    csv_buffer = StringIO()
+#    checkResult_success_df_pandas.to_csv(csv_buffer)
+#    s3_resource = boto3.resource('s3')
+#    s3_resource.Object('sagemaker-us-east-1-835319576252', 'blahblah/output/success-metrics').put(Body=csv_buffer.getvalue())
+    
     spark.stop()
 
+    
 if __name__ == "__main__":
     main()
