@@ -9,10 +9,6 @@ import csv
 import subprocess
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', '--no-deps', 'pydeequ==0.1.5'])
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'pandas==1.1.4'])
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'boto3==1.16.17'])
-
-from io import StringIO
-import boto3
 
 import pyspark
 from pyspark.sql import SparkSession
@@ -140,19 +136,6 @@ def main():
         .option('header', True) \
         .option('sep', '\t') \
         .save('{}/constraint-suggestions'.format(s3_output_analyze_data))
-
-    # We can now review the constraints that Deequ suggested after seeing the latest dataset.
-    #     suggestionsDataFrame = suggestionsResult['constraint_suggestions'].flatMap(lambda row: row { 
-    #           case (column, suggestions) => 
-    #             suggestions.map { constraint =>
-    #               (column, constraint.description, constraint.codeForConstraint)
-    #             } 
-    #     }.toSeq.toDS()
-    
-#    csv_buffer = StringIO()
-#    checkResult_success_df_pandas.to_csv(csv_buffer)
-#    s3_resource = boto3.resource('s3')
-#    s3_resource.Object('sagemaker-us-east-1-835319576252', 'blahblah/output/success-metrics').put(Body=csv_buffer.getvalue())
     
     spark.stop()
 
