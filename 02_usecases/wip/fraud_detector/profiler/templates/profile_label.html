@@ -1,0 +1,148 @@
+{% block content %}
+<br>
+<div class="container"> 
+  <h3>Data & Label Maturity</h3>
+  <hr>
+    <div class="alert alert-info">
+      <p>
+        AWS Fraud Detector models require a minimum of 500 observations labeled as “fraud”. As part of the data gathering process it is important to ensure that records have had sufficient time to “mature”, i.e. that enough time has passed to insure “non-fraud" and  “fraud” records have been correctly identified.   
+      </p>
+        <i>Note: It can often take 30 - 45 days (or more) to correctly identify fraudulent events.</i>
+    </div>
+
+    <div class="container">
+    	<div class="row">
+            <div class="col-6">
+              <div class="row">
+                <div class="col-6">
+                  <p>Label Field</p>
+                </div>
+                <div class="col-6">
+                      <p class="text-right"><b> {{label.label_field}}</b></p>
+                </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                      <p style="margin-left:20px;""> Data Type </p>
+                    </div>
+                    <div class="col-6">
+                          <p class="text-right">{{label.label_dtype}}</p>
+                    </div>
+                    </div>
+                <div class="row">
+                    <div class="col-6">
+                      <p style="margin-left:20px;"">Labels </p>
+                    </div>
+                    <div class="col-6">
+                          <p class="text-right">{{label.fraud_label}} - (fraud),  {{label.legit_label}} - (legit)</p>
+                    </div>
+                    </div>
+                <div class="row">
+                <div class="col-6">
+            <p style="margin-left:20px;"">Fraud rate</p>
+                </div>
+                <div class="col-6">
+                      <p class="text-right">{{label.fraud_rate}}%</p>
+                </div>
+          </div>
+          <div class="row">
+              <div class="col-6">
+                <p style="margin-left:20px;"">Fraud count</p>
+              </div>
+              <div class="col-6">
+                    <p class="text-right">{{label.fraud_count}}</p>
+              </div>
+              </div>
+                
+          <div class="row">
+              <div class="col-6">
+                <p style="margin-left:20px;""> Legitimate rate </p>
+              </div>
+              <div class="col-6">
+                    <p class="text-right"> {{label.legit_rate}}%</p>
+              </div>
+              </div>
+              <div class="row">
+                  <div class="col-6">
+                    <p style="margin-left:20px;""> Legitimate count </p>
+                  </div>
+                  <div class="col-6">
+                        <p class="text-right"> {{label.legit_count}}</p>
+                  </div>
+                  </div>
+                <div class="row">
+                <div class="col-6">
+                    <p style="margin-left:20px;"">Missing count </p>
+                </div>
+                <div class="col-6">
+                      <p class="text-right">{{label.null_count}}</p>
+                </div>
+          </div>
+          <div class="row">
+              <div class="col-6">
+                <p style="margin-left:20px;"">Missing pct </p>
+              </div>
+              <div class="col-6">
+                    <p class="text-right">{{label.null_rate}}%</p>
+              </div>
+              </div>
+    </div>
+    <div class="col-6">
+        <canvas id="myChart" width="400" height="300"></canvas>
+            <script>
+            var ctx = document.getElementById('myChart');
+            var myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Not-Fraud', 'Fraud', 'Missing'],
+                    datasets: [{
+                        label: 'Label Distribution',
+                        data: [{{label.legit_rate}}, {{label.fraud_rate}}, {{label.null_rate}}],
+                        backgroundColor: [
+            "#1975BA",
+                            '#689B0C',
+                            '#f1f1f1'
+                        ],
+                        borderColor: [
+              "#1975BA",
+                            '#689B0C',
+                            '#f1f1f1'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: { legend: {
+                            display: false
+                    },
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                max: 100,
+                                min: 0,
+                                stepSize: 10
+                            }
+                        }]
+                    }
+                }
+            });
+            </script>
+    </div>
+    </div>
+</div>
+
+{% if label.warnings > 0 %}
+<div class="alert alert-warning" role="alert">
+    <table class="table table-striped">
+    <tbody>
+    {% for key in label_msg.keys() %}
+                    <tr>
+                      <td>{{ label_msg[key] }}</td>
+                    </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+</div>
+{% endif %}
+</div>
+
+{% endblock %}

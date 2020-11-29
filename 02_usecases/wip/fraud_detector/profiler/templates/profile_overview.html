@@ -1,0 +1,36 @@
+
+{% block content %}
+<div class="container"> 
+    <h5><span class="badge badge-secondary">Overview</span></h5>
+    <div class="alert alert-info"> 
+      {{file}}
+    </div>
+    <table class="table table-striped">
+        <tbody>
+        {% for key in overview %}
+            {% if key != 'overview_msg' and key != 'overview_cnt' %}
+                <tr>
+                  <td>{{ key }}</td>
+                  <td>{{ overview [key] }}</td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+        </tbody>
+      </table>
+      {% if overview['overview_cnt'] != 0 %}
+      <div class="alert alert-warning" role="alert">
+        <table class="table table-striped">
+            <tbody>
+            {% for key in overview['overview_msg'] %}
+                    <tr>
+                      <td>{{ key }}</td>
+                      <td>{{ overview['overview_msg'][key] }}</td>
+                    </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+      </div>
+      {% endif %}
+    </div>
+</div>
+{% endblock %}

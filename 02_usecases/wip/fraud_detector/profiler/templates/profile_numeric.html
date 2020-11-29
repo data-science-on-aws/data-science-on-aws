@@ -1,0 +1,88 @@
+{% block content %}
+<br>
+<div class="container"> 
+<h2>Numeric Variables  </h2>
+<br>
+{% for rec in num_rec %}
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">Name</th>
+        <th scope="col">Type</th>
+        <th scope="col">Count</th>
+        <th scope="col"># Distinct</th>
+        <th scope="col">% Distinct</th>
+        <th scope="col"># Missing</th>
+        <th scope="col">% Missing</th>
+        <th scope="col">Mean</th>
+        <th scope="col">Min</th>
+        <th scope="col">Max</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><b>{{ rec['_column'] }}</b></td>
+        <td>{{ rec['_dtype'] }}</td>
+        <td>{{ rec['count'] }}</td>
+        <td>{{ rec['nunique'] }}</td>
+        <td>{{ '{0: >#016.2f}'.format(rec['nunique_pct']*100) }}%</td>
+        <td>{{ rec['null'] }}</td>
+        <td>{{ '{0: >#016.2f}'.format(rec['null_pct']*100)}}%</td>
+        <td>{{ rec['mean'] }}</td>
+        <td>{{ rec['min'] }}</td>
+        <td>{{ rec['max'] }}</td>
+      </tr>
+      </tbody>
+      </table>
+
+      <canvas id="{{rec['_column']}}" width="600" height="200"></canvas>
+      <div class="row">
+        <div class="col-6">
+          <script>
+          var options = {
+            type: 'bar',
+            data: {
+              labels: {{rec['bin_label']}},
+              datasets: [{
+                  label: 'Fraud',
+                  data: {{rec['fraud_count']}},
+                  borderWidth: 1,
+                  backgroundColor: "#689B0C",
+                  hoverBackgroundColor: "#D4E4B4",
+                },
+                {
+                  label: 'Legit',
+                  backgroundColor: "#1975BA",
+                  hoverBackgroundColor: "#B5D3EA",
+                  data: {{rec['legit_count']}},
+                  borderWidth: 1
+                }
+              ]
+            },
+            options: {
+              scales: {
+                xAxes: [{ 
+                stacked: true, 
+                gridLines: { display: false },
+                }],
+                yAxes: [{
+                  ticks: {
+                    reverse: false
+                  }
+                }]
+              }
+            }
+          }
+          var ctx = document.getElementById("{{rec['_column']}}").getContext('2d');
+          new Chart(ctx, options);
+        </script>
+        </div>
+      </div>
+{% endfor %}
+{% endblock %}
+
+
+
+
+
+ 

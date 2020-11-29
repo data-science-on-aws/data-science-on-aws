@@ -1,0 +1,155 @@
+{% block content %}
+<div class="container"> 
+  <h4>IP Address Analysis</h4>
+  <hr>
+    <div class="alert alert-info">
+        AWS Fraud Detector performs the following checks on IP Addresses:
+        <li> IP is in IPv4 format ex: 192.0.2.235  </li>
+        <li> IP contains less than 20% missing values  </li>
+        <li> IP contains more than 100 unique ip addresses </li>
+    </div>
+    <div class="container">
+    	<div class="row">
+            <div class="col-6">
+              <div class="row">
+                <div class="col-6">
+                  <p>IP Field</p>
+                </div>
+                <div class="col-6">
+                      <p class="text-right"><b> {{i_stats.ip_addr}}</b></p>
+                </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                      <p style="margin-left:20px;"">Record count</p>
+                    </div>
+                    <div class="col-6">
+                          <p class="text-right">{{i_stats.ip_recs}}</p>
+                    </div>
+                    </div>
+                <div class="row">
+                    <div class="col-6">
+                      <p style="margin-left:20px;"">Valid count</p>
+                    </div>
+                    <div class="col-6">
+                          <p class="text-right">{{i_stats.ip_valid}}</p>
+                    </div>
+                    </div>
+                
+
+        <div class="row">
+                <div class="col-6">
+            <p style="margin-left:20px;"">Invalid count</p>
+                </div>
+                <div class="col-6">
+                      <p class="text-right">{{i_stats.ip_invalid }}</p>
+        </div>
+          </div>
+          <div class="row">
+              <div class="col-6">
+                <p style="margin-left:20px;"">Missing count </p>
+              </div>
+              <div class="col-6">
+                    <p class="text-right">{{i_stats.ip_null}}</p>
+              </div>
+              </div>
+          <div class="row">
+                <div class="col-6">
+                  <p style="margin-left:20px;""> Missing pct  </p>
+                </div>
+                <div class="col-6">
+                      <p class="text-right">{{i_stats.ip_pctnull}} %</p>
+                </div>
+                </div>
+          <div class="row">
+              <div class="col-6">
+                <p style="margin-left:20px;""> Unique count </p>
+              </div>
+              <div class="col-6">
+                    <p class="text-right"> {{i_stats.ip_unique}}</p>
+              </div>
+              </div>
+              <div class="row">
+                <div class="col-6">
+                  <p style="margin-left:20px;"">  Unique pct </p>
+                </div>
+                <div class="col-6">
+                      <p class="text-right"> {{i_stats.ip_pctunq}}%</p>
+                </div>
+                </div>
+             
+    </div>
+    <div class="col-6">
+        <canvas id="ipChart" width="400" height="300"></canvas>
+            <script>
+                var dataFraud = {{i_stats.ip_fraud}};
+                var dataLegit = {{i_stats.ip_legit}};
+                var datalabel = {{i_stats.ip_list}}
+                
+                var bar_ctx = document.getElementById("ipChart");
+                var bar_chart = new Chart(bar_ctx, {
+                type: 'horizontalBar',
+                data: {
+                    labels: datalabel,
+                    datasets: [{
+                        label: 'Fraud',
+                        data: dataFraud,
+                        backgroundColor: "#689B0C",
+                        hoverBackgroundColor: "#D4E4B4",
+                        hoverBorderWidth: 1
+                    },
+                    {
+                        label: 'Not-Fraud',
+                        data: dataLegit,
+                        backgroundColor: "#1975BA ",
+                        hoverBackgroundColor: "#B5D3EA",
+                        hoverBorderWidth: 1
+                    }
+                    ]
+                },
+                options: {
+                    animation: {
+                    duration: 10,
+                    },
+                    scales: {
+                    xAxes: [{
+                        stacked: true,
+                        gridLines: {
+                        display: false
+                        },
+                    }],
+                    yAxes: [{
+                        stacked: true,
+                        ticks: {
+                        suggestedMin: 0,
+                        suggestedMax: 1
+                        },
+                    }],
+                    },
+                    legend: {
+                    display: false
+                    }
+                },
+                });
+            </script>
+    </div>
+    </div>
+</div>
+
+{% if i_stats.ip_warnings > 0 %}
+<div class="alert alert-warning" role="alert">
+    <table class="table table-striped">
+    <tbody>
+    {% for key in i_warnings.keys() %}
+                    <tr>
+                      <td>{{ i_warnings[key] }}</td>
+                    </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+</div>
+{% endif%}
+
+</div>
+
+{% endblock %}

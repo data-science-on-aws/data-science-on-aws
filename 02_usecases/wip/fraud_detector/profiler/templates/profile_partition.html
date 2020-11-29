@@ -1,0 +1,67 @@
+
+{% block content %}
+<div class="container"> 
+    <canvas id="partChart" width="800" height="200"></canvas>
+    
+    <script>
+                var ctx = document.getElementById('partChart');
+                
+				var data1 = {{ p_stats['fraud_rates'] }};
+				var data0 = {{p_stats['legit_rates']}};
+                var dlabels ={{ p_stats['labels']}} ;
+                
+				var myChart2 = new Chart(ctx, {
+                    type: 'bar',
+                    
+					data: {
+						labels: dlabels,
+						datasets: [{
+							label: 'Fraud ',
+                            data: data1,
+                            backgroundColor: "#689B0C",
+						              hoverBackgroundColor: "#D4E4B4",
+						    hoverBorderWidth: 1
+                        },
+                        {
+                          label: 'Not Fraud',
+                          data: data0,
+                                        backgroundColor: "#1975BA ",
+                                        hoverBackgroundColor: "#B5D3EA",
+                                        hoverBorderWidth: 1
+                        }]
+					},
+					options: {
+                        title: {
+                        display: true,
+                        text: 'Fraud Rate over Time'
+                        },
+                        legend: {
+                            display: false
+                        },
+						scales: {
+							xAxes: [{ 
+          						stacked: true, 
+								}],
+							yAxes: [{
+								stacked: true, 
+							}]
+						}
+					}
+				});
+				
+				</script>
+{% if label.warnings > 0 %}
+<div class="alert alert-warning" role="alert">
+    <table class="table table-striped">
+    <tbody>
+    {% for key in label_msg.keys() %}
+                    <tr>
+                      <td>{{ label_msg[key] }}</td>
+                    </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+</div>
+{% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% block content %}
+<small>
+<div class="container"> 
+  <h5><span class="badge badge-secondary">Field Summary</span></h5>
+      <table class="table table-striped">
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Type</th>
+              <th scope="col">Feature</th>
+              <th scope="col">Count</th>
+              <th scope="col"># Distinct</th>
+              <th scope="col">% Distinct</th>
+              <th scope="col"># Missing</th>
+              <th scope="col">% Missing</th>    
+            </tr>
+          </thead>
+          <tbody>
+          {% for ix, rec in df_stats.iterrows() %}
+              <tr>
+              <td>{{ rec['_column'] }}</td>
+              <td>{{ rec['_dtype'] }}</td>
+              <td>{{ rec['_feature'] }}</td>
+              <td>{{ rec['count'] }}</td>
+              <td>{{ rec['nunique'] }}</td>
+              <td>{{ '{0: >#016.2f}'.format(rec['nunique_pct']*100) }}%</td>
+              <td>{{ rec['null'] }}</td>
+              <td>{{ '{0: >#016.2f}'.format(rec['null_pct']*100)}}%</td>
+              </tr>
+          {% endfor %}
+          </tbody>
+      </table>
+  </div>
+</div>
+</small>
+<small>
+<div class="container"> 
+    <h5><span class="badge badge-secondary">Field Warnings </span></h5>
+    <div class="alert alert-warning">
+        The following <b>{{warnings.shape[0]}}</b> fields may cause potential issues, check the message and consider excluding them from model training   
+      </div>
+        <table class="table table-striped">
+            <thead>
+              <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Type</th>
+                <th scope="col">Feature</th>
+                <th scope="col">Count</th>
+                <th scope="col"># Distinct</th>
+                <th scope="col">% Distinct</th>
+                <th scope="col"># Missing</th>
+                <th scope="col">% Missing</th>
+                <th scope="col">Message</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for ix, rec in warnings.iterrows() %}
+                <tr>
+                <td>{{ rec['_column'] }}</td>
+                <td>{{ rec['_dtype'] }}</td>
+                <td>{{ rec['_feature'] }}</td>
+                <td>{{ rec['count'] }}</td>
+                <td>{{ rec['nunique'] }}</td>
+                <td>{{ '{0: >#016.2f}'.format(rec['nunique_pct']*100) }}%</td>
+                <td>{{ rec['null'] }}</td>
+                <td>{{ '{0: >#016.2f}'.format(rec['null_pct']*100)}}%</td>
+                <td>{{ rec['_message'] }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</small>
+{% endblock %}

@@ -1,0 +1,136 @@
+{% block content %}
+<br>
+<div class="container"> 
+    <h4>Categorical Analysis</h4>
+{% for rec in cat_rec %}
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">Name</th>
+        <th scope="col">Type</th>
+        <th scope="col">Count</th>
+        <th scope="col"># Distinct</th>
+        <th scope="col">% Distinct</th>
+        <th scope="col"># Missing</th>
+        <th scope="col">% Missing</th>
+    
+      </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><b>{{rec['_column']}}</b></td>
+          <td>{{rec['_dtype']}}</td>
+          <td>{{rec['count']}}</td>
+          <td>{{rec['nunique']}}</td>
+          <td>{{'{0: >#016.2f}'.format(rec['nunique_pct']*100)}}%</td>
+          <td>{{rec['null']}}</td>
+          <td>{{'{0: >#016.2f}'.format(rec['null_pct']*100)}}%</td>
+        </tr>
+      </tbody>
+  </table>
+  <div class="row">
+  <div class="col-6">
+  <canvas id="{{rec['_column']}}" width="400" height="300"></canvas>
+  <script>
+  var dataPack1 = {{rec['fraud_pct']}};
+  var dataPack2 = {{rec['legit_pct']}};
+  var datalabel = {{rec['top_n']}};
+    var bar_ctx = document.getElementById("{{rec['_column']}}");
+    var bar_chart = new Chart(bar_ctx, {
+      type: 'horizontalBar',
+      data: {
+        labels: datalabel,
+        datasets: [{
+            label: 'Fraud',
+            data: dataPack1,
+            backgroundColor: "#689B0C",
+            hoverBackgroundColor: "#D4E4B4",
+            hoverBorderWidth: 1
+          },
+          {
+            label: 'Not-Fraud',
+            data: dataPack2,
+            backgroundColor: "#1975BA ",
+            hoverBackgroundColor: "#B5D3EA",
+            hoverBorderWidth: 1
+          }
+        ]
+      },
+      options: {
+        animation: {
+          duration: 10,
+        },
+        scales: {
+          xAxes: [{
+            stacked: true,
+            gridLines: {
+              display: false
+            },
+          }],
+          yAxes: [{
+            stacked: true,
+            ticks: {
+              suggestedMin: 0,
+              suggestedMax: 1
+            },
+          }],
+        },
+        legend: {
+          display: true
+        }
+      },
+    });
+
+ 
+  </script>
+  </div>
+  <div class="col-6">
+    <canvas id="{{rec['_column']}}_1" width="400" height="300"></canvas>
+    <script>
+    var dataPack1 = {{rec['top_n_count']}};
+    var datalabel = {{rec['top_n']}};
+      var bar_ctx = document.getElementById("{{rec['_column']}}_1");
+      var bar_chart = new Chart(bar_ctx, {
+        type: 'horizontalBar',
+        data: {
+          labels: datalabel,
+          datasets: [{
+              label: 'FREQ',
+              data: dataPack1,
+              backgroundColor: "#1975BA",
+              hoverBackgroundColor: "#B5D3EA",
+              hoverBorderWidth: 0
+            },
+          ]
+        },
+        options: {
+          animation: {
+            duration: 10,
+          },
+          scales: {
+            xAxes: [{
+              stacked: true,
+              gridLines: {
+                display: false
+              },
+            }],
+            yAxes: [{
+              stacked: true,
+              ticks: {
+               
+              },
+            }],
+          },
+          legend: {
+            display: true
+          }
+        },
+      });
+  
+   
+    </script>
+    </div>
+  </div>
+
+{% endfor %}
+{% endblock %}

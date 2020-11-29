@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Data Profile Report </title>
+    <!-- Bootstrap -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <!-- d3 java script -->
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <!-- Load d3.js -->
+    <script src="https://d3js.org/d3.v4.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
+</head>
+
+<body>
+<div class="container">
+    <h2>Amazon Fraud Detector CSV Profile</h2>
+    <hr>
+</div>
+
+    {% include "profile_overview.html" %}
+    {% include "profile_messages.html" %}
+    {% include "profile_label.html" %}
+    {% include "profile_partition.html" %}
+    {% include "profile_email.html" %}
+    {% include "profile_ip.html" %}
+    {% include "profile_categorical.html" %}
+    {% include "profile_numeric.html" %}
+
+</body>
