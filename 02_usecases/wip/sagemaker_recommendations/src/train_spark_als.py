@@ -13,6 +13,12 @@ from pyspark.sql.functions import *
 from pyspark.ml.evaluation import RegressionEvaluator
 from pyspark.ml.recommendation import ALS
 from pyspark.sql import Row
+from pyspark.sql.functions import udf
+from pyspark.sql.types import StringType
+
+
+def array_to_string(my_list):
+    return '[' + ','.join([str(elem) for elem in my_list]) + ']'
 
 
 def main():
@@ -57,12 +63,20 @@ def main():
 
     # Generate top 10 movie recommendations for each user
     userRecs = model.recommendForAllUsers(10)
-    userRecs.show()
+    userRecs.show(truncate=True)
+
+    # |userId|recommendations |
+    # +------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+    # |21 |[[29, 4.6440034], [2, 4.11408], [85, 3.541986], [74, 3.5180748], [53, 3.4512622], [62, 3.4409468], [94, 3.2867239], [31, 3.2672868], [76, 3.2666306], [58, 3.1715796]] |
 
     # Write top 10 movie recommendations for each user
     # Note:  This is commented out until we fix this: 
     #    org.apache.spark.sql.AnalysisException: CSV data source does not support array<struct<movieId:int,rating:float>> data type.;
-#    userRecs.repartition(1).write.mode("overwrite").option("header", True).option("delimiter", "\t").csv(f"{s3_output_data}/recommendations")
+    userRecs \
+      .repartition(1) \
+      .write \
+      .mode("overwrite") \
+      .json(f"{s3_output_data}/all-recommendations")
         
     # Generate top 10 movie recommendations for a specified set of 3 users
     # TODO:  Just select user_id "42"    
@@ -70,17 +84,15 @@ def main():
     userSubsetRecs = model.recommendForUserSubset(users, 10)
     userSubsetRecs.show(truncate=False)
     
-#     # Generate top 10 user recommendations for each movie
-#     movieRecs = model.recommendForAllItems(10)
-#     movieRecs.show()
-#     # Write top 10 user recommendations for each movie
-#     movieRecs.
-#       .repartition(1)
-#       .write
-#       .mode("overwrite")
-#       .option("header", True)      
-#       .option("delimiter", "\t")
-#       .csv(f"{s3_output_data}/movies")
+     # Generate top 10 user recommendations for each movie
+    movieRecs = model.recommendForAllItems(10)
+    movieRecs.show()
+    # Write top 10 user recommendations for each movie
+    movieRecs \
+      .repartition(1) \
+      .write \
+      .mode("overwrite") \
+      .json(f"{s3_output_data}/top-10-recommendations")
   
 #     # Generate top 10 user recommendations for a specified set of movies
 #     # TODO:  Just select user_id "42"
