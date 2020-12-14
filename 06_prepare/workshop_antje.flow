@@ -1,0 +1,156 @@
+{
+  "metadata": {
+    "version": 1
+  },
+  "nodes": [
+    {
+      "node_id": "d46ffe0e-f774-4ecc-bdbf-40a708832774",
+      "type": "SOURCE",
+      "operator": "sagemaker.athena_source_0.1",
+      "parameters": {
+        "dataset_definition": {
+          "datasetSourceType": "Athena",
+          "name": "amazon-reviews-pds-tsv",
+          "catalogName": "AwsDataCatalog",
+          "databaseName": "dsoaws",
+          "queryString": "select * from amazon_reviews_tsv",
+          "s3OutputLocation": "s3://sagemaker-us-east-1-806570384721/athena/",
+          "outputFormat": "parquet"
+        }
+      },
+      "trained_parameters": {
+        "query_execution_id": "6ac41976-7552-438a-a3d0-f3f87c38e654",
+        "ctas_table_name": "sagemaker_tmp_79d13f07d65a4ff38c9b5a57594464c3",
+        "ctas_s3_output_location": "s3://sagemaker-us-east-1-806570384721/athena/79d13f07d65a4ff38c9b5a57594464c3/data/"
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "default",
+          "sampling": {
+            "sampling_method": "sample_by_ratio",
+            "sample_ratio": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "node_id": "b1cdf334-0f01-40e6-819b-5806e59d41e6",
+      "type": "TRANSFORM",
+      "operator": "sagemaker.spark.infer_and_cast_type_0.1",
+      "parameters": {},
+      "trained_parameters": {
+        "schema": {
+          "marketplace": "string",
+          "customer_id": "long",
+          "review_id": "string",
+          "product_id": "string",
+          "product_parent": "long",
+          "product_title": "string",
+          "product_category": "string",
+          "vine": "string",
+          "verified_purchase": "string",
+          "review_headline": "string",
+          "review_body": "string",
+          "review_date": "date",
+          "star_rating": "long",
+          "helpful_votes": "long",
+          "total_votes": "long"
+        }
+      },
+      "inputs": [
+        {
+          "name": "default",
+          "node_id": "d46ffe0e-f774-4ecc-bdbf-40a708832774",
+          "output_name": "default"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "default"
+        }
+      ]
+    },
+    {
+      "node_id": "a4edc65c-a7f8-43db-93d1-ab6c7bd9e202",
+      "type": "TRANSFORM",
+      "operator": "sagemaker.spark.process_numeric_0.1",
+      "parameters": {
+        "operator": "Scale values",
+        "scale_values_parameters": {
+          "scaler": "Min-max scaler",
+          "min_max_scaler_parameters": {
+            "min": -1,
+            "max": 1,
+            "input_column": "star_rating",
+            "output_column": "star_rating_scaled"
+          },
+          "standard_scaler_parameters": {}
+        }
+      },
+      "trained_parameters": {
+        "scale_values_parameters": {
+          "min_max_scaler_parameters": {
+            "_hash": -1822493288712256300,
+            "scaler_model": "P)h>@6aWAK2mpM9j!}b_A8*3|002G#000vJ003=ebYWy+bYU-WVRCdWFfcGMFm;a2YQr!P2Jd~0J==>^V;kq%v!PJvRV?<V6_qTZ9|#F~_iR#HOrh6hX1=|^;wWc0Ku8}*k(N)!94URFcX(tfH8IY1o9XnnkmEFml^rxttmj<FM>yy~jnmML{it={z(arMlx^4~+@V6%l0R>)60h1-j{Bl{9ww!U$9|eRAw(xXlY}o|w^++daH16U(JbM<?X84cjjDlA%P(Pm5OW{$bduLlT^m^WNY$0sUHFkue+&P<Wz09W?_Qs7P)h>@6aWAK2mpM9j#0yL+R_dH000aC000;O003=ebYWy+bYU+paA9(EEif=JFfcA-a$`#_N@ieSU}DIZpVkZjP)h>@6aWAK2mpM9j!^&r0006200000000pH003=ebYWy+bYU-FQ&mGlMN?A)08mQ<1QY-O00;nlgpN@~rsw<$000080000M0001OWprU=VRT_HE?-ksLqkPVQ!Zn2V@obdW?*1oVgLY8O9KQH000080DOdwQ5`-f4A%kx0B{Nb07w7;0AyiwVJ~oDa&#>)FfcGMEo3-0HZx&jF)cVXGh{6^H)3NgIX5?9EjKYVWn(lpVr4csI4xr^FfcB2Zeeh6c`k5aa&dKKbnRBlZqq;%oj9&*g~tLimW`q+vS`$zU?rq6X%&egx~Pyq6)J2HLX&tLEGBm9M@d@c5BdRJbcrgyfKT8H`XQ_lLd-Z$?L0|YAQp|HXlCv?_uPAY$I9N*S7iub7Rp7)(S-oToXn>H0E1r%tR;5zley2)-*k#?DgHLR6BBh7T9(rxfJN`Ym0?sEL~oTsI*2h3pcZ3faiH@3NxY&ZOgUxpdx>0WFpT_%?PRy(RoqVUbXGgrZOAD<@9y68I>`O_-fMoqZ3KBx<>VWVYqcyJkr$Q?MF6=~+Lqtz;MEnj;bh*kjxa+mTee{}u}A9?K$VwyVtGE~29#w?a2wk`0}6+T1XFOCF<dN-y8lvI;*^|nQV?_0l&T;CWi4q!SOMfDPO>GpAlBzRcqIqf!(xUPj%H+IEri)>QoV3gr_Vdd`kG?2RRJiwN!GC6u>N7)VU`_fmy*WQ{Gw?xlW8J1CbN7_NncWwRlmYbN$Q=ar*(_Equ!mT7d7vcpOJ6Gy;FX??+bp4eW*L%zKe-8XG>G;L)|~vceYf&!p%(RNoRsY3n<F6<F+)^LG(Im;my<zvFllmEiYBHl2!up`UJu|AR1j91lZSH=abgPJ~EJx<R9X(%IsISRL^&Vrmq%N)565?)UCJ2s*Tz#l$Z`0AK))}fx$>kf;=yTj!CzPMi{rHy}?c2abNH3Q+TKMEFyGz^Ki8A{ZY9&Wrm1heQKlUvz;9ff*ORLn230|s1AFlIs5(MC7BIPOtx$vx3D|Hr^2)8(eO;#gIpK&=y5a(`{VhWj_o7M_Fht*sK)-ns)JcuRMc<+mh!JO-}M)-DsdaG$K`rlW+8z5JbEWRY`gjBC6+I1<&sv;uQdXT82OU9X_y-o1Dj@}Rx^#qW=+?1L$BzY<=V!hN~L6O=nZ3YT{+1CF!c+*(f8>d{jd2OP)h>@6aWAK2mpM9j#22GCQ>5+001BW002z@003lRbYU+paA9(EEif=JFfc7-I5svjVPY{YI5jh5Ei^Y`V=Xy1H(@O|F*IdkG&W*oHaIvfV=yo<E^}^SaBz7paA9(Bb!BueV{&6lE=p!#U|?d{qU>*|Q6abc-7l9(%;)T~Emx{o3v81K1^`e?0|XQR000O8e1wis000000ssI2000004FCWDWMOn+FJDttLqkPVQv(1{O9KQH000080DOdwQAMWb{0aa700;m801^NI0AyiwVJ|LUQ&mGlMN?BQV{&6lE=p!#U|?bZ08mQ-0u%!j000080DOdwQG=ErZ^Hlp06qZ#022TJ00000000000HlEc0001OWprU=VRT_HaA9(EEif=JFfdR{0Rj{Q6aWAK2mpM9j#0yL+R_dH000aC000;O0000000000005+c^Z)<=ZDn*}WMOn+FD`Ila&#>)FfcGME@N_IP)h*<6ay3h000O8e1wis000000ssI2000005dZ)H0000000000q=7gA003=ebYWy+bYU-FQ&mGlMN?ByO928D0~7!N00;nlgpN@~rsw<$000080000M00000000000001_foTB%0BvP-VPs)+VJ|LUQ&mGlMN?BQV{&6qO928D0~7!N00;nlgpN@iJ|_&<0ssJT3IG5|00000000000001_fu{ig0AyiwVJ~oDa&#>)FfcGMEo3-0HZx&jF)cVXGh{6^H)3NgIX5?9EjKYVWn(lpVr4csI4xr^FfcB2Zeeh6c`k5aa&dKKbWlqH0u%!j000080DOdwQRti|QX>EW03ZMW08Ib@00000000000HlHB1ONbJVRT_HE^uLTbS*G2FfcGJWH>f9Ght#eEjTqZWGyr|Vq+~iH#cD|H!(D2V>C8mWi~iCEn_e+FfMa$VQ_GHE^uLTadl;ME@N_IP)h*<6ay3h000O8e1wis000000ssI2000004FCWD0000000000q=9k;003lRbYU-FQ&mGlMN?ByO928D0~7!N00;nlgpN@~rsw<$000080000I00000000000001_fu98c0AyiwVJ|LUQ&mGlMN?BQV{&6qO9ci10000800;nf0ssKn1poj500"
+          }
+        }
+      },
+      "inputs": [
+        {
+          "name": "df",
+          "node_id": "b1cdf334-0f01-40e6-819b-5806e59d41e6",
+          "output_name": "default"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "default"
+        }
+      ]
+    },
+    {
+      "node_id": "839a999c-6912-46ba-a7ff-2e245700c230",
+      "type": "TRANSFORM",
+      "operator": "sagemaker.spark.custom_formula_0.1",
+      "parameters": {
+        "output_column": "star_rating_scaled_floored",
+        "formula": "floor(star_rating_scaled)"
+      },
+      "inputs": [
+        {
+          "name": "df",
+          "node_id": "a4edc65c-a7f8-43db-93d1-ab6c7bd9e202",
+          "output_name": "default"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "default"
+        }
+      ]
+    },
+    {
+      "node_id": "813ca642-d317-407e-9938-78ad0cd4bf9a",
+      "type": "VISUALIZATION",
+      "operator": "sagemaker.visualizations.histogram_0.1",
+      "parameters": {
+        "name": "sentiment_distribution",
+        "x_axis": "star_rating_scaled_floored",
+        "facet_by": "product_category"
+      },
+      "inputs": [
+        {
+          "name": "df",
+          "node_id": "839a999c-6912-46ba-a7ff-2e245700c230",
+          "output_name": "default"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "default"
+        }
+      ]
+    }
+  ]
+}
