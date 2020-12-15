@@ -152,6 +152,27 @@
           "name": "default"
         }
       ]
+    },
+    {
+      "node_id": "f3216444-c104-41c8-a524-84afe9e6b613",
+      "type": "TRANSFORM",
+      "operator": "sagemaker.spark.custom_formula_0.1",
+      "parameters": {
+        "output_column": "review_date_iso",
+        "formula": "concat(to_date(review_date, \"%Y-%m-%d\"), \"T00:00:00Z\")"
+      },
+      "inputs": [
+        {
+          "name": "df",
+          "node_id": "969f0c55-dbfe-4658-88fc-15d4de6762e0",
+          "output_name": "default"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "default"
+        }
+      ]
     }
   ]
 }
