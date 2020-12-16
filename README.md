@@ -1,6 +1,6 @@
 # Upcoming O'Reilly Book:  _Data Science on AWS_
 
-YouTube Videos, Meetups, Book, and Code:  https://datascienceonaws.com
+YouTube Videos, Meetups, Book, and Code:  **https://datascienceonaws.com**
 
 [![Data Science on AWS](img/data-science-on-aws-book.png)](https://datascienceonaws.com)
 
