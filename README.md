@@ -4,6 +4,7 @@ YouTube Videos, Meetups, Book, and Code:  **https://datascienceonaws.com**
 
 [![Data Science on AWS](img/data-science-on-aws-book.png)](https://datascienceonaws.com)
 
+
 # Workshop Description
 
 In this workshop, we build a natural language processing (NLP) model to classify sample Twitter comments and customer-support emails using the state-of-the-art [BERT](https://arxiv.org/abs/1810.04805) model for language representation.
