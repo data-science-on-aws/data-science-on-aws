@@ -1,4 +1,6 @@
-# O'Reilly Book Coming Early 2021:  _Data Science on AWS_
+# O'Reilly Book Coming Early 2021
+
+# Data Science on AWS
 
 YouTube Videos, Meetups, Book, and Code:  **https://datascienceonaws.com**
 
