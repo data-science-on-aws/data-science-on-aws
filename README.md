@@ -22,6 +22,11 @@ This workshop is FREE, but would otherwise cost <25 USD.
 ![Workshop Agenda](img/outline.png)
 
 
+# Workshop Contributors
+
+![Workshop Contributors](img/primary-contributors.png)
+
+
 # Workshop Instructions
 
 ## 1. Create `TeamRole` IAM Role
