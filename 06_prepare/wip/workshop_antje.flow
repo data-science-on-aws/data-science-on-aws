@@ -1,0 +1,178 @@
+{
+  "metadata": {
+    "version": 1
+  },
+  "nodes": [
+    {
+      "node_id": "d46ffe0e-f774-4ecc-bdbf-40a708832774",
+      "type": "SOURCE",
+      "operator": "sagemaker.athena_source_0.1",
+      "parameters": {
+        "dataset_definition": {
+          "datasetSourceType": "Athena",
+          "name": "amazon-reviews-pds-tsv",
+          "catalogName": "AwsDataCatalog",
+          "databaseName": "dsoaws",
+          "queryString": "select * from amazon_reviews_tsv",
+          "s3OutputLocation": "s3://sagemaker-us-east-1-806570384721/athena/",
+          "outputFormat": "parquet"
+        }
+      },
+      "trained_parameters": {
+        "query_execution_id": "6ac41976-7552-438a-a3d0-f3f87c38e654",
+        "ctas_table_name": "sagemaker_tmp_79d13f07d65a4ff38c9b5a57594464c3",
+        "ctas_s3_output_location": "s3://sagemaker-us-east-1-806570384721/athena/79d13f07d65a4ff38c9b5a57594464c3/data/"
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "default",
+          "sampling": {
+            "sampling_method": "sample_by_ratio",
+            "sample_ratio": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "node_id": "b1cdf334-0f01-40e6-819b-5806e59d41e6",
+      "type": "TRANSFORM",
+      "operator": "sagemaker.spark.infer_and_cast_type_0.1",
+      "parameters": {},
+      "trained_parameters": {
+        "schema": {
+          "marketplace": "string",
+          "customer_id": "long",
+          "review_id": "string",
+          "product_id": "string",
+          "product_parent": "long",
+          "product_title": "string",
+          "product_category": "string",
+          "vine": "string",
+          "verified_purchase": "string",
+          "review_headline": "string",
+          "review_body": "string",
+          "review_date": "date",
+          "star_rating": "long",
+          "helpful_votes": "long",
+          "total_votes": "long"
+        }
+      },
+      "inputs": [
+        {
+          "name": "default",
+          "node_id": "d46ffe0e-f774-4ecc-bdbf-40a708832774",
+          "output_name": "default"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "default"
+        }
+      ]
+    },
+    {
+      "node_id": "e880c72f-910c-4554-9a28-a66ce9d3b35f",
+      "type": "TRANSFORM",
+      "operator": "sagemaker.spark.process_numeric_0.1",
+      "parameters": {
+        "operator": "Scale values",
+        "scale_values_parameters": {
+          "scaler": "Min-max scaler",
+          "min_max_scaler_parameters": {
+            "min": -1,
+            "max": 1,
+            "input_column": "star_rating",
+            "output_column": "star_rating_scaled"
+          },
+          "standard_scaler_parameters": {}
+        }
+      },
+      "trained_parameters": {
+        "scale_values_parameters": {
+          "min_max_scaler_parameters": {
+            "_hash": -1822493288712256300,
+            "scaler_model": "P)h>@6aWAK2mrm3j#0;WqX)qN002G#000vJ003=ebYWy+bYU-WVRCdWFfcGMFm;a0iUKhZMfdX=weBv`J*cBw*A2pe+fb%U4U=?29w3VUZmG;5!fa}B>z>2CfN_*FtRSQVQY3R^%#qR$dWU<aQWN7~r-4r2h8(9MjO?I+Vm;?VKEkS-tHpAmx=xO2;DK*BWg8|Df1*Owl0Q$a60X`&!dIg<%bvgbakrbz?+wAp4<zCXcq@vwL(zs>VlC_71lNUq)FwE62ki9s_{}BtbdqVPt__U5r|Qb)U98@{|IX6-S$p+fKW<P<0|XQR000O8y^@Ymu<}4r4gdfE3;+NC7ytkOZDn*}WMOn+FD`Ila&#>)FfcGME@N_IOD;-gU|?WkU|(Eu8~{*D0|XQR000O8y^@Ym000000ssI2000005dZ)HZDn*}WMOn+FJDttLqkPVQv(1{O9KQH000080KJlqQAMWb{0aa700;m802TlM0BvP-VPs)+VJ|LUQ&mGlMN?BQV{&6lE=p!#U|?bZ08mQ<1QY-O00;oRl8#X;bT%2*0ssJT3IG5|0001FVRT_HaA9(EEif=JFfc7JH8e3fF*q_UHa9XfEi^GQH7#N|IXNw4Wn*PEW@2M9GGsR`V=yo<E^}^SaBz7paA9(Bb!BwzR^4h7K@^^Bw&@aoE;O@DB$Tk&&`Mkq)2wL;Sg{vHP>NJ<L}Zekjf<1rbbo5nk~ioB^rDwid;%ZAC+LHCEh5frHr>sysTbl!LkKf-zVCeJe0yfe-qTlQ2w(=HA{5vn1*IGk699n0uME~=JN8N67uaty!M6;58{UbC8V@a_WB}mNdvIkKO%0;AN&y{2m<LdeFi0Axe18(HSP4^3x%^%%R}u^(|6x0s?PwLX6F;5RPG%bl*`IfJZ@L}qe0=XVKae(tBB%=JhV7Uw)57$HX+a4<VU@Mz^*UsAg>M8Ty5<q#$Ys;g%_ebKT`5o%kw{I~gTjEaOekp+%j3Y*A*TKmTzU)_N#pLnl$M2TE_+gta?F&flmgkcxCuc8P>==LlAVH7pY!0eImjOtH@t8(BO7la$X1i<g`+xq-f`B~1gEVs)^40N>^G=?Sa*<RN8V+m@if0!n)GCv(2dC~pA+(z1Y^~&a8u%X=gDc^;_j$-=gCFQI~8Z-8*%Sc9Pj%=oMIpD&bRMkBF)*-6#H=Z5B8lc)vs_fV|wygN@fKV5we|@iaVHHM>V*a>LGDl)3(r3MJ=f%fYv7v?g3TV;=m`K>e!#uHu12IJ&b-x#|pP!*-~83@tdAfR1A|)-Bq^U9xE1Z^H6L$SbTuL<oP-$H7R!806He!rYhy!mimS?J==M`v(Mn2-m{R<>CMBj!uLnz=9C#AhV?0pp2v5VPbqFtc4A=alA<!~o#pKJi<e|RG!fafJklc02%ibhria5bX%BWB++)Y#DD02tZ`ziJP0M}Bbix|@3#$%hZBbF(_Ib*`(tOunysFr3xE`15ahZhx=y~`~df0aI;Y%!ER?8)|oL_7BCe`yLV^cRaDmpQYMy+P(kByq9X}VU?Hp{h*N0my+*w7mK=6d!d2f)-X_{QF+d+fjFZ%|7E1QY-O00;oRl8#ZvbKy`U0000W0000@0001FVRT_HE^uLTbS*G2FfcGJFf}wWIWaggEjBkYG%YkSGBqt?I5{~jWMyMzHD+RCGBRX0En_e+FfMa$VQ_GHE^uLTadl;ME@N_IOD;-gU|?Wk*rM!jc<5>J4vE8d*39SZvMpDtSPN{E2?hXAO9KQH000080KJlqQ2+n{00IC20000001W^D0AyiwVJ}}(RYOBXQ&R%~P)h>@6aWAK2mrm3j!{LX=llu)000O8000sI003lRbYU+pUsF{>Lq$_lE@N_IOD;-gU|?Wk002-+0Rj{Q6aWAK2mrm3j#0;WqX)qN002G#000vJ0000000000005+c00000ZDn*}WMOn+FK}UUbS*G2FfcGsO928D0~7!N00;oRl8#ZZ@<34z0000C0000O00000000000001_f${(V0BvP-VPs)+VJ|LlVRCdWFfcGMFfL<qV^B*00u%!j000080KJlqQ2+n{00IC20000001*HH00000000000HlF70RRAPWprU=VRT_HUsF{>Lq$_lP)h*<6ay3h000O8y^@YmMW*Nc3IG5A2mk;8761SM0000000000q=9Dv003=ebYWy+bYU+pUsF{>Lq$_lE@N_IP)h*<6ay3h000O8y^@YmD|9v))&c+ka0&nbNB{r;0000000000q=BUY003lRbYU-WVRCdWFfcGMFfA}OG%-0bI5I6ZH!?IWG%+$YEn+x1IW1&mV`VjFVq-EgWH&8iFfcGKb8ca9aCt6pVRCVGWpq$W0Rj{Q6aWAK2mrm3j#0*Q;ZP$0001BW002z@0000000000005+c;RFBxWMOn+FD`Ila&#>)FfcGMEig4SF*z|fGA%YYGBhnTF)}qRVmLWDEo5b5Wi@7EV=^*iH!Wi@FfcB2Zeeh6c`k5aa&dKKbS`6ZV^B*00u%!j000080KJlqQ2+n{00IC20000001W^D00000000000HlF$1pokKVRT_HUsF{>Lq$_lP)h*<6ay3h000O8y^@YmMW*Nc3IG5A2mk;85&!@I0000000000q=B3T003lRbYU+pUsF{>Lq$_lE@N_IP)h{{000002mlBGb^-tZ)&&3n000"
+          }
+        }
+      },
+      "inputs": [
+        {
+          "name": "df",
+          "node_id": "b1cdf334-0f01-40e6-819b-5806e59d41e6",
+          "output_name": "default"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "default"
+        }
+      ]
+    },
+    {
+      "node_id": "969f0c55-dbfe-4658-88fc-15d4de6762e0",
+      "type": "TRANSFORM",
+      "operator": "sagemaker.spark.custom_formula_0.1",
+      "parameters": {
+        "output_column": "star_rating_scaled_floored",
+        "formula": "floor(star_rating_scaled)"
+      },
+      "inputs": [
+        {
+          "name": "df",
+          "node_id": "e880c72f-910c-4554-9a28-a66ce9d3b35f",
+          "output_name": "default"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "default"
+        }
+      ]
+    },
+    {
+      "node_id": "a4ea0a37-e76c-4fba-bfdd-a4c09daaad7b",
+      "type": "VISUALIZATION",
+      "operator": "sagemaker.visualizations.histogram_0.1",
+      "parameters": {
+        "name": "sentiment_distribution",
+        "x_axis": "star_rating_scaled_floored",
+        "color_by": "product_category",
+        "facet_by": "product_category"
+      },
+      "inputs": [
+        {
+          "name": "df",
+          "node_id": "969f0c55-dbfe-4658-88fc-15d4de6762e0",
+          "output_name": "default"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "default"
+        }
+      ]
+    },
+    {
+      "node_id": "f3216444-c104-41c8-a524-84afe9e6b613",
+      "type": "TRANSFORM",
+      "operator": "sagemaker.spark.custom_formula_0.1",
+      "parameters": {
+        "output_column": "review_date_iso",
+        "formula": "concat(to_date(review_date, \"%Y-%m-%d\"), \"T00:00:00Z\")"
+      },
+      "inputs": [
+        {
+          "name": "df",
+          "node_id": "969f0c55-dbfe-4658-88fc-15d4de6762e0",
+          "output_name": "default"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "default"
+        }
+      ]
+    }
+  ]
+}
