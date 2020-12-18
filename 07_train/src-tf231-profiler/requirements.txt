@@ -1,0 +1,5 @@
+# This doesn't actually work, so use subprocess.check_call in your .py
+#tensorflow==2.1.0
+#transformers==2.8.0
+#scikit-learn==0.23.1
+#matplotlib==3.2.1
