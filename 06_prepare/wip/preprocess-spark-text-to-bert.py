@@ -9,12 +9,12 @@ import csv
 import collections
 import subprocess
 import sys
-#subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'pip', '--upgrade'])
-#subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'wrapt', '--upgrade', '--ignore-installed'])
-#subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow==2.1.0', '--ignore-installed'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'pip', '--upgrade'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'wrapt', '--upgrade', '--ignore-installed'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow==2.1.0', '--ignore-installed'])
 import tensorflow as tf
 print(tf.__version__)
-#subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'transformers==2.8.0'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'transformers==2.8.0'])
 from transformers import DistilBertTokenizer
 
 import pyspark
