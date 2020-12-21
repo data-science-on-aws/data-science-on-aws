@@ -3,18 +3,9 @@ from sklearn.utils import resample
 import functools
 import multiprocessing
 
-import pandas as pd
-import boto3
 from datetime import datetime
 from time import strftime
-import subprocess
 import sys
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow==2.1.0'])
-import tensorflow as tf
-print(tf.__version__)
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'transformers==2.8.0'])
-from transformers import DistilBertTokenizer
-from tensorflow import keras
 import os
 import re
 import collections
@@ -25,6 +16,23 @@ import pandas as pd
 import csv
 import glob
 from pathlib import Path
+import time
+import boto3
+import subprocess
+
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'pandas==1.1.5'])
+import pandas as pd
+
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow==2.1.0'])
+import tensorflow as tf
+from tensorflow import keras
+
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'transformers==2.8.0'])
+from transformers import DistilBertTokenizer
+
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'sagemaker==2.20.0'])
+import sagemaker
+
 
 tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
 
@@ -38,6 +46,61 @@ LABEL_VALUES = [1, 2, 3, 4, 5]
 label_map = {}
 for (i, label) in enumerate(LABEL_VALUES):
     label_map[label] = i
+
+
+# Setup the feature store
+timestamp = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+print(timestamp)
+    
+prefix = 'reviews-feature-store-' + timestamp
+print(prefix)
+
+sagemaker_session = sagemaker.Session()
+bucket = sagemaker_session.default_bucket()
+role = sagemaker.get_execution_role()
+region = boto3.Session().region_name
+
+sm = boto3.Session().client(service_name='sagemaker', region_name=region)
+
+sm.list_feature_groups()
+
+featurestore_runtime = boto3.Session().client(service_name='sagemaker-featurestore-runtime', region_name=region)
+
+from time import gmtime, strftime, sleep
+
+from sagemaker.feature_store.feature_group import FeatureGroup
+
+reviews_feature_group_name = 'reviews-feature-group-' + strftime('%d-%H-%M-%S', gmtime())
+print(reviews_feature_group_name)
+
+reviews_feature_group = FeatureGroup(name=reviews_feature_group_name, 
+                                     sagemaker_session=sagemaker_session)
+print(reviews_feature_group)
+
+# record identifier and event time feature names
+record_identifier_feature_name = "review_id"
+event_time_feature_name = "date"
+
+def cast_object_to_string(data_frame):
+    for label in data_frame.columns:
+        if data_frame.dtypes[label] == 'object':
+            data_frame[label] = data_frame[label].astype("str").astype("string")
+
+def wait_for_feature_group_creation_complete(feature_group):
+    status = feature_group.describe().get("FeatureGroupStatus")
+    while status == "Creating":
+        print("Waiting for Feature Group Creation")
+        time.sleep(5)
+        status = feature_group.describe().get("FeatureGroupStatus")
+    if status != "Created":
+        raise RuntimeError(f"Failed to create feature group {feature_group.name}")
+    print(f"FeatureGroup {feature_group.name} successfully created.")
+
+account_id = boto3.client('sts').get_caller_identity()["Account"]
+
+reviews_feature_group_s3_prefix = prefix + '/' + account_id + '/sagemaker/' + region + '/offline-store/' + reviews_feature_group_name + '/data'
+
+s3 = boto3.Session().client(service_name='s3', region_name=region)    
 
     
 class InputFeatures(object):
@@ -79,7 +142,7 @@ class Input(object):
     self.label = label
     
     
-def convert_input(text_input, max_seq_length):
+def convert_input(the_input, max_seq_length):
     # First, we need to preprocess our data so that it matches the data BERT was trained on:
     #
     # 1. Lowercase our text (if we're using a BERT lowercase model)
@@ -88,7 +151,7 @@ def convert_input(text_input, max_seq_length):
     # 
     # Fortunately, the Transformers tokenizer does this for us!
     #
-    tokens = tokenizer.tokenize(text_input.text)    
+    tokens = tokenizer.tokenize(the_input.text)    
 
     # Next, we need to do the following:
     #
@@ -98,7 +161,7 @@ def convert_input(text_input, max_seq_length):
     #
     # Again, the Transformers tokenizer does this for us!
     #
-    encode_plus_tokens = tokenizer.encode_plus(text_input.text,
+    encode_plus_tokens = tokenizer.encode_plus(the_input.text,
                                                pad_to_max_length=True,
                                                max_length=max_seq_length,
 #                                               truncation=True
@@ -114,7 +177,7 @@ def convert_input(text_input, max_seq_length):
     segment_ids = [0] * max_seq_length
 
     # Label for each training row (`star_rating` 1 through 5)
-    label_id = label_map[text_input.label]
+    label_id = label_map[the_input.label]
 
     features = InputFeatures(
         input_ids=input_ids,
@@ -138,40 +201,50 @@ def convert_input(text_input, max_seq_length):
     return features
 
 
-def convert_features_to_tfrecord(inputs,
+def transform_inputs_to_tfrecord(inputs,
                                  output_file,
                                  max_seq_length):
     """Convert a set of `Input`s to a TFRecord file."""
 
-    tfrecord_writer = tf.io.TFRecordWriter(output_file)
+    records = []
 
-    for (input_idx, text_input) in enumerate(inputs):
-        if input_idx % 1000 == 0:
-            print("Writing example %d of %d" % (input_idx, len(inputs)))
+    tf_record_writer = tf.io.TFRecordWriter(output_file)
+    
+    for (input_idx, the_input) in enumerate(inputs):
+        if input_idx % 10000 == 0:
+            print('Writing input {} of {}\n'.format(input_idx, len(inputs)))
 
-            bert_features = convert_input(text_input, max_seq_length)
+        features = convert_input(the_input, max_seq_length)
+
+        all_features = collections.OrderedDict()
+        all_features['input_ids'] = tf.train.Feature(int64_list=tf.train.Int64List(value=features.input_ids))
+        all_features['input_mask'] = tf.train.Feature(int64_list=tf.train.Int64List(value=features.input_mask))
+        all_features['segment_ids'] = tf.train.Feature(int64_list=tf.train.Int64List(value=features.segment_ids))
+        all_features['label_ids'] = tf.train.Feature(int64_list=tf.train.Int64List(value=[features.label_id]))
+
+        tf_record = tf.train.Example(features=tf.train.Features(feature=all_features))
+        tf_record_writer.write(tf_record.SerializeToString())
+
+        records.append({'tf_record': tf_record.SerializeToString(),
+                        'input_ids': features.input_ids,
+                        'input_mask': features.input_mask,
+                        'segment_ids': features.segment_ids,
+                        'label_id': features.label_id,
+                        'review_id': the_input.review_id,
+                        'date': the_input.date,
+                        'label': features.label,
+                        'review_body': features.review_body
+                       })
+
+        #####################################
+        ####### TODO:  REMOVE THIS BREAK #######
+        #####################################            
+        # break
         
-            tfrecord_features = collections.OrderedDict()
-            
-            tfrecord_features['input_ids'] = tf.train.Feature(int64_list=tf.train.Int64List(value=bert_features.input_ids))
-            tfrecord_features['input_mask'] = tf.train.Feature(int64_list=tf.train.Int64List(value=bert_features.input_mask))
-            tfrecord_features['segment_ids'] = tf.train.Feature(int64_list=tf.train.Int64List(value=bert_features.segment_ids))
-            tfrecord_features['label_ids'] = tf.train.Feature(int64_list=tf.train.Int64List(value=[bert_features.label_id]))
+    tf_record_writer.close()
+    
+    return records
 
-            tfrecord = tf.train.Example(features=tf.train.Features(feature=tfrecord_features))
-            
-            tfrecord_writer.write(tfrecord.SerializeToString())
-
-    tfrecord_writer.close()
-    
-    
-def create_feature_store():
-    timestamp = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
-    print(timestamp)
-    featurestore_runtime = boto3.Session().client(service_name='sagemaker-featurestore-runtime', region_name=region)
-    
-    
-    
     
 def list_arg(raw_value):
     """argparse type for a list of strings"""
@@ -319,14 +392,32 @@ def _transform_tsv_to_tfrecord(file,
     print('Shape of validation dataframe {}'.format(df_validation.shape))
     print('Shape of test dataframe {}'.format(df_test.shape))
 
-    train_inputs = df_train.apply(lambda x: Input(text = x[DATA_COLUMN], 
-                                                         label = x[LABEL_COLUMN]), axis = 1)
+    timestamp = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+    print(timestamp)
 
-    validation_inputs = df_validation.apply(lambda x: Input(text = x[DATA_COLUMN], 
-                                                            label = x[LABEL_COLUMN]), axis = 1)
+    train_inputs = df_train.apply(lambda x: Input(
+                                    label = x[LABEL_COLUMN],
+                                    text = x[REVIEW_BODY_COLUMN],
+                                    review_id = x[REVIEW_ID_COLUMN],
+                                    date = timestamp
+                            ),
+                  axis = 1)
 
-    test_inputs = df_test.apply(lambda x: Input(text = x[DATA_COLUMN], 
-                                                label = x[LABEL_COLUMN]), axis = 1)
+    validation_inputs = df_validation.apply(lambda x: Input(
+                                    label = x[LABEL_COLUMN],
+                                    text = x[REVIEW_BODY_COLUMN],
+                                    review_id = x[REVIEW_ID_COLUMN],
+                                    date = timestamp
+                            ),
+                  axis = 1)
+
+    test_inputs = df_test.apply(lambda x: Input(
+                                    label = x[LABEL_COLUMN],
+                                    text = x[REVIEW_BODY_COLUMN],
+                                    review_id = x[REVIEW_ID_COLUMN],
+                                    date = timestamp
+                            ),
+                  axis = 1)
 
     # Next, we need to preprocess our data so that it matches the data BERT was trained on. For this, we'll need to do a couple of things (but don't worry--this is also included in the Python library):
     # 
@@ -345,15 +436,52 @@ def _transform_tsv_to_tfrecord(file,
     test_data = '{}/bert/test'.format(args.output_data)
 
     # Convert our train and validation features to InputFeatures (.tfrecord protobuf) that works with BERT and TensorFlow.
-    df_train_embeddings = convert_features_to_tfrecord(train_inputs, 
-                                                       '{}/part-{}-{}.tfrecord'.format(train_data, args.current_host, filename_without_extension), 
-                                                       max_seq_length)
+    train_records = transform_inputs_to_tfrecord(train_inputs, 
+                                                        '{}/part-{}-{}.tfrecord'.format(train_data, args.current_host, filename_without_extension), 
+                                                         max_seq_length)
 
-    df_validation_embeddings = convert_features_to_tfrecord(validation_inputs, '{}/part-{}-{}.tfrecord'.format(validation_data, args.current_host, filename_without_extension), max_seq_length)
+    validation_records = transform_inputs_to_tfrecord(validation_inputs, 
+                                                              '{}/part-{}-{}.tfrecord'.format(validation_data, args.current_host, filename_without_extension), 
+                                                              max_seq_length)
 
-    df_test_embeddings = convert_features_to_tfrecord(test_inputs, '{}/part-{}-{}.tfrecord'.format(test_data, args.current_host, filename_without_extension), max_seq_length)
-        
+    test_records = transform_inputs_to_tfrecord(test_inputs, 
+                                                        '{}/part-{}-{}.tfrecord'.format(test_data, args.current_host, filename_without_extension), 
+                                                        max_seq_length)    
+                
+    df_train_records = pd.DataFrame.from_dict(train_records)
+    df_train_records.head()   
     
+    cast_object_to_string(df_train_records)
+
+    reviews_feature_group.load_feature_definitions(data_frame=df_train_records)
+
+    reviews_feature_group.create(
+        s3_uri=f"s3://{bucket}/{prefix}",
+        record_identifier_name=record_identifier_feature_name,
+        event_time_feature_name=event_time_feature_name,
+        role_arn=role,
+        enable_online_store=True
+    )
+
+    wait_for_feature_group_creation_complete(feature_group=reviews_feature_group)
+
+    reviews_feature_group.describe()
+
+    reviews_feature_group.ingest(
+        data_frame=df_train_records, max_workers=3, wait=True
+    )       
+
+    reviews_feature_group.ingest(
+        data_frame=df_validation_records, max_workers=3, wait=True
+    )       
+
+    reviews_feature_group.ingest(
+        data_frame=df_test_records, max_workers=3, wait=True
+    )       
+
+    print(reviews_feature_group.as_hive_ddl())
+
+
 def process(args):
     print('Current host: {}'.format(args.current_host))
     
@@ -393,7 +521,21 @@ def process(args):
     dirs_output = os.listdir(test_data)
     for file in dirs_output:
         print(file)
+        
+    offline_store_contents = None
+    while (offline_store_contents is None):
+        objects_in_bucket = s3.list_objects(Bucket=bucket,
+                                            Prefix=prefix)
+        if ('Contents' in objects_in_bucket and len(objects_in_bucket['Contents']) > 1):
+            offline_store_contents = objects_in_bucket['Contents']
+        else:
+            print('Waiting for data in offline store...\n')
+            sleep(60)
 
+    print('Data available.')    
+
+    
+        
     print('Complete')
     
     
