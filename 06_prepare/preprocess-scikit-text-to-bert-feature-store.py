@@ -55,8 +55,12 @@ prefix = 'reviews-feature-store-' + timestamp
 print(prefix)
 
 region = boto3.Session().region_name
+print(region)
 
-sm = boto3.Session().client(service_name='sagemaker', region_name=region)
+region='us-east-1'
+
+sm = boto3.Session().client(service_name='sagemaker', 
+                            region_name=region)
 sm.list_feature_groups()
 
 featurestore_runtime = boto3.Session().client(service_name='sagemaker-featurestore-runtime', region_name=region)
