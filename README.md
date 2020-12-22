@@ -1,8 +1,11 @@
-# Upcoming O'Reilly Book:  _Data Science on AWS_
+# O'Reilly Book Coming Early 2021
+
+## Data Science on AWS
 
 YouTube Videos, Meetups, Book, and Code:  **https://datascienceonaws.com**
 
 [![Data Science on AWS](img/data-science-on-aws-book.png)](https://datascienceonaws.com)
+
 
 # Workshop Description
 
@@ -20,6 +23,11 @@ This workshop is FREE, but would otherwise cost <25 USD.
 # Workshop Agenda
 
 ![Workshop Agenda](img/outline.png)
+
+
+# Workshop Contributors
+
+![Workshop Contributors](img/primary-contributors.png)
 
 
 # Workshop Instructions
