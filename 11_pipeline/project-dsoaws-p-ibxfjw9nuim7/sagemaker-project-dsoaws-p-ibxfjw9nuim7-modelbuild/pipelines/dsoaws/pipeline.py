@@ -103,7 +103,8 @@ def get_pipeline(
     input_data = ParameterString(
         name="InputDataUrl",
         default_value="s3://{}/amazon-reviews-pds/tsv/".format(bucket),
-#        default_value=None
+#        default_value='' # Does not like '' 
+#        default_value=None # Does not like None
     )
     
     processor = SKLearnProcessor(
@@ -378,7 +379,7 @@ def get_pipeline(
         model_data=step_train.properties.ModelArtifacts.S3ModelArtifacts,
         content_types=["text/csv"],
         response_types=["text/csv"],
-        inference_instances=["ml.m5.large", "ml.m5.4xlarge"],
+        inference_instances=["ml.m5.large", "ml.m5.4xlarge"], # The JSON spec must be within these instance types or we will see "Instance Type Not Allowed" Exception 
         transform_instances=["ml.c5.18xlarge"],
         model_package_group_name=model_package_group_name,
         approval_status=model_approval_status,
