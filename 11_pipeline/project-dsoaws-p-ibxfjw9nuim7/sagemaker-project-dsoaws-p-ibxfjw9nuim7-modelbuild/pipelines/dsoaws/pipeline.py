@@ -65,14 +65,16 @@ timestamp = str(int(time.time() * 10**7))
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 print('BASE_DIR: {}'.format(BASE_DIR))
 
-
 def get_pipeline(
     region,
-    role=role,
-    bucket=None,
-    model_package_group_name="project-dsoaws-p-ibxfjw9nuim7",
-    pipeline_name="project-dsoaws-p-ibxfjw9nuim7",
-    base_job_prefix="BERT",
+    role,
+    bucket,
+    pipeline_name,
+    model_package_group_name,
+    base_job_prefix
+#    model_package_group_name="dsoaws-p-krqhvy8kqs0b",
+#    pipeline_name="dsoaws-p-krqhvy8kqs0b",
+#    base_job_prefix="BERT",
 ):
     """Gets a SageMaker ML Pipeline instance working with BERT.
 
@@ -99,7 +101,8 @@ def get_pipeline(
     )
     input_data = ParameterString(
         name="InputDataUrl",
-        default_value="s3://sagemaker-us-east-1-231218423789/amazon-reviews-pds/tsv/",
+#        default_value="s3://sagemaker-us-east-1-231218423789/amazon-reviews-pds/tsv/",
+        default_value=None
     )
     
     processor = SKLearnProcessor(
@@ -127,13 +130,13 @@ def get_pipeline(
     balance_dataset=True
     
     ## DEFINE PROCESSING INPUTS  
-    raw_input_data_s3_uri = 's3://sagemaker-us-east-1-231218423789/amazon-reviews-pds/tsv/'
-    print(raw_input_data_s3_uri)
+#    raw_input_data_s3_uri = 's3://sagemaker-us-east-1-231218423789/amazon-reviews-pds/tsv/'
+#    print(raw_input_data_s3_uri)
     
     processing_inputs=[
         ProcessingInput(
             input_name='raw_input',
-            source=raw_input_data_s3_uri,
+            source=input_data,
             destination='/opt/ml/processing/input/data/',
             s3_data_distribution_type='ShardedByS3Key'
         )
@@ -377,7 +380,7 @@ def get_pipeline(
         inference_instances=["ml.m5.large", "ml.m5.4xlarge"],
         transform_instances=["ml.c5.18xlarge"],
         model_package_group_name=model_package_group_name,
-        approval_status='PendingManualApproval',
+        approval_status=model_approval_status,
     )
     
     ## EVALUATING MODEL -- CONDITION STEP
@@ -403,8 +406,8 @@ def get_pipeline(
 #             processing_instance_type,
 #             processing_instance_count,
 #             training_instance_type,
-#             model_approval_status,
-#             input_data,
+             model_approval_status,
+             input_data,
         ],
         steps=[step_process, step_train, step_register],
         sagemaker_session=sess
