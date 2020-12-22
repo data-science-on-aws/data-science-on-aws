@@ -65,6 +65,7 @@ timestamp = str(int(time.time() * 10**7))
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 print('BASE_DIR: {}'.format(BASE_DIR))
 
+
 def get_pipeline(
     region,
     role,
@@ -101,8 +102,8 @@ def get_pipeline(
     )
     input_data = ParameterString(
         name="InputDataUrl",
-#        default_value="s3://sagemaker-us-east-1-231218423789/amazon-reviews-pds/tsv/",
-        default_value=None
+        default_value="s3://{}/amazon-reviews-pds/tsv/".format(bucket),
+#        default_value=None
     )
     
     processor = SKLearnProcessor(
