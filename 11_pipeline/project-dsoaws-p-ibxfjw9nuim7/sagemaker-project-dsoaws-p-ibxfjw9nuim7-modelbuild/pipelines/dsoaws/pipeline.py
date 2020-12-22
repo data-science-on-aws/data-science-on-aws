@@ -217,14 +217,26 @@ def get_pipeline(
     )
     print(image_uri)
     
-    train_code=os.path.join(BASE_DIR, "tf_bert_reviews.py")    
+    # train_code=os.path.join(BASE_DIR, "tf_bert_reviews.py")  
+    train_src=os.path.join(BASE_DIR, "src") 
     model_path = f"s3://{sess.default_bucket()}/{base_job_prefix}/output/model"
+    
+#     # List current directory
+#     print('os.listdir: {}'.format(os.listdir('.')))
+#     os.listdir('.')
+    
+    print('os.listdir(BASE_DIR): {}'.format(os.listdir(BASE_DIR)))
+    os.listdir(BASE_DIR)
+    
+#     print('os.listdir(train_src): {}'.format(os.listdir(train_src)))
+#     os.listdir(train_src)
+
 
         
     ## DEFINE TF ESTIMATOR
     estimator = TensorFlow(
-        entry_point=train_code,
-#        source_dir=train_src,
+        entry_point='tf_bert_reviews.py',
+        source_dir=BASE_DIR,
         role=role,
         output_path=model_path,
 #        base_job_name=training_job_name,
