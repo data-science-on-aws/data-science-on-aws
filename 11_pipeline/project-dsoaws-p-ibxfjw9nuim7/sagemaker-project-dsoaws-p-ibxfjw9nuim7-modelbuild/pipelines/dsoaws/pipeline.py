@@ -70,8 +70,8 @@ def get_pipeline(
     region,
     role=role,
     bucket=None,
-    model_package_group_name="DSOAWS_BERT_PackageGroup",
-    pipeline_name="DSOAWS_BERT_Pipeline",
+    model_package_group_name="project-dsoaws-p-ibxfjw9nuim7",
+    pipeline_name="project-dsoaws-p-ibxfjw9nuim7",
     base_job_prefix="BERT",
 ):
     """Gets a SageMaker ML Pipeline instance working with BERT.
@@ -205,8 +205,6 @@ def get_pipeline(
     
     ## GET TRAINING IMAGE
     
-    model_path = f"s3://{sess.default_bucket()}/{base_job_prefix}/TrainBERTModel"
-
     from sagemaker.tensorflow import TensorFlow
 
     image_uri = sagemaker.image_uris.retrieve(
@@ -219,13 +217,14 @@ def get_pipeline(
     )
     print(image_uri)
     
-    train_code=os.path.join(BASE_DIR, "tf_bert_reviews.py")
+    train_code=os.path.join(BASE_DIR, "tf_bert_reviews.py")    
+    model_path = f"s3://{sess.default_bucket()}/{base_job_prefix}/output/model"
 
         
     ## DEFINE TF ESTIMATOR
     estimator = TensorFlow(
         entry_point=train_code,
-#        source_dir='src',
+#        source_dir=train_src,
         role=role,
         output_path=model_path,
 #        base_job_name=training_job_name,
@@ -325,15 +324,15 @@ def get_pipeline(
 
     ## REGISTER MODEL
     
-    model_package_group_name = f"BERT-Reviews-{timestamp}"
+#     model_package_group_name = f"BERT-Reviews-{timestamp}"
 
     # NOTE: in the future, the model package group will be created automatically if it doesn't exist
     
-    sm.create_model_package_group(
-        ModelPackageGroupName=model_package_group_name,
-        ModelPackageGroupDescription="BERT-Reviews",
-    )
-    print(model_package_group_name)
+#     sm.create_model_package_group(
+#         ModelPackageGroupName=model_package_group_name,
+#         ModelPackageGroupDescription="BERT-Reviews",
+#     )
+#     print(model_package_group_name)
 
 #     model_metrics = ModelMetrics(
 #         model_statistics=MetricsSource(
@@ -350,11 +349,12 @@ def get_pipeline(
         region=region,
         version="2.1.0",
         py_version="py3",
-        instance_type="ml.m5.4xlarge",
+        instance_type="ml.m5.large",
         image_scope="inference"
     )
     print(inference_image_uri)
 
+    ## TODO: Figure out where ml.m5.large is set
     step_register = RegisterModel(
         name="RegisterBERTModel",
         estimator=estimator,
@@ -362,7 +362,7 @@ def get_pipeline(
         model_data=step_train.properties.ModelArtifacts.S3ModelArtifacts,
         content_types=["text/csv"],
         response_types=["text/csv"],
-        inference_instances=["ml.m5.4xlarge"],
+        inference_instances=["ml.m5.large", "ml.m5.4xlarge"],
         transform_instances=["ml.c5.18xlarge"],
         model_package_group_name=model_package_group_name,
         approval_status='PendingManualApproval',
