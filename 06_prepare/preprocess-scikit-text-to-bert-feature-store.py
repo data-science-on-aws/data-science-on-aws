@@ -272,7 +272,7 @@ def transform_inputs_to_tfrecord(inputs,
         #####################################
         ####### TODO:  REMOVE THIS BREAK #######
         #####################################            
-        break
+        #break
         
     tf_record_writer.close()
     
