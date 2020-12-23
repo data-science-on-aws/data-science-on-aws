@@ -4,9 +4,9 @@ import functools
 import multiprocessing
 
 from datetime import datetime
-from time import strftime
+from time import gmtime, strftime, sleep
+
 import sys
-import os
 import re
 import collections
 import argparse
@@ -20,6 +20,7 @@ import time
 import boto3
 import subprocess
 
+## PIP INSTALLS ##
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'pandas==1.1.5'])
 import pandas as pd
 
@@ -32,6 +33,27 @@ from transformers import DistilBertTokenizer
 
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'sagemaker==2.20.0'])
 import sagemaker
+from sagemaker.session import Session
+
+
+############################
+
+region='us-east-1'
+os.environ['AWS_DEFAULT_REGION'] = region
+
+sm = boto3.Session(region_name=region).client(service_name='sagemaker', region_name=region)
+
+featurestore_runtime = boto3.Session(region_name=region).client(service_name='sagemaker-featurestore-runtime', region_name=region)
+
+s3 = boto3.Session(region_name=region).client(service_name='s3', region_name=region)
+
+sagemaker_session = sagemaker.Session(boto_session=boto3.Session(region_name=region), sagemaker_client=sm, sagemaker_featurestore_runtime_client=featurestore_runtime)
+
+role = sagemaker.get_execution_role()
+bucket = sagemaker_session.default_bucket()
+
+
+############################
 
 tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
 
@@ -54,22 +76,20 @@ print(timestamp)
 prefix = 'reviews-feature-store-' + timestamp
 print(prefix)
 
-region = boto3.Session().region_name
-print(region)
+#region = boto3.Session().region_name
+#print(region)
 
-region='us-east-1'
+#region='us-east-1'
 
-sm = boto3.Session().client(service_name='sagemaker', 
-                            region_name=region)
-sm.list_feature_groups()
+#sm = boto3.Session().client(service_name='sagemaker', region_name=region)
+print('List Feature Groups: {}'.format(sm.list_feature_groups()))
 
-featurestore_runtime = boto3.Session().client(service_name='sagemaker-featurestore-runtime', region_name=region)
 
-sagemaker_session = sagemaker.Session(boto_session=boto3.Session(),
-                                      sagemaker_client=sm,
-                                      sagemaker_featurestore_runtime_client=featurestore_runtime)
-bucket = sagemaker_session.default_bucket()
-role = sagemaker.get_execution_role()
+# sagemaker_session = sagemaker.Session(boto_session=boto3.Session(),
+#                                       sagemaker_client=sm,
+#                                       sagemaker_featurestore_runtime_client=featurestore_runtime)
+# bucket = sagemaker_session.default_bucket()
+# role = sagemaker.get_execution_role()
 
 #     def __init__(
 #         self,
@@ -80,16 +100,16 @@ role = sagemaker.get_execution_role()
 #         default_bucket=None,
 #     ):
 
-from time import gmtime, strftime, sleep
 
 from sagemaker.feature_store.feature_group import FeatureGroup
 
 reviews_feature_group_name = 'reviews-feature-group-' + strftime('%d-%H-%M-%S', gmtime())
 print(reviews_feature_group_name)
 
-reviews_feature_group = FeatureGroup(name=reviews_feature_group_name, 
-                                     sagemaker_session=sagemaker_session)
+reviews_feature_group = FeatureGroup(name=reviews_feature_group_name, sagemaker_session=sagemaker_session)
 print(reviews_feature_group)
+
+#################
 
 # record identifier and event time feature names
 record_identifier_feature_name = "review_id"
@@ -114,7 +134,6 @@ account_id = boto3.client('sts').get_caller_identity()["Account"]
 
 reviews_feature_group_s3_prefix = prefix + '/' + account_id + '/sagemaker/' + region + '/offline-store/' + reviews_feature_group_name + '/data'
 
-s3 = boto3.Session().client(service_name='s3', region_name=region)    
 
     
 class InputFeatures(object):
@@ -253,7 +272,7 @@ def transform_inputs_to_tfrecord(inputs,
         #####################################
         ####### TODO:  REMOVE THIS BREAK #######
         #####################################            
-        # break
+        break
         
     tf_record_writer.close()
     
@@ -485,13 +504,13 @@ def _transform_tsv_to_tfrecord(file,
         data_frame=df_train_records, max_workers=3, wait=True
     )       
 
-    reviews_feature_group.ingest(
-        data_frame=df_validation_records, max_workers=3, wait=True
-    )       
+#     reviews_feature_group.ingest(
+#         data_frame=df_validation_records, max_workers=3, wait=True
+#     )       
 
-    reviews_feature_group.ingest(
-        data_frame=df_test_records, max_workers=3, wait=True
-    )       
+#     reviews_feature_group.ingest(
+#         data_frame=df_test_records, max_workers=3, wait=True
+#     )       
 
     print(reviews_feature_group.as_hive_ddl())
 
@@ -546,11 +565,26 @@ def process(args):
             print('Waiting for data in offline store...\n')
             sleep(60)
 
-    print('Data available.')    
-
-    
+    print('Data available.')
         
     print('Complete')
+    
+    print('QUERY FEATURE STORE...')
+    reviews_query = reviews_feature_group.athena_query()
+    reviews_table = reviews_query.table_name
+
+    query_string = 'SELECT * FROM "'+reviews_table+'" LIMIT 1'
+
+    print('Running ' + query_string)
+
+    # run Athena query. The output is loaded to a Pandas dataframe.
+    dataset = pd.DataFrame()
+    reviews_query.run(query_string=query_string, output_location='s3://'+bucket+'/'+prefix+'/query_results/')
+    reviews_query.wait()
+    dataset = reviews_query.as_dataframe()
+
+    print('Data From Feature Store: {}:'.format(dataset))
+    print('DONE!')
     
     
 if __name__ == "__main__":
