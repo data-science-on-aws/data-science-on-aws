@@ -21,7 +21,7 @@ import boto3
 import subprocess
 
 ## PIP INSTALLS ##
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'pandas==1.1.5'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'pandas==1.0.5'])
 import pandas as pd
 
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow==2.1.0'])
@@ -31,7 +31,7 @@ from tensorflow import keras
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'transformers==2.8.0'])
 from transformers import DistilBertTokenizer
 
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'sagemaker==2.20.0'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'sagemaker>=2.22.0'])
 import sagemaker
 from sagemaker.session import Session
 
