@@ -12,7 +12,6 @@ import collections
 import argparse
 import json
 import os
-import pandas as pd
 import csv
 import glob
 from pathlib import Path
@@ -21,7 +20,7 @@ import boto3
 import subprocess
 
 ## PIP INSTALLS ##
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'pandas==1.0.5'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'pandas==1.1.4'])
 import pandas as pd
 
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow==2.1.0'])
@@ -31,7 +30,7 @@ from tensorflow import keras
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'transformers==2.8.0'])
 from transformers import DistilBertTokenizer
 
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'sagemaker>=2.22.0'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'sagemaker==2.20.0'])
 import sagemaker
 from sagemaker.session import Session
 
@@ -272,7 +271,7 @@ def transform_inputs_to_tfrecord(inputs,
         #####################################
         ####### TODO:  REMOVE THIS BREAK #######
         #####################################            
-        #break
+        break
         
     tf_record_writer.close()
     
@@ -488,15 +487,17 @@ def _transform_tsv_to_tfrecord(file,
 
     reviews_feature_group.load_feature_definitions(data_frame=df_train_records)
 
-    reviews_feature_group.create(
-        s3_uri=f"s3://{bucket}/{prefix}",
-        record_identifier_name=record_identifier_feature_name,
-        event_time_feature_name=event_time_feature_name,
-        role_arn=role,
-        enable_online_store=True
-    )
-
-    wait_for_feature_group_creation_complete(feature_group=reviews_feature_group)
+    try:
+        reviews_feature_group.create(
+            s3_uri=f"s3://{bucket}/{prefix}",
+            record_identifier_name=record_identifier_feature_name,
+            event_time_feature_name=event_time_feature_name,
+            role_arn=role,
+            enable_online_store=True)
+        
+        wait_for_feature_group_creation_complete(feature_group=reviews_feature_group)        
+    except:
+        pass
 
     reviews_feature_group.describe()
 
@@ -569,22 +570,22 @@ def process(args):
         
     print('Complete')
     
-    print('QUERY FEATURE STORE...')
-    reviews_query = reviews_feature_group.athena_query()
-    reviews_table = reviews_query.table_name
+#     print('QUERY FEATURE STORE...')
+#     reviews_query = reviews_feature_group.athena_query()
+#     reviews_table = reviews_query.table_name
 
-    query_string = 'SELECT * FROM "'+reviews_table+'" LIMIT 1'
+#     query_string = 'SELECT * FROM "'+reviews_table+'" LIMIT 1'
 
-    print('Running ' + query_string)
+#     print('Running ' + query_string)
 
-    # run Athena query. The output is loaded to a Pandas dataframe.
-    dataset = pd.DataFrame()
-    reviews_query.run(query_string=query_string, output_location='s3://'+bucket+'/'+prefix+'/query_results/')
-    reviews_query.wait()
-    dataset = reviews_query.as_dataframe()
+#     # run Athena query. The output is loaded to a Pandas dataframe.
+#     dataset = pd.DataFrame()
+#     reviews_query.run(query_string=query_string, output_location='s3://'+bucket+'/'+prefix+'/query_results/')
+#     reviews_query.wait()
+#     dataset = reviews_query.as_dataframe()
 
-    print('Data From Feature Store: {}:'.format(dataset))
-    print('DONE!')
+#     print('Data From Feature Store: {}:'.format(dataset))
+#     print('DONE!')
     
     
 if __name__ == "__main__":
@@ -595,4 +596,4 @@ if __name__ == "__main__":
     print('Environment variables:')
     print(os.environ)
 
-    process(args)    
+    process(args)
