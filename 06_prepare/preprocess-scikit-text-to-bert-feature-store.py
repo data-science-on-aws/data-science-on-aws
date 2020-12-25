@@ -20,7 +20,7 @@ import boto3
 import subprocess
 
 ## PIP INSTALLS ##
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'pandas==1.1.4'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'pandas==1.0.5'])
 import pandas as pd
 
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow==2.1.0'])
