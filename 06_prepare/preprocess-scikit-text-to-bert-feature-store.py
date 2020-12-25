@@ -36,7 +36,7 @@ from sagemaker.session import Session
 
 
 ############################
-
+# TODO:  Remove hard-coding
 region='us-east-1'
 os.environ['AWS_DEFAULT_REGION'] = region
 
@@ -75,30 +75,7 @@ print(timestamp)
 prefix = 'reviews-feature-store-' + timestamp
 print(prefix)
 
-#region = boto3.Session().region_name
-#print(region)
-
-#region='us-east-1'
-
-#sm = boto3.Session().client(service_name='sagemaker', region_name=region)
 print('List Feature Groups: {}'.format(sm.list_feature_groups()))
-
-
-# sagemaker_session = sagemaker.Session(boto_session=boto3.Session(),
-#                                       sagemaker_client=sm,
-#                                       sagemaker_featurestore_runtime_client=featurestore_runtime)
-# bucket = sagemaker_session.default_bucket()
-# role = sagemaker.get_execution_role()
-
-#     def __init__(
-#         self,
-#         boto_session=None,
-#         sagemaker_client=None,
-#         sagemaker_runtime_client=None,
-#         sagemaker_featurestore_runtime_client=None,
-#         default_bucket=None,
-#     ):
-
 
 from sagemaker.feature_store.feature_group import FeatureGroup
 
