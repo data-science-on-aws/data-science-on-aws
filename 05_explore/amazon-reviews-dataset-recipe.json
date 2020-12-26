@@ -1,0 +1,10 @@
+[
+  {
+    "Action": {
+      "Operation": "DELETE",
+      "Parameters": {
+        "sourceColumns": "[\"marketplace\",\"customer_id\",\"review_id\",\"product_id\",\"product_parent\",\"product_title\",\"helpful_votes\",\"total_votes\",\"vine\",\"verified_purchase\",\"review_headline\",\"review_date\",\"year\"]"
+      }
+    }
+  }
+]
