@@ -1,10 +1,10 @@
 #!/bin/bash
 
-pip install pandas==1.0.5
 pip install scikit-learn==0.20.0
-pip install tensorflow==2.1.0
-pip install transformers==2.8.0
-pip install sagemaker==2.22.0
+#pip install pandas==1.0.5
+#pip install tensorflow==2.1.0
+#pip install transformers==2.8.0
+#pip install sagemaker==2.22.0
 
 mkdir -p ./output/scikit/bert/train
 mkdir -p ./output/scikit/bert/validation

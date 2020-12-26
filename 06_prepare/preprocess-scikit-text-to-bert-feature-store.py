@@ -36,7 +36,8 @@ from sagemaker.session import Session
 
 
 ############################
-
+# TODO:  Remove hard-coding
+# Check out this for a list of env vars:  https://github.com/aws/sagemaker-containers#sm-training-env
 region='us-east-1'
 os.environ['AWS_DEFAULT_REGION'] = region
 
@@ -50,8 +51,6 @@ sagemaker_session = sagemaker.Session(boto_session=boto3.Session(region_name=reg
 
 role = sagemaker.get_execution_role()
 bucket = sagemaker_session.default_bucket()
-
-
 ############################
 
 tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
@@ -68,6 +67,8 @@ for (i, label) in enumerate(LABEL_VALUES):
     label_map[label] = i
 
 
+############################
+# TODO:  Do this outside of this script and pass in the feature-store (and feature-group?) name
 # Setup the feature store
 timestamp = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
 print(timestamp)
@@ -75,30 +76,7 @@ print(timestamp)
 prefix = 'reviews-feature-store-' + timestamp
 print(prefix)
 
-#region = boto3.Session().region_name
-#print(region)
-
-#region='us-east-1'
-
-#sm = boto3.Session().client(service_name='sagemaker', region_name=region)
 print('List Feature Groups: {}'.format(sm.list_feature_groups()))
-
-
-# sagemaker_session = sagemaker.Session(boto_session=boto3.Session(),
-#                                       sagemaker_client=sm,
-#                                       sagemaker_featurestore_runtime_client=featurestore_runtime)
-# bucket = sagemaker_session.default_bucket()
-# role = sagemaker.get_execution_role()
-
-#     def __init__(
-#         self,
-#         boto_session=None,
-#         sagemaker_client=None,
-#         sagemaker_runtime_client=None,
-#         sagemaker_featurestore_runtime_client=None,
-#         default_bucket=None,
-#     ):
-
 
 from sagemaker.feature_store.feature_group import FeatureGroup
 
@@ -107,8 +85,6 @@ print(reviews_feature_group_name)
 
 reviews_feature_group = FeatureGroup(name=reviews_feature_group_name, sagemaker_session=sagemaker_session)
 print(reviews_feature_group)
-
-#################
 
 # record identifier and event time feature names
 record_identifier_feature_name = "review_id"
@@ -132,6 +108,7 @@ def wait_for_feature_group_creation_complete(feature_group):
 account_id = boto3.client('sts').get_caller_identity()["Account"]
 
 reviews_feature_group_s3_prefix = prefix + '/' + account_id + '/sagemaker/' + region + '/offline-store/' + reviews_feature_group_name + '/data'
+############################
 
 
     
