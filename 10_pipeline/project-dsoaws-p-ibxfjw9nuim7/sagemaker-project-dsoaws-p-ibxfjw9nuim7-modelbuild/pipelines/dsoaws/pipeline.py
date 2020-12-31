@@ -125,10 +125,10 @@ def get_pipeline(
         default_value=64,
     )
 
-    # balance_dataset = ParameterBool(
-    #     name="BalanceDataset",
-    #     default_value="True",
-    # )
+    balance_dataset = ParameterString(
+        name="BalanceDataset",
+        default_value="True",
+    )
 
     train_split_percentage = ParameterFloat(
         name="TrainSplitPercentage",
@@ -191,7 +191,7 @@ def get_pipeline(
         max_runtime_in_seconds=7200)
 
     # DEFINE PROCESSING HYPERPARAMATERS  
-    balance_dataset=True
+    # balance_dataset=True
     
     processing_inputs=[
         ProcessingInput(
@@ -232,7 +232,7 @@ def get_pipeline(
             '--validation-split-percentage', str(validation_split_percentage.default_value),
             '--test-split-percentage', str(test_split_percentage.default_value),
             '--max-seq-length', str(max_seq_length.default_value),
-            '--balance-dataset', str(balance_dataset)],
+            '--balance-dataset', str(balance_dataset.default_value)],
         code=os.path.join(BASE_DIR, "preprocess-scikit-text-to-bert.py")
     )
     
@@ -467,6 +467,7 @@ def get_pipeline(
             processing_instance_count,
             processing_instance_type,
             max_seq_length,
+            balance_dataset,
             train_split_percentage,
             validation_split_percentage,
             test_split_percentage,
