@@ -539,6 +539,9 @@ if __name__ == '__main__':
         print(glob(inference_path))        
 #        os.system('cp requirements.txt {}/code'.format(inference_path))
         
+        # Copy test data for the evaluation step
+        os.system('cp -R ./test_data/ {}'.format(local_model_dir))
+        
     if run_sample_predictions:
         def predict(text):
             encode_plus_tokens = tokenizer.encode_plus(text,
