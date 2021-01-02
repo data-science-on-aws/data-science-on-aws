@@ -30,16 +30,26 @@ from tensorflow import keras
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'transformers==2.8.0'])
 from transformers import DistilBertTokenizer
 
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'sagemaker==2.20.0'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'sagemaker==2.23.1'])
 import sagemaker
+
 from sagemaker.session import Session
+
+from sagemaker.feature_store.feature_group import FeatureGroup
+
+from sagemaker.feature_store.feature_definition import (
+    FeatureDefinition,
+    FeatureTypeEnum,
+)
 
 
 ############################
-# TODO:  Remove hard-coding
-# Check out this for a list of env vars:  https://github.com/aws/sagemaker-containers#sm-training-env
-region='us-east-1'
-os.environ['AWS_DEFAULT_REGION'] = region
+#region='us-east-1'
+#os.environ['AWS_DEFAULT_REGION'] = region
+
+region = os.environ['AWS_DEFAULT_REGION']
+print('Region: {}'.format(region))
+############################
 
 sm = boto3.Session(region_name=region).client(service_name='sagemaker', region_name=region)
 
@@ -51,6 +61,7 @@ sagemaker_session = sagemaker.Session(boto_session=boto3.Session(region_name=reg
 
 role = sagemaker.get_execution_role()
 bucket = sagemaker_session.default_bucket()
+
 ############################
 
 tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
@@ -67,33 +78,12 @@ for (i, label) in enumerate(LABEL_VALUES):
     label_map[label] = i
 
 
-############################
-# TODO:  Do this outside of this script and pass in the feature-store (and feature-group?) name
-# Setup the feature store
-timestamp = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
-print(timestamp)
-    
-prefix = 'reviews-feature-store-' + timestamp
-print(prefix)
-
-print('List Feature Groups: {}'.format(sm.list_feature_groups()))
-
-from sagemaker.feature_store.feature_group import FeatureGroup
-
-reviews_feature_group_name = 'reviews-feature-group-' + strftime('%d-%H-%M-%S', gmtime())
-print(reviews_feature_group_name)
-
-reviews_feature_group = FeatureGroup(name=reviews_feature_group_name, sagemaker_session=sagemaker_session)
-print(reviews_feature_group)
-
-# record identifier and event time feature names
-record_identifier_feature_name = "review_id"
-event_time_feature_name = "date"
-
 def cast_object_to_string(data_frame):
     for label in data_frame.columns:
         if data_frame.dtypes[label] == 'object':
             data_frame[label] = data_frame[label].astype("str").astype("string")
+    return data_frame
+            
 
 def wait_for_feature_group_creation_complete(feature_group):
     status = feature_group.describe().get("FeatureGroupStatus")
@@ -104,11 +94,59 @@ def wait_for_feature_group_creation_complete(feature_group):
     if status != "Created":
         raise RuntimeError(f"Failed to create feature group {feature_group.name}")
     print(f"FeatureGroup {feature_group.name} successfully created.")
+    
+            
+def create_or_load_feature_group(prefix, feature_group_name):
 
-account_id = boto3.client('sts').get_caller_identity()["Account"]
-
-reviews_feature_group_s3_prefix = prefix + '/' + account_id + '/sagemaker/' + region + '/offline-store/' + reviews_feature_group_name + '/data'
-############################
+    # Feature Definitions for our records
+    feature_definitions= [
+        FeatureDefinition(feature_name='input_ids', feature_type=FeatureTypeEnum.STRING),
+        FeatureDefinition(feature_name='input_mask', feature_type=FeatureTypeEnum.STRING),
+        FeatureDefinition(feature_name='segment_ids', feature_type=FeatureTypeEnum.STRING),
+        FeatureDefinition(feature_name='label_id', feature_type=FeatureTypeEnum.INTEGRAL),
+        FeatureDefinition(feature_name='review_id', feature_type=FeatureTypeEnum.STRING),
+        FeatureDefinition(feature_name='date', feature_type=FeatureTypeEnum.STRING),
+        FeatureDefinition(feature_name='label', feature_type=FeatureTypeEnum.INTEGRAL),
+        FeatureDefinition(feature_name='review_body', feature_type=FeatureTypeEnum.STRING),
+        FeatureDefinition(feature_name='split_type', feature_type=FeatureTypeEnum.STRING)            
+    ]
+    
+    feature_group = FeatureGroup(
+        name=feature_group_name,
+        feature_definitions=feature_definitions,
+        sagemaker_session=sagemaker_session)
+    
+    print('Feature Group: {}'.format(feature_group))
+    
+    try:                
+        print('Waiting for existing Feature Group to become available if it is being created by another instance in our cluster...')
+        wait_for_feature_group_creation_complete(feature_group)
+    except:
+        pass
+        
+    try:
+        record_identifier_feature_name = "review_id"
+        event_time_feature_name = "date"
+        
+        print('Creating Feature Group...')
+        feature_group.create(
+            s3_uri=f"s3://{bucket}/{prefix}",
+            record_identifier_name=record_identifier_feature_name,
+            event_time_feature_name=event_time_feature_name,
+            role_arn=role,
+            enable_online_store=True
+        )
+        print('Creating Feature Group. Completed.')
+        
+        print('Waiting for new Feature Group to become available...')
+        wait_for_feature_group_creation_complete(feature_group)
+        print('Feature Group available.')        
+    except:
+        pass
+        
+    feature_group.describe()        
+        
+    return feature_group
 
 
     
@@ -234,7 +272,7 @@ def transform_inputs_to_tfrecord(inputs,
         tf_record = tf.train.Example(features=tf.train.Features(feature=all_features))
         tf_record_writer.write(tf_record.SerializeToString())
 
-        records.append({'tf_record': tf_record.SerializeToString(),
+        records.append({#'tf_record': tf_record.SerializeToString(),
                         'input_ids': features.input_ids,
                         'input_mask': features.input_mask,
                         'segment_ids': features.segment_ids,
@@ -302,17 +340,30 @@ def parse_args():
     parser.add_argument('--max-seq-length', type=int,
         default=64,
     )  
-    
+    parser.add_argument('--feature-store-offline-prefix', type=str,
+        default=None,
+    ) 
+    parser.add_argument('--reviews-feature-group-name', type=str,
+        default=None,
+    ) 
+        
     return parser.parse_args()
 
     
 def _transform_tsv_to_tfrecord(file, 
                                max_seq_length, 
-                               balance_dataset):
+                               balance_dataset,
+                               prefix,
+                               feature_group_name):
     print('file {}'.format(file))
     print('max_seq_length {}'.format(max_seq_length))
     print('balance_dataset {}'.format(balance_dataset))
+    print('prefix {}'.format(prefix)) 
+    print('feature_group_name {}'.format(feature_group_name))    
 
+    # need to re-load since we can't pass feature_group object in _partial functions for some reason
+    reviews_feature_group = create_or_load_feature_group(prefix, feature_group_name)
+    
     filename_without_extension = Path(Path(file).stem).stem
 
     df = pd.read_csv(file, 
@@ -458,53 +509,55 @@ def _transform_tsv_to_tfrecord(file,
                                                         max_seq_length)    
                 
     df_train_records = pd.DataFrame.from_dict(train_records)
+    df_train_records['split_type'] = 'train'
     df_train_records.head()   
     
-    cast_object_to_string(df_train_records)
+    df_validation_records = pd.DataFrame.from_dict(validation_records)
+    df_validation_records['split_type'] = 'validation'    
+    df_validation_records.head()   
 
-    reviews_feature_group.load_feature_definitions(data_frame=df_train_records)
+    df_test_records = pd.DataFrame.from_dict(test_records)
+    df_test_records['split_type'] = 'test'    
+    df_test_records.head()   
+    
+    # Add record to feature store    
+    df_fs_train_records = cast_object_to_string(df_train_records)
+    df_fs_validation_records = cast_object_to_string(df_validation_records)
+    df_fs_test_records = cast_object_to_string(df_test_records)
 
-    try:
-        reviews_feature_group.create(
-            s3_uri=f"s3://{bucket}/{prefix}",
-            record_identifier_name=record_identifier_feature_name,
-            event_time_feature_name=event_time_feature_name,
-            role_arn=role,
-            enable_online_store=True)
-        
-        wait_for_feature_group_creation_complete(feature_group=reviews_feature_group)        
-    except:
-        pass
-
-    reviews_feature_group.describe()
-
+    print('Ingesting Features...')
     reviews_feature_group.ingest(
-        data_frame=df_train_records, max_workers=3, wait=True
-    )       
-
-#     reviews_feature_group.ingest(
-#         data_frame=df_validation_records, max_workers=3, wait=True
-#     )       
-
-#     reviews_feature_group.ingest(
-#         data_frame=df_test_records, max_workers=3, wait=True
-#     )       
-
-    print(reviews_feature_group.as_hive_ddl())
+        data_frame=df_fs_train_records, max_workers=3, wait=True
+    )        
+    reviews_feature_group.ingest(
+        data_frame=df_fs_validation_records, max_workers=3, wait=True
+    )        
+    reviews_feature_group.ingest(
+        data_frame=df_fs_test_records, max_workers=3, wait=True
+    )            
+    print('Feature ingest completed.')
 
 
 def process(args):
     print('Current host: {}'.format(args.current_host))
     
+    reviews_feature_group = create_or_load_feature_group(prefix=args.feature_store_offline_prefix, 
+                                                         feature_group_name=args.reviews_feature_group_name)
+
+    reviews_feature_group.describe()
+    
+    print(reviews_feature_group.as_hive_ddl())
+    
     train_data = None
     validation_data = None
     test_data = None
-
+    
     transform_tsv_to_tfrecord = functools.partial(_transform_tsv_to_tfrecord, 
-                                                 max_seq_length=args.max_seq_length,
-                                                 balance_dataset=args.balance_dataset
+                                                  max_seq_length=args.max_seq_length,
+                                                  balance_dataset=args.balance_dataset,
+                                                  prefix=args.feature_store_offline_prefix,
+                                                  feature_group_name=args.reviews_feature_group_name)
 
-    )
     input_files = glob.glob('{}/*.tsv.gz'.format(args.input_data))
 
     num_cpus = multiprocessing.cpu_count()
@@ -536,7 +589,7 @@ def process(args):
     offline_store_contents = None
     while (offline_store_contents is None):
         objects_in_bucket = s3.list_objects(Bucket=bucket,
-                                            Prefix=prefix)
+                                            Prefix=args.feature_store_offline_prefix)
         if ('Contents' in objects_in_bucket and len(objects_in_bucket['Contents']) > 1):
             offline_store_contents = objects_in_bucket['Contents']
         else:
