@@ -108,30 +108,30 @@ def file_based_input_dataset_builder(channel,
     return dataset
 
 
-# def load_checkpoint_model(checkpoint_path):
-#     import glob
-#     import os
+def load_checkpoint_model(checkpoint_path):
+    import glob
+    import os
     
-#     glob_pattern = os.path.join(checkpoint_path, '*.h5')
-#     print('glob pattern {}'.format(glob_pattern))
+    glob_pattern = os.path.join(checkpoint_path, '*.h5')
+    print('glob pattern {}'.format(glob_pattern))
 
-#     list_of_checkpoint_files = glob.glob(glob_pattern)
-#     print('List of checkpoint files {}'.format(list_of_checkpoint_files))
+    list_of_checkpoint_files = glob.glob(glob_pattern)
+    print('List of checkpoint files {}'.format(list_of_checkpoint_files))
     
-#     latest_checkpoint_file = max(list_of_checkpoint_files)
-#     print('Latest checkpoint file {}'.format(latest_checkpoint_file))
+    latest_checkpoint_file = max(list_of_checkpoint_files)
+    print('Latest checkpoint file {}'.format(latest_checkpoint_file))
 
-#     initial_epoch_number_str = latest_checkpoint_file.rsplit('_', 1)[-1].split('.h5')[0]
-#     initial_epoch_number = int(initial_epoch_number_str)
+    initial_epoch_number_str = latest_checkpoint_file.rsplit('_', 1)[-1].split('.h5')[0]
+    initial_epoch_number = int(initial_epoch_number_str)
 
-#     loaded_model = TFDistilBertForSequenceClassification.from_pretrained(
-#                                                latest_checkpoint_file,
-#                                                config=config)
+    loaded_model = TFDistilBertForSequenceClassification.from_pretrained(
+                                               latest_checkpoint_file,
+                                               config=config)
 
-#     print('loaded_model {}'.format(loaded_model))
-#     print('initial_epoch_number {}'.format(initial_epoch_number))
+    print('loaded_model {}'.format(loaded_model))
+    print('initial_epoch_number {}'.format(initial_epoch_number))
     
-#     return loaded_model, initial_epoch_number
+    return loaded_model, initial_epoch_number
 
 
 if __name__ == '__main__':
@@ -312,8 +312,8 @@ if __name__ == '__main__':
     print('Using pipe_mode: {}'.format(pipe_mode))
  
     # Model Output 
-#     transformer_fine_tuned_model_path = os.path.join(local_model_dir, 'transformers/fine-tuned/')
-#     os.makedirs(transformer_fine_tuned_model_path, exist_ok=True)
+    transformer_fine_tuned_model_path = os.path.join(local_model_dir, 'transformers/fine-tuned/')
+    os.makedirs(transformer_fine_tuned_model_path, exist_ok=True)
 
     # SavedModel Output
     tensorflow_saved_model_path = os.path.join(local_model_dir, 'tensorflow/saved_model/0')
@@ -408,23 +408,23 @@ if __name__ == '__main__':
 
         initial_epoch_number = 0 
 
-#         if enable_checkpointing:
-#             print('***** Checkpoint enabled *****')
+        if enable_checkpointing:
+            print('***** Checkpoint enabled *****')
             
-#             os.makedirs(checkpoint_path, exist_ok=True)        
-#             if os.listdir(checkpoint_path):
-#                 print('***** Found checkpoint *****')
-#                 print(checkpoint_path)
-#                 model, initial_epoch_number = load_checkpoint_model(checkpoint_path)
-#                 print('***** Using checkpoint model {} *****'.format(model))
+            os.makedirs(checkpoint_path, exist_ok=True)        
+            if os.listdir(checkpoint_path):
+                print('***** Found checkpoint *****')
+                print(checkpoint_path)
+                model, initial_epoch_number = load_checkpoint_model(checkpoint_path)
+                print('***** Using checkpoint model {} *****'.format(model))
                 
-#             checkpoint_callback = ModelCheckpoint(
-#                     filepath=os.path.join(checkpoint_path, 'tf_model_{epoch:05d}.h5'),
-#                     save_weights_only=False,
-#                     verbose=1,
-#                     monitor='val_accuracy')
-#             print('*** CHECKPOINT CALLBACK {} ***'.format(checkpoint_callback))
-#             callbacks.append(checkpoint_callback)
+            checkpoint_callback = ModelCheckpoint(
+                    filepath=os.path.join(checkpoint_path, 'tf_model_{epoch:05d}.h5'),
+                    save_weights_only=False,
+                    verbose=1,
+                    monitor='val_accuracy')
+            print('*** CHECKPOINT CALLBACK {} ***'.format(checkpoint_callback))
+            callbacks.append(checkpoint_callback)
 
         if not tokenizer or not model or not config:
             print('Not properly initialized...')
@@ -518,9 +518,9 @@ if __name__ == '__main__':
             print('Test history {}'.format(test_history))
             
         # Save the Fine-Yuned Transformers Model as a New "Pre-Trained" Model
-#        print('transformer_fine_tuned_model_path {}'.format(transformer_fine_tuned_model_path))   
-#        transformer_model.save_pretrained(transformer_fine_tuned_model_path)
-#        print('Model inputs after save_pretrained: {}'.format(model.inputs))
+        print('transformer_fine_tuned_model_path {}'.format(transformer_fine_tuned_model_path))   
+        transformer_model.save_pretrained(transformer_fine_tuned_model_path)
+        print('Model inputs after save_pretrained: {}'.format(model.inputs))
             
         # Save the TensorFlow SavedModel for Serving Predictions
         print('tensorflow_saved_model_path {}'.format(tensorflow_saved_model_path))   
@@ -575,10 +575,6 @@ if __name__ == '__main__':
         df_test_reviews.shape
         df_test_reviews.head()
         
-#         def predict(review_body, tokenizer):
-#             prediction_map = inference_pipeline(review_body)
-#             return prediction_map[0]['label']
-
         y_test = df_test_reviews['review_body'].map(predict)
         y_test
         
@@ -619,8 +615,6 @@ if __name__ == '__main__':
         import numpy as np
         from sklearn.metrics import confusion_matrix
         import matplotlib.pyplot as plt
-        #%matplotlib inline
-        #%config InlineBackend.figure_format='retina'
 
         cm = confusion_matrix(y_true=y_test, y_pred=y_actual)
 
