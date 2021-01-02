@@ -44,9 +44,6 @@ from sagemaker.feature_store.feature_definition import (
 
 
 ############################
-#region='us-east-1'
-#os.environ['AWS_DEFAULT_REGION'] = region
-
 region = os.environ['AWS_DEFAULT_REGION']
 print('Region: {}'.format(region))
 ############################
@@ -107,7 +104,7 @@ def create_or_load_feature_group(prefix, feature_group_name):
         FeatureDefinition(feature_name='review_id', feature_type=FeatureTypeEnum.STRING),
         FeatureDefinition(feature_name='date', feature_type=FeatureTypeEnum.STRING),
         FeatureDefinition(feature_name='label', feature_type=FeatureTypeEnum.INTEGRAL),
-        FeatureDefinition(feature_name='review_body', feature_type=FeatureTypeEnum.STRING),
+#        FeatureDefinition(feature_name='review_body', feature_type=FeatureTypeEnum.STRING),
         FeatureDefinition(feature_name='split_type', feature_type=FeatureTypeEnum.STRING)            
     ]
     
@@ -160,8 +157,8 @@ class InputFeatures(object):
                label_id,
                review_id,
                date,
-               label,
-               review_body):
+               label):
+#               review_body):
         self.input_ids = input_ids
         self.input_mask = input_mask
         self.segment_ids = segment_ids
@@ -169,7 +166,7 @@ class InputFeatures(object):
         self.review_id = review_id
         self.date = date
         self.label = label
-        self.review_body = review_body
+#        self.review_body = review_body
     
     
 class Input(object):
@@ -233,17 +230,17 @@ def convert_input(the_input, max_seq_length):
         label_id=label_id,
         review_id=the_input.review_id,
         date=the_input.date,
-        label=the_input.label,
-        review_body=the_input.text)
+        label=the_input.label)
+#        review_body=the_input.text)
 
-    print('**input_ids**\n{}\n'.format(features.input_ids))
-    print('**input_mask**\n{}\n'.format(features.input_mask))
-    print('**segment_ids**\n{}\n'.format(features.segment_ids))
-    print('**label_id**\n{}\n'.format(features.label_id))
-    print('**review_id**\n{}\n'.format(features.review_id))
-    print('**date**\n{}\n'.format(features.date))
-    print('**label**\n{}\n'.format(features.label))
-    print('**review_body**\n{}\n'.format(features.review_body))
+#     print('**input_ids**\n{}\n'.format(features.input_ids))
+#     print('**input_mask**\n{}\n'.format(features.input_mask))
+#     print('**segment_ids**\n{}\n'.format(features.segment_ids))
+#     print('**label_id**\n{}\n'.format(features.label_id))
+#     print('**review_id**\n{}\n'.format(features.review_id))
+#     print('**date**\n{}\n'.format(features.date))
+#     print('**label**\n{}\n'.format(features.label))
+#    print('**review_body**\n{}\n'.format(features.review_body))
 
     return features
 
@@ -280,13 +277,13 @@ def transform_inputs_to_tfrecord(inputs,
                         'review_id': the_input.review_id,
                         'date': the_input.date,
                         'label': features.label,
-                        'review_body': features.review_body
+#                        'review_body': features.review_body
                        })
 
         #####################################
         ####### TODO:  REMOVE THIS BREAK #######
         #####################################            
-        break
+        # break
         
     tf_record_writer.close()
     
@@ -548,9 +545,9 @@ def process(args):
     
     print(reviews_feature_group.as_hive_ddl())
     
-    train_data = None
-    validation_data = None
-    test_data = None
+    train_data = '{}/bert/train'.format(args.output_data)
+    validation_data = '{}/bert/validation'.format(args.output_data)
+    test_data = '{}/bert/test'.format(args.output_data)
     
     transform_tsv_to_tfrecord = functools.partial(_transform_tsv_to_tfrecord, 
                                                   max_seq_length=args.max_seq_length,
@@ -599,23 +596,6 @@ def process(args):
     print('Data available.')
         
     print('Complete')
-    
-#     print('QUERY FEATURE STORE...')
-#     reviews_query = reviews_feature_group.athena_query()
-#     reviews_table = reviews_query.table_name
-
-#     query_string = 'SELECT * FROM "'+reviews_table+'" LIMIT 1'
-
-#     print('Running ' + query_string)
-
-#     # run Athena query. The output is loaded to a Pandas dataframe.
-#     dataset = pd.DataFrame()
-#     reviews_query.run(query_string=query_string, output_location='s3://'+bucket+'/'+prefix+'/query_results/')
-#     reviews_query.wait()
-#     dataset = reviews_query.as_dataframe()
-
-#     print('Data From Feature Store: {}:'.format(dataset))
-#     print('DONE!')
     
     
 if __name__ == "__main__":
