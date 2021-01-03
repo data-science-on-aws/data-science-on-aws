@@ -421,7 +421,7 @@ def get_pipeline(
 
     model_metrics = ModelMetrics(
         model_statistics=MetricsSource(
-            s3_uri="{}/metrics/evaluation.json".format(
+            s3_uri="{}/evaluation.json".format(
                 evaluation_step.arguments["ProcessingOutputConfig"]["Outputs"][0]["S3Output"]["S3Uri"]
             ),
             content_type="application/json"
