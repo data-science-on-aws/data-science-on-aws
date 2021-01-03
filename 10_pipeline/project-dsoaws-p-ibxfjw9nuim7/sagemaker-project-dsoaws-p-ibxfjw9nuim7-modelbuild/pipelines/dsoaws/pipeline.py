@@ -469,7 +469,7 @@ def get_pipeline(
             property_file=evaluation_report,
             json_path="metrics.accuracy.value",
         ),
-        right=0 # accuracy percent
+        right=0.01 # accuracy 
     )
 
     minimum_accuracy_condition_step = ConditionStep(
