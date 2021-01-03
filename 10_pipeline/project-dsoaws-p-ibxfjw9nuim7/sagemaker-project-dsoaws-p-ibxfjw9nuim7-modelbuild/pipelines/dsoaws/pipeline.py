@@ -37,7 +37,7 @@ from sagemaker.processing import (
 )
 
 from sagemaker.sklearn.processing import SKLearnProcessor
-from sagemaker.workflow.conditions import ConditionLessThanOrEqualTo
+from sagemaker.workflow.conditions import ConditionGreaterThanOrEqualTo
 from sagemaker.workflow.condition_step import (
     ConditionStep,
     JsonGet,
@@ -144,7 +144,16 @@ def get_pipeline(
         name="TestSplitPercentage",
         default_value=0.05,
     )
-    
+
+    feature_store_offline_prefix = ParameterString(
+        name="FeatureStoreOfflinePrefix",
+        default_value="reviews-feature-store-" + str(timestamp),
+    )
+
+    feature_group_name = ParameterString(
+        name="FeatureGroupName",
+        default_value="reviews-feature-group-" + str(timestamp)
+    )
     
     # PARAMETERS FOR PIPELINE EXECUTION
     # TRAINING STEP 
@@ -178,10 +187,9 @@ def get_pipeline(
     deploy_instance_count = ParameterInteger(
         name="DeployInstanceCount",
         default_value=1
-    )
+    )    
     
-    
-    # PIPELINE PROCESSING STEP
+    # PROCESSING STEP
 
     processor = SKLearnProcessor(
         framework_version='0.20.0',
@@ -191,11 +199,10 @@ def get_pipeline(
         max_runtime_in_seconds=7200)
 
     # DEFINE PROCESSING HYPERPARAMATERS  
-    # balance_dataset=True
     
     processing_inputs=[
         ProcessingInput(
-            input_name='raw_input',
+            input_name='raw-input-data',
             source=input_data,
             destination='/opt/ml/processing/input/data/',
             s3_data_distribution_type='ShardedByS3Key'
@@ -204,25 +211,24 @@ def get_pipeline(
     
     # DEFINE PROCESSING OUTPUTS 
     processing_outputs=[
-        ProcessingOutput(s3_upload_mode='EndOfJob',
-                         output_name='bert-train',
+        ProcessingOutput(output_name='bert-train',
+                         s3_upload_mode='EndOfJob',                         
                          source='/opt/ml/processing/output/bert/train',
 #                         destination=processed_train_data_s3_uri
                         ),
-        ProcessingOutput(s3_upload_mode='EndOfJob',
-                         output_name='bert-validation',
+        ProcessingOutput(output_name='bert-validation',
+                         s3_upload_mode='EndOfJob',                         
                          source='/opt/ml/processing/output/bert/validation',
 #                         destination=processed_validation_data_s3_uri
                         ),
-        ProcessingOutput(s3_upload_mode='EndOfJob',
-                         output_name='bert-test',
+        ProcessingOutput(output_name='bert-test',
+                         s3_upload_mode='EndOfJob',                         
                          source='/opt/ml/processing/output/bert/test',
 #                         destination=processed_test_data_s3_uri
                         ),
     ]
-       
     
-    step_process = ProcessingStep(
+    processing_step = ProcessingStep(
         name="Processing",
         processor=processor,
         inputs=processing_inputs,
@@ -232,11 +238,14 @@ def get_pipeline(
             '--validation-split-percentage', str(validation_split_percentage.default_value),
             '--test-split-percentage', str(test_split_percentage.default_value),
             '--max-seq-length', str(max_seq_length.default_value),
-            '--balance-dataset', str(balance_dataset.default_value)],
-        code=os.path.join(BASE_DIR, "preprocess-scikit-text-to-bert.py")
+            '--balance-dataset', str(balance_dataset.default_value),
+            '--feature-store-offline-prefix', str(feature_store_offline_prefix.default_value),
+            '--feature-group-name', str(feature_group_name.default_value)
+        ],
+        code=os.path.join(BASE_DIR, "preprocess-scikit-text-to-bert-feature-store.py")
     )
     
-    # PIPELINE TRAIN STEP
+    # TRAIN STEP
     
     # DEFINE TRAINING HYPERPARAMETERS
     epochs=1
@@ -269,17 +278,17 @@ def get_pipeline(
     ]
     
     # GET TRAINING IMAGE
-    from sagemaker.tensorflow import TensorFlow
+#     from sagemaker.tensorflow import TensorFlow
 
-    image_uri = sagemaker.image_uris.retrieve(
-        framework="tensorflow",
-        region=region,
-        version="2.1.0",
-        py_version="py3",
-        instance_type=train_instance_type,
-        image_scope="training"
-    )
-    print(image_uri)
+#     image_uri = sagemaker.image_uris.retrieve(
+#         framework="tensorflow",
+#         region=region,
+#         version="2.3.1",
+#         py_version="py37",
+#         instance_type=train_instance_type,
+#         image_scope="training"
+#     )
+#     print(image_uri)
     
     # train_code=os.path.join(BASE_DIR, "tf_bert_reviews.py")  
     train_src=os.path.join(BASE_DIR, "src") 
@@ -306,9 +315,9 @@ def get_pipeline(
         instance_count=train_instance_count,
         instance_type=train_instance_type,
         volume_size=train_volume_size,
-        image_uri=image_uri,
-#        py_version='py3',
-#        framework_version='2.1.0',
+#        image_uri=image_uri,
+        py_version='py37',
+        framework_version='2.3.1',
         hyperparameters={
             'epochs': epochs,
             'learning_rate': learning_rate,
@@ -332,106 +341,110 @@ def get_pipeline(
         input_mode=input_mode,
         metric_definitions=metrics_definitions,
 #        max_run=7200 # max 2 hours * 60 minutes seconds per hour * 60 seconds per minute
-    )
-    
+    )    
 
-    step_train = TrainingStep(
-        name="Train",
+    training_step = TrainingStep(
+        name='Train',
         estimator=estimator,
         inputs={
-            "train": TrainingInput(
+            'train': TrainingInput(
                 s3_data=step_process.properties.ProcessingOutputConfig.Outputs[
-                    "bert-train"
+                    'bert-train'
                 ].S3Output.S3Uri,
-                content_type="text/csv"
+                content_type='text/csv'
             ),
-            "validation": TrainingInput(
+            'validation': TrainingInput(
                 s3_data=step_process.properties.ProcessingOutputConfig.Outputs[
-                    "bert-validation"
+                    'bert-validation'
                 ].S3Output.S3Uri,
-                content_type="text/csv"
+                content_type='text/csv'
             ),
-            "test": TrainingInput(
+            'test': TrainingInput(
                 s3_data=step_process.properties.ProcessingOutputConfig.Outputs[
-                    "bert-test"
+                    'bert-test'
                 ].S3Output.S3Uri,
-                content_type="text/csv"
+                content_type='text/csv'
             )        
         }
     )
     
-    ## DEFINE EVALUATION STEP
-#     script_eval = ScriptProcessor(
-#         image_uri=image_uri,
-#         command=["python3"],
-#         instance_type=processing_instance_type,
-#         instance_count=1,
-#         base_job_name=f"{base_job_prefix}/script-bert-eval",
-#         sagemaker_session=sagemaker_session,
-#         role=role,
-#     )
-#     evaluation_report = PropertyFile(
-#         name="AbaloneEvaluationReport",
-#         output_name="evaluation",
-#         path="evaluation.json",
-#     )
-#     step_eval = ProcessingStep(
-#         name="EvaluateBERTModel",
-#         processor=script_eval,
-#         inputs=[
-#             ProcessingInput(
-#                 source=step_train.properties.ModelArtifacts.S3ModelArtifacts,
-#                 destination="/opt/ml/processing/model",
-#             ),
-#             ProcessingInput(
-#                 source=step_process.properties.ProcessingOutputConfig.Outputs[
-#                     "test"
-#                 ].S3Output.S3Uri,
-#                 destination="/opt/ml/processing/test",
-#             ),
-#         ],
-#         outputs=[
-#             ProcessingOutput(output_name="evaluation", source="/opt/ml/processing/evaluation"),
-#         ],
-#         code=os.path.join(BASE_DIR, "evaluate.py"),
-#         property_files=[evaluation_report],
-#     )
+    # EVALUATION STEP
+    
+    from sagemaker.sklearn.processing import SKLearnProcessor
 
+    evaluation_processor = SKLearnProcessor(framework_version='0.23-1',
+                                          role=role,
+                                          instance_type=processing_instance_type,
+                                          instance_count=processing_instance_count,
+                                          env={'AWS_DEFAULT_REGION': region},
+                                          max_runtime_in_seconds=7200)
+    
+    
+    from sagemaker.workflow.properties import PropertyFile
+
+    # NOTE:
+    # property files cause deserialization failure on listing pipeline executions
+    # therefore jsonget and robust conditions won't work
+    evaluation_report = PropertyFile(
+        name='EvaluationReport',
+        output_name='metrics',
+        path='evaluation.json'
+    )
+    
+    evaluation_step = ProcessingStep(
+        name='EvaluateBERTModel',
+        processor=evaluation_processor,
+        code='evaluate_model_metrics.py',
+        inputs=[
+            ProcessingInput(
+                source=training_step.properties.ModelArtifacts.S3ModelArtifacts,
+                destination='/opt/ml/processing/input/model'
+            ),
+            ProcessingInput(
+                source=raw_input_data_s3_uri,
+                #processing_step.properties.ProcessingInputConfig.Inputs['raw-input-data'].S3Output.S3Uri,
+                destination='/opt/ml/processing/input/data'
+            )
+        ],
+        outputs=[
+            ProcessingOutput(output_name='metrics', 
+                             s3_upload_mode='EndOfJob',
+                             source='/opt/ml/processing/output/metrics/'),
+        ],
+        job_arguments=[
+                       '--max-seq-length', str(max_seq_length.default_value),
+                      ],
+        property_files=[evaluation_report],  # these cause deserialization issues
+    )    
+    
+    from sagemaker.model_metrics import MetricsSource, ModelMetrics 
+
+    model_metrics = ModelMetrics(
+        model_statistics=MetricsSource(
+            s3_uri="{}/metrics/evaluation.json".format(
+                evaluation_step.arguments["ProcessingOutputConfig"]["Outputs"][0]["S3Output"]["S3Uri"]
+            ),
+            content_type="application/json"
+        )
+    )    
+    
+    
     ## REGISTER MODEL
     
-#     model_package_group_name = f"BERT-Reviews-{timestamp}"
-
-    # NOTE: in the future, the model package group will be created automatically if it doesn't exist
-    
-#     sm.create_model_package_group(
-#         ModelPackageGroupName=model_package_group_name,
-#         ModelPackageGroupDescription="BERT-Reviews",
-#     )
-#     print(model_package_group_name)
-
-#     model_metrics = ModelMetrics(
-#         model_statistics=MetricsSource(
-#             s3_uri="{}/evaluation.json".format(
-#                 step_eval.arguments["ProcessingOutputConfig"]["Outputs"][0]["S3Output"]["S3Uri"]
-#             ),
-#             content_type="application/json"
-#         )
-#     )
-
     ## GET INFERENCE IMAGE 
     inference_image_uri = sagemaker.image_uris.retrieve(
         framework="tensorflow",
         region=region,
-        version="2.1.0",
-        py_version="py3",
+        version="2.3.1",
+        py_version="py37",
         instance_type=deploy_instance_type,
         image_scope="inference"
     )
     print(inference_image_uri)
 
     ## TODO: Figure out where ml.m5.large is set
-    step_register = RegisterModel(
-        name="RegisterModel",
+    register_step = RegisterModel(
+        name="RegisterBERTModel",
         estimator=estimator,
         image_uri=inference_image_uri, # we have to specify, by default it's using training image
         model_data=step_train.properties.ModelArtifacts.S3ModelArtifacts,
@@ -444,20 +457,27 @@ def get_pipeline(
     )
     
     ## EVALUATING MODEL -- CONDITION STEP
-#     cond_lte = ConditionLessThanOrEqualTo(
-#         left=JsonGet(
-#             step=step_eval,
-#             property_file=evaluation_report,
-#             json_path="regression_metrics.mse.value"
-#         ),
-#         right=6.0,
-#     )
-#     step_cond = ConditionStep(
-#         name="CheckMSEAbaloneEvaluation",
-#         conditions=[cond_lte],
-#         if_steps=[step_register],
-#         else_steps=[],
-#     )
+    from sagemaker.workflow.conditions import ConditionGreaterThanOrEqualTo
+    from sagemaker.workflow.condition_step import (
+        ConditionStep,
+        JsonGet,
+    )
+
+    minimum_accuracy_condition = ConditionGreaterThanOrEqualTo(
+        left=JsonGet(
+            step=evaluation_step,
+            property_file=evaluation_report,
+            json_path="metrics.accuracy.value",
+        ),
+        right=0 # accuracy percent
+    )
+
+    minimum_accuracy_condition_step = ConditionStep(
+        name="AccuracyCondition",
+        conditions=[minimum_accuracy_condition],
+        if_steps=[register_step], # success, continue with model registration
+        else_steps=[], # fail, end the pipeline
+    )
 
     ## CREATE PIPELINE
     pipeline = Pipeline(
@@ -471,13 +491,15 @@ def get_pipeline(
             train_split_percentage,
             validation_split_percentage,
             test_split_percentage,
+            feature_store_offline_prefix,
+            feature_group_name,
             train_instance_type,
             train_instance_count,
             model_approval_status,
             deploy_instance_type,
             deploy_instance_count
         ],
-        steps=[step_process, step_train, step_register],
+    steps=[processing_step, training_step, evaluation_step, minimum_accuracy_condition_step], # register_step],
         sagemaker_session=sess
     )
     return pipeline

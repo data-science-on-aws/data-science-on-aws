@@ -20,23 +20,19 @@ import boto3
 import subprocess
 
 ## PIP INSTALLS ##
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'pandas==1.0.5'])
-import pandas as pd
-
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow==2.1.0'])
+subprocess.check_call([sys.executable, '-m', 'conda', 'install', '-c', 'anaconda', 'tensorflow==2.3.0', '-y'])
 import tensorflow as tf
 from tensorflow import keras
-
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'transformers==2.8.0'])
+subprocess.check_call([sys.executable, '-m', 'conda', 'install', '-c', 'conda-forge', 'transformers==3.5.1', '-y'])
 from transformers import DistilBertTokenizer
-
+from transformers import DistilBertConfig
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'matplotlib==3.2.1'])
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'sagemaker==2.23.1'])
+import pandas as pd
+
 import sagemaker
-
 from sagemaker.session import Session
-
 from sagemaker.feature_store.feature_group import FeatureGroup
-
 from sagemaker.feature_store.feature_definition import (
     FeatureDefinition,
     FeatureTypeEnum,
@@ -340,7 +336,7 @@ def parse_args():
     parser.add_argument('--feature-store-offline-prefix', type=str,
         default=None,
     ) 
-    parser.add_argument('--reviews-feature-group-name', type=str,
+    parser.add_argument('--feature-group-name', type=str,
         default=None,
     ) 
         
@@ -359,7 +355,7 @@ def _transform_tsv_to_tfrecord(file,
     print('feature_group_name {}'.format(feature_group_name))    
 
     # need to re-load since we can't pass feature_group object in _partial functions for some reason
-    reviews_feature_group = create_or_load_feature_group(prefix, feature_group_name)
+    feature_group = create_or_load_feature_group(prefix, feature_group_name)
     
     filename_without_extension = Path(Path(file).stem).stem
 
@@ -523,13 +519,13 @@ def _transform_tsv_to_tfrecord(file,
     df_fs_test_records = cast_object_to_string(df_test_records)
 
     print('Ingesting Features...')
-    reviews_feature_group.ingest(
+    feature_group.ingest(
         data_frame=df_fs_train_records, max_workers=3, wait=True
     )        
-    reviews_feature_group.ingest(
+    feature_group.ingest(
         data_frame=df_fs_validation_records, max_workers=3, wait=True
     )        
-    reviews_feature_group.ingest(
+    feature_group.ingest(
         data_frame=df_fs_test_records, max_workers=3, wait=True
     )            
     print('Feature ingest completed.')
@@ -538,12 +534,12 @@ def _transform_tsv_to_tfrecord(file,
 def process(args):
     print('Current host: {}'.format(args.current_host))
     
-    reviews_feature_group = create_or_load_feature_group(prefix=args.feature_store_offline_prefix, 
-                                                         feature_group_name=args.reviews_feature_group_name)
+    feature_group = create_or_load_feature_group(prefix=args.feature_store_offline_prefix, 
+                                                         feature_group_name=args.feature_group_name)
 
-    reviews_feature_group.describe()
+    feature_group.describe()
     
-    print(reviews_feature_group.as_hive_ddl())
+    print(feature_group.as_hive_ddl())
     
     train_data = '{}/bert/train'.format(args.output_data)
     validation_data = '{}/bert/validation'.format(args.output_data)
@@ -553,7 +549,7 @@ def process(args):
                                                   max_seq_length=args.max_seq_length,
                                                   balance_dataset=args.balance_dataset,
                                                   prefix=args.feature_store_offline_prefix,
-                                                  feature_group_name=args.reviews_feature_group_name)
+                                                  feature_group_name=args.feature_group_name)
 
     input_files = glob.glob('{}/*.tsv.gz'.format(args.input_data))
 

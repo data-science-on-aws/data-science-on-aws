@@ -1,19 +1,17 @@
-from sklearn.model_selection import train_test_split
-from sklearn.utils import resample
 import functools
 import multiprocessing
 
-import pandas as pd
 from datetime import datetime
 import subprocess
 import sys
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow==2.3.1'])
+subprocess.check_call([sys.executable, '-m', 'conda', 'install', '-c', 'anaconda', 'tensorflow==2.3.0', '-y'])
 import tensorflow as tf
-print(tf.__version__)
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'transformers==3.5.1'])
+from tensorflow import keras
+subprocess.check_call([sys.executable, '-m', 'conda', 'install', '-c', 'conda-forge', 'transformers==3.5.1', '-y'])
 from transformers import DistilBertTokenizer
 from transformers import DistilBertConfig
-from tensorflow import keras
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'matplotlib==3.2.1'])
+import pandas as pd
 import os
 import re
 import collections
@@ -31,6 +29,8 @@ import matplotlib.pyplot as plt
 from tensorflow import keras
 from sklearn.metrics import classification_report
 from sklearn.metrics import accuracy_score
+from sklearn.model_selection import train_test_split
+from sklearn.utils import resample
 
 
 tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
@@ -84,6 +84,9 @@ def parse_args():
     parser.add_argument('--input-data', type=str,
         default='/opt/ml/processing/input/data',
     )
+    parser.add_argument('--input-model', type=str,
+        default='/opt/ml/processing/input/model',
+    )
     parser.add_argument('--output-data', type=str,
         default='/opt/ml/processing/output',
     )
@@ -97,18 +100,19 @@ def parse_args():
 def process(args):
     print('Current host: {}'.format(args.current_host))
     
-    print('Listing contents of input dir: {}'.format(args.input_data))
-    input_files = os.listdir(args.input_data)
+    print('input_data: {}'.format(args.input_data))
+    print('input_model: {}'.format(args.input_model))          
+          
+    print('Listing contents of input model dir: {}'.format(args.input_model))
+    input_files = os.listdir(args.input_model)
     for file in input_files:
         print(file)
-
-    model_tar_path = '{}/model.tar.gz'.format(args.input_data)
-                
-    model_tar = tarfile.open(model_tar_path) #, mode="r:gz")
-    model_tar.extractall('{}/model'.format(args.input_data))
+    model_tar_path = '{}/model.tar.gz'.format(args.input_model)                
+    model_tar = tarfile.open(model_tar_path)
+    model_tar.extractall(args.input_model)
     model_tar.close()                                
 
-    model = keras.models.load_model('{}/model/tensorflow/saved_model/0'.format(args.input_data))
+    model = keras.models.load_model('{}/tensorflow/saved_model/0'.format(args.input_model))
     print(model)
     
     def predict(text):
@@ -137,15 +141,21 @@ def process(args):
 
     print("""Really bad.  I hope they don't make this anymore.""", predict("""Really bad.  I hope they don't make this anymore."""))
 
-    ####################
-    # TODO:  Add ./test_data/ to source_dir of this processing job
-    #        (hopefully this will work)
-    ####################
+
+    ###########################################################################################
+    # TODO:  Replace this with glob for all files and remove test_data/ from the model.tar.gz #
+    ###########################################################################################    
+#    evaluation_data_path = '/opt/ml/processing/input/data/'
     
-    df_test_reviews = pd.read_csv('./test_data/amazon_reviews_us_Digital_Software_v1_00.tsv.gz', 
-                                    delimiter='\t', 
-                                    quoting=csv.QUOTE_NONE,
-                                    compression='gzip')[['review_body', 'star_rating']]
+    print('Listing contents of input data dir: {}'.format(args.input_data))
+    input_files = os.listdir(args.input_data)
+
+    test_data_path = '{}/amazon_reviews_us_Digital_Software_v1_00.tsv.gz'.format(args.input_data)
+    print('Using only {} to evaluate.'.format(test_data_path))
+    df_test_reviews = pd.read_csv(test_data_path, 
+                                  delimiter='\t', 
+                                  quoting=csv.QUOTE_NONE,
+                                  compression='gzip')[['review_body', 'star_rating']]
 
     df_test_reviews = df_test_reviews.sample(n=100)
     df_test_reviews.shape
@@ -213,6 +223,11 @@ def process(args):
         
     print('Listing contents of output dir: {}'.format(args.output_data))
     output_files = os.listdir(args.output_data)
+    for file in output_files:
+        print(file)
+
+    print('Listing contents of output/metrics dir: {}'.format(metrics_path))
+    output_files = os.listdir('{}'.format(metrics_path))
     for file in output_files:
         print(file)
 
