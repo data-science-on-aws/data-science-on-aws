@@ -61,27 +61,10 @@ from sagemaker.workflow.step_collections import RegisterModel
 
 sess   = sagemaker.Session()
 bucket = sess.default_bucket()
-#role = sagemaker.get_execution_role()
-#region = boto3.Session().region_name
-
 timestamp = str(int(time.time() * 10**7))
 
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 print('BASE_DIR: {}'.format(BASE_DIR))
-
-# SM_EXPERIMENT_NAME=None
-# print('SM_EXPERIMENT_NAME: {}'.format(SM_EXPERIMENT_NAME))
-
-
-# def create_or_load_experiment(experiment_name):
-#     try:
-#         experiment = Experiment.create(
-#             experiment_name=experiment_name,
-#             description='Amazon Customer Reviews BERT Pipeline Experiment')
-#     except Exception as e:
-#         print(e)
-#         experiment = Experiment.load(experiment_name=experiment_name)
-#     return experiment
 
 
 def get_pipeline(
@@ -155,9 +138,6 @@ def get_pipeline(
         default_value="reviews-feature-group-" + str(timestamp)
     )
     
-    # PARAMETERS FOR PIPELINE EXECUTION
-    # TRAINING STEP 
-    
     train_instance_type = ParameterString(
         name="TrainingInstanceType",
         default_value="ml.c5.9xlarge"
@@ -167,18 +147,12 @@ def get_pipeline(
         name="TrainingInstanceCount",
         default_value=1
     )
-    
-    # PARAMETERS FOR PIPELINE EXECUTION
-    # MODEL STEP     
 
     model_approval_status = ParameterString(
         name="ModelApprovalStatus",
         default_value="PendingManualApproval"
     )
     
-    # PARAMETERS FOR PIPELINE EXECUTION
-    # INFERENCE      
-
     deploy_instance_type = ParameterString(
         name="DeployInstanceType",
         default_value="ml.m5.4xlarge"
@@ -189,16 +163,15 @@ def get_pipeline(
         default_value=1
     )    
     
+    
     # PROCESSING STEP
 
     processor = SKLearnProcessor(
-        framework_version='0.20.0',
+        framework_version='0.23-1',
         role=role,
         instance_type=processing_instance_type,
         instance_count=processing_instance_count,
         max_runtime_in_seconds=7200)
-
-    # DEFINE PROCESSING HYPERPARAMATERS  
     
     processing_inputs=[
         ProcessingInput(
@@ -209,22 +182,18 @@ def get_pipeline(
         )
     ]
     
-    # DEFINE PROCESSING OUTPUTS 
     processing_outputs=[
         ProcessingOutput(output_name='bert-train',
                          s3_upload_mode='EndOfJob',                         
                          source='/opt/ml/processing/output/bert/train',
-#                         destination=processed_train_data_s3_uri
                         ),
         ProcessingOutput(output_name='bert-validation',
                          s3_upload_mode='EndOfJob',                         
                          source='/opt/ml/processing/output/bert/validation',
-#                         destination=processed_validation_data_s3_uri
                         ),
         ProcessingOutput(output_name='bert-test',
                          s3_upload_mode='EndOfJob',                         
                          source='/opt/ml/processing/output/bert/test',
-#                         destination=processed_test_data_s3_uri
                         ),
     ]
     
@@ -245,9 +214,11 @@ def get_pipeline(
         code=os.path.join(BASE_DIR, "preprocess-scikit-text-to-bert-feature-store.py")
     )
     
-    # TRAIN STEP
     
-    # DEFINE TRAINING HYPERPARAMETERS
+    #########################
+    # TRAINING STEP
+    #########################
+    
     epochs=1
     learning_rate=0.00001
     epsilon=0.00000001
@@ -269,7 +240,6 @@ def get_pipeline(
     run_test=False
     run_sample_predictions=False
     
-    # SETUP METRICS TO TRACK MODEL PERFORMANCE
     metrics_definitions = [
         {'Name': 'train:loss', 'Regex': 'loss: ([0-9\\.]+)'},
         {'Name': 'train:accuracy', 'Regex': 'accuracy: ([0-9\\.]+)'},
@@ -277,45 +247,17 @@ def get_pipeline(
         {'Name': 'validation:accuracy', 'Regex': 'val_accuracy: ([0-9\\.]+)'}
     ]
     
-    # GET TRAINING IMAGE
-#     from sagemaker.tensorflow import TensorFlow
-
-#     image_uri = sagemaker.image_uris.retrieve(
-#         framework="tensorflow",
-#         region=region,
-#         version="2.3.1",
-#         py_version="py37",
-#         instance_type=train_instance_type,
-#         image_scope="training"
-#     )
-#     print(image_uri)
-    
-    # train_code=os.path.join(BASE_DIR, "tf_bert_reviews.py")  
     train_src=os.path.join(BASE_DIR, "src") 
     model_path = f"s3://{default_bucket}/{base_job_prefix}/output/model"
     
-#     # List current directory
-#     print('os.listdir: {}'.format(os.listdir('.')))
-#     os.listdir('.')
-    
-    print('os.listdir(BASE_DIR): {}'.format(os.listdir(BASE_DIR)))
-    os.listdir(BASE_DIR)
-    
-#     print('os.listdir(train_src): {}'.format(os.listdir(train_src)))
-#     os.listdir(train_src)
-
-        
-    # DEFINE TF ESTIMATOR
     estimator = TensorFlow(
         entry_point='tf_bert_reviews.py',
         source_dir=BASE_DIR,
         role=role,
         output_path=model_path,
-#        base_job_name=training_job_name,
         instance_count=train_instance_count,
         instance_type=train_instance_type,
         volume_size=train_volume_size,
-#        image_uri=image_uri,
         py_version='py37',
         framework_version='2.3.1',
         hyperparameters={
@@ -368,23 +310,21 @@ def get_pipeline(
         }
     )
     
-    # EVALUATION STEP
     
+    #########################
+    # EVALUATION STEP
+    #########################
+        
     from sagemaker.sklearn.processing import SKLearnProcessor
+    from sagemaker.workflow.properties import PropertyFile
 
     evaluation_processor = SKLearnProcessor(framework_version='0.23-1',
                                           role=role,
                                           instance_type=processing_instance_type,
                                           instance_count=processing_instance_count,
                                           env={'AWS_DEFAULT_REGION': region},
-                                          max_runtime_in_seconds=7200)
+                                          max_runtime_in_seconds=7200)    
     
-    
-    from sagemaker.workflow.properties import PropertyFile
-
-    # NOTE:
-    # property files cause deserialization failure on listing pipeline executions
-    # therefore jsonget and robust conditions won't work
     evaluation_report = PropertyFile(
         name='EvaluationReport',
         output_name='metrics',
@@ -428,10 +368,10 @@ def get_pipeline(
         )
     )    
     
+    #########################    
+    ## REGISTER TRAINED MODEL STEP 
+    #########################
     
-    ## REGISTER MODEL
-    
-    ## GET INFERENCE IMAGE 
     inference_image_uri = sagemaker.image_uris.retrieve(
         framework="tensorflow",
         region=region,
@@ -442,7 +382,6 @@ def get_pipeline(
     )
     print(inference_image_uri)
 
-    ## TODO: Figure out where ml.m5.large is set
     register_step = RegisterModel(
         name="RegisterBERTModel",
         estimator=estimator,
@@ -455,8 +394,39 @@ def get_pipeline(
         model_package_group_name=model_package_group_name,
         approval_status=model_approval_status,
     )
+        
+      
+    #########################
+    ## CREATE MODEL FOR DEPLOYMENT STEP
+    #########################
     
-    ## EVALUATING MODEL -- CONDITION STEP
+    from sagemaker.model import Model
+
+    model = Model(
+        image_uri=inference_image_uri,
+        model_data=training_step.properties.ModelArtifacts.S3ModelArtifacts,
+        sagemaker_session=sess,
+        role=role,
+    )
+    
+    from sagemaker.inputs import CreateModelInput
+    from sagemaker.workflow.steps import CreateModelStep
+
+    create_inputs = CreateModelInput(
+        instance_type="ml.m5.4xlarge",
+    )
+
+    create_step = CreateModelStep(
+        name="CreateBERTModel",
+        model=model,
+        inputs=create_inputs,
+    )
+    
+
+    #########################
+    ## CONDITION STEP:  EVALUATE THE MODEL
+    #########################
+    
     from sagemaker.workflow.conditions import ConditionGreaterThanOrEqualTo
     from sagemaker.workflow.condition_step import (
         ConditionStep,
@@ -475,11 +445,15 @@ def get_pipeline(
     minimum_accuracy_condition_step = ConditionStep(
         name="AccuracyCondition",
         conditions=[minimum_accuracy_condition],
-        if_steps=[register_step], # success, continue with model registration
+        if_steps=[register_step, create_step], # success, continue with model registration
         else_steps=[], # fail, end the pipeline
     )
 
+    
+    #########################
     ## CREATE PIPELINE
+    #########################
+    
     pipeline = Pipeline(
         name=pipeline_name,
         parameters=[
@@ -499,7 +473,14 @@ def get_pipeline(
             deploy_instance_type,
             deploy_instance_count
         ],
-    steps=[processing_step, training_step, evaluation_step, minimum_accuracy_condition_step], # register_step],
+    steps=[processing_step, training_step, evaluation_step, minimum_accuracy_condition_step], # register_step, create_step],
         sagemaker_session=sess
     )
+    
+    
+    #########################    
+    ## RETURN PIPELINE
+    #########################
+    
     return pipeline
+
