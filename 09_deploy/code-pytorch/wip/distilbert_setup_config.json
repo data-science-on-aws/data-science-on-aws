@@ -1,0 +1,8 @@
+{
+ "model_name":"distilbert-base-uncased",
+ "mode":"sequence_classification",
+ "do_lower_case":"True",
+ "num_labels":"5",
+ "save_mode":"pretrained",
+ "max_length":"64"
+}
