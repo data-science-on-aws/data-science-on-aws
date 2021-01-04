@@ -44,16 +44,39 @@ region = os.environ['AWS_DEFAULT_REGION']
 print('Region: {}'.format(region))
 ############################
 
+#############################
+## It seems that the Role and Bucket has to be set before setting sm, featurestore_runtime, etc.
+#############################
+try:
+    role = sagemaker.get_execution_role()
+    print('found role from sagemaker.get_execution_role: {}'.format(role))
+except Exception as e:
+    print(f"Exception: {e}")    
+print('THE ROLE IS ARN:  ' + role)
+#############################
+
+bucket = sagemaker.Session().default_bucket()
+print('The DEFAULT BUCKET is {}'.format(bucket))
+
+#############################
+
 sm = boto3.Session(region_name=region).client(service_name='sagemaker', region_name=region)
 
 featurestore_runtime = boto3.Session(region_name=region).client(service_name='sagemaker-featurestore-runtime', region_name=region)
 
 s3 = boto3.Session(region_name=region).client(service_name='s3', region_name=region)
 
-sagemaker_session = sagemaker.Session(boto_session=boto3.Session(region_name=region), sagemaker_client=sm, sagemaker_featurestore_runtime_client=featurestore_runtime)
+sagemaker_session = sagemaker.Session(boto_session=boto3.Session(region_name=region), 
+                                      sagemaker_client=sm,
+                                      sagemaker_featurestore_runtime_client=featurestore_runtime)
 
-role = sagemaker.get_execution_role()
-bucket = sagemaker_session.default_bucket()
+# print(sagemaker_session)
+# print(sagemaker_session.__dict__)
+
+#role = sagemaker_session.get_execution_role()
+#print('THE ROLE IS ARN:  ' + role)
+
+#bucket = sagemaker_session.default_bucket()
 
 ############################
 
@@ -79,14 +102,20 @@ def cast_object_to_string(data_frame):
             
 
 def wait_for_feature_group_creation_complete(feature_group):
-    status = feature_group.describe().get("FeatureGroupStatus")
-    while status == "Creating":
-        print("Waiting for Feature Group Creation")
-        time.sleep(5)
+    try:
         status = feature_group.describe().get("FeatureGroupStatus")
-    if status != "Created":
-        raise RuntimeError(f"Failed to create feature group {feature_group.name}")
-    print(f"FeatureGroup {feature_group.name} successfully created.")
+        print('Feature Group status: {}'.format(status))
+        while status == "Creating":
+            print("Waiting for Feature Group Creation")
+            time.sleep(5)
+            status = feature_group.describe().get("FeatureGroupStatus")
+            print('Feature Group status: {}'.format(status))
+        if status != "Created":
+            print('Feature Group status: {}'.format(status))
+            raise RuntimeError(f"Failed to create feature group {feature_group.name}")
+        print(f"FeatureGroup {feature_group.name} successfully created.")
+    except:
+        print('No feature group created yet.')
     
             
 def create_or_load_feature_group(prefix, feature_group_name):
@@ -114,14 +143,15 @@ def create_or_load_feature_group(prefix, feature_group_name):
     try:                
         print('Waiting for existing Feature Group to become available if it is being created by another instance in our cluster...')
         wait_for_feature_group_creation_complete(feature_group)
-    except:
-        pass
+    except Exception as e:
+        print('Before CREATE FG wait exeption: {}'.format(e))
+#        pass
         
     try:
         record_identifier_feature_name = "review_id"
         event_time_feature_name = "date"
         
-        print('Creating Feature Group...')
+        print('Creating Feature Group with role {}...'.format(role))
         feature_group.create(
             s3_uri=f"s3://{bucket}/{prefix}",
             record_identifier_name=record_identifier_feature_name,
@@ -133,11 +163,24 @@ def create_or_load_feature_group(prefix, feature_group_name):
         
         print('Waiting for new Feature Group to become available...')
         wait_for_feature_group_creation_complete(feature_group)
-        print('Feature Group available.')        
-    except:
-        pass
+        print('Feature Group available.')  
+        feature_group.describe()
         
-    feature_group.describe()        
+    except Exception as e:
+        print('Exception: {}'.format(e))
+#        pass
+
+#         print('FAILED - NOW Creating Feature Group with service-role {}...'.format('arn:aws:iam::231218423789:role/service-role/AmazonSageMakerServiceCatalogProductsUseRole'))
+#         feature_group.create(
+#             s3_uri=f"s3://{bucket}/{prefix}",
+#             record_identifier_name=record_identifier_feature_name,
+#             event_time_feature_name=event_time_feature_name,
+#             role_arn='arn:aws:iam::231218423789:role/service-role/AmazonSageMakerServiceCatalogProductsUseRole',
+#             enable_online_store=True
+#         )
+#         print('Creating Feature Group. Completed.')
+        
+#    feature_group.describe()        
         
     return feature_group
 
