@@ -19,12 +19,11 @@ from botocore.exceptions import ClientError
 
 import sagemaker
 import sagemaker.session
-
-import smexperiments
-from smexperiments.experiment import Experiment
-
 from sagemaker.estimator import Estimator
 from sagemaker.inputs import TrainingInput
+from sagemaker.sklearn.processing import SKLearnProcessor
+from sagemaker.tensorflow import TensorFlow
+
 from sagemaker.model_metrics import (
     MetricsSource,
     ModelMetrics,
@@ -36,13 +35,6 @@ from sagemaker.processing import (
     ScriptProcessor,
 )
 
-from sagemaker.sklearn.processing import SKLearnProcessor
-from sagemaker.workflow.conditions import ConditionGreaterThanOrEqualTo
-from sagemaker.workflow.condition_step import (
-    ConditionStep,
-    JsonGet,
-)
-
 from sagemaker.workflow.parameters import (
     ParameterInteger,
     ParameterString,
@@ -50,18 +42,29 @@ from sagemaker.workflow.parameters import (
 )
 
 from sagemaker.workflow.pipeline import Pipeline
-
-from sagemaker.workflow.properties import PropertyFile
 from sagemaker.workflow.steps import (
     ProcessingStep,
     TrainingStep,
+    CreateModelStep
 )
+
+from sagemaker.model_metrics import MetricsSource, ModelMetrics 
+from sagemaker.workflow.conditions import ConditionGreaterThanOrEqualTo
+from sagemaker.workflow.condition_step import (
+    ConditionStep,
+    JsonGet,
+)
+from sagemaker.workflow.properties import PropertyFile
 
 from sagemaker.workflow.step_collections import RegisterModel
 
+from sagemaker.model import Model
+from sagemaker.inputs import CreateModelInput
+
+
 sess   = sagemaker.Session()
 bucket = sess.default_bucket()
-timestamp = str(int(time.time() * 10**7))
+timestamp = int(time.time())
 
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 print('BASE_DIR: {}'.format(BASE_DIR))
@@ -164,13 +167,16 @@ def get_pipeline(
     )    
     
     
+    #########################
     # PROCESSING STEP
-
+    #########################
+    
     processor = SKLearnProcessor(
         framework_version='0.23-1',
         role=role,
         instance_type=processing_instance_type,
         instance_count=processing_instance_count,
+        env={'AWS_DEFAULT_REGION': region},
         max_runtime_in_seconds=7200)
     
     processing_inputs=[
@@ -249,7 +255,7 @@ def get_pipeline(
     
     train_src=os.path.join(BASE_DIR, "src") 
     model_path = f"s3://{default_bucket}/{base_job_prefix}/output/model"
-    
+        
     estimator = TensorFlow(
         entry_point='tf_bert_reviews.py',
         source_dir=BASE_DIR,
@@ -290,19 +296,19 @@ def get_pipeline(
         estimator=estimator,
         inputs={
             'train': TrainingInput(
-                s3_data=step_process.properties.ProcessingOutputConfig.Outputs[
+                s3_data=processing_step.properties.ProcessingOutputConfig.Outputs[
                     'bert-train'
                 ].S3Output.S3Uri,
                 content_type='text/csv'
             ),
             'validation': TrainingInput(
-                s3_data=step_process.properties.ProcessingOutputConfig.Outputs[
+                s3_data=processing_step.properties.ProcessingOutputConfig.Outputs[
                     'bert-validation'
                 ].S3Output.S3Uri,
                 content_type='text/csv'
             ),
             'test': TrainingInput(
-                s3_data=step_process.properties.ProcessingOutputConfig.Outputs[
+                s3_data=processing_step.properties.ProcessingOutputConfig.Outputs[
                     'bert-test'
                 ].S3Output.S3Uri,
                 content_type='text/csv'
@@ -315,9 +321,6 @@ def get_pipeline(
     # EVALUATION STEP
     #########################
         
-    from sagemaker.sklearn.processing import SKLearnProcessor
-    from sagemaker.workflow.properties import PropertyFile
-
     evaluation_processor = SKLearnProcessor(framework_version='0.23-1',
                                           role=role,
                                           instance_type=processing_instance_type,
@@ -334,15 +337,15 @@ def get_pipeline(
     evaluation_step = ProcessingStep(
         name='EvaluateBERTModel',
         processor=evaluation_processor,
-        code='evaluate_model_metrics.py',
+        code=os.path.join(BASE_DIR, "evaluate_model_metrics.py"),
         inputs=[
             ProcessingInput(
                 source=training_step.properties.ModelArtifacts.S3ModelArtifacts,
                 destination='/opt/ml/processing/input/model'
             ),
             ProcessingInput(
-                source=raw_input_data_s3_uri,
-                #processing_step.properties.ProcessingInputConfig.Inputs['raw-input-data'].S3Output.S3Uri,
+                source=input_data,
+                #processing_step.properties.ProcessingInputConfig.Inputs['raw-input-data'].S3Input.S3Uri,
                 destination='/opt/ml/processing/input/data'
             )
         ],
@@ -357,8 +360,6 @@ def get_pipeline(
         property_files=[evaluation_report],  # these cause deserialization issues
     )    
     
-    from sagemaker.model_metrics import MetricsSource, ModelMetrics 
-
     model_metrics = ModelMetrics(
         model_statistics=MetricsSource(
             s3_uri="{}/evaluation.json".format(
@@ -386,7 +387,7 @@ def get_pipeline(
         name="RegisterBERTModel",
         estimator=estimator,
         image_uri=inference_image_uri, # we have to specify, by default it's using training image
-        model_data=step_train.properties.ModelArtifacts.S3ModelArtifacts,
+        model_data=training_step.properties.ModelArtifacts.S3ModelArtifacts,
         content_types=["text/csv"],
         response_types=["text/csv"],
         inference_instances=[deploy_instance_type], # The JSON spec must be within these instance types or we will see "Instance Type Not Allowed" Exception 
@@ -400,7 +401,6 @@ def get_pipeline(
     ## CREATE MODEL FOR DEPLOYMENT STEP
     #########################
     
-    from sagemaker.model import Model
 
     model = Model(
         image_uri=inference_image_uri,
@@ -408,9 +408,6 @@ def get_pipeline(
         sagemaker_session=sess,
         role=role,
     )
-    
-    from sagemaker.inputs import CreateModelInput
-    from sagemaker.workflow.steps import CreateModelStep
 
     create_inputs = CreateModelInput(
         instance_type="ml.m5.4xlarge",
@@ -427,12 +424,6 @@ def get_pipeline(
     ## CONDITION STEP:  EVALUATE THE MODEL
     #########################
     
-    from sagemaker.workflow.conditions import ConditionGreaterThanOrEqualTo
-    from sagemaker.workflow.condition_step import (
-        ConditionStep,
-        JsonGet,
-    )
-
     minimum_accuracy_condition = ConditionGreaterThanOrEqualTo(
         left=JsonGet(
             step=evaluation_step,
