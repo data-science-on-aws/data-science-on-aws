@@ -8,22 +8,17 @@ import json
 import subprocess
 import sys
 import os
-import csv
-#subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow==2.1.0'])
 import tensorflow as tf
-import pandas as pd
-import numpy as np
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'transformers==3.5.1'])
+#subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow==2.1.0'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'transformers==2.8.0'])
 #subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'sagemaker-tensorflow==2.1.0.1.0.0'])
 #subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'smdebug==0.9.3'])
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'scikit-learn==0.23.1'])
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'matplotlib==3.2.1'])
-
 from transformers import DistilBertTokenizer
-from transformers import DistilBertConfig
-from transformers import TFDistilBertModel
-#from transformers import TFBertForSequenceClassification
-
+from transformers import TFDistilBertForSequenceClassification
+from transformers import TextClassificationPipeline
+from transformers.configuration_distilbert import DistilBertConfig
 from tensorflow.keras.callbacks import ModelCheckpoint
 from tensorflow.keras.models import load_model
 #from tensorflow.keras.mixed_precision import experimental as mixed_precision
@@ -353,7 +348,6 @@ if __name__ == '__main__':
         tokenizer = None
         config = None
         model = None
-        transformer_model = None
 
         # This is required when launching many instances at once...  the urllib request seems to get denied periodically
         successful_download = False
@@ -362,40 +356,9 @@ if __name__ == '__main__':
             try:
                 tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
                 config = DistilBertConfig.from_pretrained('distilbert-base-uncased',
-                                                          num_labels=len(CLASSES),
-                                                          id2label={
-                                                            0: 1,
-                                                            1: 2,
-                                                            2: 3,
-                                                            3: 4,
-                                                            4: 5
-                                                          },
-                                                          label2id={
-                                                            1: 0,
-                                                            2: 1,
-                                                            3: 2,
-                                                            4: 3,
-                                                            5: 4
-                                                          })
-
-                transformer_model = TFDistilBertModel.from_pretrained('distilbert-base-uncased', 
-                                                                      config=config)
-
-                input_ids = tf.keras.layers.Input(shape=(max_seq_length,), name='input_ids', dtype='int32')
-                input_mask = tf.keras.layers.Input(shape=(max_seq_length,), name='input_mask', dtype='int32') 
-
-                embedding_layer = transformer_model.distilbert(input_ids, attention_mask=input_mask)[0]
-                X = tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(50, return_sequences=True, dropout=0.1, recurrent_dropout=0.1))(embedding_layer)
-                X = tf.keras.layers.GlobalMaxPool1D()(X)
-                X = tf.keras.layers.Dense(50, activation='relu')(X)
-                X = tf.keras.layers.Dropout(0.2)(X)
-                X = tf.keras.layers.Dense(len(CLASSES), activation='sigmoid')(X)
-
-                model = tf.keras.Model(inputs=[input_ids, input_mask], outputs = X)
-
-                for layer in model.layers[:3]:
-                    layer.trainable = not freeze_bert_layer
-
+                                                          num_labels=len(CLASSES))
+                model = TFDistilBertForSequenceClassification.from_pretrained('distilbert-base-uncased',
+                                                                              config=config)
                 successful_download = True
                 print('Sucessfully downloaded after {} retries.'.format(retries))
             except:
@@ -458,7 +421,7 @@ if __name__ == '__main__':
 
         model.compile(optimizer=optimizer, loss=loss, metrics=[metric])
         print('Compiled model {}'.format(model))          
-#        model.layers[0].trainable = not freeze_bert_layer
+        model.layers[0].trainable = not freeze_bert_layer
         print(model.summary())
 
         if run_validation:
@@ -519,16 +482,12 @@ if __name__ == '__main__':
             
         # Save the Fine-Yuned Transformers Model as a New "Pre-Trained" Model
         print('transformer_fine_tuned_model_path {}'.format(transformer_fine_tuned_model_path))   
-        transformer_model.save_pretrained(transformer_fine_tuned_model_path)
-        print('Model inputs after save_pretrained: {}'.format(model.inputs))
-            
+        model.save_pretrained(transformer_fine_tuned_model_path)
+
         # Save the TensorFlow SavedModel for Serving Predictions
         print('tensorflow_saved_model_path {}'.format(tensorflow_saved_model_path))   
-        model.save(tensorflow_saved_model_path,
-                   include_optimizer=False,
-                   overwrite=True,
-                   save_format='tf')
-        
+        model.save(tensorflow_saved_model_path, save_format='tf')
+                
         # Copy inference.py and requirements.txt to the code/ directory
         #   Note: This is required for the SageMaker Endpoint to pick them up.
         #         This appears to be hard-coded and must be called code/
@@ -539,35 +498,41 @@ if __name__ == '__main__':
         print(glob(inference_path))        
 #        os.system('cp requirements.txt {}/code'.format(inference_path))
         
-        # Copy test data for the evaluation step
-        os.system('cp -R ./test_data/ {}'.format(local_model_dir))
-        
     if run_sample_predictions:
-        def predict(text):
-            encode_plus_tokens = tokenizer.encode_plus(text,
-                                                       pad_to_max_length=True,
-                                                       max_length=max_seq_length,
-                                                       truncation=True,
-                                                       return_tensors='tf')
-            # The id from the pre-trained BERT vocabulary that represents the token.  (Padding of 0 will be used if the # of tokens is less than `max_seq_length`)
-            input_ids = encode_plus_tokens['input_ids']
+        loaded_model = TFDistilBertForSequenceClassification.from_pretrained(transformer_fine_tuned_model_path,
+                                                                       id2label={
+                                                                        0: 1,
+                                                                        1: 2,
+                                                                        2: 3,
+                                                                        3: 4,
+                                                                        4: 5
+                                                                       },
+                                                                       label2id={
+                                                                        1: 0,
+                                                                        2: 1,
+                                                                        3: 2,
+                                                                        4: 3,
+                                                                        5: 4
+                                                                       })
 
-            # Specifies which tokens BERT should pay attention to (0 or 1).  Padded `input_ids` will have 0 in each of these vector elements.    
-            input_mask = encode_plus_tokens['attention_mask']
+        tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
 
-            outputs = model.predict(x=(input_ids, input_mask))
+        if num_gpus >= 1:
+            inference_device = 0 # GPU 0
+        else:
+            inference_device = -1 # CPU
+        print('inference_device {}'.format(inference_device))
 
-            scores = np.exp(outputs) / np.exp(outputs).sum(-1, keepdims=True)
+        inference_pipeline = TextClassificationPipeline(model=loaded_model, 
+                                                        tokenizer=tokenizer,
+                                                        framework='tf',
+                                                        device=inference_device)  
 
-            prediction = [{"label": config.id2label[item.argmax()], "score": item.max().item()} for item in scores]
+        print("""I loved it!  I will recommend this to everyone.""", inference_pipeline("""I loved it!  I will recommend this to everyone."""))
+        print("""It's OK.""", inference_pipeline("""It's OK."""))
+        print("""Really bad.  I hope they don't make this anymore.""", inference_pipeline("""Really bad.  I hope they don't make this anymore."""))
 
-            return prediction[0]['label']
-
-        print("""I loved it!  I will recommend this to everyone.""", predict("""I loved it!  I will recommend this to everyone."""))
-            
-        print("""It's OK.""", predict("""It's OK."""))
-
-        print("""Really bad.  I hope they don't make this anymore.""", predict("""Really bad.  I hope they don't make this anymore."""))
+        import csv
 
         df_test_reviews = pd.read_csv('./test_data/amazon_reviews_us_Digital_Software_v1_00.tsv.gz', 
                                         delimiter='\t', 
@@ -578,6 +543,12 @@ if __name__ == '__main__':
         df_test_reviews.shape
         df_test_reviews.head()
         
+        import pandas as pd
+
+        def predict(review_body):
+            prediction_map = inference_pipeline(review_body)
+            return prediction_map[0]['label']
+
         y_test = df_test_reviews['review_body'].map(predict)
         y_test
         
@@ -588,8 +559,7 @@ if __name__ == '__main__':
         print(classification_report(y_true=y_test, y_pred=y_actual))
         
         from sklearn.metrics import accuracy_score
-        accuracy = accuracy_score(y_true=y_test, y_pred=y_actual)        
-        print('Test accuracy: ', accuracy)
+        print('Accuracy: ', accuracy_score(y_true=y_test, y_pred=y_actual))
         
         import matplotlib.pyplot as plt
         import pandas as pd
@@ -618,6 +588,8 @@ if __name__ == '__main__':
         import numpy as np
         from sklearn.metrics import confusion_matrix
         import matplotlib.pyplot as plt
+        #%matplotlib inline
+        #%config InlineBackend.figure_format='retina'
 
         cm = confusion_matrix(y_true=y_test, y_pred=y_actual)
 
@@ -630,19 +602,7 @@ if __name__ == '__main__':
         # Save the confusion matrix        
         plt.show()
         
-        # Model Output         
+        # Model Output 
         metrics_path = os.path.join(local_model_dir, 'metrics/')
         os.makedirs(metrics_path, exist_ok=True)
         plt.savefig('{}/confusion_matrix.png'.format(metrics_path))
-        
-        report_dict = {
-            "metrics": {
-                "accuracy": {
-                    "value": accuracy,
-                },
-            },
-        }
-
-        evaluation_path = "{}/evaluation.json".format(metrics_path)
-        with open(evaluation_path, "w") as f:
-            f.write(json.dumps(report_dict))

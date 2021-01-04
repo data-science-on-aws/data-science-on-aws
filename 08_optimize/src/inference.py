@@ -1,8 +1,12 @@
 import json
 import subprocess
 import sys
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow==2.1.0'])
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'transformers==2.8.0'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'tensorflow==2.3.1'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'transformers==4.1.1'])
+# Workaround for https://github.com/huggingface/tokenizers/issues/120 and
+#                https://github.com/kaushaltrivedi/fast-bert/issues/174
+#subprocess.check_call([sys.executable, '-m', 'pip', 'install', '--upgrade', 'tokenizers'])
+
 import tensorflow as tf
 from transformers import DistilBertTokenizer
 
@@ -23,11 +27,11 @@ def input_handler(data, context):
         
         tokens = tokenizer.tokenize(data_str)
         print('TOKENS {}'.format(tokens))
-
+        
         encode_plus_tokens = tokenizer.encode_plus(data_str,
                                                    pad_to_max_length=True,
                                                    max_length=max_seq_length,
-#                                                   truncation=True
+                                                   truncation=True
                                                   )
 
         # Convert the text-based tokens to ids from the pre-trained BERT vocabulary
@@ -35,19 +39,20 @@ def input_handler(data, context):
         # Specifies which tokens BERT should pay attention to (0 or 1)
         input_mask = encode_plus_tokens['attention_mask']
         # Segment Ids are always 0 for single-sequence tasks (or 1 if two-sequence tasks)
-        segment_ids = [0] * max_seq_length
+#        segment_ids = [0] * max_seq_length
     
         transformed_instance = { 
                                  "input_ids": input_ids, 
                                  "input_mask": input_mask, 
-                                 "segment_ids": segment_ids
+#                                 "segment_ids": segment_ids
                                }
     
         transformed_instances.append(transformed_instance)
 
     print(transformed_instances)
     
-    transformed_data = {"instances": transformed_instances}
+    transformed_data = {"signature_name":"serving_default",
+                        "instances": transformed_instances}
     print(transformed_data)
 
     transformed_data_json = json.dumps(transformed_data)
