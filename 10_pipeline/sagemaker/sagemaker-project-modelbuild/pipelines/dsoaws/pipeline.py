@@ -347,7 +347,7 @@ def get_pipeline(
                 destination='/opt/ml/processing/input/model'
             ),
             ProcessingInput(
-                source=processing_step.properties.ProcessingInputConfig.Inputs['raw-input-data'].S3Input.S3Uri,
+                source=input_data,
                 destination='/opt/ml/processing/input/data'
             )
         ],
