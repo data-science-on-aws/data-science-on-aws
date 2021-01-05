@@ -20,6 +20,8 @@ import boto3
 import subprocess
 
 ## PIP INSTALLS ##
+# This is 2.3.0 (vs. 2.3.1 everywhere else) because we need to 
+# use anaconda and anaconda only supports 2.3.0 at this time
 subprocess.check_call([sys.executable, '-m', 'conda', 'install', '-c', 'anaconda', 'tensorflow==2.3.0', '-y'])
 import tensorflow as tf
 from tensorflow import keras
@@ -53,6 +55,9 @@ try:
 except Exception as e:
     print(f"Exception: {e}")    
 print('THE ROLE IS ARN:  ' + role)
+
+role = role.replace(':role', ':service-role')
+print('replaced to use :service-role instead of :role -- {}'.format(role))
 #############################
 
 bucket = sagemaker.Session().default_bucket()
