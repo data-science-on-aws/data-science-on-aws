@@ -57,7 +57,7 @@ print('(assumed_role) caller_identity_arn: {}'.format(assumed_role))
 # Derived and inspired by these since sagemaker.get_execution_role() doesn't work properly in our case:
 #     https://github.com/aws/sagemaker-python-sdk/blob/1fdefe06068e5eaf9f63287737d55db96ecc12cf/src/sagemaker/session.py#L3509
 #     https://github.com/aws/sagemaker-python-sdk/issues/300    
-role = re.sub(r"^(.+)sts::(\d+):assumed-role/(.+?)/.*$", r"\1iam::\2:role\/service-role/\3", assumed_role)
+role = re.sub(r"^(.+)sts::(\d+):assumed-role/(.+?)/.*$", r"\1iam::\2:role/service-role/\3", assumed_role)
 print('caller_identity (assume_role) with :role/service-role/ instead of :role/ {}'.format(role))
 
 # try:
