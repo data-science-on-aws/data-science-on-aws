@@ -84,6 +84,9 @@ def get_pipeline(
         region: AWS region to create and run the pipeline.
         role: IAM role to create and run steps and pipeline.
         default_bucket: the bucket to use for storing the artifacts
+        pipeline_name:  name of this pipeline
+        model_package_group_name:  model package group
+        base_job_prefix:  prefic of the job name
 
     Returns:
         an instance of a pipeline
@@ -322,11 +325,11 @@ def get_pipeline(
     #########################
         
     evaluation_processor = SKLearnProcessor(framework_version='0.23-1',
-                                          role=role,
-                                          instance_type=processing_instance_type,
-                                          instance_count=processing_instance_count,
-                                          env={'AWS_DEFAULT_REGION': region},
-                                          max_runtime_in_seconds=7200)    
+                                            role=role,
+                                            instance_type=processing_instance_type,
+                                            instance_count=processing_instance_count,
+                                            env={'AWS_DEFAULT_REGION': region},
+                                            max_runtime_in_seconds=7200)    
     
     evaluation_report = PropertyFile(
         name='EvaluationReport',
@@ -335,7 +338,7 @@ def get_pipeline(
     )
     
     evaluation_step = ProcessingStep(
-        name='EvaluateBERTModel',
+        name='EvaluateModel',
         processor=evaluation_processor,
         code=os.path.join(BASE_DIR, "evaluate_model_metrics.py"),
         inputs=[
@@ -344,8 +347,7 @@ def get_pipeline(
                 destination='/opt/ml/processing/input/model'
             ),
             ProcessingInput(
-                source=input_data,
-                #processing_step.properties.ProcessingInputConfig.Inputs['raw-input-data'].S3Input.S3Uri,
+                source=processing_step.properties.ProcessingInputConfig.Inputs['raw-input-data'].S3Input.S3Uri,
                 destination='/opt/ml/processing/input/data'
             )
         ],
@@ -369,6 +371,7 @@ def get_pipeline(
         )
     )    
     
+    
     #########################    
     ## REGISTER TRAINED MODEL STEP 
     #########################
@@ -384,7 +387,7 @@ def get_pipeline(
     print(inference_image_uri)
 
     register_step = RegisterModel(
-        name="RegisterBERTModel",
+        name="RegisterModel",
         estimator=estimator,
         image_uri=inference_image_uri, # we have to specify, by default it's using training image
         model_data=training_step.properties.ModelArtifacts.S3ModelArtifacts,
@@ -401,7 +404,6 @@ def get_pipeline(
     ## CREATE MODEL FOR DEPLOYMENT STEP
     #########################
     
-
     model = Model(
         image_uri=inference_image_uri,
         model_data=training_step.properties.ModelArtifacts.S3ModelArtifacts,
@@ -414,7 +416,7 @@ def get_pipeline(
     )
 
     create_step = CreateModelStep(
-        name="CreateBERTModel",
+        name="CreateModel",
         model=model,
         inputs=create_inputs,
     )
