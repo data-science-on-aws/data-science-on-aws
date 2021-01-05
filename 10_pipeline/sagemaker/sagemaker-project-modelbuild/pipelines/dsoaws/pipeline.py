@@ -206,6 +206,8 @@ def get_pipeline(
                         ),
     ]
     
+    # TODO:  Figure out why the Parameter's are not resolving properly to their native type when user here.
+    #        We shouldn't be using `default_value`
     processing_step = ProcessingStep(
         name="Processing",
         processor=processor,
@@ -228,6 +230,7 @@ def get_pipeline(
     # TRAINING STEP
     #########################
     
+    # TODO:  Convert these to Parameters
     epochs=1
     learning_rate=0.00001
     epsilon=0.00000001
