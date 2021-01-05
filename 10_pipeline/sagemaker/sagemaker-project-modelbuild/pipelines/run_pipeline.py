@@ -159,53 +159,46 @@ def main():  # pragma: no cover
                 time.sleep(5)
 
         # Add Trial Compontents To Experiment Trial        
-        print(processing_job_name)            
-        
         processing_job_tc = '{}-aws-processing-job'.format(processing_job_name)
         print(processing_job_tc)
-        
+
+        # -aws-processing-job is the default name assigned by ProcessingJob
         response = sm.associate_trial_component(
-            # -aws-processing-job is the default name assigned by ProcessingJob
             TrialComponentName=processing_job_tc,
             TrialName=trial_name
         )
-                
-        print(training_job_name)
-        
+                        
+        # -aws-training-job is the default name assigned by TrainingJob
         training_job_tc = '{}-aws-training-job'.format(training_job_name)
         print(training_job_tc)
 
         response = sm.associate_trial_component(
-            # -aws-training-job is the default name assigned by TrainingJob
             TrialComponentName=training_job_tc,
             TrialName=trial_name
-        )
+        )     
         
+        ##############
+        # TODO: Inspect all of the kwargs and update the processing_job_tracker accordingly (more than nust balance_dataset, i believe)
+        ##############
         ## Log Additional Parameters within Trial
 #         from smexperiments import tracker
-
-#         processing_job_tracker = tracker.Tracker.load(trial_component_name=processing_job_tc)
-#         print(processing_job_tracker)
-        
+#         processing_job_tracker = tracker.Tracker.load(trial_component_name=processing_job_tc)        
 #         processing_job_tracker.log_parameters({
 #             "balance_dataset": str(balance_dataset), 
+#             ...
 #         })
 
 #         # must save after logging
 #         processing_job_tracker.trial_component.save()
         
-#         from sagemaker.analytics import ExperimentAnalytics
-
 #         import pandas as pd
 #         pd.set_option("max_colwidth", 500)
 #         #pd.set_option("max_rows", 100)
 
 #         from sagemaker.analytics import ExperimentAnalytics
-
 #         experiment_analytics = ExperimentAnalytics(
 #             experiment_name=experiment.experiment_name,
 #         )
-
 #         experiment_analytics_df = experiment_analytics.dataframe()
 #         print(experiment_analytics_df) 
         

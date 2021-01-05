@@ -350,7 +350,7 @@ def get_pipeline(
                 destination='/opt/ml/processing/input/model'
             ),
             ProcessingInput(
-                source=input_data,
+                source=processing_step.properties.ProcessingInputs['raw-input-data'].S3Input.S3Uri,
                 destination='/opt/ml/processing/input/data'
             )
         ],
@@ -469,7 +469,7 @@ def get_pipeline(
             deploy_instance_type,
             deploy_instance_count
         ],
-    steps=[processing_step, training_step, evaluation_step, minimum_accuracy_condition_step], # register_step, create_step],
+    steps=[processing_step, training_step, evaluation_step, minimum_accuracy_condition_step],
         sagemaker_session=sess
     )
     
