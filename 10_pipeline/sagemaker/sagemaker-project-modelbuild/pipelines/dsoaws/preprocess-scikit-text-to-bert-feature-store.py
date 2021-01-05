@@ -31,7 +31,7 @@ from transformers import DistilBertConfig
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'matplotlib==3.2.1'])
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'sagemaker==2.23.1'])
 import pandas as pd
-
+import re
 import sagemaker
 from sagemaker.session import Session
 from sagemaker.feature_store.feature_group import FeatureGroup
@@ -40,29 +40,36 @@ from sagemaker.feature_store.feature_definition import (
     FeatureTypeEnum,
 )
 
-
-############################
 region = os.environ['AWS_DEFAULT_REGION']
 print('Region: {}'.format(region))
-############################
 
 #############################
-## It seems that the Role and Bucket has to be set before setting sm, featurestore_runtime, etc.
-#############################
-try:
-    role = sagemaker.get_execution_role()
-    print('found role from sagemaker.get_execution_role: {}'.format(role))
-except Exception as e:
-    print(f"Exception: {e}")    
-print('THE ROLE IS ARN:  ' + role)
+## We may need to get the Role and Bucket before setting sm, featurestore_runtime, etc.
+## Role and Bucket are malformed if we do this later.
+sts = boto3.Session(region_name=region).client(service_name='sts', region_name=region)
 
-role = role.replace(':role/', ':role/service-role/')
-print('replaced to use :role/service-role/ instead of :role/ -- {}'.format(role))
-#############################
+caller_identity = sts.get_caller_identity()
+print('caller_identity: {}'.format(caller_identity))
+
+assumed_role = caller_identity['Arn']
+print('(assumed_role) caller_identity_arn: {}'.format(assumed_role))
+
+# Derived and inspired by these since sagemaker.get_execution_role() doesn't work properly in our case:
+#     https://github.com/aws/sagemaker-python-sdk/blob/1fdefe06068e5eaf9f63287737d55db96ecc12cf/src/sagemaker/session.py#L3509
+#     https://github.com/aws/sagemaker-python-sdk/issues/300    
+role = re.sub(r"^(.+)sts::(\d+):assumed-role/(.+?)/.*$", r"\1iam::\2:role\/service-role/\3", assumed_role)
+print('caller_identity (assume_role) with :role/service-role/ instead of :role/ {}'.format(role))
+
+# try:
+#     role = sagemaker.get_execution_role()
+#     print('found role from sagemaker.get_execution_role: {}'.format(role))
+# except Exception as e:
+#     print(f"Exception: {e}")    
+# role = role.replace(':role/', ':role/service-role/')
+# print('replaced to use :role/service-role/ instead of :role/ -- {}'.format(role))
 
 bucket = sagemaker.Session().default_bucket()
 print('The DEFAULT BUCKET is {}'.format(bucket))
-
 #############################
 
 sm = boto3.Session(region_name=region).client(service_name='sagemaker', region_name=region)
@@ -74,16 +81,6 @@ s3 = boto3.Session(region_name=region).client(service_name='s3', region_name=reg
 sagemaker_session = sagemaker.Session(boto_session=boto3.Session(region_name=region), 
                                       sagemaker_client=sm,
                                       sagemaker_featurestore_runtime_client=featurestore_runtime)
-
-# print(sagemaker_session)
-# print(sagemaker_session.__dict__)
-
-#role = sagemaker_session.get_execution_role()
-#print('THE ROLE IS ARN:  ' + role)
-
-#bucket = sagemaker_session.default_bucket()
-
-############################
 
 tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
 
