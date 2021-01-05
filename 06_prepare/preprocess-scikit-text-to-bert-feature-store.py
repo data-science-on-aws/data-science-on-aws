@@ -56,8 +56,8 @@ except Exception as e:
     print(f"Exception: {e}")    
 print('THE ROLE IS ARN:  ' + role)
 
-role = role.replace(':role', ':service-role')
-print('replaced to use :service-role instead of :role -- {}'.format(role))
+role = role.replace(':role/', ':role/service-role/')
+print('replaced to use :role/service-role/ instead of :role/ -- {}'.format(role))
 #############################
 
 bucket = sagemaker.Session().default_bucket()
