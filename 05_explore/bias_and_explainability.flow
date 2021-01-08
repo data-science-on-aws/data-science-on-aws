@@ -1,0 +1,134 @@
+{
+  "metadata": {
+    "version": 1
+  },
+  "nodes": [
+    {
+      "node_id": "725cc25a-f1a3-4125-832c-67701ddf3d59",
+      "type": "SOURCE",
+      "operator": "sagemaker.s3_source_0.1",
+      "parameters": {
+        "dataset_definition": {
+          "__typename": "S3CreateDatasetDefinitionOutput",
+          "datasetSourceType": "S3",
+          "name": "amazon_customer_reviews.csv",
+          "description": null,
+          "s3ExecutionContext": {
+            "__typename": "S3ExecutionContext",
+            "s3Uri": "s3://sagemaker-us-east-1-231218423789/data/amazon_customer_reviews.csv",
+            "s3ContentType": "csv",
+            "s3HasHeader": true
+          }
+        }
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "default",
+          "sampling": {
+            "sampling_method": "sample_by_limit",
+            "limit_rows": 50000
+          }
+        }
+      ]
+    },
+    {
+      "node_id": "3dcfe2ba-0703-430d-a5e7-5d81b4a86905",
+      "type": "TRANSFORM",
+      "operator": "sagemaker.spark.infer_and_cast_type_0.1",
+      "parameters": {},
+      "trained_parameters": {
+        "schema": {
+          "marketplace": "string",
+          "customer_id": "long",
+          "review_id": "string",
+          "product_id": "string",
+          "product_parent": "long",
+          "product_title": "string",
+          "product_category": "string",
+          "star_rating": "long",
+          "helpful_votes": "long",
+          "total_votes": "long",
+          "vine": "string",
+          "verified_purchase": "string",
+          "review_headline": "string",
+          "review_body": "string",
+          "review_date": "date"
+        }
+      },
+      "inputs": [
+        {
+          "name": "default",
+          "node_id": "725cc25a-f1a3-4125-832c-67701ddf3d59",
+          "output_name": "default"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "default"
+        }
+      ]
+    },
+    {
+      "node_id": "48c3f6f5-31c0-4508-8975-3fe920130bea",
+      "type": "VISUALIZATION",
+      "operator": "sagemaker.visualizations.bias_report_0.1",
+      "parameters": {
+        "name": "Bias Analysis for Product Category Facet",
+        "is_label_value_or_threshold": "value",
+        "is_facet_value_or_threshold": "value",
+        "default_metrics": {
+          "CI": true,
+          "DPL": true,
+          "JS": true,
+          "CDDL": false
+        },
+        "group_name": "",
+        "show_additional_metrics": "no",
+        "label_values": "5",
+        "facet_values": "Gift Card",
+        "label_name": "star_rating",
+        "facet_name": "product_category",
+        "metrics": {
+          "CI": true,
+          "DPL": true,
+          "JS": true,
+          "CDDL": false
+        }
+      },
+      "inputs": [
+        {
+          "name": "df",
+          "node_id": "3dcfe2ba-0703-430d-a5e7-5d81b4a86905",
+          "output_name": "default"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "default"
+        }
+      ]
+    },
+    {
+      "node_id": "f3986804-74bd-45c7-b4a0-2285d864a85b",
+      "type": "VISUALIZATION",
+      "operator": "sagemaker.visualizations.quick_model_0.1",
+      "parameters": {
+        "name": "Amazon Customer Reviews",
+        "label": "star_rating"
+      },
+      "inputs": [
+        {
+          "name": "df",
+          "node_id": "3dcfe2ba-0703-430d-a5e7-5d81b4a86905",
+          "output_name": "default"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "default"
+        }
+      ]
+    }
+  ]
+}
