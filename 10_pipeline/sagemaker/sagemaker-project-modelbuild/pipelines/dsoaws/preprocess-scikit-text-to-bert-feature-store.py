@@ -54,13 +54,13 @@ print('caller_identity: {}'.format(caller_identity))
 assumed_role = caller_identity['Arn']
 print('(assumed_role) caller_identity_arn: {}'.format(assumed_role))
 
-if "AmazonSageMakerServiceCatalogProductsUseRole" in assumed_role:
-    role = re.sub(r"^(.+)sts::(\d+):assumed-role/(.+?)/.*$", r"\1iam::\2:role/service-role/\3", assumed_role)
-    print('caller_identity (assume_role) with :role/service-role/ instead of :role/ {}'.format(role))
-else:
+if "TeamRole" in assumed_role: # TeamRole is specific to our workshop and is not a service-role
     role = re.sub(r"^(.+)sts::(\d+):assumed-role/(.+?)/.*$", r"\1iam::\2:role/\3", assumed_role)
-    print('caller_identity (assume_role) with :role/service-role/ instead of :role/ {}'.format(role))      
-    
+    print('[TeamRole] Replacing :assumed-role/ to :role/') 
+else:
+    role = re.sub(r"^(.+)sts::(\d+):assumed-role/(.+?)/.*$", r"\1iam::\2:role/service-role/\3", assumed_role)
+    print('Replacing :assumed-role/ with :role/service-role/')
+
 
 # # Derived and inspired by these since sagemaker.get_execution_role() doesn't work properly in our case:
 # #     https://github.com/aws/sagemaker-python-sdk/blob/1fdefe06068e5eaf9f63287737d55db96ecc12cf/src/sagemaker/session.py#L3509
