@@ -54,12 +54,12 @@ print('caller_identity: {}'.format(caller_identity))
 assumed_role = caller_identity['Arn']
 print('(assumed_role) caller_identity_arn: {}'.format(assumed_role))
 
-if "AmazonSageMakerServiceCatalogProductsUseRole" in assumed_role:
+if "TeamRole" in assumed_role: 
+    role = re.sub(r"^(.+)sts::(\d+):assumed-role/(.+?)/.*$", r"\1iam::\2:role/\3", assumed_role)
+    print('caller_identity (assume_role) with :role/service-role/ instead of :role/ {}'.format(role)) 
+else:
     role = re.sub(r"^(.+)sts::(\d+):assumed-role/(.+?)/.*$", r"\1iam::\2:role/service-role/\3", assumed_role)
     print('caller_identity (assume_role) with :role/service-role/ instead of :role/ {}'.format(role))
-else:
-    role = re.sub(r"^(.+)sts::(\d+):assumed-role/(.+?)/.*$", r"\1iam::\2:role/\3", assumed_role)
-    print('caller_identity (assume_role) with :role/service-role/ instead of :role/ {}'.format(role))      
     
 
 # # Derived and inspired by these since sagemaker.get_execution_role() doesn't work properly in our case:
