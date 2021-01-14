@@ -153,21 +153,7 @@ def get_pipeline(
         name="TrainingInstanceCount",
         default_value=1
     )
-
-    model_approval_status = ParameterString(
-        name="ModelApprovalStatus",
-        default_value="PendingManualApproval"
-    )
-    
-    deploy_instance_type = ParameterString(
-        name="DeployInstanceType",
-        default_value="ml.m5.4xlarge"
-    )
-    
-    deploy_instance_count = ParameterInteger(
-        name="DeployInstanceCount",
-        default_value=1
-    )    
+  
     
     
     #########################
@@ -230,27 +216,106 @@ def get_pipeline(
     # TRAINING STEP
     #########################
     
-    # TODO:  Convert these to Parameters
-    epochs=1
-    learning_rate=0.00001
-    epsilon=0.00000001
-    train_batch_size=128
-    validation_batch_size=128
-    test_batch_size=128
-    train_steps_per_epoch=50
-    validation_steps=50
-    test_steps=50
-    train_volume_size=1024
-    use_xla=True
-    use_amp=True
-    freeze_bert_layer=False
-    enable_sagemaker_debugger=False
-    enable_checkpointing=False
-    enable_tensorboard=False
-    input_mode='File'
-    run_validation=True
-    run_test=False
-    run_sample_predictions=False
+    epochs = ParameterInteger(
+        name="Epochs",
+        default_value=1
+    )
+    
+    learning_rate = ParameterFloat(
+        name="LearningRate",
+        default_value=0.00001
+    ) 
+    
+    epsilon = ParameterFloat(
+        name="Epsilon",
+        default_value=0.00000001
+    )
+        
+    train_batch_size = ParameterInteger(
+        name="TrainBatchSize",
+        default_value=128
+    )
+    
+    validation_batch_size = ParameterInteger(
+        name="ValidationBatchSize",
+        default_value=128
+    )
+    
+    test_batch_size = ParameterInteger(
+        name="TestBatchSize",
+        default_value=128
+    )
+    
+    train_steps_per_epoch = ParameterInteger(
+        name="TrainStepsPerEpoch",
+        default_value=50
+    )
+    
+    validation_steps = ParameterInteger(
+        name="ValidationSteps",
+        default_value=50
+    )
+    
+    test_steps = ParameterInteger(
+        name="TestSteps",
+        default_value=50
+    )
+    
+    train_volume_size = ParameterInteger(
+        name="TrainVolumeSize",
+        default_value=1024
+    ) 
+    
+    use_xla = ParameterString(
+        name="UseXLA",
+        default_value="True",
+    )
+
+    use_amp = ParameterString(
+        name="UseAMP",
+        default_value="True",
+    )
+    
+    freeze_bert_layer = ParameterString(
+        name="FreezeBERTLayer",
+        default_value="False",
+    )
+
+    enable_sagemaker_debugger = ParameterString(
+        name="EnableSageMakerDebugger",
+        default_value="False",
+    )
+    
+    enable_checkpointing = ParameterString(
+        name="EnableCheckpointing",
+        default_value="False",
+    )
+
+    enable_tensorboard = ParameterString(
+        name="EnableTensorboard",
+        default_value="False",
+    )
+    
+    input_mode = ParameterString(
+        name="InputMode",
+        default_value="File",
+    )
+
+    run_validation = ParameterString(
+        name="RunValidation",
+        default_value="True",
+    )
+    
+    run_test = ParameterString(
+        name="RunTest",
+        default_value="False",
+    )
+    
+    run_sample_predictions = ParameterString(
+        name="RunSamplePredictions",
+        default_value="False",
+    )
+    
     
     metrics_definitions = [
         {'Name': 'train:loss', 'Regex': 'loss: ([0-9\\.]+)'},
@@ -379,6 +444,21 @@ def get_pipeline(
     ## REGISTER TRAINED MODEL STEP 
     #########################
     
+    model_approval_status = ParameterString(
+        name="ModelApprovalStatus",
+        default_value="PendingManualApproval"
+    )
+    
+    deploy_instance_type = ParameterString(
+        name="DeployInstanceType",
+        default_value="ml.m5.4xlarge"
+    )
+    
+    deploy_instance_count = ParameterInteger(
+        name="DeployInstanceCount",
+        default_value=1
+    )  
+    
     inference_image_uri = sagemaker.image_uris.retrieve(
         framework="tensorflow",
         region=region,
@@ -415,7 +495,7 @@ def get_pipeline(
     )
 
     create_inputs = CreateModelInput(
-        instance_type="ml.m5.4xlarge",
+        instance_type=deploy_instance_type,
     )
 
     create_step = CreateModelStep(
@@ -429,13 +509,18 @@ def get_pipeline(
     ## CONDITION STEP:  EVALUATE THE MODEL
     #########################
     
+    min_accuracy_value = ParameterFloat(
+        name="MinAccuracyValue",
+        default_value=0.01
+    )
+    
     minimum_accuracy_condition = ConditionGreaterThanOrEqualTo(
         left=JsonGet(
             step=evaluation_step,
             property_file=evaluation_report,
             json_path="metrics.accuracy.value",
         ),
-        right=0.01 # accuracy 
+        right=min_accuracy_value # accuracy 
     )
 
     minimum_accuracy_condition_step = ConditionStep(
@@ -465,9 +550,30 @@ def get_pipeline(
             feature_group_name,
             train_instance_type,
             train_instance_count,
+            epochs,
+            learning_rate,
+            epsilon,
+            train_batch_size,
+            validation_batch_size,
+            test_batch_size,
+            train_steps_per_epoch,
+            validation_steps,
+            test_steps,
+            train_volume_size,
+            use_xla,
+            use_amp,
+            freeze_bert_layer,
+            enable_sagemaker_debugger,
+            enable_checkpointing,
+            enable_tensorboard,
+            input_mode,
+            run_validation,
+            run_test,
+            run_sample_predictions,     
+            min_accuracy_value,
             model_approval_status,
             deploy_instance_type,
-            deploy_instance_count
+            deploy_instance_count          
         ],
     steps=[processing_step, training_step, evaluation_step, minimum_accuracy_condition_step],
         sagemaker_session=sess
