@@ -12,6 +12,11 @@ In this workshop, we build a natural language processing (NLP) model to classify
 
 To build our BERT-based NLP model, we use the [Amazon Customer Reviews Dataset](https://s3.amazonaws.com/amazon-reviews-pds/readme.html) which contains 150+ million customer reviews from Amazon.com for the 20 year period between 1995 and 2015.  In particular, we train a classifier to predict the `star_rating` (1 is bad, 5 is good) from the `review_body` (free-form review text).
 
+# Workshop Cost
+This workshop is FREE, but would otherwise cost <25 USD.
+
+![Workshop Cost](img/billing.png)
+
 # Workshop Agenda
 ![Workshop Agenda](img/outline.png)
 
@@ -88,6 +93,18 @@ Within the Terminal, run the following:
 ```
 cd ~ && git clone https://github.com/data-science-on-aws/workshop
 ```
+
+If you see an error like the following, just re-run the command again until it works:
+```
+fatal: Unable to create '/home/sagemaker-user/workshop/.git/index.lock': File exists.
+
+Another git process seems to be running in this repository, e.g.
+an editor opened by 'git commit'. Please make sure all processes
+are terminated then try again. If it still fails, a git process
+may have crashed in this repository earlier:
+remove the file manually to continue.
+```
+_Note:  This is not a fatal error ^^ above ^^.  Just re-run the command again until it works._
 
 ## 7. Start the Workshop!
 
