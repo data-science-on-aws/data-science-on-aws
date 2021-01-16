@@ -25,6 +25,6 @@ algor: # Vowpal Wabbit algorithm parameters
     num_policies: 3 # number of nested policies to create when using bag or cover exploration policy
     num_arms: 2
     cfa_type: "dr" # supports "dr", "ips"
-local_mode: true # use local mode?
+local_mode: false # use local mode?
 soft_deployment: true # use the same endpoint with updated model using a blue-green deployment?
  
