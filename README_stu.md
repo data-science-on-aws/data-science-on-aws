@@ -88,7 +88,7 @@ Click `File` > `New` > `Terminal` to launch a terminal in your Jupyter instance.
 Within the Jupyter terminal, run the following:
 
 ```
-cd ~/SageMaker && git clone https://github.com/data-science-on-aws/workshop
+cd ~ && git clone https://github.com/data-science-on-aws/workshop
 ```
 
 ## 7. Start the Workshop!
