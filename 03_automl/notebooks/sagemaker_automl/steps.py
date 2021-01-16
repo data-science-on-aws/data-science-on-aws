@@ -2,33 +2,30 @@
 
 This package contains helper classes and functions that are used in the candidates definition notebook.
 """
-from sagemaker.amazon.amazon_estimator import get_image_uri
 from sagemaker.estimator import Estimator
-from sagemaker.fw_registry import default_framework_uri, registry
+from sagemaker import image_uris
 from sagemaker.sklearn import SKLearn, SKLearnModel
 
 from sagemaker_automl.common import AutoMLLocalCandidateStep
+from sagemaker_automl.common import get_algo_image_uri
 
 
 class AutoMLCandidateAlgoStep:
-    """Represents the Algorithm compute step of an AutoML local run. Currently supported `xgboost` and `linear-learner`.
+    """Represents the Algorithm compute step of an AutoML local run. Currently supported `xgboost`, `linear-learner`
+    and `mlp`.
     """
 
-    def __init__(self, name, training_resource_config, region, repo_version):
+    def __init__(self, name, training_resource_config, region, repo_version, inference_repo_version,
+                 candidate_specific_static_hyperparameters=None):
 
         self.algo_name = name
         self.training_resource_config = training_resource_config
+        self.candidate_specific_static_hps = candidate_specific_static_hyperparameters \
+            if candidate_specific_static_hyperparameters else {}
         self.region = region
         self.repo_version = repo_version
-
-        if self.algo_name == "xgboost":
-            self.algo_image_uri = default_framework_uri(
-                framework=self.algo_name, region_name=region, image_tag=repo_version
-            )
-        else:
-            self.algo_image_uri = get_image_uri(
-                region_name=region, repo_name=self.algo_name, repo_version=repo_version
-            )
+        self.algo_image_uri = get_algo_image_uri(self.algo_name, region, repo_version)
+        self.algo_inference_image_uri = get_algo_image_uri(self.algo_name, region, inference_repo_version)
 
     def create_estimator(
         self, role, output_path, hyperparameters, sagemaker_session, **kwargs
@@ -37,16 +34,28 @@ class AutoMLCandidateAlgoStep:
         estimator = Estimator(
             self.algo_image_uri,
             role=role,
-            train_instance_count=self.training_resource_config["instance_count"],
-            train_instance_type=self.training_resource_config["instance_type"],
+            instance_count=self.training_resource_config["instance_count"],
+            instance_type=self.training_resource_config["instance_type"],
             output_path=output_path,
             sagemaker_session=sagemaker_session,
             **kwargs,
         )
-
+        hyperparameters.update(self.candidate_specific_static_hps)
         estimator.set_hyperparameters(**hyperparameters)
 
         return estimator
+
+    def get_inference_container_config(self):
+        config = {
+            'env': {
+                'SAGEMAKER_DEFAULT_INVOCATIONS_ACCEPT': 'text/csv'
+            },
+            'image_uri': self.algo_inference_image_uri
+        }
+        if self.algo_name == 'mlp':
+            config['env']['ML_APPLICATION'] = 'mlp'
+
+        return config
 
 
 class AutoMLCandidateDataTransformerStep:
@@ -97,9 +106,10 @@ class AutoMLCandidateDataTransformerStep:
         self.source_module_path = source_module_path or self.DEFAULT_SOURCE_MODULE
 
         # We share registry account id with all framework container
-        image_registry = registry(region_name=region, framework="xgboost")
+        xgb_image_uri = image_uris.retrieve("xgboost", region=region, version="1.0-1")
+        last_slash_index = xgb_image_uri.rfind('/')
         self.transformer_image_uri = "{}/{}:{}".format(
-            image_registry, "sagemaker-sklearn-automl", repo_version
+            xgb_image_uri[:last_slash_index], "sagemaker-sklearn-automl", repo_version
         )
 
     @property
@@ -154,10 +164,10 @@ class AutoMLCandidateDataTransformerStep:
         return SKLearn(
             entry_point=self.TRAIN_ENTRY_POINT,
             source_dir=f"{self.source_module_path}/candidate_data_processors",
-            train_instance_type=self.train_instance_type,
-            train_instance_count=self.train_instance_count,
-            train_volume_size=self.train_volume_size_gb,
-            image_name=self.transformer_image_uri,
+            instance_type=self.train_instance_type,
+            instance_count=self.train_instance_count,
+            volume_size=self.train_volume_size_gb,
+            image_uri=self.transformer_image_uri,
             output_path=output_path,
             hyperparameters=_hyperparameters,
             role=role,
@@ -270,7 +280,7 @@ class AutoMLCandidateDataTransformerStep:
             role=role,
             entry_point=f"{self.source_module_path}/{self.SERVE_ENTRY_POINT}",
             env=environment,
-            image=self.transformer_image_uri,
+            image_uri=self.transformer_image_uri,
             sagemaker_session=sagemaker_session,
             **kwargs,
         )

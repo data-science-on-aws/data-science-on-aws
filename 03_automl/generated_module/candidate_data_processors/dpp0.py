@@ -17,6 +17,7 @@ def build_feature_transform():
     """ Returns the model definition representing feature processing."""
 
     # These features can be parsed as natural language.
+
     text = HEADER.as_feature_indices(['review_body'])
 
     text_processors = Pipeline(

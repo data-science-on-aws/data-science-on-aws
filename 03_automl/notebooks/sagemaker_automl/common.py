@@ -10,6 +10,7 @@ import threading
 from time import gmtime, sleep, strftime
 
 from botocore.exceptions import ClientError
+from sagemaker import image_uris
 
 
 def uid():
@@ -145,3 +146,16 @@ def select_inference_output(problem_type, model_containers, output_keys):
     })
 
     return model_containers
+
+
+def get_algo_image_uri(algo_name, region, repo_version):
+    if algo_name == "xgboost":
+        return image_uris.retrieve(algo_name, region=region, version='1.0-1')
+    elif algo_name == "mlp":
+        mlp_image_uri = image_uris.retrieve("linear-learner", region=region, version=repo_version)
+        last_slash_index = mlp_image_uri.rfind('/')
+        return "{}/{}:{}".format(
+            mlp_image_uri[:last_slash_index], "mxnet-algorithms", repo_version
+        )
+    else:
+        return image_uris.retrieve(algo_name, region=region, version=repo_version)

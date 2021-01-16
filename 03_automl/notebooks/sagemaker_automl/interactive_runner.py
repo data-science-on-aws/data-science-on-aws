@@ -227,11 +227,11 @@ class AutoMLInteractiveRunner:
     def prepare_multi_algo_inputs(self):
         return {
             candidate_name: {
-                "train": sagemaker.session.s3_input(
+                "train": sagemaker.session.TrainingInput(
                     candidate.data_transformer_transformed_data_path + "/train",
                     content_type=candidate.content_type,
                 ),
-                "validation": sagemaker.session.s3_input(
+                "validation": sagemaker.session.TrainingInput(
                     candidate.data_transformer_transformed_data_path + "/validation",
                     content_type=candidate.content_type,
                 ),

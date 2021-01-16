@@ -85,6 +85,8 @@ class AutoMLLocalRunConfig:
             "algo_image_repo_versions"
         ]
 
+        self.algo_inference_image_repo_versions = base_automl_job_config["algo_inference_image_repo_versions"]
+
         # The default conventional path to store the output from an local run job on S3.
         self.data_processing_model_s3_root = join(
             self.local_automl_job_output_s3_base_path,

@@ -90,7 +90,8 @@ class AutoMLLocalCandidate:
         algo_step = AutoMLCandidateAlgoStep(
             **candidate_definition["algorithm"],
             region=local_run_config.region,
-            repo_version=local_run_config.algo_image_repo_versions[algo_name]
+            repo_version=local_run_config.algo_image_repo_versions[algo_name],
+            inference_repo_version=local_run_config.algo_inference_image_repo_versions[algo_name]
         )
 
         return AutoMLLocalCandidate(
@@ -132,7 +133,7 @@ class AutoMLLocalCandidate:
 
         kwargs["subnets"] = self.local_run_config.subnets
         kwargs["security_group_ids"] = self.local_run_config.security_group_ids
-        kwargs["train_volume_kms_key"] = self.local_run_config.volume_kms_key
+        kwargs["volume_kms_key"] = self.local_run_config.volume_kms_key
         kwargs["output_kms_key"] = self.local_run_config.output_kms_key
 
         data_transformer_trainer = self.data_transformer_step.create_trainer(
