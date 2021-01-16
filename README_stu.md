@@ -20,7 +20,7 @@ To build our BERT-based NLP model, we use the [Amazon Customer Reviews Dataset](
 
 ## 1. Login to AWS Console
 
-If not, please logout of your AWS Console in all browser tabs and re-run the steps above!
+![IAM](img/alt_iam_1.png)
 
 ## 2. Create `TeamRole` IAM Role
 
