@@ -45,8 +45,6 @@ To build our BERT-based NLP model, we use the [Amazon Customer Reviews Dataset](
 
 ![Select IAM](img/studio_select_iam.png)
 
-![Select Roles](img/studio_select_roles.png)
-
 ![Edit TeamRole](img/studio_edit_teamrole.png)
 
 Click `Attach Policies`.
