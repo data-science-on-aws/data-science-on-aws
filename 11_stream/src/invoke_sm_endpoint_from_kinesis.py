@@ -10,7 +10,7 @@ import json
 JSON_CONTENT_TYPE = 'application/json'
 ENDPOINT_NAME = os.environ['ENDPOINT_NAME']
 print('Endpoint: {}'.format(ENDPOINT_NAME))
-runtime= boto3.client('runtime.sagemaker')
+runtime = boto3.client('runtime.sagemaker')
 
 print('Loading function')
 
@@ -35,14 +35,18 @@ def lambda_handler(event, context):
         print(split_inputs)
         review_body = split_inputs[2]
         print(review_body)
-        
+
+        input_data = {"review_body": review_body}
+                
         response = runtime.invoke_endpoint(
-            EndpointName=ENDPOINT_NAME,
-            # ContentType='text/csv',
-            Body=review_body.encode('utf-8'))
+             EndpointName=ENDPOINT_NAME,
+             ContentType='application/json',    
+             Body=json.dumps(input_data).encode('utf-8')
+        )
         print('response: {}'.format(response))
                                        
         result = json.loads(response['Body'].read().decode())
+        
         print('result: {}'.format(result))
         
         # Built output_record
