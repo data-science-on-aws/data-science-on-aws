@@ -78,15 +78,11 @@ In the AWS Console search bar, type `SageMaker` and select `Amazon SageMaker` to
 
 ![Loading Studio](img/studio_loading.png)
 
-![Terminal Studio](img/studio_terminal.png)
-
-![Start Workshop](img/studio_start_workshop.png)
-
 ## 5. Launch a new Terminal within the Jupyter notebook
 
-Click `File` > `New` > [...scroll down...] `Terminal` to launch a terminal in your Jupyter instance.
+Click `File` > `New` > `Terminal` to launch a terminal in your Jupyter instance.
 
-![](img/launch_jupyter_terminal.png)
+![Terminal Studio](img/studio_terminal.png)
 
 ## 6. Clone this GitHub Repo in the Terminal
 
