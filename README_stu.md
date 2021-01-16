@@ -83,9 +83,7 @@ Click `File` > `New` > `Terminal` to launch a terminal in your Jupyter instance.
 
 ## 6. Clone this GitHub Repo in the Terminal
 
-![](img/clone-workshop-repo.png)
-
-Within the Jupyter terminal, run the following:
+Within the Terminal, run the following:
 
 ```
 cd ~ && git clone https://github.com/data-science-on-aws/workshop
