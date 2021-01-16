@@ -89,6 +89,18 @@ Within the Terminal, run the following:
 cd ~ && git clone https://github.com/data-science-on-aws/workshop
 ```
 
+If you see an error like the following, just re-run the command again until it works:
+```
+fatal: Unable to create '/home/sagemaker-user/workshop/.git/index.lock': File exists.
+
+Another git process seems to be running in this repository, e.g.
+an editor opened by 'git commit'. Please make sure all processes
+are terminated then try again. If it still fails, a git process
+may have crashed in this repository earlier:
+remove the file manually to continue.
+```
+_Note:  This is not a fatal error ^^ above ^^.  Just re-run the command again until it works._
+
 ## 7. Start the Workshop!
 
 Navigate to `01_setup/` in your Jupyter notebook and start the workshop!
