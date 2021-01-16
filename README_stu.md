@@ -24,10 +24,6 @@ Take the defaults and click on **Open AWS Console**. This will open AWS Console 
 
 ![AWS Console](img/alt_aws_console.png)
 
-Double-check that your account name is something like `IibsAdminAccess-DO-NOT-DELETE...` as follows:
-
-![IAM Role](img/alt_iibsadminaccess.png)
-
 If not, please logout of your AWS Console in all browser tabs and re-run the steps above!
 
 ## 2. Create `TeamRole` IAM Role
@@ -46,7 +42,25 @@ If not, please logout of your AWS Console in all browser tabs and re-run the ste
 
 ![Review Name](img/alt_review_name_7.png)
 
-## 3. Launch an Amazon SageMaker Notebook Instance
+## 3. Update IAM Role Policy
+
+![Select IAM](img/studio_select_iam.png)
+
+![Select Roles](img/studio_select_roles.png)
+
+![Edit TeamRole](img/studio_edit_teamrole.png)
+
+Click `Attach Policies`.
+
+![IAM Policy](img/view_policies.png)
+              
+Select `AmazonS3FullAccess` and click on `Attach Policy`.
+
+_Note:  Reminder that you should allow access only to the resources that you need._ 
+
+![Attach Admin Policy](img/alt_attach_policies.png)
+
+## 4. Launch an Amazon SageMaker Notebook Instance
 
 Open the [AWS Management Console](https://console.aws.amazon.com/console/home)
 
@@ -66,33 +80,7 @@ In the AWS Console search bar, type `SageMaker` and select `Amazon SageMaker` to
 
 ![Terminal Studio](img/studio_terminal.png)
 
-![Select Workshop](img/studio_select_workshop.png)
-
 ![Start Workshop](img/studio_start_workshop.png)
-
-## 4. Update IAM Role Policy
-
-![Select IAM](img/studio_select_iam.png)
-
-![Select Roles](img/studio_select_roles.png)
-
-![Edit TeamRole](img/studio_edit_teamrole.png)
-
-Click `Attach Policies`.
-
-![IAM Policy](img/view_policies.png)
-              
-Select `AmazonS3FullAccess` and click on `Attach Policy`.
-
-_Note:  Reminder that you should allow access only to the resources that you need._ 
-
-![Attach Admin Policy](img/alt_attach_policies.png)
-
-## 4. Start the Jupyter notebook
-
-_Note:  Proceed when the status of the notebook instance changes from `Pending` to `InService`._
-
-![Start Jupyter](img/start_jupyter.png)
 
 ## 5. Launch a new Terminal within the Jupyter notebook
 
@@ -110,11 +98,7 @@ Within the Jupyter terminal, run the following:
 cd ~/SageMaker && git clone https://github.com/data-science-on-aws/workshop
 ```
 
-## 7. Navigate Back to Notebook View
-
-![](img/back-to-jupyter-notebook.png)
-
-## 8. Start the Workshop!
+## 7. Start the Workshop!
 Navigate to `01_setup/` in your Jupyter notebook and start the workshop!
 
 _You may need to refresh your browser if you don't see the new `workshop/` directory._
