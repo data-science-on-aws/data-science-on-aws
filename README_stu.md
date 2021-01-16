@@ -18,11 +18,7 @@ To build our BERT-based NLP model, we use the [Amazon Customer Reviews Dataset](
 
 # Workshop Instructions
 
-## 1. Click on AWS Console
-
-Take the defaults and click on **Open AWS Console**. This will open AWS Console in a new browser tab.
-
-![AWS Console](img/alt_aws_console.png)
+## 1. Login to AWS Console
 
 If not, please logout of your AWS Console in all browser tabs and re-run the steps above!
 
