@@ -1400,20 +1400,22 @@ class ExperimentManager():
             succeeded_state = self.experiment_record._joining_state == JoiningState.SUCCEEDED \
                               and self.experiment_record._last_joined_job_id == next_join_job_id \
                               and self.experiment_record._next_join_job_id is None
-            num_retries = 0
+            num_retries = 0        
+            max_retries = 1000
             
             while not succeeded_state:
                 # Sync experiment state if required
                 self._sync_experiment_state_with_ddb()
                 logger.debug("Waiting for experiment table joining status to be updated...")
-                time.sleep(2 * (2**num_retries))
+                time.sleep(5 * 2**num_retries)
                 succeeded_state = self.experiment_record._joining_state == JoiningState.SUCCEEDED \
                                   and self.experiment_record._last_joined_job_id == next_join_job_id \
                                   and self.experiment_record._next_join_job_id is None
                 num_retries += 1
-                if num_retries >=5:
+                if num_retries > max_retries:
                     raise UnhandledWorkflowException(f"Joining job '{self.experiment_record._next_join_job_id}' "
                     f"was in state of '{self.experiment_record._joining_state}'. Failed to sync table states.")
+
                 if self.experiment_record._joining_state == JoiningState.FAILED or \
                     self.experiment_record._joining_state == JoiningState.CANCELLED:
                     raise WorkflowJoiningJobException(f"Joining job '{self.experiment_record._next_join_job_id}' "
@@ -1490,6 +1492,7 @@ class ExperimentManager():
             trained_state = self.experiment_record._training_state == TrainingState.TRAINED \
                             and self.experiment_record._last_trained_model_id == next_model_to_train_id \
                             and self.experiment_record._next_model_to_train_id is None
+
             num_retries = 0
             
             while not trained_state:

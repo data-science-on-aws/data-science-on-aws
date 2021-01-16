@@ -414,14 +414,18 @@ class ModelManager():
     
         # Else, try and fetch updated SageMaker TrainingJob status
         sm_job_info = {}
-        for i in range(3):
+        
+        max_describe_retries = 100 
+        sleep_between_describe_retries = 10
+        
+        for i in range(max_describe_retries):
             try:
                 sm_job_info = self.sagemaker_client.describe_training_job(
                     TrainingJobName=self.model_id)
             except Exception as e:
                 if "ValidationException" in str(e):
-                    if i >= 2:
-                        # 3rd attempt for DescribeTrainingJob failed with ValidationException
+                    if i > max_describe_retries:
+                        # max attempts for DescribeTrainingJob.  Fail with ValidationException
                         logger.warn(f"Looks like SageMaker Job was not submitted successfully."
                                     f" Failing Training Job with ModelId {self.model_id}"
                         )
@@ -429,7 +433,7 @@ class ModelManager():
                         self.model_db_client.update_model_as_failed(self._jsonify())
                         return
                     else: 
-                        time.sleep(5)
+                        time.sleep(sleep_between_describe_retries)
                         continue
                 else:
                     # Do not raise exception, most probably throttling. 
@@ -437,7 +441,7 @@ class ModelManager():
                                 " This exception will be ignored, and retried."
                     )
                     logger.debug(e)
-                    time.sleep(2)
+                    time.sleep(sleep_between_describe_retries)
                     return self._jsonify()
 
         train_state = sm_job_info.get('TrainingJobStatus', "Pending")
@@ -449,7 +453,6 @@ class ModelManager():
         if training_end_time is not None:
             training_end_time =  training_end_time.strftime("%Y-%m-%d %H:%M:%S")
         
-
         model_artifacts = sm_job_info.get('ModelArtifacts', None)
         if model_artifacts is not None:
             s3_model_output_path = model_artifacts.get("S3ModelArtifacts", None)
@@ -485,13 +488,18 @@ class ModelManager():
     
         # Try and fetch updated SageMaker Training Job Status
         sm_eval_job_info = {}
-        for i in range(3):
+        
+        max_describe_retries = 100 
+        sleep_between_describe_retries = 10
+
+        for i in range(max_describe_retries):
             try:
                 sm_eval_job_info = self.sagemaker_client.describe_training_job(
                     TrainingJobName=self.model_record._evaluation_job_name)
             except Exception as e:
                 if "ValidationException" in str(e):
-                    if i >= 2:
+                    print(e)
+                    if i > max_describe_retries:
                         # 3rd attempt for DescribeTrainingJob with validation failure
                         logger.warn("Looks like SageMaker Job was not submitted successfully."
                                     f" Failing EvaluationJob {self.model_record._evaluation_job_name}"
@@ -500,7 +508,7 @@ class ModelManager():
                         self.model_db_client.update_model_eval_as_failed(self._jsonify())
                         return
                     else: 
-                        time.sleep(5)
+                        time.sleep(sleep_between_describe_retries)
                         continue
                 else:
                     # Do not raise exception, most probably throttling. 
@@ -508,7 +516,7 @@ class ModelManager():
                                 f" {self.model_record._evaluation_job_name}. This exception will be ignored,"
                                 " and retried."
                     )
-                    time.sleep(2)
+                    time.sleep(sleep_between_describe_retries)
                     return self._jsonify()
         
 
