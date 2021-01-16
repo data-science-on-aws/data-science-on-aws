@@ -54,27 +54,15 @@ print('caller_identity: {}'.format(caller_identity))
 assumed_role = caller_identity['Arn']
 print('(assumed_role) caller_identity_arn: {}'.format(assumed_role))
 
-if "TeamRole" in assumed_role: # TeamRole is specific to our workshop and is not a service-role
+if ("TeamRole" in assumed_role or "SageMakerExecutionRole" in assumed_role) and "service-role" not in assumed_role: 
+    # TeamRole is specific to our workshop and is not a service-role
+    # Differentiating /AmazonSageMakerExecutionRole (Chris' Notebook) from /SageMakerExecutionRole (Event Engine Notebook)
     role = re.sub(r"^(.+)sts::(\d+):assumed-role/(.+?)/.*$", r"\1iam::\2:role/\3", assumed_role)
-    print('[TeamRole] Replacing :assumed-role/ to :role/') 
+    print('[TeamRole] Replacing :assumed-role/ to :role/ which results in this:  {}'.format(role))
 else:
     role = re.sub(r"^(.+)sts::(\d+):assumed-role/(.+?)/.*$", r"\1iam::\2:role/service-role/\3", assumed_role)
-    print('Replacing :assumed-role/ with :role/service-role/')
+    print('Replacing :assumed-role/ with :role/service-role/ which results in this:  {}'.format(role))
 
-
-# # Derived and inspired by these since sagemaker.get_execution_role() doesn't work properly in our case:
-# #     https://github.com/aws/sagemaker-python-sdk/blob/1fdefe06068e5eaf9f63287737d55db96ecc12cf/src/sagemaker/session.py#L3509
-# #     https://github.com/aws/sagemaker-python-sdk/issues/300    
-# role = re.sub(r"^(.+)sts::(\d+):assumed-role/(.+?)/.*$", r"\1iam::\2:role/service-role/\3", assumed_role)
-# print('caller_identity (assume_role) with :role/service-role/ instead of :role/ {}'.format(role))
-
-# try:
-#     role = sagemaker.get_execution_role()
-#     print('found role from sagemaker.get_execution_role: {}'.format(role))
-# except Exception as e:
-#     print(f"Exception: {e}")    
-# role = role.replace(':role/', ':role/service-role/')
-# print('replaced to use :role/service-role/ instead of :role/ -- {}'.format(role))
 
 bucket = sagemaker.Session().default_bucket()
 print('The DEFAULT BUCKET is {}'.format(bucket))
@@ -178,22 +166,8 @@ def create_or_load_feature_group(prefix, feature_group_name):
         
     except Exception as e:
         print('Exception: {}'.format(e))
-#        pass
-
-#         print('FAILED - NOW Creating Feature Group with service-role {}...'.format('arn:aws:iam::231218423789:role/service-role/AmazonSageMakerServiceCatalogProductsUseRole'))
-#         feature_group.create(
-#             s3_uri=f"s3://{bucket}/{prefix}",
-#             record_identifier_name=record_identifier_feature_name,
-#             event_time_feature_name=event_time_feature_name,
-#             role_arn='arn:aws:iam::231218423789:role/service-role/AmazonSageMakerServiceCatalogProductsUseRole',
-#             enable_online_store=True
-#         )
-#         print('Creating Feature Group. Completed.')
-        
-#    feature_group.describe()        
         
     return feature_group
-
 
     
 class InputFeatures(object):
