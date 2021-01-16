@@ -15,6 +15,10 @@ To build our BERT-based NLP model, we use the [Amazon Customer Reviews Dataset](
 # Workshop Agenda
 ![Workshop Agenda](img/outline.png)
 
+# Workshop Contributors
+
+![Workshop Contributors](img/primary-contributors.png)
+
 # Workshop Instructions
 
 ## 1. Login to AWS Console
