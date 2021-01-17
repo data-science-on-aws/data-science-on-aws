@@ -23,6 +23,7 @@ from pipelines._utils import get_pipeline_driver, convert_struct
 import smexperiments
 from smexperiments.experiment import Experiment
 from smexperiments.trial import Trial
+from smexperiments import tracker
 
 import boto3
 sm = boto3.Session().client(service_name='sagemaker')
@@ -127,7 +128,35 @@ def main():  # pragma: no cover
 
         trial_name = trial.trial_name
         print('Trial name: {}'.format(trial_name))
-     
+        
+        ######################################################
+        ## Parse Pipeline Definition For Processing Job Args
+        ######################################################
+        
+        processing_param_dict = {}
+        
+        for step in parsed['Steps']:
+            print('step: {}'.format(step))
+            if step['Name']=='Processing':
+                print('Step Name is Processing...')
+                arg_list = step['Arguments']['AppSpecification']['ContainerArguments']
+                print(arg_list)
+                num_args = len(arg_list)
+                print(num_args)
+        
+                # arguments are (key, value) pairs in this list, so we extract them in pairs 
+                # using [i] and [i+1] indexes and stepping by 2 through the list
+                for i in range(0, num_args, 2):
+                    key = arg_list[i].replace('--', '')
+                    value = arg_list[i+1]
+                    print('arg key: {}'.format(key))
+                    print('arg value: {}'.format(value))
+                    processing_param_dict[key] = value
+        
+
+        ##############################
+        ## Wait For Execution To Finish
+        ##############################
         
         print("Waiting for the execution to finish...")
         execution.wait()
@@ -149,13 +178,13 @@ def main():  # pragma: no cover
             if execution_step['StepName'] == 'Processing':
                 processing_job_name=execution_step['Metadata']['ProcessingJob']['Arn'].split('/')[-1]
                 print(processing_job_name)
-                # display(viz.show(processing_job_name=processing_job_name))
+                #display(viz.show(processing_job_name=processing_job_name))
             elif execution_step['StepName'] == 'Train':
                 training_job_name=execution_step['Metadata']['TrainingJob']['Arn'].split('/')[-1]
                 print(training_job_name)
-                # display(viz.show(training_job_name=training_job_name))
+                #display(viz.show(training_job_name=training_job_name))
             else:
-                # display(viz.show(pipeline_execution_step=execution_step))
+                #display(viz.show(pipeline_execution_step=execution_step))
                 time.sleep(5)
 
         # Add Trial Compontents To Experiment Trial        
@@ -175,33 +204,21 @@ def main():  # pragma: no cover
         response = sm.associate_trial_component(
             TrialComponentName=training_job_tc,
             TrialName=trial_name
-        )     
-        
+        )
+              
         ##############
-        # TODO: Inspect all of the kwargs and update the processing_job_tracker accordingly (more than nust balance_dataset, i believe)
+        # Log Additional Parameters within Trial
         ##############
-        ## Log Additional Parameters within Trial
-#         from smexperiments import tracker
-#         processing_job_tracker = tracker.Tracker.load(trial_component_name=processing_job_tc)        
-#         processing_job_tracker.log_parameters({
-#             "balance_dataset": str(balance_dataset), 
-#             ...
-#         })
-
-#         # must save after logging
-#         processing_job_tracker.trial_component.save()
+        print('Logging Processing Job Parameters within Experiment Trial...')
+        processing_job_tracker = tracker.Tracker.load(trial_component_name=processing_job_tc) 
         
-#         import pandas as pd
-#         pd.set_option("max_colwidth", 500)
-#         #pd.set_option("max_rows", 100)
-
-#         from sagemaker.analytics import ExperimentAnalytics
-#         experiment_analytics = ExperimentAnalytics(
-#             experiment_name=experiment.experiment_name,
-#         )
-#         experiment_analytics_df = experiment_analytics.dataframe()
-#         print(experiment_analytics_df) 
-        
+        for key, value in processing_param_dict.items():
+            print('key: {}, value: {}'.format(key, value))
+            processing_job_tracker.log_parameters({
+                key: str(value)
+            })
+            # must save after logging
+            processing_job_tracker.trial_component.save();
 
     except Exception as e:  # pylint: disable=W0703
         print(f"Exception: {e}")
