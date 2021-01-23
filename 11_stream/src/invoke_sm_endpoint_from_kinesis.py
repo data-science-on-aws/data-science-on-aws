@@ -15,7 +15,7 @@ runtime = boto3.client('runtime.sagemaker')
 print('Loading function')
 
 def lambda_handler(event, context):
-    output = []
+    outputs = []
     
     r = event['records']
     print('records: {}'.format(r))
@@ -36,34 +36,60 @@ def lambda_handler(event, context):
         review_body = split_inputs[2]
         print(review_body)
 
-        input_data = {"review_body": review_body}
-                
+        input_data = [{"review_body": review_body}]
+
+        
+        #############            
+        # TODO:  Test this.  
+        # Note:  I changed to jsonlines and added AcceptType
+        #############            
+        
         response = runtime.invoke_endpoint(
              EndpointName=ENDPOINT_NAME,
-             ContentType='application/json',    
+             ContentType='application/jsonlines',    
+             AcceptType='application/jsonlines',    
              Body=json.dumps(input_data).encode('utf-8')
         )
         print('response: {}'.format(response))
-                                       
-        result = json.loads(response['Body'].read().decode())
-        
-        print('result: {}'.format(result))
-        
-        # Built output_record
-        # review_id, star_rating, product_category, review_body
-        output_data = '{}\t{}\t{}\t{}'.format(split_inputs[0], str(result), split_inputs[1], review_body)
-        print('output_data: {}'.format(output_data))
-        output_data_encoded = output_data.encode('utf-8')
 
-        output_record = {
-            'recordId': record['recordId'],
-            'result': 'Ok',
-            'data': base64.b64encode(output_data_encoded).decode('utf-8')
-        }
-        output.append(output_record)
+        predicted_classes_str = response['Body'].read().decode()
+        print('response_str: {}'.format(predicted_classes_str))
+        
+        # TODO:  Handle multiple jsonlines
+#         result_json = json.loads(response_str)
+#         print('result_json: {}'.format(result_json))
+
+#         # Handle "predicted_label"
+#         result = result_json["predicted_label"]
+#         print('result: {}'.format(result))
+
+
+        #############
+        # TODO:  Test with multiple jsonlines.
+        # Note:  I am appending multiple `output_record` to output
+        #############
+                
+        predicted_classes = predicted_classes_str.splitlines()
+
+        for predicted_class_json, input_data in zip(predicted_classes, inputs):
+            predicted_class = json.loads(predicted_class_json)['predicted_label']
+            print('Predicted star_rating: {} for review_body "{}"'.format(predicted_class, input_data["review_body"]))
+
+            # Built output_record
+            # review_id, star_rating, product_category, review_body
+            output_data = '{}\t{}\t{}\t{}'.format(split_inputs[0], str(predicted_class), split_inputs[1], review_body)
+            print('output_data: {}'.format(output_data))
+            output_data_encoded = output_data.encode('utf-8')
+
+            output_record = {
+                'recordId': record['recordId'],
+                'result': 'Ok',
+                'data': base64.b64encode(output_data_encoded).decode('utf-8')
+            }
+            outputs.append(output_record)
 
     print('Successfully processed {} records.'.format(len(event['records'])))
-    print('type(output): {}'.format(type(output)))
-    print('Output Length: {} .'.format(len(output)))
+    print('type(output): {}'.format(type(outputs)))
+    print('Output Length: {} .'.format(len(outputs)))
 
     return {'records': output}

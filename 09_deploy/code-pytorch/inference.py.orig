@@ -1,3 +1,4 @@
+eiifccrchtulnlfbdiejcubckfcclvjifjuhrlnvufru
 import json
 import sys
 import logging
@@ -13,17 +14,28 @@ logger.addHandler(logging.StreamHandler(sys.stdout))
 ###################################
 ### VARIABLES 
 ###################################
-max_seq_length = 64
 
-classes = [1, 2, 3, 4, 5]
+# Needs to be called 'model.pth' as per 
+# https://github.com/aws/sagemaker-pytorch-inference-toolkit/blob/6936c08581e26ff3bac26824b1e4946ec68ffc85/src/sagemaker_pytorch_serving_container/torchserve.py#L45
+MODEL_NAME = 'model.pth'
+
+PRE_TRAINED_MODEL_NAME = 'distilbert-base-uncased'
+MAX_SEQ_LEN = 64
+
+JSON_CONTENT_TYPE = 'application/json'
+
+DATA_COLUMN = 'review_body'
+LABEL_COLUMN = 'star_rating'
+LABEL_VALUES = [0, 1, 2, 3, 4]
+CLASS_NAMES = ['1', '2', '3', '4', '5']
 
 #LABEL_MAP = {-1:0, 0:1, 1:2}
-# LABEL_MAP = {}
-# for (i, label) in enumerate(LABEL_VALUES):
-#     LABEL_MAP[label] = i
+LABEL_MAP = {}
+for (i, label) in enumerate(LABEL_VALUES):
+    LABEL_MAP[label] = i
 
 # Load Hugging Face Tokenizer
-tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')  
+TOKENIZER = DistilBertTokenizer.from_pretrained(PRE_TRAINED_MODEL_NAME)  
 
 
 ###################################
@@ -32,10 +44,8 @@ tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
 
 # You need to put in config.json from saved fine-tuned Hugging Face model in code/ 
 # Reference it in the inference container at /opt/ml/model/code
-# The model needs to be called 'model.pth' per https://github.com/aws/sagemaker-pytorch-inference-toolkit/blob/6936c08581e26ff3bac26824b1e4946ec68ffc85/src/sagemaker_pytorch_serving_container/torchserve.py#L45
-
 def model_fn(model_dir):
-    model_path = '{}/{}'.format(model_dir, 'model.pth') 
+    model_path = '{}/{}'.format(model_dir, MODEL_NAME) 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     config = DistilBertConfig.from_json_file('/opt/ml/model/code/config.json')
     model = DistilBertForSequenceClassification.from_pretrained(model_path, config=config)
@@ -49,24 +59,17 @@ def model_fn(model_dir):
 def predict_fn(input_data, model):
     model.eval()
 
-    print('input_data: {}'.format(input_data))
-    print('type(input_data): {}'.format(type(input_data)))
+    print(input_data)
 
-    data_json = json.loads(input_data)
-    print('data_json: {}'.format(data_json))
-
+    inputs = input_data['inputs']
+    print(inputs)
+  
     predicted_classes = []
 
-    for data_json_line in data_json:
-        print('data_json_line: {}'.format(data_json_line))
-        print('type(data_json_line): {}'.format(type(data_json_line)))
-
-        input_data = data_json_line['review_body']
-        print("""review_body: {}""".format(review_body))
-
-        encode_plus_token = tokenizer.encode_plus(
-            data_json_line,
-            max_length=max_seq_length,
+    for instance in inputs:
+        encoded_review = TOKENIZER.encode_plus(
+            review_text,
+            max_length=MAX_SEQ_LEN,
             add_special_tokens=True,
             return_token_type_ids=False,
             pad_to_max_length=True,
@@ -74,30 +77,26 @@ def predict_fn(input_data, model):
             return_tensors='pt',
             truncation=True)
 
-        input_ids = encode_plus_token['input_ids']
-        attention_mask = encode_plus_token['attention_mask']
+        input_ids = encoded_review['input_ids']
+        attention_mask = encoded_review['attention_mask']
 
         output = model(input_ids, attention_mask)
-        print('output: {}'.format(output))
 
         # output is a tuple: 
         # output: (tensor([[-1.9840, -0.9870,  2.8947]], grad_fn=<AddmmBackward>),
         # for torch.max() you need to pass in the tensor, output[0]   
         _, prediction = torch.max(output[0], dim=1)
 
-        predicted_class_idx = prediction.item()
-        predicted_class = classes[predicted_class_idx]
-        print('predicted_class: {}'.format(predicted_class))
-
+        pred_idx = prediction.item()
+        predicted_class = CLASS_NAMES[pred_idx]
+    
         prediction_dict = {}
         prediction_dict['predicted_label'] = predicted_class
         
         jsonline = json.dumps(prediction_dict)
-        print('jsonline: {}'.format(jsonline))
-
-        predicted_classes.append(jsonline)
-        print('predicted_classes in the loop: {}'.format(predicted_classes))
         
+        predicted_classes.append(jsonline)
+
     predicted_classes_jsonlines = '\n'.join(predicted_classes)    
     print('predicted_classes_jsonlines: {}'.format(predicted_classes_jsonlines))
     
@@ -108,19 +107,18 @@ def predict_fn(input_data, model):
 ### SAGEMKAER MODEL INPUT FUNCTION 
 ################################### 
 
-def input_fn(serialized_input_data, content_type='application/json'):  
-    if content_type == 'application/json':
-        #data = json.loads(serialized_input_data)
+def input_fn(serialized_input_data, content_type=JSON_CONTENT_TYPE):  
+    if content_type == JSON_CONTENT_TYPE:
+        data = json.loads(serialized_input_data)
         return data
-#    else:
-#        pass
-    raise Exception('Requested unsupported ContentType: ' + content_type)
+    else:
+        pass
 
 ###################################
 ### SAGEMKAER MODEL OUTPUT FUNCTION 
 ################################### 
 
-def output_fn(prediction_output, accept='application/json'):
-    if accept == 'application/json':
+def output_fn(prediction_output, accept=JSON_CONTENT_TYPE):
+    if accept == JSON_CONTENT_TYPE:
         return prediction_output, accept
     raise Exception('Requested unsupported ContentType in Accept: ' + accept)
