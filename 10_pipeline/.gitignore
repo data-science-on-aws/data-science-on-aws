@@ -10,4 +10,4 @@ policy.json
 #transformers/
 __pycache__/
 content/
-data/
+#data/
