@@ -377,11 +377,12 @@ class ExperimentManagerSyncThread(Thread):
 
                     model_id = ""
                     num_retries = 0
+                    max_retries = 100
                     while model_id != next_model_to_host_id:
                         predictor = self.experiment_manager.predictor
                         model_id = predictor.get_hosted_model_id()
                         num_retries += 1
-                        if (not self.experiment_manager.local_mode) or (num_retries >= 5):
+                        if (not self.experiment_manager.local_mode) or (num_retries >= max_retries):
                             break
                         time.sleep(1)
 
@@ -1186,7 +1187,7 @@ class ExperimentManager():
             
             num_retries = 0
             num_retries_blue_green_deployment = 0
-            
+            max_retries = 100
             while not deployed_state:
                 # Sync experiment state if required
                 # local mode is fast, 'num_retries' increases exponentially
@@ -1194,12 +1195,12 @@ class ExperimentManager():
                 logger.debug("Waiting for experiment table hosting status to be updated...")
                                 
                 if self.soft_deployment:
-                    time.sleep(2 * (2**num_retries))
+                    time.sleep(10 * max_retries)
                     deployed_state = self.experiment_record._hosting_state == HostingState.DEPLOYED \
                                     and self.experiment_record._last_hosted_model_id == model_id \
                                     and self.experiment_record._next_model_to_host_id is None
                     num_retries += 1
-                    if num_retries >=5 and self.local_mode: 
+                    if num_retries >= max_retries and self.local_mode: 
                         raise UnhandledWorkflowException(f"Deployment with model "
                         f"'{self.experiment_record._next_model_to_host_id}' was in "
                         f"state of '{self.experiment_record._hosting_state}'. Failed "
@@ -1319,17 +1320,17 @@ class ExperimentManager():
                             and self.experiment_record._last_joined_job_id == next_join_job_id \
                             and self.experiment_record._next_join_job_id is None
         num_retries = 0
-        
+        max_retries = 100
         while not succeeded_state:
             # Sync experiment state if required
             self._sync_experiment_state_with_ddb()
             logger.debug("Waiting for experiment table joining status to be updated...")
-            time.sleep(2 * (2**num_retries))
+            time.sleep(10 * max_retries)
             succeeded_state = self.experiment_record._joining_state == JoiningState.SUCCEEDED \
                                 and self.experiment_record._last_joined_job_id == next_join_job_id \
                                 and self.experiment_record._next_join_job_id is None
             num_retries += 1
-            if num_retries >=5:
+            if num_retries >= max_retries:
                 raise UnhandledWorkflowException(f"Joining job '{self.experiment_record._next_join_job_id}' "
                 f"was in state of '{self.experiment_record._joining_state}'. Failed to sync table states.")
             if self.experiment_record._joining_state == JoiningState.FAILED or \
@@ -1401,13 +1402,13 @@ class ExperimentManager():
                               and self.experiment_record._last_joined_job_id == next_join_job_id \
                               and self.experiment_record._next_join_job_id is None
             num_retries = 0        
-            max_retries = 1000
+            max_retries = 100
             
             while not succeeded_state:
                 # Sync experiment state if required
                 self._sync_experiment_state_with_ddb()
                 logger.debug("Waiting for experiment table joining status to be updated...")
-                time.sleep(5 * 2**num_retries)
+                time.sleep(10 * num_retries)
                 succeeded_state = self.experiment_record._joining_state == JoiningState.SUCCEEDED \
                                   and self.experiment_record._last_joined_job_id == next_join_job_id \
                                   and self.experiment_record._next_join_job_id is None
@@ -1494,17 +1495,18 @@ class ExperimentManager():
                             and self.experiment_record._next_model_to_train_id is None
 
             num_retries = 0
+            max_retries = 100
             
             while not trained_state:
                 # Sync experiment state if required
                 self._sync_experiment_state_with_ddb()
                 logger.debug("Waiting for experiment table training status to be updated...")
-                time.sleep(2 * (2**num_retries))
+                time.sleep(10 * num_retries)
                 trained_state = self.experiment_record._training_state == TrainingState.TRAINED \
                                 and self.experiment_record._last_trained_model_id == next_model_to_train_id \
                                 and self.experiment_record._next_model_to_train_id is None
                 num_retries += 1
-                if num_retries >=5:
+                if num_retries >= max_retries:
                     raise UnhandledWorkflowException(f"Training job '{self.experiment_record._next_model_to_train_id}' "
                     f"was in state of '{self.experiment_record._training_state}'. Expected it to be TRAINED.")
                 if self.experiment_record._training_state == TrainingState.FAILED \
@@ -1591,17 +1593,17 @@ class ExperimentManager():
                             and self.experiment_record._last_trained_model_id == next_model_to_train_id \
                             and self.experiment_record._next_model_to_train_id is None
             num_retries = 0
-            
+            max_retries = 100
             while not trained_state:
                 # Sync experiment state if required
                 self._sync_experiment_state_with_ddb()
                 logger.debug("Waiting for experiment table training status to be updated...")
-                time.sleep(2 * (2**num_retries))
+                time.sleep(10 * num_retries)
                 trained_state = self.experiment_record._training_state == TrainingState.TRAINED \
                                 and self.experiment_record._last_trained_model_id == next_model_to_train_id \
                                 and self.experiment_record._next_model_to_train_id is None
                 num_retries += 1
-                if num_retries >=5:
+                if num_retries >= max_retries:
                     raise UnhandledWorkflowException(f"Training job '{self.experiment_record._next_model_to_train_id}' "
                     f"was in state of '{self.experiment_record._training_state}'. Expected it to be TRAINED.")
                 if self.experiment_record._training_state == TrainingState.FAILED \
@@ -1706,17 +1708,17 @@ class ExperimentManager():
                               and self.experiment_record._next_evaluation_job_id is None
 
             num_retries = 0
-            
+            max_retries = 100                           
             while not evaluated_state:
                 # Sync experiment state if required
                 self._sync_experiment_state_with_ddb()
                 logger.debug("Waiting for experiment table evaluation status to be updated...")
-                time.sleep(2 * (2**num_retries))
+                time.sleep(10 * num_retries)
                 evaluated_state = self.experiment_record._evaluation_state == EvaluationState.EVALUATED \
                                   and self.experiment_record._last_evaluation_job_id == next_evaluation_job_id \
                                   and self.experiment_record._next_evaluation_job_id is None
                 num_retries += 1
-                if num_retries >=5:
+                if num_retries >= max_retries:
                     raise UnhandledWorkflowException(f"Evaluation job '{self.experiment_record._next_evaluation_job_id}' "
                     f"was in state of '{self.experiment_record._evaluation_state}'. Failed to sync table states.")
                 if self.experiment_record._evaluation_state == EvaluationState.FAILED \

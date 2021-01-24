@@ -35,12 +35,16 @@ tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
 # The model needs to be called 'model.pth' per https://github.com/aws/sagemaker-pytorch-inference-toolkit/blob/6936c08581e26ff3bac26824b1e4946ec68ffc85/src/sagemaker_pytorch_serving_container/torchserve.py#L45
 
 def model_fn(model_dir):
-    model_path = '{}/{}'.format(model_dir, 'model.pth') 
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     config = DistilBertConfig.from_json_file('/opt/ml/model/code/config.json')
+    
+    model_path = '{}/{}'.format(model_dir, 'model.pth') 
     model = DistilBertForSequenceClassification.from_pretrained(model_path, config=config)
+
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model.to(device)
+    
     return model
+
 
 ###################################
 ### SAGEMKAER PREDICT FUNCTION 
@@ -50,7 +54,6 @@ def predict_fn(input_data, model):
     model.eval()
 
     print('input_data: {}'.format(input_data))
-    print('type(input_data): {}'.format(type(input_data)))
 
     data_json = json.loads(input_data)
     print('data_json: {}'.format(data_json))
@@ -61,11 +64,11 @@ def predict_fn(input_data, model):
         print('data_json_line: {}'.format(data_json_line))
         print('type(data_json_line): {}'.format(type(data_json_line)))
 
-        input_data = data_json_line['review_body']
+        review_body = data_json_line['review_body']
         print("""review_body: {}""".format(review_body))
 
         encode_plus_token = tokenizer.encode_plus(
-            data_json_line,
+            review_body,
             max_length=max_seq_length,
             add_special_tokens=True,
             return_token_type_ids=False,
@@ -91,36 +94,38 @@ def predict_fn(input_data, model):
 
         prediction_dict = {}
         prediction_dict['predicted_label'] = predicted_class
-        
+
         jsonline = json.dumps(prediction_dict)
         print('jsonline: {}'.format(jsonline))
 
         predicted_classes.append(jsonline)
         print('predicted_classes in the loop: {}'.format(predicted_classes))
-        
-    predicted_classes_jsonlines = '\n'.join(predicted_classes)    
+
+    predicted_classes_jsonlines = '\n'.join(predicted_classes)
     print('predicted_classes_jsonlines: {}'.format(predicted_classes_jsonlines))
-    
-    return predicted_classes_jsonlines
+    print('type(predicted_classes_jsonlines): {}'.format(type(predicted_classes_jsonlines)))
+
+    predicted_classes_jsonlines_dump = json.dumps(predicted_classes_jsonlines)
+    print('predicted_classes_jsonlines_dump: {}'.format(predicted_classes_jsonlines_dump))
+    print('type(predicted_classes_jsonlines_dump): {}'.format(type(predicted_classes_jsonlines_dump)))
+
+    return predicted_classes_jsonlines_dump
 
 
 ###################################
 ### SAGEMKAER MODEL INPUT FUNCTION 
 ################################### 
 
-def input_fn(serialized_input_data, content_type='application/json'):  
-    if content_type == 'application/json':
-        #data = json.loads(serialized_input_data)
-        return data
-#    else:
-#        pass
-    raise Exception('Requested unsupported ContentType: ' + content_type)
+def input_fn(serialized_input_data, content_type='application/jsonlines'):  
+#    if content_type == 'application/jsonlines':
+    return serialized_input_data
+#    raise Exception('Requested unsupported ContentType: ' + content_type)
 
 ###################################
 ### SAGEMKAER MODEL OUTPUT FUNCTION 
 ################################### 
 
-def output_fn(prediction_output, accept='application/json'):
-    if accept == 'application/json':
-        return prediction_output, accept
-    raise Exception('Requested unsupported ContentType in Accept: ' + accept)
+def output_fn(prediction_output, accept='application/jsonlines'):
+#    if accept == 'application/jsonlines':
+    return prediction_output, accept
+#    raise Exception('Requested unsupported ContentType in Accept: ' + accept)

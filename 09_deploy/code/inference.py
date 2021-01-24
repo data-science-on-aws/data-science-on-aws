@@ -92,9 +92,12 @@ def output_handler(response, context):
     
     predicted_classes_jsonlines = '\n'.join(predicted_classes)
     print('predicted_classes_jsonlines: {}'.format(predicted_classes_jsonlines))
+    print('type(predicted_classes_jsonlines): {}'.format(type(predicted_classes_jsonlines)))
 
-    response_content_type = context.accept_header
-    
     predicted_classes_jsonlines_dump = json.dumps(predicted_classes_jsonlines)
+    print('predicted_classes_jsonlines_dump: {}'.format(predicted_classes_jsonlines_dump))
+    print('type(predicted_classes_jsonlines_dump): {}'.format(type(predicted_classes_jsonlines_dump)))
     
+    response_content_type = context.accept_header
+
     return predicted_classes_jsonlines_dump, response_content_type

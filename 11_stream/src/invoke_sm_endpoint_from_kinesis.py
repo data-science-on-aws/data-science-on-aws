@@ -36,39 +36,18 @@ def lambda_handler(event, context):
         review_body = split_inputs[2]
         print(review_body)
 
-        input_data = [{"review_body": review_body}]
-
-        
-        #############            
-        # TODO:  Test this.  
-        # Note:  I changed to jsonlines and added AcceptType
-        #############            
-        
+        inputs = [{"review_body": review_body}]
         response = runtime.invoke_endpoint(
              EndpointName=ENDPOINT_NAME,
              ContentType='application/jsonlines',    
              AcceptType='application/jsonlines',    
-             Body=json.dumps(input_data).encode('utf-8')
+             Body=json.dumps(inputs).encode('utf-8')
         )
         print('response: {}'.format(response))
 
         predicted_classes_str = response['Body'].read().decode()
         print('response_str: {}'.format(predicted_classes_str))
         
-        # TODO:  Handle multiple jsonlines
-#         result_json = json.loads(response_str)
-#         print('result_json: {}'.format(result_json))
-
-#         # Handle "predicted_label"
-#         result = result_json["predicted_label"]
-#         print('result: {}'.format(result))
-
-
-        #############
-        # TODO:  Test with multiple jsonlines.
-        # Note:  I am appending multiple `output_record` to output
-        #############
-                
         predicted_classes = predicted_classes_str.splitlines()
 
         for predicted_class_json, input_data in zip(predicted_classes, inputs):
@@ -77,7 +56,7 @@ def lambda_handler(event, context):
 
             # Built output_record
             # review_id, star_rating, product_category, review_body
-            output_data = '{}\t{}\t{}\t{}'.format(split_inputs[0], str(predicted_class), split_inputs[1], review_body)
+            output_data = '{}\t{}\t{}\t{}'.format(split_inputs[0], str(predicted_class), split_inputs[1], input_data["review_body"])
             print('output_data: {}'.format(output_data))
             output_data_encoded = output_data.encode('utf-8')
 
