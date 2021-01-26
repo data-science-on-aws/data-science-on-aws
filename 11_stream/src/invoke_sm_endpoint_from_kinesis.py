@@ -40,19 +40,21 @@ def lambda_handler(event, context):
         response = runtime.invoke_endpoint(
              EndpointName=ENDPOINT_NAME,
              ContentType='application/jsonlines',    
-             AcceptType='application/jsonlines',    
+             Accept='application/jsonlines',    
              Body=json.dumps(inputs).encode('utf-8')
         )
         print('response: {}'.format(response))
 
         predicted_classes_str = response['Body'].read().decode()
-        print('response_str: {}'.format(predicted_classes_str))
-        
-        predicted_classes = predicted_classes_str.splitlines()
+        predicted_classes_json = json.loads(predicted_classes_str)
+
+        predicted_classes = predicted_classes_json.splitlines()
+        print('predicted_classes: {}'.format(predicted_classes))
 
         for predicted_class_json, input_data in zip(predicted_classes, inputs):
             predicted_class = json.loads(predicted_class_json)['predicted_label']
-            print('Predicted star_rating: {} for review_body "{}"'.format(predicted_class, input_data["review_body"]))
+            print('Predicted star_rating: {} for review_body "{}"'.format(predicted_class, 
+                                                                          input_data["review_body"]))    
 
             # Built output_record
             # review_id, star_rating, product_category, review_body
@@ -71,4 +73,4 @@ def lambda_handler(event, context):
     print('type(output): {}'.format(type(outputs)))
     print('Output Length: {} .'.format(len(outputs)))
 
-    return {'records': output}
+    return {'records': outputs}
