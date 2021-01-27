@@ -5,7 +5,6 @@ import torch
 from torch import nn
 from transformers import DistilBertModel, DistilBertTokenizer, DistilBertForSequenceClassification, DistilBertConfig
 
-
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 logger.addHandler(logging.StreamHandler(sys.stdout))
@@ -17,12 +16,6 @@ max_seq_length = 64
 
 classes = [1, 2, 3, 4, 5]
 
-#LABEL_MAP = {-1:0, 0:1, 1:2}
-# LABEL_MAP = {}
-# for (i, label) in enumerate(LABEL_VALUES):
-#     LABEL_MAP[label] = i
-
-# Load Hugging Face Tokenizer
 tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')  
 
 
@@ -64,7 +57,12 @@ def predict_fn(input_data, model):
         print('data_json_line: {}'.format(data_json_line))
         print('type(data_json_line): {}'.format(type(data_json_line)))
 
-        review_body = data_json_line['review_body']
+        # features[0]:  review_body
+        # features[1..n]:  is anything else (we can define the order ourselves)
+        # Example:  
+        #    {"star_rating": 5,"features": ["The best gift ever", "Gift Cards"]}        
+        #
+        review_body = data_json_line['features'][0]
         print("""review_body: {}""".format(review_body))
 
         encode_plus_token = tokenizer.encode_plus(

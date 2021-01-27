@@ -29,9 +29,7 @@ def input_handler(data, context):
         print('data_json_line: {}'.format(data_json_line))
         print('type(data_json_line): {}'.format(type(data_json_line)))
 
-        # features[0] is product_category
-        # features[1] is review_body
-        review_body = data_json_line['features'][1]
+        review_body = data_json_line['review_body']
         print("""review_body: {}""".format(review_body))
         
         encode_plus_tokens = tokenizer.encode_plus(review_body,

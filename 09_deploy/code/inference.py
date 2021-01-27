@@ -29,7 +29,12 @@ def input_handler(data, context):
         print('data_json_line: {}'.format(data_json_line))
         print('type(data_json_line): {}'.format(type(data_json_line)))
 
-        review_body = data_json_line['review_body']
+        # features[0]:  review_body
+        # features[1..n]:  is anything else (we can define the order ourselves)
+        # Example:  
+        #    {"star_rating": 5,"features": ["The best gift ever", "Gift Cards"]}        
+        #
+        review_body = data_json_line['features'][0]
         print("""review_body: {}""".format(review_body))
         
         encode_plus_tokens = tokenizer.encode_plus(review_body,
@@ -92,12 +97,9 @@ def output_handler(response, context):
     
     predicted_classes_jsonlines = '\n'.join(predicted_classes)
     print('predicted_classes_jsonlines: {}'.format(predicted_classes_jsonlines))
-    print('type(predicted_classes_jsonlines): {}'.format(type(predicted_classes_jsonlines)))
 
-    predicted_classes_jsonlines_dump = json.dumps(predicted_classes_jsonlines)
-    print('predicted_classes_jsonlines_dump: {}'.format(predicted_classes_jsonlines_dump))
-    print('type(predicted_classes_jsonlines_dump): {}'.format(type(predicted_classes_jsonlines_dump)))
-    
     response_content_type = context.accept_header
-
+    
+    predicted_classes_jsonlines_dump = json.dumps(predicted_classes_jsonlines)
+    
     return predicted_classes_jsonlines_dump, response_content_type

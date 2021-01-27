@@ -35,10 +35,15 @@ def lambda_handler(event, context):
         print(split_inputs)
         review_body = split_inputs[2]
         print(review_body)
+        
 
-        inputs = [{"review_body": review_body}]
+        inputs = [
+            {"features": ["This is great!"]}
+            {"features": ["This is bad."]}
+        ]       
+
         response = runtime.invoke_endpoint(
-             EndpointName=ENDPOINT_NAME,
+             EndpointName=pytorch_endpoint_name,
              ContentType='application/jsonlines',    
              Accept='application/jsonlines',    
              Body=json.dumps(inputs).encode('utf-8')
@@ -53,8 +58,7 @@ def lambda_handler(event, context):
 
         for predicted_class_json, input_data in zip(predicted_classes, inputs):
             predicted_class = json.loads(predicted_class_json)['predicted_label']
-            print('Predicted star_rating: {} for review_body "{}"'.format(predicted_class, 
-                                                                          input_data["review_body"]))    
+            print('Predicted star_rating: {} for review_body "{}"'.format(predicted_class, input_data["features"][0]))  
 
             # Built output_record
             # review_id, star_rating, product_category, review_body

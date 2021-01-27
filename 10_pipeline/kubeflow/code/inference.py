@@ -29,7 +29,12 @@ def input_handler(data, context):
         print('data_json_line: {}'.format(data_json_line))
         print('type(data_json_line): {}'.format(type(data_json_line)))
 
-        review_body = data_json_line['review_body']
+        # features[0]:  review_body
+        # features[1..n]:  is anything else (we can define the order ourselves)
+        # Example:  
+        #    {"star_rating": 5,"features": ["The best gift ever", "Gift Cards"]}        
+        #
+        review_body = data_json_line['features'][0]
         print("""review_body: {}""".format(review_body))
         
         encode_plus_tokens = tokenizer.encode_plus(review_body,
