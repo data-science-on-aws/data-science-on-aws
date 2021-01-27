@@ -200,6 +200,77 @@
           "name": "default"
         }
       ]
+    },
+    {
+      "node_id": "96b88833-dd43-4945-a0a2-ad60a51fdb68",
+      "type": "VISUALIZATION",
+      "operator": "sagemaker.visualizations.bias_report_0.1",
+      "parameters": {
+        "name": "bias_product_category",
+        "is_label_value_or_threshold": "value",
+        "is_facet_value_or_threshold": "value",
+        "default_metrics": {
+          "CI": true,
+          "DPL": true,
+          "JS": true,
+          "CDDL": false
+        },
+        "group_name": "",
+        "show_additional_metrics": "yes",
+        "label_values": "5;4",
+        "facet_values": "",
+        "additional_metrics": {
+          "KL": true,
+          "LP": true,
+          "TVD": true,
+          "KS": true
+        },
+        "label_name": "star_rating",
+        "facet_name": "product_category",
+        "metrics": {
+          "CI": true,
+          "DPL": true,
+          "JS": true,
+          "CDDL": false,
+          "KL": true,
+          "LP": true,
+          "TVD": true,
+          "KS": true
+        }
+      },
+      "inputs": [
+        {
+          "name": "df",
+          "node_id": "019d2a9b-9601-4cca-8395-9a976db0ada5",
+          "output_name": "default"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "default"
+        }
+      ]
+    },
+    {
+      "node_id": "b6cb0190-7f65-42f1-a79c-5ce10393db23",
+      "type": "VISUALIZATION",
+      "operator": "sagemaker.visualizations.quick_model_0.1",
+      "parameters": {
+        "name": "feature_importance",
+        "label": "star_rating"
+      },
+      "inputs": [
+        {
+          "name": "df",
+          "node_id": "019d2a9b-9601-4cca-8395-9a976db0ada5",
+          "output_name": "default"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "default"
+        }
+      ]
     }
   ]
 }
