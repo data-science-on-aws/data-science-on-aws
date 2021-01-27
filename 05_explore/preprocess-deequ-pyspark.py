@@ -137,7 +137,7 @@ def main():
         .option('sep', '\t') \
         .save('{}/constraint-suggestions'.format(s3_output_analyze_data))
     
-    spark.stop()
+#    spark.stop()
 
     
 if __name__ == "__main__":
