@@ -21,7 +21,7 @@ def lambda_handler(event, context):
     print('records: {}'.format(r))
     print('type_records: {}'.format(type(r)))
     
-
+    # TODO:  Handle batches
     for record in event['records']:
         print(record['recordId'])
         payload = base64.b64decode(record['data'])
@@ -36,10 +36,8 @@ def lambda_handler(event, context):
         review_body = split_inputs[2]
         print(review_body)
         
-
         inputs = [
-            {"features": ["This is great!"]}
-            {"features": ["This is bad."]}
+            {"features": [review_body]}
         ]       
 
         response = runtime.invoke_endpoint(
