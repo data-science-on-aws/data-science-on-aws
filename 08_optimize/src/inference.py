@@ -17,68 +17,86 @@ max_seq_length=64
 tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
 
 def input_handler(data, context):
+    data_str = data.read().decode('utf-8')
+    print('data_str: {}'.format(data_str))
+    print('type data_str: {}'.format(type(data_str)))
+    
+    jsonlines = data_str.split("\n")
+    print('jsonlines: {}'.format(jsonlines))
+    print('type jsonlines: {}'.format(type(jsonlines)))
+    
     transformed_instances = []
+    
+    for jsonline in jsonlines:
+        print('jsonline: {}'.format(jsonline))
+        print('type jsonline: {}'.format(type(jsonline)))
 
-    print('DATA {}'.format(data))
-
-    for instance in data:
-        data_str = instance.decode('utf-8')
-        print('DATA_STR {}'.format(data_str))
+        # features[0] is review_body
+        # features[1..n] are others (ie. 1: product_category, etc)
+        review_body = json.loads(jsonline)["features"][0]
+        print("""review_body: {}""".format(review_body))
         
-        tokens = tokenizer.tokenize(data_str)
-        print('TOKENS {}'.format(tokens))
-        
-        encode_plus_tokens = tokenizer.encode_plus(data_str,
+        encode_plus_tokens = tokenizer.encode_plus(review_body,
                                                    pad_to_max_length=True,
                                                    max_length=max_seq_length,
-                                                   truncation=True
-                                                  )
+                                                   truncation=True)
 
         # Convert the text-based tokens to ids from the pre-trained BERT vocabulary
         input_ids = encode_plus_tokens['input_ids']
+        
         # Specifies which tokens BERT should pay attention to (0 or 1)
         input_mask = encode_plus_tokens['attention_mask']
-        # Segment Ids are always 0 for single-sequence tasks (or 1 if two-sequence tasks)
-#        segment_ids = [0] * max_seq_length
     
         transformed_instance = { 
-                                 "input_ids": input_ids, 
-                                 "input_mask": input_mask, 
-#                                 "segment_ids": segment_ids
-                               }
+            "input_ids": input_ids, 
+            "input_mask": input_mask
+        }
     
         transformed_instances.append(transformed_instance)
-
-    print(transformed_instances)
     
-    transformed_data = {"signature_name":"serving_default",
-                        "instances": transformed_instances}
-    print(transformed_data)
+    transformed_data = {
+        "signature_name":"serving_default",
+        "instances": transformed_instances
+    }
 
     transformed_data_json = json.dumps(transformed_data)
-    print(transformed_data_json)
+    print('transformed_data_json: {}'.format(transformed_data_json))
     
     return transformed_data_json
 
 
 def output_handler(response, context):
+    print('response: {}'.format(response))
     response_json = response.json()
     print('response_json: {}'.format(response_json))
     
     log_probabilities = response_json["predictions"]
-
+    print('log_probabilities: {}'.format(log_probabilities))
+    
     predicted_classes = []
 
     for log_probability in log_probabilities:
-        softmax = tf.nn.softmax(log_probability)    
-        predicted_class_idx = tf.argmax(softmax, axis=-1, output_type=tf.int32)
+        print('log_probability in loop: {}'.format(log_probability))
+        print('type(log_probability) in loop: {}'.format(type(log_probability)))
+        
+        softmax = tf.nn.softmax(log_probability) 
+        
+        predicted_class_idx = tf.argmax(softmax, axis=-1, output_type=tf.int32)   
         predicted_class = classes[predicted_class_idx]
-        predicted_classes.append(predicted_class)
+        print('predicted_class: {}'.format(predicted_class))
+
+        prediction_dict = {}
+        prediction_dict['predicted_label'] = predicted_class
+        
+        jsonline = json.dumps(prediction_dict)
+        print('jsonline: {}'.format(jsonline))
+        
+        predicted_classes.append(jsonline)
+        print('predicted_classes in the loop: {}'.format(predicted_classes))
     
-    predicted_classes_json = json.dumps(predicted_classes)    
-    print(predicted_classes_json)
+    predicted_classes_jsonlines = '\n'.join(predicted_classes)
+    print('predicted_classes_jsonlines: {}'.format(predicted_classes_jsonlines))
 
     response_content_type = context.accept_header
-
-    return predicted_classes_json, response_content_type
-
+    
+    return predicted_classes_jsonlines, response_content_type

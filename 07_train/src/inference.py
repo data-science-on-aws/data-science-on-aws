@@ -30,24 +30,11 @@ def input_handler(data, context):
     for jsonline in jsonlines:
         print('jsonline: {}'.format(jsonline))
         print('type jsonline: {}'.format(type(jsonline)))
-        
+
+        # features[0] is review_body
+        # features[1..n] are others (ie. 1: product_category, etc)
         review_body = json.loads(jsonline)["features"][0]
         print("""review_body: {}""".format(review_body))
-
-
-#     data_json = json.loads(data_str)
-#     print('data_json: {}'.format(data_json))
-
-#     transformed_instances = []
-
-#     for data_json_line in data_json:
-#         print('data_json_line: {}'.format(data_json_line))
-#         print('type(data_json_line): {}'.format(type(data_json_line)))
-
-#         # features[0] is review_body
-#         # features[1] is product_category
-#         review_body = data_json_line['features'][0]
-#         print("""review_body: {}""".format(review_body))
         
         encode_plus_tokens = tokenizer.encode_plus(review_body,
                                                    pad_to_max_length=True,
@@ -112,6 +99,4 @@ def output_handler(response, context):
 
     response_content_type = context.accept_header
     
-    predicted_classes_jsonlines_dump = json.dumps(predicted_classes_jsonlines)
-    
-    return predicted_classes_jsonlines_dump, response_content_type
+    return predicted_classes_jsonlines, response_content_type

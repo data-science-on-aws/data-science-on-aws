@@ -47,24 +47,30 @@ def predict_fn(input_data, model):
     model.eval()
 
     print('input_data: {}'.format(input_data))
-
-    data_json = json.loads(input_data)
-    print('data_json: {}'.format(data_json))
+    print('type(input_data): {}'.format(type(input_data)))
+    
+    data_str = input_data.decode('utf-8')
+    print('data_str: {}'.format(data_str))
+    print('type data_str: {}'.format(type(data_str)))
+    
+    jsonlines = data_str.split("\n")
+    print('jsonlines: {}'.format(jsonlines))
+    print('type jsonlines: {}'.format(type(jsonlines)))
 
     predicted_classes = []
 
-    for data_json_line in data_json:
-        print('data_json_line: {}'.format(data_json_line))
-        print('type(data_json_line): {}'.format(type(data_json_line)))
+    for jsonline in jsonlines:
+        print('jsonline: {}'.format(jsonline))
+        print('type jsonline: {}'.format(type(jsonline)))
 
         # features[0]:  review_body
         # features[1..n]:  is anything else (we can define the order ourselves)
         # Example:  
         #    {"star_rating": 5,"features": ["The best gift ever", "Gift Cards"]}        
         #
-        review_body = data_json_line['features'][0]
+        review_body = json.loads(jsonline)["features"][0]
         print("""review_body: {}""".format(review_body))
-
+        
         encode_plus_token = tokenizer.encode_plus(
             review_body,
             max_length=max_seq_length,
@@ -101,13 +107,13 @@ def predict_fn(input_data, model):
 
     predicted_classes_jsonlines = '\n'.join(predicted_classes)
     print('predicted_classes_jsonlines: {}'.format(predicted_classes_jsonlines))
-    print('type(predicted_classes_jsonlines): {}'.format(type(predicted_classes_jsonlines)))
 
-    predicted_classes_jsonlines_dump = json.dumps(predicted_classes_jsonlines)
-    print('predicted_classes_jsonlines_dump: {}'.format(predicted_classes_jsonlines_dump))
-    print('type(predicted_classes_jsonlines_dump): {}'.format(type(predicted_classes_jsonlines_dump)))
+#     predicted_classes_jsonlines_dump = json.dumps(predicted_classes_jsonlines)
+#     print('predicted_classes_jsonlines_dump: {}'.format(predicted_classes_jsonlines_dump))
+#     print('type(predicted_classes_jsonlines_dump): {}'.format(type(predicted_classes_jsonlines_dump)))
 
-    return predicted_classes_jsonlines_dump
+#    return predicted_classes_jsonlines_dump
+    return predicted_classes_jsonlines
 
 
 ###################################
@@ -115,15 +121,11 @@ def predict_fn(input_data, model):
 ################################### 
 
 def input_fn(serialized_input_data, content_type='application/jsonlines'):  
-#    if content_type == 'application/jsonlines':
     return serialized_input_data
-#    raise Exception('Requested unsupported ContentType: ' + content_type)
 
 ###################################
 ### SAGEMKAER MODEL OUTPUT FUNCTION 
 ################################### 
 
 def output_fn(prediction_output, accept='application/jsonlines'):
-#    if accept == 'application/jsonlines':
     return prediction_output, accept
-#    raise Exception('Requested unsupported ContentType in Accept: ' + accept)
