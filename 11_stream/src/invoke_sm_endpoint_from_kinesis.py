@@ -7,7 +7,6 @@ import boto3
 import json
 
 # grab environment variables
-JSON_CONTENT_TYPE = 'application/json'
 ENDPOINT_NAME = os.environ['ENDPOINT_NAME']
 print('Endpoint: {}'.format(ENDPOINT_NAME))
 runtime = boto3.client('runtime.sagemaker')
