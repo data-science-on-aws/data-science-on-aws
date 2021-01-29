@@ -13,17 +13,12 @@ To build our BERT-based NLP model, we use the [Amazon Customer Reviews Dataset](
 
 # Workshop Cost
 This workshop is FREE, but would otherwise cost <25 USD.
-
 ![Workshop Cost](img/billing.png)
-
-# Workshop Agenda
-![Workshop Paths](img/workshop_paths.png)
 
 # Workshop Description
 ![Workshop Agenda](img/outline.png)
 
 # Workshop Contributors
-
 ![Workshop Contributors](img/primary-contributors.png)
 
 # Workshop Instructions
@@ -110,7 +105,7 @@ _Note:  This is not a fatal error ^^ above ^^.  Just re-run the command again un
 
 ## 7. Start the Workshop!
 
-Navigate to `01_setup/` in your Jupyter notebook and start the workshop!
+Navigate to `00_quickstart/` or `01_setup/` in your Jupyter notebook and start the workshop!
 
 _You may need to refresh your browser if you don't see the new `workshop/` directory._
 
