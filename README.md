@@ -18,6 +18,9 @@ This workshop is FREE, but would otherwise cost <25 USD.
 # Workshop Description
 ![Workshop Agenda](img/outline.png)
 
+# Workshop Paths
+![Workshop Paths](img/workshop_paths.png)
+
 # Workshop Contributors
 ![Workshop Contributors](img/primary-contributors.png)
 
