@@ -56,7 +56,7 @@ print('(assumed_role) caller_identity_arn: {}'.format(assumed_role))
 
 # Aiken + Chris
 #   "arn:aws:sts::XXX:assumed-role/mod-81045caa359946a1-SageMakerExecutionRole-JHURCYL80VLI/SageMaker"
-if ("TeamRole" in assumed_role or "SageMakerExecutionRole" in assumed_role) and "service-role" not in assumed_role and "mod-" not assumed_role: 
+if ("TeamRole" in assumed_role or "SageMakerExecutionRole" in assumed_role) and "service-role" not in assumed_role and "mod-" not in assumed_role: 
     # TeamRole is specific to our workshop and is not a service-role
     # Differentiating /AmazonSageMakerExecutionRole (Chris' Notebook) from /SageMakerExecutionRole (Event Engine Notebook)
     role = re.sub(r"^(.+)sts::(\d+):assumed-role/(.+?)/.*$", r"\1iam::\2:role/\3", assumed_role)
