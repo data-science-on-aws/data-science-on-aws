@@ -26,6 +26,16 @@
                 "arn:aws:s3:::{3}/*"
             ]
         },
+        { 
+            "Effect": "Allow",
+            "Action": [
+                "cloudformation:CreateStack",
+                "cloudformation:DescribeStacks"
+            ],
+            "Resource": [
+                "arn:aws:cloudformation:{0}:{1}:stack/*/*"
+            ]
+        },        
         {
             "Effect": "Allow",
             "Action": [
