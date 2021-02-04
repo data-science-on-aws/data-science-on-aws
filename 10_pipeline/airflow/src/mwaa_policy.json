@@ -6,7 +6,8 @@
             "Action": [
                 "airflow:PublishMetrics",
                 "airflow:CreateEnvironment",
-                "airflow:GetEnvironment"
+                "airflow:GetEnvironment",
+                "airflow:CreateCliToken"
             ],
             "Resource": "arn:aws:airflow:{0}:{1}:environment/{2}"
         },
