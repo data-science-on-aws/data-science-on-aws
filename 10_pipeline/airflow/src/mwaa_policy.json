@@ -3,7 +3,11 @@
     "Statement": [
         {
             "Effect": "Allow",
-            "Action": "airflow:PublishMetrics",
+            "Action": [
+                "airflow:PublishMetrics",
+                "airflow:CreateEnvironment",
+                "airflow:GetEnvironment"
+            ],
             "Resource": "arn:aws:airflow:{0}:{1}:environment/{2}"
         },
         { 
