@@ -201,6 +201,18 @@ Resources:
               - !Sub "arn:${AWS::Partition}:sagemaker:*:*:domain/*"
               - !Sub "arn:${AWS::Partition}:sagemaker:*:*:user-profile/*"
               - !Sub "arn:${AWS::Partition}:sagemaker:*:*:app/*"
+          - Sid: SageMakerProjectsPermission
+            Effect: Allow
+            Action:
+              - servicecatalog:AcceptPortfolioShare
+              - sagemaker:EnableSagemakerServicecatalogPortfolio
+              - sagemaker:DisableSagemakerServicecatalogPortfolio
+            Resource: '*'
+          - Sid: ServiceCatalogPermission
+            Effect: Allow
+            Action:
+              - servicecatalog:*
+            Resource: '*'
           - Sid: SageMakerExecPassRole
             Effect: Allow
             Action:
@@ -227,10 +239,12 @@ Resources:
         - arn:aws:iam::aws:policy/AmazonAthenaFullAccess
         - arn:aws:iam::aws:policy/AmazonSageMakerFeatureStoreAccess
         - arn:aws:iam::aws:policy/AmazonRedshiftFullAccess
-        - arn:aws:iam::aws:policy/AWSStepFunctionsFullAccess
-        - arn:aws:iam::aws:policy/AmazonKinesisFullAccess
-        - arn:aws:iam::aws:policy/AmazonKinesisFirehoseFullAccess
-        - arn:aws:iam::aws:policy/AmazonKinesisAnalyticsFullAccess
+#        - arn:aws:iam::aws:policy/AWSStepFunctionsFullAccess
+#        - arn:aws:iam::aws:policy/AmazonKinesisFullAccess
+#        - arn:aws:iam::aws:policy/AmazonKinesisFirehoseFullAccess
+#        - arn:aws:iam::aws:policy/AmazonKinesisAnalyticsFullAccess
+        - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
+        - arn:aws:iam::aws:policy/AWSCodePipeline_FullAccess
 
   SageMakerExecutionPolicy:
     Type: AWS::IAM::ManagedPolicy
@@ -253,6 +267,57 @@ Resources:
       Roles:
         - !Ref  SageMakerExecutionRole
 
+
+#  CfnResponseLayer:
+#    Type: AWS::Lambda::LayerVersion
+#    Properties:
+#      Content::
+#        ZipFile: |
+#          import urllib3
+#          import json
+#          http = urllib3.PoolManager()
+#          SUCCESS = "SUCCESS"
+#          FAILED = "FAILED"
+#
+#          def send(event, context, responseStatus, responseData, physicalResourceId=None, noEcho=False, error=None):
+#              responseUrl = event['ResponseURL']
+#
+#              print(responseUrl)
+#
+#              responseBody = {}
+#              responseBody['Status'] = responseStatus
+#              if error is None: 
+#                  responseBody['Reason'] = 'See the details in CloudWatch Log Stream: ' + context.log_stream_name + ' LogGroup: ' + context.log_group_name
+#              else:
+#                  responseBody['Reason'] = error
+#              responseBody['PhysicalResourceId'] = physicalResourceId or context.log_stream_name
+#              responseBody['StackId'] = event['StackId']
+#              responseBody['RequestId'] = event['RequestId']
+#              responseBody['LogicalResourceId'] = event['LogicalResourceId']
+#              responseBody['NoEcho'] = noEcho
+#              responseBody['Data'] = responseData
+#
+#              json_responseBody = json.dumps(responseBody)
+#
+#              print("Response body:\n" + json_responseBody)
+#
+#              headers = {
+#                  'content-type' : '',
+#                  'content-length' : str(len(json_responseBody))
+#              }
+#
+#              try:
+#        
+#                  response = http.request('PUT',responseUrl,body=json_responseBody.encode('utf-8'),headers=headers)
+#                  print("Status code: " + response.reason)
+#              except Exception as e:
+#                  print("send(..) failed executing requests.put(..): " + str(e))
+#      CompatibleRuntimes: 
+#        - python3.8
+#      Description: cfnresponse layer
+#      LayerName: cfnresponse
+
+
   StudioDomainFunction:
     Type: AWS::Lambda::Function
     Properties:
@@ -266,100 +331,85 @@ Resources:
           import logging
           import cfnresponse
           from botocore.exceptions import ClientError
-          client = boto3.client('sagemaker')
-          def lambda_handler(event, context):
+          S=cfnresponse.SUCCESS
+          c=boto3.client('sagemaker')
+          def lambda_handler(event,context):
             try:
-              if event['RequestType'] == 'Create':
+              if event['RequestType']=='Create':
                 handle_create(event, context)
-              elif event['RequestType'] == 'Update':
+              elif event['RequestType']=='Update':
                 handle_update(event, context)
-              elif event['RequestType'] == 'Delete':
+              elif event['RequestType']=='Delete':
                 handle_delete(event, context)
             except ClientError as exception:
-                print(exception)
-                logging.error(exception)
-                cfnresponse.send(event, context, cfnresponse.FAILED, {}, error=str(exception))
+                cfnresponse.send(event,context,cfnresponse.FAILED,{},error=str(exception))
           def handle_create(event, context):
-            resource_config = event['ResourceProperties']
-            response_data = create_studio_domain(resource_config)
-            efs_client = boto3.client('efs')
-            efs_response = efs_client.describe_mount_targets(FileSystemId=response_data['HomeEfsFileSystemId'])
-            sg_response = efs_client.describe_mount_target_security_groups(MountTargetId = efs_response['MountTargets'][0]['MountTargetId'])
-            ec2_client = boto3.client('ec2')
-            ec2_response = ec2_client.describe_security_groups(GroupIds=sg_response['SecurityGroups'])
-            e = ec2_response['SecurityGroups'][0]['IpPermissions'][0]['UserIdGroupPairs'][0]['GroupId']
-            cfnresponse.send(event, context, cfnresponse.SUCCESS, {'DomainId': response_data['DomainId'],'EFSId':response_data['HomeEfsFileSystemId'], 'SG':e}, physicalResourceId=response_data['DomainId'])
-          def handle_delete(event, context):
-            print('Received delete event')
-            domain_id = event['PhysicalResourceId']
+            config=event['ResourceProperties']
+            r=create_studio_domain(config)
+            efs=boto3.client('efs')
+            efs_r=efs.describe_mount_targets(FileSystemId=r['HomeEfsFileSystemId'])
+            sg_r=efs.describe_mount_target_security_groups(MountTargetId=efs_r['MountTargets'][0]['MountTargetId'])
+            e=boto3.client('ec2').describe_security_groups(GroupIds=sg_r['SecurityGroups'])['SecurityGroups'][0]['IpPermissions'][0]['UserIdGroupPairs'][0]['GroupId']
+            cfnresponse.send(event,context,S,{'DomainId':r['DomainId'],'EFSId':r['HomeEfsFileSystemId'],'SG':e},physicalResourceId=response['DomainId'])
+          def handle_delete(event,context):
+            domain_id=event['PhysicalResourceId']
             try:
-              client.describe_domain(DomainId=domain_id)
+              c.describe_domain(DomainId=domain_id)
             except ClientError as exception:
-              logging.error(exception)
-              cfnresponse.send(event, context, cfnresponse.SUCCESS, {}, physicalResourceId=event['PhysicalResourceId'])
+              cfnresponse.send(event,context,S,{},physicalResourceId=event['PhysicalResourceId'])
               return
             delete_domain(domain_id)
-            cfnresponse.send(event, context, cfnresponse.SUCCESS, {}, physicalResourceId=event['PhysicalResourceId'])
+            cfnresponse.send(event,context,S,{},physicalResourceId=event['PhysicalResourceId'])
           def handle_update(event, context):
-            logging.info('Received Update event')
-            domain_id = event['PhysicalResourceId']
-            default_user_settings = event['ResourceProperties']['DefaultUserSettings']
-            update_domain(domain_id, default_user_settings)
-            cfnresponse.send(event, context, cfnresponse.SUCCESS, {'DomainId' : domain_id}, physicalResourceId=event['PhysicalResourceId'])
+            did=event['PhysicalResourceId']
+            dus=event['ResourceProperties']['DefaultUserSettings']
+            update_domain(did,dus)
+            cfnresponse.send(event,context,S,{'DomainId':did},physicalResourceId=event['PhysicalResourceId'])
           def create_studio_domain(config):
-            vpc_id = config['VPC']
-            subnet_ids = config['SubnetIds']
-            default_user_settings = config['DefaultUserSettings']
-            domain_name = config['DomainName']
-            response = client.create_domain(
-              DomainName=domain_name,
-              AuthMode='IAM',
-              DefaultUserSettings=default_user_settings,
-              SubnetIds=subnet_ids.split(','),
-              VpcId=vpc_id
-            )
-            domain_id = response['DomainArn'].split('/')[-1]
-            created = False
+            sc=boto3.client('servicecatalog')
+            vpc_id=config['VPC']
+            subnet_ids=config['SubnetIds']
+            dus=config['DefaultUserSettings']
+            dn=config['DomainName']
+            c.enable_sagemaker_servicecatalog_portfolio()
+            response=sc.list_accepted_portfolio_shares()
+            pid=''
+            for portfolio in response['PortfolioDetails']:
+              if portfolio['ProviderName']=='Amazon SageMaker':
+                pid=portfolio['Id']
+            sc.associate_principal_with_portfolio(PortfolioId=pid,PrincipalARN=dus['ExecutionRole'],PrincipalType='IAM')
+            did=c.create_domain(DomainName=dn,AuthMode='IAM',DefaultUserSettings=dus,SubnetIds=subnet_ids.split(','),VpcId=vpc_id)['DomainArn'].split('/')[-1]
+            created=False
             while not created:
-              response = client.describe_domain(DomainId=domain_id)
+              response=c.describe_domain(DomainId=did)
               time.sleep(5)
-              if response['Status'] == 'InService':
-                created = True
+              created=(response['Status']=='InService')
             return response
-          def delete_domain(domain_id):
-            response = client.delete_domain(DomainId=domain_id, RetentionPolicy={'HomeEfsFileSystem': 'Delete'})
-            print(response)
-            deleted = False
+          def delete_domain(did):
+            response=c.delete_domain(DomainId=did,RetentionPolicy={'HomeEfsFileSystem':'Delete'})
+            deleted=False
             while not deleted:
               try:
-                response = client.describe_domain(DomainId=domain_id)
-                print(response)
+                response=c.describe_domain(DomainId=did)
               except ClientError as error:
-                print(error)
-                if error.response['Error']['Code'] == 'ResourceNotFound':
-                  print('Deleted')
-                  deleted = True
-                  return
+                deleted=(error.response['Error']['Code']=='ResourceNotFound')
               time.sleep(5)
             return response
-          def update_domain(domain_id, default_user_settings):
-            response = client.update_domain(
-              DomainId=domain_id,
-              DefaultUserSettings=default_user_settings
-            )
-            updated = False
+          def update_domain(did,dus):
+            response=c.update_domain(DomainId=did,DefaultUserSettings=dus)
+            updated=False
             while not updated:
-              response = client.describe_domain(DomainId=domain_id)
-              if response['Status'] == 'InService':
-                updated = True
-              else:
-                logging.info('Updating .. %s', response['Status'])
+              response=c.describe_domain(DomainId=did)
+              updated=(response['Status']=='InService')
               time.sleep(5)
             return response
       Runtime: python3.8
       Timeout: 900
+#      Layers:
+#        - !Ref CfnResponseLayer
     DependsOn:
       - LambdaExecutionPolicy
+
 
   UserProfileFunction:
     Type: AWS::Lambda::Function
@@ -368,7 +418,8 @@ Resources:
       Role: !GetAtt LambdaExecutionRole.Arn
       Code:
         ZipFile: |
-          import time, logging
+          import time
+          import logging
           import boto3
           import cfnresponse
           from botocore.exceptions import ClientError
@@ -446,6 +497,8 @@ Resources:
             return response  
       Runtime: python3.8
       Timeout: 900
+#      Layers:
+#        - !Ref CfnResponseLayer
     DependsOn:
       - LambdaExecutionPolicy
 
@@ -457,7 +510,8 @@ Resources:
       Runtime: python3.8
       Code:
         ZipFile: |
-          import time, logging
+          import time
+          import logging
           import boto3
           import cfnresponse
           client = boto3.client('sagemaker')
@@ -513,7 +567,14 @@ Resources:
               user_profile_name = config['UserProfileName']
               app_name = config['AppName']
               app_type = config['AppType']
-              response = client.create_app(DomainId=domain_id, UserProfileName=user_profile_name,  AppType=app_type, AppName=app_name)
+
+              if app_type == "JupyterServer":
+                  response = client.create_app(DomainId=domain_id, UserProfileName=user_profile_name,  AppType=app_type, AppName=app_name)
+              elif app_type == "KernelGateway":
+                  sagemaker_image_arn = config['SageMakerImageArn'] if "SageMakerImageArn" in config else 'arn:aws:sagemaker:us-east-1:081325390199:image/datascience-1.0'
+                  instance_type = config['InstanceType'] if "InstanceType" in config else 'ml.t3.medium'                                
+                  response = client.create_app(DomainId=domain_id, UserProfileName=user_profile_name,  AppType=app_type, AppName=app_name, ResourceSpec={'SageMakerImageArn': sagemaker_image_arn, 'InstanceType': instance_type})
+
               created = False
               while not created:
                   response = client.describe_app(DomainId=domain_id, UserProfileName=user_profile_name, AppType=app_type, AppName=app_name)
@@ -522,6 +583,8 @@ Resources:
                       created=True
               return response
       Timeout: 900
+#      Layers:
+#        - !Ref CfnResponseLayer
     DependsOn:
       - LambdaExecutionPolicy
 
@@ -530,7 +593,12 @@ Resources:
     Properties:
       Code: 
         ZipFile: | 
-          import json, os, time, sys, traceback, logging
+          import json
+          import os
+          import time
+          import sys
+          import traceback
+          import logging
           import boto3
           import cfnresponse
 
@@ -612,6 +680,8 @@ Resources:
       Role: !GetAtt LambdaExecutionRole.Arn
       Runtime: python3.8
       Timeout: 300
+#      Layers:
+#        - !Ref CfnResponseLayer
       VpcConfig:
         SecurityGroupIds:
           - !Ref LambdaSG
@@ -639,7 +709,7 @@ Resources:
         ExecutionRole: !GetAtt SageMakerExecutionRole.Arn
 
   DefaultApp:
-    Type: Custom::App
+    Type: Custom::StudioApp
     Properties:
       ServiceToken: !GetAtt AppFunction.Arn
       DomainId: !GetAtt StudioDomain.DomainId
@@ -648,6 +718,523 @@ Resources:
       AppType: JupyterServer
       UserSettings:
         ExecutionRole: !GetAtt SageMakerExecutionRole.Arn
+
+  KernelApp:
+    Type: Custom::StudioApp
+    Properties:
+      ServiceToken: !GetAtt AppFunction.Arn
+      DomainId: !GetAtt StudioDomain.DomainId
+      UserProfileName: !GetAtt UserProfile.UserProfileName
+      SageMakerImageArn: arn:aws:sagemaker:us-east-1:081325390199:image/datascience-1.0
+      AppName: datascience-1-0-ml-t3-medium-1abf3407f667f989be9d86559395
+      AppType: KernelGateway
+      InstanceType: ml.t3.medium
+      UserSettings:
+        ExecutionRole: !GetAtt SageMakerExecutionRole.Arn
+  
+  DataWranglerApp:
+    Type: Custom::StudioApp
+    Properties:
+      ServiceToken: !GetAtt AppFunction.Arn
+      DomainId: !GetAtt StudioDomain.DomainId
+      UserProfileName: !GetAtt UserProfile.UserProfileName
+      SageMakerImageArn: arn:aws:sagemaker:us-east-1:663277389841:image/sagemaker-data-wrangler-1.0
+      AppName: sagemaker-data-wrang-ml-m5-4xlarge-b741c1a025d542c78bb538373f2d
+      AppType: KernelGateway
+      InstanceType: ml.m5.4xlarge
+      UserSettings:
+        ExecutionRole: !GetAtt SageMakerExecutionRole.Arn
+
+### Roles for Sagemaker projects
+  AmazonSageMakerServiceCatalogProductsLaunchRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      RoleName: AmazonSageMakerServiceCatalogProductsLaunchRole
+      Description: "SageMaker role created from the SageMaker AWS Management Console. This role has the permissions required to launch the Amazon SageMaker portfolio of products from AWS ServiceCatalog."
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service: "servicecatalog.amazonaws.com"
+            Action: "sts:AssumeRole"
+      Path: "/service-role/"
+      MaxSessionDuration: 3600
+      Policies: 
+        - PolicyName: AmazonSageMakerAdmin-ServiceCatalogProductsServiceRolePolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'apigateway:GET'
+                  - 'apigateway:POST'
+                  - 'apigateway:PUT'
+                  - 'apigateway:PATCH'
+                  - 'apigateway:DELETE'
+                Resource: '*'
+                Condition:
+                  StringLike:
+                    'aws:ResourceTag/sagemaker:launch-source': '*'
+              - Effect: Allow
+                Action:
+                  - 'apigateway:POST'
+                Resource: '*'
+                Condition:
+                  'ForAnyValue:StringLike':
+                    'aws:TagKeys':
+                      - 'sagemaker:launch-source'
+              - Effect: Allow
+                Action:
+                  - 'apigateway:PATCH'
+                Resource:
+                  - 'arn:aws:apigateway:*::/account'
+              - Effect: Allow
+                Action:
+                  - 'cloudformation:CreateStack'
+                  - 'cloudformation:UpdateStack'
+                  - 'cloudformation:DeleteStack'
+                Resource: 'arn:aws:cloudformation:*:*:stack/SC-*'
+                Condition:
+                  ArnLikeIfExists:
+                    'cloudformation:RoleArn':
+                      - 'arn:aws:sts::*:assumed-role/AmazonSageMakerServiceCatalog*'
+              - Effect: Allow
+                Action:
+                  - 'cloudformation:DescribeStackEvents'
+                  - 'cloudformation:DescribeStacks'
+                Resource: 'arn:aws:cloudformation:*:*:stack/SC-*'
+              - Effect: Allow
+                Action:
+                  - 'cloudformation:GetTemplateSummary'
+                  - 'cloudformation:ValidateTemplate'
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - 'codebuild:CreateProject'
+                  - 'codebuild:DeleteProject'
+                  - 'codebuild:UpdateProject'
+                Resource:
+                  - 'arn:aws:codebuild:*:*:project/sagemaker-*'
+              - Effect: Allow
+                Action:
+                  - 'codecommit:CreateCommit'
+                  - 'codecommit:CreateRepository'
+                  - 'codecommit:DeleteRepository'
+                  - 'codecommit:GetRepository'
+                  - 'codecommit:TagResource'
+                Resource:
+                  - 'arn:aws:codecommit:*:*:sagemaker-*'
+              - Effect: Allow
+                Action:
+                  - 'codecommit:ListRepositories'
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - 'codepipeline:CreatePipeline'
+                  - 'codepipeline:DeletePipeline'
+                  - 'codepipeline:GetPipeline'
+                  - 'codepipeline:GetPipelineState'
+                  - 'codepipeline:StartPipelineExecution'
+                  - 'codepipeline:TagResource'
+                  - 'codepipeline:UpdatePipeline'
+                Resource:
+                  - 'arn:aws:codepipeline:*:*:sagemaker-*'
+              - Effect: Allow
+                Action:
+                  - 'cognito-idp:CreateUserPool'
+                Resource: '*'
+                Condition:
+                  'ForAnyValue:StringLike':
+                    'aws:TagKeys':
+                      - 'sagemaker:launch-source'
+              - Effect: Allow
+                Action:
+                  - 'cognito-idp:CreateGroup'
+                  - 'cognito-idp:CreateUserPoolDomain'
+                  - 'cognito-idp:CreateUserPoolClient'
+                  - 'cognito-idp:DeleteGroup'
+                  - 'cognito-idp:DeleteUserPool'
+                  - 'cognito-idp:DeleteUserPoolClient'
+                  - 'cognito-idp:DeleteUserPoolDomain'
+                  - 'cognito-idp:DescribeUserPool'
+                  - 'cognito-idp:DescribeUserPoolClient'
+                  - 'cognito-idp:UpdateUserPool'
+                  - 'cognito-idp:UpdateUserPoolClient'
+                Resource: '*'
+                Condition:
+                  StringLike:
+                    'aws:ResourceTag/sagemaker:launch-source': '*'
+              - Action:
+                  - 'ecr:CreateRepository'
+                  - 'ecr:DeleteRepository'
+                Resource:
+                  - 'arn:aws:ecr:*:*:repository/sagemaker-*'
+                Effect: Allow
+              - Effect: Allow
+                Action:
+                  - 'events:DescribeRule'
+                  - 'events:DeleteRule'
+                  - 'events:DisableRule'
+                  - 'events:EnableRule'
+                  - 'events:PutRule'
+                  - 'events:PutTargets'
+                  - 'events:RemoveTargets'
+                Resource:
+                  - 'arn:aws:events:*:*:rule/sagemaker-*'
+              - Effect: Allow
+                Action:
+                  - 'firehose:CreateDeliveryStream'
+                  - 'firehose:DeleteDeliveryStream'
+                  - 'firehose:DescribeDeliveryStream'
+                  - 'firehose:StartDeliveryStreamEncryption'
+                  - 'firehose:StopDeliveryStreamEncryption'
+                  - 'firehose:UpdateDestination'
+                Resource: 'arn:aws:firehose:*:*:deliverystream/sagemaker-*'
+              - Action:
+                  - 'glue:CreateDatabase'
+                  - 'glue:DeleteDatabase'
+                Resource:
+                  - 'arn:aws:glue:*:*:catalog'
+                  - 'arn:aws:glue:*:*:database/sagemaker-*'
+                  - 'arn:aws:glue:*:*:table/sagemaker-*'
+                  - 'arn:aws:glue:*:*:userDefinedFunction/sagemaker-*'
+                Effect: Allow
+              - Action:
+                  - 'glue:CreateClassifier'
+                  - 'glue:DeleteClassifier'
+                  - 'glue:DeleteCrawler'
+                  - 'glue:DeleteJob'
+                  - 'glue:DeleteTrigger'
+                  - 'glue:DeleteWorkflow'
+                  - 'glue:StopCrawler'
+                Resource:
+                  - '*'
+                Effect: Allow
+              - Action:
+                  - 'glue:CreateWorkflow'
+                Resource:
+                  - 'arn:aws:glue:*:*:workflow/sagemaker-*'
+                Effect: Allow
+              - Action:
+                  - 'glue:CreateJob'
+                Resource:
+                  - 'arn:aws:glue:*:*:job/sagemaker-*'
+                Effect: Allow
+              - Action:
+                  - 'glue:CreateCrawler'
+                  - 'glue:GetCrawler'
+                Resource:
+                  - 'arn:aws:glue:*:*:crawler/sagemaker-*'
+                Effect: Allow
+              - Action:
+                  - 'glue:CreateTrigger'
+                  - 'glue:GetTrigger'
+                Resource:
+                  - 'arn:aws:glue:*:*:trigger/sagemaker-*'
+                Effect: Allow
+              - Effect: Allow
+                Action:
+                  - 'iam:PassRole'
+                Resource:
+                  - 'arn:aws:iam::*:role/service-role/AmazonSageMakerServiceCatalog*'
+              - Effect: Allow
+                Action:
+                  - 'lambda:AddPermission'
+                  - 'lambda:CreateFunction'
+                  - 'lambda:DeleteFunction'
+                  - 'lambda:GetFunction'
+                  - 'lambda:GetFunctionConfiguration'
+                  - 'lambda:InvokeFunction'
+                  - 'lambda:RemovePermission'
+                Resource:
+                  - 'arn:aws:lambda:*:*:function:sagemaker-*'
+              - Effect: Allow
+                Action:
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:DeleteLogGroup'
+                  - 'logs:DeleteLogStream'
+                  - 'logs:DescribeLogGroups'
+                  - 'logs:DescribeLogStreams'
+                  - 'logs:PutRetentionPolicy'
+                Resource:
+                  - 'arn:aws:logs:*:*:log-group:/aws/apigateway/AccessLogs/*'
+                  - 'arn:aws:logs:*:*:log-group::log-stream:*'
+              - Effect: Allow
+                Action: 's3:GetObject'
+                Resource: '*'
+                Condition:
+                  StringEquals:
+                    's3:ExistingObjectTag/servicecatalog:provisioning': 'true'
+              - Effect: Allow
+                Action: 's3:GetObject'
+                Resource:
+                  - 'arn:aws:s3:::sagemaker-*'
+              - Effect: Allow
+                Action:
+                  - 's3:CreateBucket'
+                  - 's3:DeleteBucket'
+                  - 's3:DeleteBucketPolicy'
+                  - 's3:GetBucketPolicy'
+                  - 's3:PutBucketAcl'
+                  - 's3:PutBucketNotification'
+                  - 's3:PutBucketPolicy'
+                  - 's3:PutBucketPublicAccessBlock'
+                  - 's3:PutBucketLogging'
+                  - 's3:PutEncryptionConfiguration'
+                Resource: 'arn:aws:s3:::sagemaker-*'
+              - Action:
+                  - 'sagemaker:CreateEndpoint'
+                  - 'sagemaker:CreateEndpointConfig'
+                  - 'sagemaker:CreateModel'
+                  - 'sagemaker:CreateWorkteam'
+                  - 'sagemaker:DeleteEndpoint'
+                  - 'sagemaker:DeleteEndpointConfig'
+                  - 'sagemaker:DeleteModel'
+                  - 'sagemaker:DeleteWorkteam'
+                  - 'sagemaker:DescribeModel'
+                  - 'sagemaker:DescribeEndpointConfig'
+                  - 'sagemaker:DescribeEndpoint'
+                  - 'sagemaker:DescribeWorkteam'
+                Resource:
+                  - 'arn:aws:sagemaker:*:*:*'
+                Effect: Allow
+              - Action:
+                  - 'states:CreateStateMachine'
+                  - 'states:DeleteStateMachine'
+                  - 'states:UpdateStateMachine'
+                Resource:
+                  - 'arn:aws:states:*:*:stateMachine:sagemaker-*'
+                Effect: Allow
+
+
+  AmazonSageMakerServiceCatalogProductsUseRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      RoleName: AmazonSageMakerServiceCatalogProductsUseRole
+      Description: "SageMaker role created from the SageMaker AWS Management Console. This role has the permissions required to use the Amazon SageMaker portfolio of products from AWS ServiceCatalog."
+      Path: "/service-role/"
+      MaxSessionDuration: 3600 
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "cloudformation.amazonaws.com"
+                - "apigateway.amazonaws.com"
+                - "lambda.amazonaws.com"
+                - "codebuild.amazonaws.com"
+                - "sagemaker.amazonaws.com"
+                - "glue.amazonaws.com"
+                - "events.amazonaws.com"
+                - "states.amazonaws.com"
+                - "codepipeline.amazonaws.com"
+                - "firehose.amazonaws.com"
+            Action: "sts:AssumeRole"
+      Policies: 
+        - PolicyName: AmazonSageMakerServiceCatalogProductsUseRole-20210122T152377
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - 
+                Action:
+                  - cloudformation:CreateChangeSet
+                  - cloudformation:CreateStack
+                  - cloudformation:DescribeChangeSet
+                  - cloudformation:DeleteChangeSet
+                  - cloudformation:DeleteStack
+                  - cloudformation:DescribeStacks
+                  - cloudformation:ExecuteChangeSet
+                  - cloudformation:SetStackPolicy
+                  - cloudformation:UpdateStack
+                Resource: arn:aws:cloudformation:*:*:stack/sagemaker-*
+                Effect: Allow
+              - 
+                Action:
+                  - cloudwatch:PutMetricData
+                Resource: "*"
+                Effect: Allow
+              - 
+                Action:
+                  - codebuild:BatchGetBuilds
+                  - codebuild:StartBuild
+                Resource:
+                  - arn:aws:codebuild:*:*:project/sagemaker-*
+                  - arn:aws:codebuild:*:*:build/sagemaker-*
+                Effect: Allow
+              - 
+                Action:
+                  - codecommit:CancelUploadArchive
+                  - codecommit:GetBranch
+                  - codecommit:GetCommit
+                  - codecommit:GetUploadArchiveStatus
+                  - codecommit:UploadArchive
+                Resource: arn:aws:codecommit:*:*:sagemaker-*
+                Effect: Allow
+              - 
+                Action:
+                  - codepipeline:StartPipelineExecution
+                Resource: arn:aws:codepipeline:*:*:sagemaker-*
+                Effect: Allow
+              - 
+                Action:
+                  - ec2:DescribeRouteTables
+                Resource: "*"
+                Effect: Allow
+              - 
+                Action:
+                  - ecr:BatchCheckLayerAvailability
+                  - ecr:BatchGetImage
+                  - ecr:Describe*
+                  - ecr:GetAuthorizationToken
+                  - ecr:GetDownloadUrlForLayer
+                Resource: "*"
+                Effect: Allow
+              - 
+                Effect: Allow
+                Action:
+                  - ecr:BatchDeleteImage
+                  - ecr:CompleteLayerUpload
+                  - ecr:CreateRepository
+                  - ecr:DeleteRepository
+                  - ecr:InitiateLayerUpload
+                  - ecr:PutImage
+                  - ecr:UploadLayerPart
+                Resource:
+                  - arn:aws:ecr:*:*:repository/sagemaker-*
+              - 
+                Action:
+                  - events:DeleteRule
+                  - events:DescribeRule
+                  - events:PutRule
+                  - events:PutTargets
+                  - events:RemoveTargets
+                Resource:
+                  - arn:aws:events:*:*:rule/sagemaker-*
+                Effect: Allow
+              - 
+                Action:
+                  - firehose:PutRecord
+                  - firehose:PutRecordBatch
+                Resource: arn:aws:firehose:*:*:deliverystream/sagemaker-*
+                Effect: Allow
+              - 
+                Action:
+                  - glue:BatchCreatePartition
+                  - glue:BatchDeletePartition
+                  - glue:BatchDeleteTable
+                  - glue:BatchDeleteTableVersion
+                  - glue:BatchGetPartition
+                  - glue:CreateDatabase
+                  - glue:CreatePartition
+                  - glue:CreateTable
+                  - glue:DeletePartition
+                  - glue:DeleteTable
+                  - glue:DeleteTableVersion
+                  - glue:GetDatabase
+                  - glue:GetPartition
+                  - glue:GetPartitions
+                  - glue:GetTable
+                  - glue:GetTables
+                  - glue:GetTableVersion
+                  - glue:GetTableVersions
+                  - glue:SearchTables
+                  - glue:UpdatePartition
+                  - glue:UpdateTable
+                Resource:
+                  - arn:aws:glue:*:*:catalog
+                  - arn:aws:glue:*:*:database/default
+                  - arn:aws:glue:*:*:database/global_temp
+                  - arn:aws:glue:*:*:database/sagemaker-*
+                  - arn:aws:glue:*:*:table/sagemaker-*
+                  - arn:aws:glue:*:*:tableVersion/sagemaker-*
+                Effect: Allow
+              - 
+                Action:
+                  - iam:PassRole
+                Resource:
+                  - arn:aws:iam::*:role/service-role/AmazonSageMakerServiceCatalogProductsUse*
+                Effect: Allow
+              - 
+                Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource:
+                  - arn:aws:lambda:*:*:function:sagemaker-*
+              - 
+                Action:
+                  - logs:CreateLogDelivery
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:DeleteLogDelivery
+                  - logs:Describe*
+                  - logs:GetLogDelivery
+                  - logs:GetLogEvents
+                  - logs:ListLogDeliveries
+                  - logs:PutLogEvents
+                  - logs:PutResourcePolicy
+                  - logs:UpdateLogDelivery
+                Resource: "*"
+                Effect: Allow
+              - 
+                Effect: Allow
+                Action:
+                  - s3:CreateBucket
+                  - s3:DeleteBucket
+                  - s3:GetBucketAcl
+                  - s3:GetBucketCors
+                  - s3:GetBucketLocation
+                  - s3:ListAllMyBuckets
+                  - s3:ListBucket
+                  - s3:ListBucketMultipartUploads
+                  - s3:PutBucketCors
+                Resource:
+                  - arn:aws:s3:::aws-glue-*
+                  - arn:aws:s3:::sagemaker-*
+              - 
+                Effect: Allow
+                Action:
+                  - s3:AbortMultipartUpload
+                  - s3:DeleteObject
+                  - s3:GetObject
+                  - s3:GetObjectVersion
+                  - s3:PutObject
+                Resource:
+                  - arn:aws:s3:::aws-glue-*
+                  - arn:aws:s3:::sagemaker-*
+              - 
+                Effect: Allow
+                Action:
+                  - sagemaker:*
+                NotResource:
+                  - arn:aws:sagemaker:*:*:domain/*
+                  - arn:aws:sagemaker:*:*:user-profile/*
+                  - arn:aws:sagemaker:*:*:app/*
+                  - arn:aws:sagemaker:*:*:flow-definition/*
+              - 
+                Action:
+                  - states:DescribeExecution
+                  - states:DescribeStateMachine
+                  - states:DescribeStateMachineForExecution
+                  - states:GetExecutionHistory
+                  - states:ListExecutions
+                  - states:ListTagsForResource
+                  - states:StartExecution
+                  - states:StopExecution
+                  - states:TagResource
+                  - states:UntagResource
+                  - states:UpdateStateMachine
+                Resource:
+                  - arn:aws:states:*:*:stateMachine:sagemaker-*
+                  - arn:aws:states:*:*:execution:sagemaker-*:*
+                Effect: Allow
+              - 
+                Action:
+                  - states:ListStateMachines
+                Resource: "*"
+                Effect: Allow
 
   CopyNotebooks:
     Type: Custom::DownloadNotebooksFunction
@@ -701,4 +1288,5 @@ Outputs:
     Value: !Ref "AWS::Region"
   LabBucket:
     Value: !Ref "LabBucket"
+
 
