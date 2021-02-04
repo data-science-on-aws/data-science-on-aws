@@ -25,29 +25,7 @@
                 "arn:aws:s3:::{3}",
                 "arn:aws:s3:::{3}/*"
             ]
-        },
-        { 
-            "Effect": "Allow",
-            "Action": [
-                "cloudformation:CreateStack",
-                "cloudformation:DescribeStacks"
-            ],
-            "Resource": [
-                "arn:aws:cloudformation:{0}:{1}:stack/*/*"
-            ]
-        },
-        { 
-            "Effect": "Allow",
-            "Action": [
-                "ec2:CreateVpc",
-                "ec2:CreateInternetGateway",
-                "ec2:DescribeInternetGateways",
-                "ec2:ModifyVpcAttribute"
-            ],
-            "Resource": [
-                "arn:aws:ec2:{0}:{1}:*"
-            ]
-        },                   
+        },                          
         {
             "Effect": "Allow",
             "Action": [
