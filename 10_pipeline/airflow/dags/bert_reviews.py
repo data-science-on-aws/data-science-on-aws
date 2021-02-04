@@ -5,7 +5,7 @@ from datetime import datetime
 
 import sys
 
-sys.path.append('/Users/cfregly/airflow/dags/')
+sys.path.append('./airflow/dags/')
 
 # airflow operators
 import airflow
