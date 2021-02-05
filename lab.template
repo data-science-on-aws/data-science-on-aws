@@ -20,9 +20,9 @@ Resources:
       EnableDnsHostnames: true
       Tags:
         - Key: VPC
-          Value: NLP
+          Value: VPC 
         - Key: Name
-          Value: NLP Lab 2.1 VPC
+          Value: VPC
   InternetGateway1:
     Type: 'AWS::EC2::InternetGateway'
     DependsOn: VPC
@@ -43,7 +43,7 @@ Resources:
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
-          Value: NLP Lab 3.1 Public Subnet
+          Value: Public Subnet
   PublicRouteTable1:
     Type: 'AWS::EC2::RouteTable'
     DependsOn:
@@ -83,7 +83,7 @@ Resources:
       MapPublicIpOnLaunch: false
       Tags:
         - Key: Name
-          Value: NLP Lab 3.1 Private Subnet
+          Value: Private Subnet
   PrivateRouteTable:
     Type: 'AWS::EC2::RouteTable'
     Properties:
@@ -1121,7 +1121,7 @@ Resources:
                 os.chown(dirpath, 200005, 1001) 
 
           def download_dir(prefix, local, bucket, region):
-              client = boto3.client('s3', region_name='us-west-2')
+              client = boto3.client('s3', region_name=region)
               paginator = client.get_paginator('list_objects')
               operation_parameters = {'Bucket': bucket, 'Prefix': prefix}
               keys = []
