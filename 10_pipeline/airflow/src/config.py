@@ -9,7 +9,7 @@ config["job_level"] = {
 }
 
 config["preprocess_data"] = {
-    "s3_in_url": "s3://amazon-reviews-pds/tsv/amazon_reviews_us_Digital_Software_v1_00.tsv.gz",
+    "s3_in_url": "s3://amazon-reviews-pds/tsv/amazon_reviews_us_Digital_Video_Download_v1_00.tsv.gz",
     "s3_out_bucket": "{1}", # replace
     "s3_out_prefix": "preprocess/",
     "delimiter": "\t"
