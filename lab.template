@@ -355,15 +355,15 @@ Resources:
             efs_r=efs.describe_mount_targets(FileSystemId=r['HomeEfsFileSystemId'])
             sg_r=efs.describe_mount_target_security_groups(MountTargetId=efs_r['MountTargets'][0]['MountTargetId'])
             e=boto3.client('ec2').describe_security_groups(GroupIds=sg_r['SecurityGroups'])['SecurityGroups'][0]['IpPermissions'][0]['UserIdGroupPairs'][0]['GroupId']
-            cfnresponse.send(event,context,S,{'DomainId':r['DomainId'],'EFSId':r['HomeEfsFileSystemId'],'SG':e},physicalResourceId=response['DomainId'])
+            cfnresponse.send(event,context,S,{'DomainId':r['DomainId'],'EFSId':r['HomeEfsFileSystemId'],'SG':e},physicalResourceId=r['DomainId'])
           def handle_delete(event,context):
-            domain_id=event['PhysicalResourceId']
+            did=event['PhysicalResourceId']
             try:
-              c.describe_domain(DomainId=domain_id)
+              c.describe_domain(DomainId=did)
             except ClientError as exception:
               cfnresponse.send(event,context,S,{},physicalResourceId=event['PhysicalResourceId'])
               return
-            delete_domain(domain_id)
+            delete_domain(did)
             cfnresponse.send(event,context,S,{},physicalResourceId=event['PhysicalResourceId'])
           def handle_update(event, context):
             did=event['PhysicalResourceId']
