@@ -2,334 +2,84 @@
     "Version": "2012-10-17",
     "Statement": [
         {
-            "Sid": "LabPermissions",
-            "Action": [
-                "autoscaling-plans:Describe*",
-                "autoscaling-plans:GetScalingPlanResourceForecastData",
-                "autoscaling:Describe*",
-                "cloudtrail:Describe*",
-                "cloudtrail:Get*",
-                "cloudtrail:List*",
-                "cloudtrail:LookupEvents",
-                "ec2:AssociateRouteTable",
-                "ec2:AttachInternetGateway",
-                "ec2:AttachNetworkInterface",
-                "ec2:AuthorizeSecurityGroupEgress",
-                "ec2:CreateInternetGateway",
-                "ec2:CreateNatGateway",
-                "ec2:CreateNetworkInterface",
-                "ec2:CreateRoute",
-                "ec2:CreateRouteTable",
-                "ec2:CreateSecurityGroup",
-                "ec2:CreateSubnet",
-                "ec2:CreateVpc",
-                "ec2:DeleteInternetGateway",
-                "ec2:DeleteNatGateway",
-                "ec2:DeleteNetworkInterface",
-                "ec2:DeleteRoute",
-                "ec2:DeleteRouteTable",
-                "ec2:DeleteSecurityGroup",
-                "ec2:DeleteSubnet",
-                "ec2:DeleteVpc",
-                "ec2:Describe*",
-                "ec2:DescribeNetworkInterfaceAttribute",
-                "ec2:DescribeNetworkInterfaces",
-                "ec2:DescribeSecurityGroups",
-                "ec2:DetachInternetGateway",
-                "ec2:DetachNetworkInterface",
-                "ec2:DetatchInternetGateway",
-                "ec2:DisassociateRouteTable",
-                "ec2:Get*",
-                "ec2:ModifySubnetAttribute",
-                "ec2:ModifyVpcAttribute",
-                "ec2:RevokeSecurityGroupEgress",
-                "ec2:SearchTransitGatewayRoutes",
-                "ec2:allocateAddress",
-                "ec2:createTags",
-                "ec2:deleteTags",
-                "ec2:releaseAddress",
-                "ec2messages:Get*",
-                "elasticfilesystem:CreateAccessPoint",
-                "elasticfilesystem:DeleteAccessPoint",
-                "elasticfilesystem:DescribeAccessPoints",
-                "elasticfilesystem:DescribeMountTargetSecurityGroups",
-                "elasticfilesystem:DescribeMountTargets",
-                "iam:AttachRolePolicy",
-                "iam:CreatePolicy",
-                "iam:CreateRole",
-                "iam:DeletePolicy",
-                "iam:DeleteRole",
-                "iam:DeleteRolePolicy",
-                "iam:DetachRolePolicy",
-                "iam:DetatchRolePolicy",
-                "iam:Generate*",
-                "iam:Get*",
-                "iam:List*",
-                "iam:PassRole",
-                "iam:Simulate*",
-                "lambda:CreateFunction",
-                "lambda:DeleteFunction",
-                "lambda:GetFunction",
-                "lambda:GetFunctionConfiguration",
-                "lambda:InvokeFunction",
-                "rds:Describe*",
-                "rds:Download*",
-                "rds:List*",
-                "s3:CreateBucket",
-                "s3:DeleteBucket",
-                "s3:Get*",
-                "s3:List*",
-                "servicecatalog:ListAcceptedPortfolioShares",
-                "ssm:Describe*",
-                "ssm:Get*",
-                "ssm:List*"
-            ],
-            "Effect": "Allow",
-            "Resource": "*"
+          "Sid": "SageMakerApis",
+          "Effect": "Allow",
+          "Action": [
+            "sagemaker:*"
+          ],
+          "Resource": "*"
         },
         {
-            "Sid": "SageMakerStudio",
-            "Action": [
-                "sagemaker:*"
-            ],
-            "Effect": "Allow",
-            "Resource": "*"
+          "Sid": "S3Apis",
+          "Effect": "Allow",
+          "Action": [
+            "s3:*"
+          ],
+          "Resource": "*"
         },
         {
-            "Sid": "DenyAllActions",
-            "Action": [
-                "route53domains:RegisterDomain",
-                "dynamodb:*Reserved*",
-                "s3:*ObjectLegalHold",
-                "s3:*ObjectRetention",
-                "s3:*BucketObjectLock*",
-                "glacier:*VaultLock",
-                "redshift:AcceptReservedNodeExchange",
-                "redshift:PurchaseReservedNodeOffering"
-            ],
-            "Effect": "Deny",
-            "Resource": "*"
+          "Sid": "VpcConfigurationForCreateForms",
+          "Effect": "Allow",
+          "Action": [
+            "ec2:DescribeVpcs",
+            "ec2:DescribeSubnets",
+            "ec2:DescribeSecurityGroups"
+          ],
+          "Resource": "*"
         },
         {
-            "Sid": "RestrictActions",
-            "Effect": "Deny",
-            "Action": [
-                "ec2:*Spot*",
-                "ec2:*ReservedInstances*",
-                "ec2:*Scheduled*",
-                "ec2:*Purchase*",
-                "ec2:EnableFastSnapshotRestores"
+            "Sid":"KmsKeysForCreateForms",
+            "Effect":"Allow",
+            "Action":[
+              "kms:DescribeKey",
+              "kms:ListAliases"
             ],
-            "Resource": "*"
+            "Resource":"*"
         },
         {
-            "Sid": "RestrictPlacementGroup",
-            "Action": "ec2:*Instance*",
-            "Effect": "Deny",
-            "Resource": "*",
-            "Condition": {
-                "StringEquals": {
-                    "ec2:PlacementGroupStrategy": "cluster"
-                }
+          "Effect": "Allow",
+          "Action": [
+            "codecommit:BatchGetRepositories",
+            "codecommit:GetRepository",
+            "codecommit:ListRepositories",
+            "codecommit:ListBranches",
+            "secretsmanager:CreateSecret",
+            "secretsmanager:DescribeSecret",
+            "secretsmanager:ListSecrets"
+          ],
+          "Resource": "*"
+        },
+        {
+          "Sid":"ListAndCreateExecutionRoles",
+          "Effect":"Allow",
+          "Action":[
+            "iam:ListRoles",
+            "iam:AttachRolePolicy",
+            "iam:CreateServiceLinkedRole"
+          ],
+          "Resource":"*"
+        },
+        {
+          "Sid": "DescribeECRMetaData",
+          "Effect": "Allow",
+          "Action": [
+              "ecr:Describe*"
+          ],
+          "Resource": "*"
+        },
+        {
+          "Sid": "PassRoleForExecutionRoles",
+          "Effect": "Allow",
+          "Action": [
+            "iam:PassRole"
+          ],
+          "Resource": "*",
+          "Condition": {
+            "StringEquals": {
+                "iam:PassedToService": "sagemaker.amazonaws.com"
             }
+          }
         },
-        {
-            "Sid": "DenyTenancy",
-            "Action": "ec2:*Instance*",
-            "Effect": "Deny",
-            "Resource": "arn:aws:ec2:*:*:instance/*",
-            "Condition": {
-                "StringNotLike": {
-                    "ec2:Tenancy": "default"
-                }
-            }
-        },
-        {
-            "Sid": "RestrictInstanceTypes",
-            "Action": [
-                "ec2:RunInstances",
-                "ec2:StartInstances"
-            ],
-            "Effect": "Deny",
-            "Resource": "arn:aws:ec2:*:*:instance/*",
-            "Condition": {
-                "ForAnyValue:StringNotLike": {
-                    "ec2:InstanceType": [
-                        "*.nano",
-                        "*.micro",
-                        "*.small",
-                        "*.medium"
-                    ]
-                }
-            }
-        },
-        {
-            "Sid": "RestrictLargeVolumes",
-            "Action": [
-                "ec2:RunInstances",
-                "ec2:CreateVolume"
-            ],
-            "Effect": "Deny",
-            "Resource": "arn:aws:ec2:*:*:volume/*",
-            "Condition": {
-                "NumericGreaterThanIfExists": {
-                    "ec2:VolumeSize": "35"
-                }
-            }
-        },
-        {
-            "Sid": "RestrictPIOPSVolumes",
-            "Action": [
-                "ec2:RunInstances",
-                "ec2:CreateVolume"
-            ],
-            "Effect": "Deny",
-            "Resource": "arn:aws:ec2:*:*:volume/*",
-            "Condition": {
-                "StringNotLikeIfExists": {
-                    "ec2:VolumeType": [
-                        "gp2",
-                        "standard"
-                    ]
-                }
-            }
-        },
-        {
-            "Sid": "RestrictASGLaunchConfiguration",
-            "Action": [
-                "autoscaling:CreateLaunchConfiguration"
-            ],
-            "Effect": "Deny",
-            "Resource": "*",
-            "Condition": {
-                "ForAnyValue:StringNotLike": {
-                    "autoscaling:InstanceType": [
-                        "*.nano",
-                        "*.small",
-                        "*.micro",
-                        "*.medium"
-                    ]
-                }
-            }
-        },
-        {
-            "Sid": "RestrictRIPurchase",
-            "Action": [
-                "rds:PurchaseReservedDBInstancesOffering"
-            ],
-            "Effect": "Deny",
-            "Resource": "*"
-        },
-        {
-            "Sid": "RestrictRDSPiops",
-            "Action": [
-                "rds:CreateGlobalCluster",
-                "rds:CreateDBInstanceReadReplica",
-                "rds:StartDB*",
-                "rds:ModifyDBCluster",
-                "rds:ModifyCurrentDBClusterCapacity",
-                "rds:ModifyDBClusterEndpoint",
-                "rds:ModifyDBInstance",
-                "rds:ModifyGlobalCluster",
-                "rds:RestoreDB*",
-                "rds:RebootDBInstance"
-            ],
-            "Effect": "Deny",
-            "Resource": "*",
-            "Condition": {
-                "NumericNotEqualsIfExists": {
-                    "rds:Piops": "0"
-                }
-            }
-        },
-        {
-            "Sid": "RestrictRDSActivity",
-            "Action": [
-                "rds:*"
-            ],
-            "Effect": "Allow",
-            "Resource": "*",
-            "Condition": {
-                "ForAnyValue:StringLikeIfExists": {
-                    "rds:DatabaseClass": [
-                        "*.nano",
-                        "*.small",
-                        "*.micro",
-                        "*.medium"
-                    ],
-                    "rds:DatabaseEngine": [
-                        "aurora-mysql",
-                        "aurora-postgresql",
-                        "mysql",
-                        "postgres",
-                        "mariadb"
-                    ]
-                },
-                "NumericLessThanIfExists": {
-                    "rds:StorageSize": "101"
-                }
-            }
-        },
-        {
-            "Sid": "PublicReadForGetBucketObjects",
-            "Effect": "Allow",
-            "Action": "s3:GetObject",
-            "Resource": "arn:aws:s3:::deeplearning-ai-aws-specialization/*"
-        },
-        {
-            "Sid": "CloudWatchLogsAccess",
-            "Effect": "Allow",
-            "Action": "logs:*",
-            "Resource": "*"
-        },
-        {
-            "Sid": "CloudWatchAccess",
-            "Effect": "Allow",
-            "Action": "cloudwatch:*",
-            "Resource": "*"
-        },
-        {
-            "Sid": "GlueAccess",
-            "Effect": "Allow",
-            "Action": "glue:*",
-            "Resource": "*"
-        },              
-        {
-            "Sid": "RedshiftAccess",
-            "Effect": "Allow",
-            "Action": "redshift:*",
-            "Resource": "*"
-        },
-        {
-            "Sid": "StepFunctionsAccess",
-            "Effect": "Allow",
-            "Action": "states:*",
-            "Resource": "*"
-        },
-        {
-            "Sid": "Kinesis",
-            "Effect": "Allow",
-            "Action": "kinesis:*",
-            "Resource": "*"
-        },
-        {
-            "Sid": "KinesisAnalytics",
-            "Effect": "Allow",
-            "Action": "kinesisanalytics:*",
-            "Resource": "*"
-        },
-        {
-            "Sid": "KinesisAnalytics",
-            "Effect": "Allow",
-            "Action": "kinesisanalytics:*",
-            "Resource": "*"
-        },        
-        {
-            "Sid": "KinesisFirehose",
-            "Effect": "Allow",
-            "Action": "firehose:*",
-            "Resource": "*"
-        },        
         {
             "Sid": "EnforceInstanceTypesSageMakerStudio",
             "Effect": "Allow",
@@ -340,10 +90,66 @@
             "Condition": {
                 "ForAnyValue:StringLike": {
                     "sagemaker:InstanceTypes": [
-                        "ml.t3.medium"
+                        "ml.c5.large",
+                        "ml.m5.4xlarge", 
+                        "ml.m5.large",
+                        "ml.t3.medium" 
                     ]
                 }
             }
+        },
+        {
+            "Sid": "EnforceInstanceType",
+            "Effect": "Allow",
+            "Action": [
+                "sagemaker:CreateNotebookInstance",
+                "sagemaker:CreateTrainingJob",
+                "sagemaker:CreateHyperParameterTuningJob"
+            ],
+            "Resource": "*",
+            "Condition": {
+                "ForAllValues:StringLike": {
+                    "sagemaker:InstanceTypes": ["ml.m4.xlarge"]
+                }
+            }
+        },
+        {
+            "Sid": "PublicReadForGetBucketObjects",
+            "Effect": "Allow",
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::deeplearning-ai-aws-specialization/*"
+        },
+        {
+            "Sid" : "AllowElasticFileSystemPermissions",  
+            "Effect": "Allow",
+            "Action": [
+                "elasticfilesystem:*"
+            ],
+            "Resource": "arn:aws:elasticfilesystem:::file-system/*"
+        },
+        {
+          "Sid":"LambdaFullAccess",
+          "Effect":"Allow",
+          "Action":[
+            "lambda:*"
+          ],
+          "Resource":"*"
+        },
+        {
+          "Sid":"CloudFormationFullAccess",
+          "Effect":"Allow",
+          "Action":[
+            "cloudformation:*"
+          ],
+          "Resource":"*"
+        },
+        {
+          "Sid":"AdministratorAccess",
+          "Effect":"Allow",
+          "Action":[
+            "*"
+          ],
+          "Resource":"*"
         }
     ]
 }
