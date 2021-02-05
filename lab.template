@@ -581,7 +581,7 @@ Resources:
                   response = client.create_app(DomainId=domain_id, UserProfileName=user_profile_name,  AppType=app_type, AppName=app_name, ResourceSpec={'SageMakerImageArn': sagemaker_image_arn, 'InstanceType': instance_type})
 
               created = False
-              while not created:
+              while not created and app_type != "KernelGateway":
                   response = client.describe_app(DomainId=domain_id, UserProfileName=user_profile_name, AppType=app_type, AppName=app_name)
                   time.sleep(5)
                   if response['Status'] == 'InService':
