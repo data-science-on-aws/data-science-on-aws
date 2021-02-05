@@ -1248,7 +1248,7 @@ Resources:
     Type: Custom::DownloadNotebooksFunction
     Properties:
       ServiceToken: !GetAtt DownloadNotebooksFunction.Arn
-      Prefix: 'labs'
+      Prefix: ''
       Target: '/mnt/studio/200005'
       S3Bucket: 'deeplearning-ai-aws-specialization'
       BucketRegion: 'us-east-1'
