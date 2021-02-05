@@ -135,6 +135,11 @@ Resources:
             Action:
               - "sts:AssumeRole"
       Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+        - arn:aws:iam::aws:policy/IAMFullAccess
+
   LambdaExecutionPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
@@ -342,7 +347,7 @@ Resources:
               elif event['RequestType']=='Delete':
                 handle_delete(event, context)
             except ClientError as exception:
-                cfnresponse.send(event,context,cfnresponse.FAILED,{},error=str(exception))
+                cfnresponse.send(event,context,cfnresponse.FAILED,{},reason=str(exception))
           def handle_create(event, context):
             config=event['ResourceProperties']
             r=create_studio_domain(config)
