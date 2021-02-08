@@ -20,7 +20,7 @@ Resources:
       EnableDnsHostnames: true
       Tags:
         - Key: VPC
-          Value: VPC 
+          Value: VPC
         - Key: Name
           Value: VPC
   InternetGateway1:
@@ -628,6 +628,11 @@ Resources:
             Action:
               - "sts:AssumeRole"
       Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSageMakerFullAccess
+        - arn:aws:iam::aws:policy/AdministratorAccess
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+
   LambdaExecutionPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
@@ -734,17 +739,8 @@ Resources:
       Path: /service-role/ 
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AmazonSageMakerFullAccess
-## BEGIN CHRIS
-        - arn:aws:iam::aws:policy/AmazonAthenaFullAccess
-        - arn:aws:iam::aws:policy/AmazonSageMakerFeatureStoreAccess
-        - arn:aws:iam::aws:policy/AmazonRedshiftFullAccess
-#        - arn:aws:iam::aws:policy/AWSStepFunctionsFullAccess
-#        - arn:aws:iam::aws:policy/AmazonKinesisFullAccess
-#        - arn:aws:iam::aws:policy/AmazonKinesisFirehoseFullAccess
-#        - arn:aws:iam::aws:policy/AmazonKinesisAnalyticsFullAccess
-        - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
-        - arn:aws:iam::aws:policy/AWSCodePipeline_FullAccess
-## END CHRIS
+        - arn:aws:iam::aws:policy/AdministratorAccess
+
   SageMakerExecutionPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
@@ -755,13 +751,12 @@ Resources:
           - Sid: S3Permissions
             Effect: Allow
             Action:
-              - s3:Get*
-              - s3:List*
+              - s3:*
             Resource: '*'
           - Sid: IAMPermissions
             Effect: Allow
             Action:
-              - iam:GetRole
+              - iam:*
             Resource: '*'
       Roles:
         - !Ref  SageMakerExecutionRole
@@ -1121,7 +1116,7 @@ Resources:
                 os.chown(dirpath, 200005, 1001) 
 
           def download_dir(prefix, local, bucket, region):
-              client = boto3.client('s3', region_name=region)
+              client = boto3.client('s3', region_name='us-west-2')
               paginator = client.get_paginator('list_objects')
               operation_parameters = {'Bucket': bucket, 'Prefix': prefix}
               keys = []
@@ -1248,7 +1243,7 @@ Resources:
     Type: Custom::DownloadNotebooksFunction
     Properties:
       ServiceToken: !GetAtt DownloadNotebooksFunction.Arn
-      Prefix: ''
+      Prefix: 'labs'
       Target: '/mnt/studio/200005'
       S3Bucket: 'deeplearning-ai-aws-specialization'
       BucketRegion: 'us-east-1'
