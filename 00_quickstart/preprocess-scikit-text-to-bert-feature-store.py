@@ -29,7 +29,7 @@ subprocess.check_call([sys.executable, '-m', 'conda', 'install', '-c', 'conda-fo
 from transformers import DistilBertTokenizer
 from transformers import DistilBertConfig
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'matplotlib==3.2.1'])
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'sagemaker==2.23.1'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'sagemaker==2.24.1'])
 import pandas as pd
 import re
 import sagemaker
@@ -51,20 +51,16 @@ sts = boto3.Session(region_name=region).client(service_name='sts', region_name=r
 caller_identity = sts.get_caller_identity()
 print('caller_identity: {}'.format(caller_identity))
 
-assumed_role = caller_identity['Arn']
-print('(assumed_role) caller_identity_arn: {}'.format(assumed_role))
+assumed_role_arn = caller_identity['Arn']
+print('(assumed_role) caller_identity_arn: {}'.format(assumed_role_arn))
 
-# Aiken + Chris
-#   "arn:aws:sts::XXX:assumed-role/mod-81045caa359946a1-SageMakerExecutionRole-JHURCYL80VLI/SageMaker"
-if ("TeamRole" in assumed_role or "SageMakerExecutionRole" in assumed_role) and "service-role" not in assumed_role and "mod-" not in assumed_role: 
-    # TeamRole is specific to our workshop and is not a service-role
-    # Differentiating /AmazonSageMakerExecutionRole (Chris' Notebook) from /SageMakerExecutionRole (Event Engine Notebook)
-    role = re.sub(r"^(.+)sts::(\d+):assumed-role/(.+?)/.*$", r"\1iam::\2:role/\3", assumed_role)
-    print('[TeamRole] Replacing :assumed-role/ to :role/ which results in this:  {}'.format(role))
-else:
-    role = re.sub(r"^(.+)sts::(\d+):assumed-role/(.+?)/.*$", r"\1iam::\2:role/service-role/\3", assumed_role)
-    print('Replacing :assumed-role/ with :role/service-role/ which results in this:  {}'.format(role))
+assumed_role_name = assumed_role_arn.split('/')[-2]
 
+iam = boto3.Session(region_name=region).client(service_name='iam', region_name=region)
+get_role_response = iam.get_role(RoleName=assumed_role_name) 
+print('get_role_response {}'.format(get_role_response))
+role = get_role_response['Role']['Arn']
+print('role {}'.format(role))
 
 bucket = sagemaker.Session().default_bucket()
 print('The DEFAULT BUCKET is {}'.format(bucket))
