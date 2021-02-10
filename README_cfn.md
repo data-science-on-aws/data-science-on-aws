@@ -47,5 +47,3 @@ This workshop is FREE, but would otherwise cost <25 USD.
 ## 3. Start the Workshop!
 
 Start the workshop!
-
-![Start Workshop](img/studio_start_workshop.png)
