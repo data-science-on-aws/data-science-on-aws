@@ -62,7 +62,7 @@ _Note:  Reminder that you should allow access only to the resources that you nee
 
 ![Attach Admin Policy](img/alt_attach_policies.png)
 
-## 4. Launch an Amazon SageMaker Notebook Instance
+## 4. Launch SageMaker Studio
 
 Open the [AWS Management Console](https://console.aws.amazon.com/console/home)
 
@@ -80,7 +80,7 @@ In the AWS Console search bar, type `SageMaker` and select `Amazon SageMaker` to
 
 ![Loading Studio](img/studio_loading.png)
 
-## 5. Launch a new Terminal within the Jupyter notebook
+## 5. Launch a new Terminal within Studio
 
 Click `File` > `New` > `Terminal` to launch a terminal in your Jupyter instance.
 
