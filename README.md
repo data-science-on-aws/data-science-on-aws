@@ -56,15 +56,13 @@ In the AWS Console search bar, type `SageMaker` and select `Amazon SageMaker` to
 
 ![Notebook Instances](img/stu_notebook_instances_9.png)
 
-![Create Studio](img/studio_create.png)
-
 ![Pending Studio](img/studio_pending.png)
 
 ![Open Studio](img/studio_open.png)
 
 ![Loading Studio](img/studio_loading.png)
 
-## 4. Launch a new Terminal within Studio
+## 4. Launch a New Terminal within Studio
 
 Click `File` > `New` > `Terminal` to launch a terminal in your Jupyter instance.
 
