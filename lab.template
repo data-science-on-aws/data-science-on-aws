@@ -1243,9 +1243,9 @@ Resources:
     Type: Custom::DownloadNotebooksFunction
     Properties:
       ServiceToken: !GetAtt DownloadNotebooksFunction.Arn
-      Prefix: 'labs'
+      Prefix: 'workshop/00_quickstart'
       Target: '/mnt/studio/200005'
-      S3Bucket: 'deeplearning-ai-aws-specialization'
+      S3Bucket: 'dsoaws'
       BucketRegion: 'us-east-1'
     DependsOn:
       - JupyterServerApp
