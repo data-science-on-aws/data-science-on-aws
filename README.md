@@ -46,6 +46,54 @@ This workshop is FREE, but would otherwise cost <25 USD.
 
 ![CloudFormation 6](img/cloud-formation-6.png)
 
-## 3. Start the Workshop!
+## 3. Launch SageMaker Studio
 
-Start the workshop!
+Open the [AWS Management Console](https://console.aws.amazon.com/console/home)
+
+![Back to SageMaker](img/alt_back_to_sagemaker_8.png)
+
+In the AWS Console search bar, type `SageMaker` and select `Amazon SageMaker` to open the service console.
+
+![Notebook Instances](img/stu_notebook_instances_9.png)
+
+![Create Studio](img/studio_create.png)
+
+![Pending Studio](img/studio_pending.png)
+
+![Open Studio](img/studio_open.png)
+
+![Loading Studio](img/studio_loading.png)
+
+## 4. Launch a new Terminal within Studio
+
+Click `File` > `New` > `Terminal` to launch a terminal in your Jupyter instance.
+
+![Terminal Studio](img/studio_terminal.png)
+
+## 5. Clone this GitHub Repo in the Terminal
+
+Within the Terminal, run the following:
+
+```
+cd ~ && git clone https://github.com/data-science-on-aws/workshop
+```
+
+If you see an error like the following, just re-run the command again until it works:
+```
+fatal: Unable to create '/home/sagemaker-user/workshop/.git/index.lock': File exists.
+
+Another git process seems to be running in this repository, e.g.
+an editor opened by 'git commit'. Please make sure all processes
+are terminated then try again. If it still fails, a git process
+may have crashed in this repository earlier:
+remove the file manually to continue.
+```
+_Note:  This is not a fatal error ^^ above ^^.  Just re-run the command again until it works._
+
+## 6. Start the Workshop!
+
+Navigate to `00_quickstart/` or `01_setup/` in your Jupyter notebook and start the workshop!
+
+_You may need to refresh your browser if you don't see the new `workshop/` directory._
+
+![Start Workshop](img/studio_start_workshop.png)
