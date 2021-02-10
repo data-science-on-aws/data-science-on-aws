@@ -32,6 +32,8 @@ This workshop is FREE, but would otherwise cost <25 USD.
 
 ## 2. Setup Environment
 
+![CloudFormation 0](img/cloud-formation-0.png)
+
 ![CloudFormation 1](img/cloud-formation-1.png)
 
 ![CloudFormation 2](img/cloud-formation-2.png)
