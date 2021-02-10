@@ -90,7 +90,7 @@ _Note:  This is not a fatal error ^^ above ^^.  Just re-run the command again un
 
 ## 6. Start the Workshop!
 
-Navigate to `00_quickstart/` or `01_setup/` in your Jupyter notebook and start the workshop!
+Navigate to `00_quickstart/` in SageMaker Studio and start the workshop!
 
 _You may need to refresh your browser if you don't see the new `workshop/` directory._
 
