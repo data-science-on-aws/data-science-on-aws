@@ -30,86 +30,22 @@ This workshop is FREE, but would otherwise cost <25 USD.
 
 ![IAM](img/aws_console.png)
 
-## 2. Create `TeamRole` IAM Role
+## 2. Setup Environment
 
-![IAM](img/alt_iam_1.png)
+![CloudFormation 0](img/cloud-formation-0.png)
 
-![Roles](img/alt_roles_2.png)
+![CloudFormation 1](img/cloud-formation-1.png)
 
-![Create Role](img/alt_create_role_3.png)
+![CloudFormation 2](img/cloud-formation-2.png)
 
-![Select Service](img/alt_select_service_4.png)
+![CloudFormation 3](img/cloud-formation-3.png)
 
-![Select Policy](img/alt_select_policy_5.png)
+![CloudFormation 4](img/cloud-formation-4.png)
 
-![Add Tags](img/alt_add_tags_6.png)
+![CloudFormation 5](img/cloud-formation-5.png)
 
-![Review Name](img/alt_review_name_7.png)
+![CloudFormation 6](img/cloud-formation-6.png)
 
-## 3. Update IAM Role Policy
+## 3. Start the Workshop!
 
-![Select IAM](img/studio_select_iam.png)
-
-![Edit TeamRole](img/studio_edit_teamrole.png)
-
-Click `Attach Policies`.
-
-![IAM Policy](img/view_policies.png)
-              
-Select `AmazonS3FullAccess` and click on `Attach Policy`.
-
-_Note:  Reminder that you should allow access only to the resources that you need._ 
-
-![Attach Admin Policy](img/alt_attach_policies.png)
-
-## 4. Launch an Amazon SageMaker Notebook Instance
-
-Open the [AWS Management Console](https://console.aws.amazon.com/console/home)
-
-![Back to SageMaker](img/alt_back_to_sagemaker_8.png)
-
-In the AWS Console search bar, type `SageMaker` and select `Amazon SageMaker` to open the service console.
-
-![Notebook Instances](img/stu_notebook_instances_9.png)
-
-![Create Studio](img/studio_create.png)
-
-![Pending Studio](img/studio_pending.png)
-
-![Open Studio](img/studio_open.png)
-
-![Loading Studio](img/studio_loading.png)
-
-## 5. Launch a new Terminal within the Jupyter notebook
-
-Click `File` > `New` > `Terminal` to launch a terminal in your Jupyter instance.
-
-![Terminal Studio](img/studio_terminal.png)
-
-## 6. Clone this GitHub Repo in the Terminal
-
-Within the Terminal, run the following:
-
-```
-cd ~ && git clone https://github.com/data-science-on-aws/workshop
-```
-
-If you see an error like the following, just re-run the command again until it works:
-```
-fatal: Unable to create '/home/sagemaker-user/workshop/.git/index.lock': File exists.
-
-Another git process seems to be running in this repository, e.g.
-an editor opened by 'git commit'. Please make sure all processes
-are terminated then try again. If it still fails, a git process
-may have crashed in this repository earlier:
-remove the file manually to continue.
-```
-_Note:  This is not a fatal error ^^ above ^^.  Just re-run the command again until it works._
-
-## 7. Start the Workshop!
-
-Navigate to `00_quickstart/` or `01_setup/` in your Jupyter notebook and start the workshop!
-
-_You may need to refresh your browser if you don't see the new `workshop/` directory._
-
-![Start Workshop](img/studio_start_workshop.png)
+Start the workshop!
