@@ -20,8 +20,7 @@ def uid():
 
 
 class AutoMLLocalCandidateStep:
-    """Helper class to execute a callable which is decorated with some metadata like name action.
-    """
+    """Helper class to execute a callable which is decorated with some metadata like name action."""
 
     def __init__(self, name, action, description=""):
         self.name = name
@@ -56,22 +55,15 @@ def execute_steps(execution_name, steps, context, start_jitter_seconds=5):
     for step in steps:
         sleep(start_jitter_seconds)
         thread_name = threading.current_thread().name
-        logging.info(
-            "[{}:{}]Executing step: {}".format(thread_name, execution_name, step.name)
-        )
+        logging.info("[{}:{}]Executing step: {}".format(thread_name, execution_name, step.name))
 
         while True:
             try:
                 step.run(context)
                 break
             except ClientError as e:
-                if (
-                    e.response["Error"]["Code"] == "ThrottlingException"
-                    and wait_seconds < max_wait_seconds
-                ):
-                    logging.info(
-                        "We are getting throttled, retrying in {}s".format(wait_seconds)
-                    )
+                if e.response["Error"]["Code"] == "ThrottlingException" and wait_seconds < max_wait_seconds:
+                    logging.info("We are getting throttled, retrying in {}s".format(wait_seconds))
                     sleep(wait_seconds)
                     wait_seconds = wait_seconds * 2
                     continue
@@ -101,22 +93,22 @@ def select_inference_output(problem_type, model_containers, output_keys):
     Returns: List of model_containers updated to emit the response
     """
     ALLOWED_INVERSE_TRANSFORM_KEYS = {
-        'BinaryClassification': ['predicted_label', 'probability', 'probabilities', 'labels'],
-        'MulticlassClassification': ['predicted_label', 'probability', 'probabilities', 'labels']
+        "BinaryClassification": ["predicted_label", "probability", "probabilities", "labels"],
+        "MulticlassClassification": ["predicted_label", "probability", "probabilities", "labels"],
     }
 
     ALLOWED_ALGO_KEYS = {
-        'BinaryClassification': ['predicted_label', 'probability', 'probabilities'],
-        'MulticlassClassification': ['predicted_label', 'probability', 'probabilities']
+        "BinaryClassification": ["predicted_label", "probability", "probabilities"],
+        "MulticlassClassification": ["predicted_label", "probability", "probabilities"],
     }
 
     try:
         ALLOWED_INVERSE_TRANSFORM_KEYS[problem_type]
     except KeyError:
-        raise ValueError(f'{problem_type} does not support selective inference output.')
+        raise ValueError(f"{problem_type} does not support selective inference output.")
 
     # Either multiclass or binary classification, so the default should be 'predicted_label'
-    output_keys = output_keys or ['predicted_label']
+    output_keys = output_keys or ["predicted_label"]
 
     bad_keys = []
     algo_keys = []
@@ -130,32 +122,37 @@ def select_inference_output(problem_type, model_containers, output_keys):
             algo_keys.append(key.strip())
 
     if len(bad_keys):
-        raise ValueError('Requested inference output keys [{}] are unsupported. '
-                         'The supported inference keys are [{}]'.format(
-                            ', '.join(bad_keys), ', '.format(ALLOWED_INVERSE_TRANSFORM_KEYS[problem_type])))
+        raise ValueError(
+            "Requested inference output keys [{}] are unsupported. "
+            "The supported inference keys are [{}]".format(
+                ", ".join(bad_keys), ", ".format(ALLOWED_INVERSE_TRANSFORM_KEYS[problem_type])
+            )
+        )
 
-    model_containers[1].env.update({
-        'SAGEMAKER_DEFAULT_INVOCATIONS_ACCEPT': 'text/csv',
-        'SAGEMAKER_INFERENCE_OUTPUT': ','.join(algo_keys),
-        'SAGEMAKER_INFERENCE_SUPPORTED': ','.join(ALLOWED_ALGO_KEYS[problem_type])
-    })
-    model_containers[2].env.update({
-        'SAGEMAKER_INFERENCE_OUTPUT': ','.join(transform_keys),
-        'SAGEMAKER_INFERENCE_INPUT': ','.join(algo_keys),
-        'SAGEMAKER_INFERENCE_SUPPORTED': ','.join(ALLOWED_INVERSE_TRANSFORM_KEYS[problem_type])
-    })
+    model_containers[1].env.update(
+        {
+            "SAGEMAKER_DEFAULT_INVOCATIONS_ACCEPT": "text/csv",
+            "SAGEMAKER_INFERENCE_OUTPUT": ",".join(algo_keys),
+            "SAGEMAKER_INFERENCE_SUPPORTED": ",".join(ALLOWED_ALGO_KEYS[problem_type]),
+        }
+    )
+    model_containers[2].env.update(
+        {
+            "SAGEMAKER_INFERENCE_OUTPUT": ",".join(transform_keys),
+            "SAGEMAKER_INFERENCE_INPUT": ",".join(algo_keys),
+            "SAGEMAKER_INFERENCE_SUPPORTED": ",".join(ALLOWED_INVERSE_TRANSFORM_KEYS[problem_type]),
+        }
+    )
 
     return model_containers
 
 
 def get_algo_image_uri(algo_name, region, repo_version):
     if algo_name == "xgboost":
-        return image_uris.retrieve(algo_name, region=region, version='1.0-1')
+        return image_uris.retrieve(algo_name, region=region, version="1.0-1")
     elif algo_name == "mlp":
         mlp_image_uri = image_uris.retrieve("linear-learner", region=region, version=repo_version)
-        last_slash_index = mlp_image_uri.rfind('/')
-        return "{}/{}:{}".format(
-            mlp_image_uri[:last_slash_index], "mxnet-algorithms", repo_version
-        )
+        last_slash_index = mlp_image_uri.rfind("/")
+        return "{}/{}:{}".format(mlp_image_uri[:last_slash_index], "mxnet-algorithms", repo_version)
     else:
         return image_uris.retrieve(algo_name, region=region, version=repo_version)

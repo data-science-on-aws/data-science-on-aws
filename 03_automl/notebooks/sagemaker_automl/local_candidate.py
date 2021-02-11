@@ -17,12 +17,9 @@ from sagemaker_automl.steps import (
 
 
 class AutoMLLocalCandidate:
-    """AutoMLLocalCandidate models an AutoML pipeline consist of data transformer and algo steps
-    """
+    """AutoMLLocalCandidate models an AutoML pipeline consist of data transformer and algo steps"""
 
-    def __init__(
-        self, candidate_name, data_transformer_step, algo_step, local_run_config
-    ):
+    def __init__(self, candidate_name, data_transformer_step, algo_step, local_run_config):
         """
         Args:
             candidate_name (str): name of the candidate, e.g. `dpp0-xgboost`
@@ -83,7 +80,8 @@ class AutoMLLocalCandidate:
             repo_version=local_run_config.data_transformer_image_repo_version,
             source_module_path=os.path.join(
                 f"{local_run_config.automl_job_name}-artifacts",
-                AutoMLCandidateDataTransformerStep.DEFAULT_SOURCE_MODULE)
+                AutoMLCandidateDataTransformerStep.DEFAULT_SOURCE_MODULE,
+            ),
         )
 
         algo_name = candidate_definition["algorithm"]["name"]
@@ -91,12 +89,10 @@ class AutoMLLocalCandidate:
             **candidate_definition["algorithm"],
             region=local_run_config.region,
             repo_version=local_run_config.algo_image_repo_versions[algo_name],
-            inference_repo_version=local_run_config.algo_inference_image_repo_versions[algo_name]
+            inference_repo_version=local_run_config.algo_inference_image_repo_versions[algo_name],
         )
 
-        return AutoMLLocalCandidate(
-            candidate_name, data_transformer_step, algo_step, local_run_config
-        )
+        return AutoMLLocalCandidate(candidate_name, data_transformer_step, algo_step, local_run_config)
 
     @property
     def content_type(self):
@@ -111,9 +107,7 @@ class AutoMLLocalCandidate:
         self._check_data_transformer_prepared()
         return self._state["data_transformer"]["transform_output_path"]
 
-    def prepare_data_transformers_for_training(
-        self, training_job_name=None, transform_job_name=None, **kwargs
-    ):
+    def prepare_data_transformers_for_training(self, training_job_name=None, transform_job_name=None, **kwargs):
         """This prepare the data transformers for training:
         1. create SKlearn trainer
         2. create steps to be executed by runner
@@ -127,9 +121,7 @@ class AutoMLLocalCandidate:
         """
 
         # add network & security features
-        kwargs[
-            "encrypt_inter_container_traffic"
-        ] = self.local_run_config.encrypt_inter_container_traffic
+        kwargs["encrypt_inter_container_traffic"] = self.local_run_config.encrypt_inter_container_traffic
 
         kwargs["subnets"] = self.local_run_config.subnets
         kwargs["security_group_ids"] = self.local_run_config.security_group_ids
@@ -140,25 +132,19 @@ class AutoMLLocalCandidate:
             output_path=self.local_run_config.data_processing_model_s3_root,
             role=self.local_run_config.role,
             sagemaker_session=self.local_run_config.sagemaker_session,
-            **kwargs
+            **kwargs,
         )
 
-        training_job_name = (
-            training_job_name
-            or "{prefix}-{dpp_name}-train-{suffix}".format(
-                prefix=self.local_run_config.local_automl_job_name,
-                dpp_name=self.data_transformer_step.name,
-                suffix=uid(),
-            )
+        training_job_name = training_job_name or "{prefix}-{dpp_name}-train-{suffix}".format(
+            prefix=self.local_run_config.local_automl_job_name,
+            dpp_name=self.data_transformer_step.name,
+            suffix=uid(),
         )
 
-        transform_job_name = (
-            transform_job_name
-            or "{prefix}-{dpp_name}-transform-{suffix}".format(
-                prefix=self.local_run_config.local_automl_job_name,
-                dpp_name=self.data_transformer_step.name,
-                suffix=uid(),
-            )
+        transform_job_name = transform_job_name or "{prefix}-{dpp_name}-transform-{suffix}".format(
+            prefix=self.local_run_config.local_automl_job_name,
+            dpp_name=self.data_transformer_step.name,
+            suffix=uid(),
         )
 
         transform_output_path = "{prefix}/{dpp_name}/{transformed_data_format}".format(
@@ -207,14 +193,9 @@ class AutoMLLocalCandidate:
         self._state["data_transformer"]["trained"] = True
 
     def data_transformer_is_trained(self):
-        return (
-            "data_transformer" in self._state
-            and self._state["data_transformer"]["trained"]
-        )
+        return "data_transformer" in self._state and self._state["data_transformer"]["trained"]
 
-    def get_data_transformer_model(
-        self, role, sagemaker_session, transform_mode=None, **kwargs
-    ):
+    def get_data_transformer_model(self, role, sagemaker_session, transform_mode=None, **kwargs):
         """
 
         Args:
@@ -230,25 +211,18 @@ class AutoMLLocalCandidate:
         self._check_data_transformer_prepared()
 
         if not self.data_transformer_is_trained:
-            raise AutoMLLocalCandidateNotTrained(
-                "AutoML Candidate data transformers has not been trained yet"
-            )
+            raise AutoMLLocalCandidateNotTrained("AutoML Candidate data transformers has not been trained yet")
 
         data_transformer_state = self._state["data_transformer"]
 
         trainer = data_transformer_state["trainer"]
         training_job_name = data_transformer_state["training_job_name"]
 
-        data_transformer_estimator = trainer.attach(
-            training_job_name, sagemaker_session=sagemaker_session
-        )
+        data_transformer_estimator = trainer.attach(training_job_name, sagemaker_session=sagemaker_session)
 
         security_config = self.local_run_config.security_config
 
-        if (
-            self.local_run_config.security_config is not None
-            and "VpcConfig" not in kwargs
-        ):
+        if self.local_run_config.security_config is not None and "VpcConfig" not in kwargs:
             kwargs.update({"vpc_config": security_config["VpcConfig"]})
 
         return self.data_transformer_step.create_model(
@@ -256,27 +230,21 @@ class AutoMLLocalCandidate:
             role=role,
             sagemaker_session=sagemaker_session,
             transform_mode=transform_mode,
-            **kwargs
+            **kwargs,
         )
 
     def to_dict(self):
         base_dict = {
             "pipeline_name": self.candidate_name,
-            "data_transformer": {
-                "data_processing_module_name": self.data_transformer_step.name
-            },
+            "data_transformer": {"data_processing_module_name": self.data_transformer_step.name},
             "algorithm": {"algo_name": self.algo_step.algo_name},
         }
 
         if "data_transformer" in self._state:
             base_dict["data_transformer"].update(
                 {
-                    "training_job_name": self._state["data_transformer"][
-                        "training_job_name"
-                    ],
-                    "transform_job_name": self._state["data_transformer"][
-                        "transform_job_name"
-                    ],
+                    "training_job_name": self._state["data_transformer"]["training_job_name"],
+                    "transform_job_name": self._state["data_transformer"]["transform_job_name"],
                 }
             )
 

@@ -22,9 +22,9 @@ logging.basicConfig(
 class AutoMLInteractiveRunner:
     """AutoMLInteractiveRunner is an orchestrator that manages the AutoML local run. This includes the following:
 
-        1. Manages the state of local candidates selection
-        2. Orchestrate multi-algo tuning operations that requires inputs from all candidates.
-        3. Model selection and export of trained estimator to deployable model
+    1. Manages the state of local candidates selection
+    2. Orchestrate multi-algo tuning operations that requires inputs from all candidates.
+    3. Model selection and export of trained estimator to deployable model
     """
 
     def __init__(self, local_run_config, candidates=None):
@@ -74,9 +74,7 @@ class AutoMLInteractiveRunner:
 
         if candidate_pipeline_name in self.candidates:
             logging.info(
-                "Warning: pipeline candidate {} has already been selected, replacing".format(
-                    candidate_pipeline_name
-                )
+                "Warning: pipeline candidate {} has already been selected, replacing".format(candidate_pipeline_name)
             )
 
         # create candidate
@@ -96,9 +94,7 @@ class AutoMLInteractiveRunner:
 
         execution_future = {}
 
-        with ThreadPoolExecutor(
-            max_workers=parallel_jobs, thread_name_prefix="Worker"
-        ) as executor:
+        with ThreadPoolExecutor(max_workers=parallel_jobs, thread_name_prefix="Worker") as executor:
             for candidate_pipeline_name, candidate in self.candidates.items():
                 candidate.prepare_data_transformers_for_training()
 
@@ -125,27 +121,19 @@ class AutoMLInteractiveRunner:
                 while True:
                     future = next(iterator)
                     candidate_pipeline_name = execution_future[future]
-                    success = self._process_data_transformer_future(
-                        candidate_pipeline_name, future
-                    )
+                    success = self._process_data_transformer_future(candidate_pipeline_name, future)
 
                     if success:
                         success_count += 1
 
             except StopIteration:
-                logging.info(
-                    "Successfully fit {} data transformers".format(success_count)
-                )
+                logging.info("Successfully fit {} data transformers".format(success_count))
 
     def _process_data_transformer_future(self, candidate_pipeline_name, future):
 
         try:
             future.result()
-            logging.info(
-                "Successfully fit data transformer for {}".format(
-                    candidate_pipeline_name
-                )
-            )
+            logging.info("Successfully fit data transformer for {}".format(candidate_pipeline_name))
             self.candidates[candidate_pipeline_name].set_transformer_trained()
             return True
         except Exception:
@@ -178,14 +166,10 @@ class AutoMLInteractiveRunner:
         """
         # Create Estimators
 
-        estimator_kwargs[
-            "encrypt_inter_container_traffic"
-        ] = self.local_run_config.encrypt_inter_container_traffic
+        estimator_kwargs["encrypt_inter_container_traffic"] = self.local_run_config.encrypt_inter_container_traffic
 
         estimator_kwargs["subnets"] = self.local_run_config.subnets
-        estimator_kwargs[
-            "security_group_ids"
-        ] = self.local_run_config.security_group_ids
+        estimator_kwargs["security_group_ids"] = self.local_run_config.security_group_ids
         estimator_kwargs["output_kms_key"] = self.local_run_config.output_kms_key
         estimator_kwargs["enable_network_isolation"] = True
 
@@ -253,15 +237,9 @@ class AutoMLInteractiveRunner:
             tuner_analytics_dataframe["TrainingJobName"] == multi_algo_training_job_name
         ]
         # The TrainingJobDefinitionName is mapped to candidate name
-        best_data_processing_pipeline_name = training_job_analytics.iloc[0][
-            "TrainingJobDefinitionName"
-        ]
+        best_data_processing_pipeline_name = training_job_analytics.iloc[0]["TrainingJobDefinitionName"]
 
-        logging.info(
-            "Chosen Data Processing pipeline candidate name is {}".format(
-                best_data_processing_pipeline_name
-            )
-        )
+        logging.info("Chosen Data Processing pipeline candidate name is {}".format(best_data_processing_pipeline_name))
 
         best_candidate = self.candidates[best_data_processing_pipeline_name]
         return best_candidate

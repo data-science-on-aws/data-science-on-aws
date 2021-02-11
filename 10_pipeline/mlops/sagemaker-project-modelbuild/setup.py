@@ -12,7 +12,13 @@ with open("README.md", "r") as f:
     readme = f.read()
 
 
-required_packages = ["sagemaker==2.24.3", "sagemaker-experiments==0.1.26", "pandas==1.0.1", "boto3==1.17.4", "botocore==1.20.4"]
+required_packages = [
+    "sagemaker==2.24.3",
+    "sagemaker-experiments==0.1.26",
+    "pandas==1.0.1",
+    "boto3==1.17.4",
+    "botocore==1.20.4",
+]
 extras = {
     "test": [
         "black",
