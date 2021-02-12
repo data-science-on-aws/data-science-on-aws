@@ -56,14 +56,10 @@ class AutoMLLocalRunConfig:
         self.automl_job_name = base_automl_job_config["automl_job_name"]
         # the base s3 path where the managed AutoML job stores the intermediates (e.g. data transformation pipeline
         # candidate)
-        self.automl_output_s3_base_path = base_automl_job_config[
-            "automl_output_s3_base_path"
-        ]
+        self.automl_output_s3_base_path = base_automl_job_config["automl_output_s3_base_path"]
 
         # Auto ML output job path convention
-        self.automl_job_processed_data_path = join(
-            self.automl_output_s3_base_path, self.PRE_PROCESSED_DATA_ROOT
-        )
+        self.automl_job_processed_data_path = join(self.automl_output_s3_base_path, self.PRE_PROCESSED_DATA_ROOT)
         self.automl_job_processed_training_data_path = join(
             self.automl_job_processed_data_path, self.PRE_PROCESSED_TRAINING_DATA_PATH
         )
@@ -73,17 +69,11 @@ class AutoMLLocalRunConfig:
 
         # Auto ML local job config
         self.local_automl_job_name = local_automl_job_config["local_automl_job_name"]
-        self.local_automl_job_output_s3_base_path = local_automl_job_config[
-            "local_automl_job_output_s3_base_path"
-        ]
+        self.local_automl_job_output_s3_base_path = local_automl_job_config["local_automl_job_output_s3_base_path"]
 
         # data transformer docker image repo version
-        self.data_transformer_image_repo_version = base_automl_job_config[
-            "data_transformer_image_repo_version"
-        ]
-        self.algo_image_repo_versions = base_automl_job_config[
-            "algo_image_repo_versions"
-        ]
+        self.data_transformer_image_repo_version = base_automl_job_config["data_transformer_image_repo_version"]
+        self.algo_image_repo_versions = base_automl_job_config["algo_image_repo_versions"]
 
         self.algo_inference_image_repo_versions = base_automl_job_config["algo_inference_image_repo_versions"]
 
@@ -110,19 +100,11 @@ class AutoMLLocalRunConfig:
 
     @property
     def subnets(self):
-        return (
-            self.vpc_config.get("Subnets", None)
-            if self.vpc_config is not None
-            else None
-        )
+        return self.vpc_config.get("Subnets", None) if self.vpc_config is not None else None
 
     @property
     def security_group_ids(self):
-        return (
-            self.vpc_config.get("SecurityGroupIds", None)
-            if self.vpc_config is not None
-            else None
-        )
+        return self.vpc_config.get("SecurityGroupIds", None) if self.vpc_config is not None else None
 
     @property
     def encrypt_inter_container_traffic(self):
@@ -187,9 +169,4 @@ class AutoMLLocalRunConfig:
     def display(self):
         from IPython.display import display, Markdown
 
-        display(
-            Markdown(
-                "This notebook is initialized to use the following configuration: "
-                + self.to_html_table()
-            )
-        )
+        display(Markdown("This notebook is initialized to use the following configuration: " + self.to_html_table()))

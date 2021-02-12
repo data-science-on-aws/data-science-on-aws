@@ -1,9 +1,11 @@
 from pyspark.sql.session import SparkSession
 from pyspark.sql.dataframe import DataFrame
+
 #  You may want to configure the Spark Context with the right credentials provider.
-spark = SparkSession.builder.master('local').getOrCreate()
+spark = SparkSession.builder.master("local").getOrCreate()
 
 mode = None
+
 
 def capture_stdout(func, *args, **kwargs):
     """Capture standard output to a string buffer"""
@@ -54,7 +56,7 @@ def default_spark_with_trained_parameters_and_state(df, trained_parameters, stat
 
 def dispatch(key_name, args, kwargs, funcs):
     """
-    Dispatches to another operator based on a key in the passed parameters. 
+    Dispatches to another operator based on a key in the passed parameters.
     This also slices out any parameters using the parameter_name passed in,
     and will reassemble the trained_parameters correctly after invocation.
 
@@ -98,7 +100,9 @@ def dispatch(key_name, args, kwargs, funcs):
         updated_trained_parameters = result["trained_parameters"]
 
         if existing_trained_parameters is not None or updated_trained_parameters is not None:
-            existing_trained_parameters = existing_trained_parameters if existing_trained_parameters is not None else {}
+            existing_trained_parameters = (
+                existing_trained_parameters if existing_trained_parameters is not None else {}
+            )
             existing_trained_parameters[parameter_name] = result["trained_parameters"]
 
             # Update the result trained_parameters so they are part of the original structure.
@@ -132,6 +136,7 @@ class OperatorCustomerError(Exception):
 from sagemaker_dataprep.compute.operators.utils import (
     dispatch,
     default_spark_with_trained_parameters,
+)
 from pyspark.ml.feature import (
     VectorAssembler,
     StandardScaler,
@@ -156,7 +161,9 @@ def process_numeric_standard_scaler(
     process_numeric_expects_numeric_column(df, input_column)
 
     temp_vector_col = temp_col_name(df)
-    assembled = VectorAssembler(inputCols=[input_column], outputCol=temp_vector_col, handleInvalid="keep").transform(df)
+    assembled = VectorAssembler(inputCols=[input_column], outputCol=temp_vector_col, handleInvalid="keep").transform(
+        df
+    )
     assembled_wo_nans = VectorAssembler(
         inputCols=[input_column], outputCol=temp_vector_col, handleInvalid="skip"
     ).transform(df)
@@ -210,7 +217,9 @@ def process_numeric_robust_scaler(
     process_numeric_expects_numeric_column(df, input_column)
 
     temp_vector_col = temp_col_name(df)
-    assembled = VectorAssembler(inputCols=[input_column], outputCol=temp_vector_col, handleInvalid="keep").transform(df)
+    assembled = VectorAssembler(inputCols=[input_column], outputCol=temp_vector_col, handleInvalid="keep").transform(
+        df
+    )
     assembled_wo_nans = VectorAssembler(
         inputCols=[input_column], outputCol=temp_vector_col, handleInvalid="skip"
     ).transform(df)
@@ -266,14 +275,21 @@ def process_numeric_min_max_scaler(
     process_numeric_expects_numeric_column(df, input_column)
 
     temp_vector_col = temp_col_name(df)
-    assembled = VectorAssembler(inputCols=[input_column], outputCol=temp_vector_col, handleInvalid="keep").transform(df)
+    assembled = VectorAssembler(inputCols=[input_column], outputCol=temp_vector_col, handleInvalid="keep").transform(
+        df
+    )
     assembled_wo_nans = VectorAssembler(
         inputCols=[input_column], outputCol=temp_vector_col, handleInvalid="skip"
     ).transform(df)
     temp_normalized_vector_col = temp_col_name(assembled)
 
     trained_parameters = load_trained_parameters(
-        trained_parameters, {"input_column": input_column, "min": min, "max": max,}
+        trained_parameters,
+        {
+            "input_column": input_column,
+            "min": min,
+            "max": max,
+        },
     )
 
     scaler_model, scaler_model_loaded = load_pyspark_model_from_trained_parameters(
@@ -311,13 +327,20 @@ def process_numeric_max_absolute_scaler(df, input_column=None, output_column=Non
     process_numeric_expects_numeric_column(df, input_column)
 
     temp_vector_col = temp_col_name(df)
-    assembled = VectorAssembler(inputCols=[input_column], outputCol=temp_vector_col, handleInvalid="keep").transform(df)
+    assembled = VectorAssembler(inputCols=[input_column], outputCol=temp_vector_col, handleInvalid="keep").transform(
+        df
+    )
     assembled_wo_nans = VectorAssembler(
         inputCols=[input_column], outputCol=temp_vector_col, handleInvalid="skip"
     ).transform(df)
     temp_normalized_vector_col = temp_col_name(assembled)
 
-    trained_parameters = load_trained_parameters(trained_parameters, {"input_column": input_column,})
+    trained_parameters = load_trained_parameters(
+        trained_parameters,
+        {
+            "input_column": input_column,
+        },
+    )
 
     scaler_model, scaler_model_loaded = load_pyspark_model_from_trained_parameters(
         trained_parameters, MinMaxScalerModel, "scaler_model"
@@ -414,7 +437,9 @@ def athena_start_query_execution_core(client, request):
     try:
         result = client.start_query_execution(**request)
     except Exception as e:
-        raise RuntimeError(f"An error ({type(e).__name__}) occurred when trying to invoke `start_query_execution`: {e}")
+        raise RuntimeError(
+            f"An error ({type(e).__name__}) occurred when trying to invoke `start_query_execution`: {e}"
+        )
     return result
 
 
@@ -502,7 +527,10 @@ def athena_start_query_execution(dataset_definition, client):
 
     query_request = {
         "QueryString": ctas_query,
-        "QueryExecutionContext": {"Database": database_name, "Catalog": catalog_name,},
+        "QueryExecutionContext": {
+            "Database": database_name,
+            "Catalog": catalog_name,
+        },
         "ResultConfiguration": {"OutputLocation": metadata_s3_output_location},
     }
     logging.debug("Query request is: %s", query_request)
@@ -674,8 +702,13 @@ def cast_single_column_type(
         # |  2|None|      bar         |
         # |  3|  1 |                  |
         # +---+----+------------------+
-        df = df.withColumn(temp_column, cast_to_date if (mohave_data_type == MohaveDataType.DATE) else cast_to_non_date)
-        df = df.withColumn(non_castable_column, f.when(df[temp_column].isNotNull(), "").otherwise(df[column]),)
+        df = df.withColumn(
+            temp_column, cast_to_date if (mohave_data_type == MohaveDataType.DATE) else cast_to_non_date
+        )
+        df = df.withColumn(
+            non_castable_column,
+            f.when(df[temp_column].isNotNull(), "").otherwise(df[column]),
+        )
     elif invalid_data_handling_method == NonCastableDataHandlingMethod.REPLACE_WITH_FIXED_VALUE:
         # Replace non-castable data to a value in the same column
         # Original dataframe
@@ -696,7 +729,9 @@ def cast_single_column_type(
         # +---+----+
         value = _validate_and_cast_value(value=replace_value, mohave_data_type=mohave_data_type)
 
-        df = df.withColumn(temp_column, cast_to_date if (mohave_data_type == MohaveDataType.DATE) else cast_to_non_date)
+        df = df.withColumn(
+            temp_column, cast_to_date if (mohave_data_type == MohaveDataType.DATE) else cast_to_non_date
+        )
 
         replace_date_value = f.when(df[temp_column].isNotNull(), df[temp_column]).otherwise(
             f.to_date(f.lit(value), date_formatting)
@@ -729,8 +764,13 @@ def cast_single_column_type(
         # +---+----+------------------+
         value = _validate_and_cast_value(value=replace_value, mohave_data_type=mohave_data_type)
 
-        df = df.withColumn(temp_column, cast_to_date if (mohave_data_type == MohaveDataType.DATE) else cast_to_non_date)
-        df = df.withColumn(non_castable_column, f.when(df[temp_column].isNotNull(), "").otherwise(df[column]),)
+        df = df.withColumn(
+            temp_column, cast_to_date if (mohave_data_type == MohaveDataType.DATE) else cast_to_non_date
+        )
+        df = df.withColumn(
+            non_castable_column,
+            f.when(df[temp_column].isNotNull(), "").otherwise(df[column]),
+        )
 
         replace_date_value = f.when(df[temp_column].isNotNull(), df[temp_column]).otherwise(
             f.to_date(f.lit(value), date_formatting)
@@ -782,8 +822,7 @@ class OperatorSparkOperatorCustomerError(Exception):
 
 
 def temp_col_name(df, *illegal_names):
-    """Generates a temporary column name that is unused.
-    """
+    """Generates a temporary column name that is unused."""
     name = "temp_col"
     idx = 0
     name_set = set(list(df.columns) + list(illegal_names))
@@ -795,8 +834,7 @@ def temp_col_name(df, *illegal_names):
 
 
 def get_temp_col_if_not_set(df, col_name):
-    """Extracts the column name from the parameters if it exists, otherwise generates a temporary column name.
-    """
+    """Extracts the column name from the parameters if it exists, otherwise generates a temporary column name."""
     if col_name:
         return col_name, False
     else:
@@ -806,7 +844,7 @@ def get_temp_col_if_not_set(df, col_name):
 def replace_input_if_output_is_temp(df, input_column, output_column, output_is_temp):
     """Replaces the input column in the dataframe if the output was not set
 
-    This is used with get_temp_col_if_not_set to enable the behavior where a 
+    This is used with get_temp_col_if_not_set to enable the behavior where a
     transformer will replace its input column if an output is not specified.
     """
     if output_is_temp:
@@ -846,7 +884,9 @@ def expects_valid_column_name(value, key, nullable=False):
         return
 
     if value is None or len(str(value).strip()) == 0:
-        raise OperatorSparkOperatorCustomerError(f"Column name cannot be null, empty, or whitespace for parameter '{key}': {value}")
+        raise OperatorSparkOperatorCustomerError(
+            f"Column name cannot be null, empty, or whitespace for parameter '{key}': {value}"
+        )
 
 
 def expects_parameter(value, key, condition=None):
@@ -858,12 +898,16 @@ def expects_parameter(value, key, condition=None):
 
 def expects_column(df, value, key):
     if not value or value not in df.columns:
-        raise OperatorSparkOperatorCustomerError(f"Expected column in dataframe for '{key}' however received '{value}'")
+        raise OperatorSparkOperatorCustomerError(
+            f"Expected column in dataframe for '{key}' however received '{value}'"
+        )
 
 
 def expects_parameter_value_in_list(key, value, items):
     if value not in items:
-        raise OperatorSparkOperatorCustomerError(f"Illegal parameter value. {key} expected to be in {items}, but given {value}")
+        raise OperatorSparkOperatorCustomerError(
+            f"Illegal parameter value. {key} expected to be in {items}, but given {value}"
+        )
 
 
 def encode_pyspark_model(model):
@@ -964,7 +1008,6 @@ from pyspark.sql.types import (
     FractionalType,
     StringType,
 )
-
 
 
 def type_inference(df):  # noqa: C901 # pylint: disable=R0912
@@ -1237,7 +1280,9 @@ def athena_source(spark, mode, dataset_definition, trained_parameters=None):  # 
         trained_parameters["ctas_table_name"] = ""
         try:
             return default_spark_with_trained_parameters_and_state(
-                df=spark.read.parquet(path), trained_parameters=trained_parameters, state=get_execution_state(state),
+                df=spark.read.parquet(path),
+                trained_parameters=trained_parameters,
+                state=get_execution_state(state),
             )
         except Exception as e:
             raise RuntimeError(
@@ -1291,7 +1336,12 @@ def infer_and_cast_type(df, spark, inference_data_sample_size=1000, trained_para
 def process_numeric(df, spark, **kwargs):
 
     return dispatch(
-        "operator", [df], kwargs, {"Scale values": (process_numeric_scale_values, "scale_values_parameters"),},
+        "operator",
+        [df],
+        kwargs,
+        {
+            "Scale values": (process_numeric_scale_values, "scale_values_parameters"),
+        },
     )
 
 
@@ -1303,10 +1353,44 @@ def custom_formula(df, spark, formula, output_column=None):
     return default_spark(output_df)
 
 
-op_1_output = athena_source(spark=spark, mode=mode, **{'dataset_definition': {'datasetSourceType': 'Athena', 'name': 'amazon-reviews-pds-tsv', 'catalogName': 'AwsDataCatalog', 'databaseName': 'dsoaws', 'queryString': 'select * from amazon_reviews_tsv', 's3OutputLocation': 's3://sagemaker-us-east-1-806570384721/athena/', 'outputFormat': 'parquet'}})
-op_2_output = infer_and_cast_type(op_1_output['default'], spark=spark, **{})
-op_3_output = process_numeric(op_2_output['default'], spark=spark, **{'operator': 'Scale values', 'scale_values_parameters': {'scaler': 'Min-max scaler', 'min_max_scaler_parameters': {'min': -1, 'max': 1, 'input_column': 'star_rating', 'output_column': 'star_rating_scaled'}, 'standard_scaler_parameters': {}}})
-op_4_output = custom_formula(op_3_output['default'], spark=spark, **{'output_column': 'star_rating_scaled_floored', 'formula': 'floor(star_rating_scaled)'})
+op_1_output = athena_source(
+    spark=spark,
+    mode=mode,
+    **{
+        "dataset_definition": {
+            "datasetSourceType": "Athena",
+            "name": "amazon-reviews-pds-tsv",
+            "catalogName": "AwsDataCatalog",
+            "databaseName": "dsoaws",
+            "queryString": "select * from amazon_reviews_tsv",
+            "s3OutputLocation": "s3://sagemaker-us-east-1-806570384721/athena/",
+            "outputFormat": "parquet",
+        }
+    },
+)
+op_2_output = infer_and_cast_type(op_1_output["default"], spark=spark, **{})
+op_3_output = process_numeric(
+    op_2_output["default"],
+    spark=spark,
+    **{
+        "operator": "Scale values",
+        "scale_values_parameters": {
+            "scaler": "Min-max scaler",
+            "min_max_scaler_parameters": {
+                "min": -1,
+                "max": 1,
+                "input_column": "star_rating",
+                "output_column": "star_rating_scaled",
+            },
+            "standard_scaler_parameters": {},
+        },
+    },
+)
+op_4_output = custom_formula(
+    op_3_output["default"],
+    spark=spark,
+    **{"output_column": "star_rating_scaled_floored", "formula": "floor(star_rating_scaled)"},
+)
 
 #  Glossary: variable name to node_id
 #

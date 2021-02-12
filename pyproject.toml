@@ -1,0 +1,17 @@
+[tool.black]
+line-length = 119
+exclude = '''
+(
+  /(
+      \.eggs
+    | \.git
+    | \.mypy_cache
+    | build
+    | dist
+    | spark
+    | jars
+    | \.jar
+    | wip
+  )
+)
+'''

@@ -3,24 +3,21 @@ from sagemaker.tuner import ContinuousParameter
 
 config = {}
 
-config["job_level"] = {
-    "region_name": "{0}",
-    "run_hyperparameter_opt": "no"
-}
+config["job_level"] = {"region_name": "{0}", "run_hyperparameter_opt": "no"}
 
 config["preprocess_data"] = {
     "s3_in_url": "s3://amazon-reviews-pds/tsv/amazon_reviews_us_Digital_Video_Download_v1_00.tsv.gz",
-    "s3_out_bucket": "{1}", # replace
+    "s3_out_bucket": "{1}",  # replace
     "s3_out_prefix": "preprocess/",
-    "delimiter": "\t"
+    "delimiter": "\t",
 }
 
 config["prepare_data"] = {
-    "s3_in_bucket": "{1}", # replace
+    "s3_in_bucket": "{1}",  # replace
     "s3_in_prefix": "preprocess/",
     "s3_out_bucket": "{1}",  # replace
     "s3_out_prefix": "prepare/",
-    "delimiter": "\t"
+    "delimiter": "\t",
 }
 
 config["train_model"] = {
@@ -37,12 +34,12 @@ config["train_model"] = {
             "epochs": "10",
             "mini_batch_size": "200",
             "num_factors": "64",
-            "predictor_type": 'regressor'
-        }
+            "predictor_type": "regressor",
+        },
     },
     "inputs": {
         "train": "s3://{1}/prepare/train/train.protobuf",  # replace
-    }
+    },
 }
 
 config["tune_model"] = {
@@ -51,16 +48,16 @@ config["tune_model"] = {
         "objective_type": "Minimize",
         "hyperparameter_ranges": {
             "factors_lr": ContinuousParameter(0.0001, 0.2),
-            "factors_init_sigma": ContinuousParameter(0.0001, 1)
+            "factors_init_sigma": ContinuousParameter(0.0001, 1),
         },
         "max_jobs": 20,
         "max_parallel_jobs": 2,
-        "base_tuning_job_name": "hpo-recommender"
+        "base_tuning_job_name": "hpo-recommender",
     },
     "inputs": {
         "train": "s3://{1}/prepare/train/train.protobuf",  # replace
-        "test": "s3://{1}/prepare/validate/validate.protobuf"  # replace
-    }
+        "test": "s3://{1}/prepare/validate/validate.protobuf",  # replace
+    },
 }
 
 config["batch_transform"] = {
@@ -71,6 +68,6 @@ config["batch_transform"] = {
         "data_type": "S3Prefix",
         "content_type": "application/x-recordio-protobuf",
         "strategy": "MultiRecord",
-        "output_path": "s3://{1}/transform/"
+        "output_path": "s3://{1}/transform/",
     }
 }

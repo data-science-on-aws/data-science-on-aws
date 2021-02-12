@@ -11,6 +11,7 @@
 # ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
 
+
 def generate_s3_write_permission_for_sagemaker_role(role):
     role_name = role.split("/")[-1]
     url = "https://console.aws.amazon.com/iam/home#/roles/%s" % role_name
@@ -19,6 +20,7 @@ def generate_s3_write_permission_for_sagemaker_role(role):
     text += "3. Search and select `AmazonKinesisVideoStreamsFullAccess` policy\n"
     return text
 
+
 def generate_kinesis_create_permission_for_sagemaker_role(role):
     role_name = role.split("/")[-1]
     url = "https://console.aws.amazon.com/iam/home#/roles/%s" % role_name
@@ -26,6 +28,7 @@ def generate_kinesis_create_permission_for_sagemaker_role(role):
     text += "2. Next, go to the `Permissions tab` and click on `Attach Policy.` \n"
     text += "3. Search and select `AmazonS3FullAccess` policy\n"
     return text
+
 
 def generate_help_for_s3_endpoint_permissions(role):
     role_name = role.split("/")[-1]
@@ -138,12 +141,14 @@ def generate_robomaker_links(job_arns, aws_region):
     simulation_ids = [job_arn.split("/")[-1] for job_arn in job_arns]
     robomaker_links = []
     for simulation_id in simulation_ids:
-        robomaker_link = "https://%s.console.aws.amazon.com/robomaker/home?region=%s#simulationJobs/%s" % (aws_region,
-                                                                                                           aws_region,
-                                                                                                           simulation_id)
+        robomaker_link = "https://%s.console.aws.amazon.com/robomaker/home?region=%s#simulationJobs/%s" % (
+            aws_region,
+            aws_region,
+            simulation_id,
+        )
         robomaker_links.append(robomaker_link)
 
-    markdown_content = '> Click on the following links for visualization of simulation jobs on RoboMaker Console\n'
+    markdown_content = "> Click on the following links for visualization of simulation jobs on RoboMaker Console\n"
     for i in range(len(robomaker_links)):
         markdown_content += "- [Simulation %s](%s)  \n" % (i + 1, robomaker_links[i])
 
@@ -152,12 +157,16 @@ def generate_robomaker_links(job_arns, aws_region):
 
 
 def create_s3_endpoint_manually(aws_region, default_vpc):
-    url = "https://%s.console.aws.amazon.com/vpc/home?region=%s#Endpoints:sort=vpcEndpointId" % (aws_region, aws_region)
+    url = "https://%s.console.aws.amazon.com/vpc/home?region=%s#Endpoints:sort=vpcEndpointId" % (
+        aws_region,
+        aws_region,
+    )
     text = ">VPC S3 endpoint creation failed. Please do the following to create an endpoint manually:\n"
     text += "1. Go to [VPC console | Endpoints](%s)\n" % url
     text += "2. Click on `Create Endpoint`. Select Service Name as `com.amazonaws.%s.s3`.\n" % (aws_region)
     text += "3. Next, select your Default VPC: `%s` and click the checkbox against the main Route Table ID\n" % (
-    default_vpc)
+        default_vpc
+    )
     text += "4. Select `Full Access` in policy and click on `Create Endpoint`\n"
     text += "5. That should be it! Now wait for a few seconds before proceeding to the next cell."
     return text
@@ -173,6 +182,7 @@ def generate_help_for_administrator_policy(role):
     text += "5. You'll see message `Policy AdministratorAccess has been attached for the %s`. \n" % (role)
     text += "6. Once this is complete, you are all set."
     return text
+
 
 def generate_help_for_experiment_manager_permissions(role):
     role_name = role.split("/")[-1]
@@ -222,4 +232,3 @@ def generate_help_for_experiment_manager_permissions(role):
         },```\n"""
     text += "4. Now wait for a few minutes before executing this cell again!"
     return text
-

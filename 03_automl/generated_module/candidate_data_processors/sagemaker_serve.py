@@ -16,35 +16,34 @@ from sagemaker_sklearn_extension.externals import read_csv_data
 
 def _is_inverse_label_transform():
     """Returns True if if it's running in inverse label transform."""
-    return os.getenv('AUTOML_TRANSFORM_MODE') == 'inverse-label-transform'
+    return os.getenv("AUTOML_TRANSFORM_MODE") == "inverse-label-transform"
 
 
 def _is_feature_transform():
     """Returns True if it's running in feature transform mode."""
-    return os.getenv('AUTOML_TRANSFORM_MODE') == 'feature-transform'
+    return os.getenv("AUTOML_TRANSFORM_MODE") == "feature-transform"
 
 
 def _get_selected_input_keys():
     """Returns a list of ordered content keys for container's input."""
-    return [key.strip().lower() for key in os.environ['SAGEMAKER_INFERENCE_INPUT'].split(',')]
+    return [key.strip().lower() for key in os.environ["SAGEMAKER_INFERENCE_INPUT"].split(",")]
 
 
 def _get_selected_output_keys():
     """Returns a list of ordered content keys for container's output."""
-    return [key.strip().lower() for key in os.environ['SAGEMAKER_INFERENCE_OUTPUT'].split(',')]
+    return [key.strip().lower() for key in os.environ["SAGEMAKER_INFERENCE_OUTPUT"].split(",")]
 
 
 def _sparsify_if_needed(x):
     """Returns a sparse matrix if the needed for encoding to sparse recordio protobuf."""
-    if os.getenv('AUTOML_SPARSE_ENCODE_RECORDIO_PROTOBUF') == '1' \
-            and not sparse.issparse(x):
+    if os.getenv("AUTOML_SPARSE_ENCODE_RECORDIO_PROTOBUF") == "1" and not sparse.issparse(x):
         return sparse.csr_matrix(x)
     return x
 
 
 def _split_features_target(x):
     """Returns the features and target by splitting the input array."""
-    if os.getenv('AUTOML_TRANSFORM_MODE') == 'feature-transform':
+    if os.getenv("AUTOML_TRANSFORM_MODE") == "feature-transform":
         return _sparsify_if_needed(x), None
 
     if sparse.issparse(x):
@@ -68,7 +67,7 @@ def model_fn(model_dir):
         deserialized model object that can be used for model serving
 
     """
-    return load(filename=os.path.join(model_dir, 'model.joblib'))
+    return load(filename=os.path.join(model_dir, "model.joblib"))
 
 
 def predict_fn(input_object, model):
@@ -101,10 +100,7 @@ def predict_fn(input_object, model):
     try:
         return model.transform(input_object)
     except ValueError as e:
-        return worker.Response(
-            response='{}'.format(str(e) or 'Unknown error.'),
-            status=http_client.BAD_REQUEST
-        )
+        return worker.Response(response="{}".format(str(e) or "Unknown error."), status=http_client.BAD_REQUEST)
 
 
 def _generate_post_processed_response(array, model):
@@ -137,8 +133,9 @@ def _generate_post_processed_response(array, model):
     for output_key_idx, output_key in enumerate(output_keys):
         if output_key == "predicted_label" and output_key in input_keys:
             input_key_idx = input_keys.index(output_key)
-            output_array[:, output_key_idx] = model.inverse_label_transform(array[:, input_key_idx]
-                                                                            .ravel().astype(np.float).astype(np.int))
+            output_array[:, output_key_idx] = model.inverse_label_transform(
+                array[:, input_key_idx].ravel().astype(np.float).astype(np.int)
+            )
         elif output_key == "labels":
             output_array[:, output_key_idx][:] = str(list(model.target_transformer.get_classes()))
         elif output_key in input_keys:
@@ -168,11 +165,10 @@ def input_fn(request_body, request_content_type):
         decoded data as 2D numpy array
 
     """
-    content_type = request_content_type.lower(
-    ) if request_content_type else "text/csv"
+    content_type = request_content_type.lower() if request_content_type else "text/csv"
     content_type = content_type.split(";")[0].strip()
 
-    if content_type == 'text/csv':
+    if content_type == "text/csv":
         if isinstance(request_body, str):
             byte_buffer = request_body.encode()
         else:
@@ -182,8 +178,7 @@ def input_fn(request_body, request_content_type):
         return val
 
     return worker.Response(
-        response=f"'{request_content_type}' is an unsupported content type.",
-        status=http_client.UNSUPPORTED_MEDIA_TYPE
+        response=f"'{request_content_type}' is an unsupported content type.", status=http_client.UNSUPPORTED_MEDIA_TYPE
     )
 
 
@@ -217,20 +212,17 @@ def output_fn(prediction, accept_type):
             return worker.Response(
                 response=encoder_factory[accept_type](prediction, output_keys),
                 status=http_client.OK,
-                mimetype=accept_type
+                mimetype=accept_type,
             )
         except KeyError:
             # Selectable inference is not turned on
-            if accept_type == 'text/csv':
+            if accept_type == "text/csv":
                 return worker.Response(
-                    response=encoders.encode(prediction, accept_type),
-                    status=http_client.OK,
-                    mimetype=accept_type
+                    response=encoders.encode(prediction, accept_type), status=http_client.OK, mimetype=accept_type
                 )
             return worker.Response(
-                response=f"Accept type '{accept_type}' is not supported "
-                         f"during inverse label transformation.",
-                status=http_client.NOT_ACCEPTABLE
+                response=f"Accept type '{accept_type}' is not supported " f"during inverse label transformation.",
+                status=http_client.NOT_ACCEPTABLE,
             )
 
     if isinstance(prediction, tuple):
@@ -238,30 +230,22 @@ def output_fn(prediction, accept_type):
     else:
         X, y = _split_features_target(prediction)
 
-    if accept_type == 'application/x-recordio-protobuf':
+    if accept_type == "application/x-recordio-protobuf":
         return worker.Response(
             response=encoders.array_to_recordio_protobuf(
-                _sparsify_if_needed(X).astype('float32'),
-                y.astype('float32') if y is not None else y
+                _sparsify_if_needed(X).astype("float32"), y.astype("float32") if y is not None else y
             ),
             status=http_client.OK,
-            mimetype=accept_type
+            mimetype=accept_type,
         )
 
-    if accept_type == 'text/csv':
+    if accept_type == "text/csv":
         if y is not None:
-            X = np.column_stack(
-                (np.ravel(y), X.todense() if sparse.issparse(X) else X)
-            )
+            X = np.column_stack((np.ravel(y), X.todense() if sparse.issparse(X) else X))
 
-        return worker.Response(
-            response=encoders.encode(X, accept_type),
-            status=http_client.OK,
-            mimetype=accept_type
-        )
+        return worker.Response(response=encoders.encode(X, accept_type), status=http_client.OK, mimetype=accept_type)
     return worker.Response(
-        response=f"Accept type '{accept_type}' is not supported.",
-        status=http_client.NOT_ACCEPTABLE
+        response=f"Accept type '{accept_type}' is not supported.", status=http_client.NOT_ACCEPTABLE
     )
 
 
@@ -273,16 +257,8 @@ def execution_parameters_fn():
     used during inference and defaults to 6MB otherwise.
     """
     if _is_feature_transform():
-        return worker.Response(
-            response='{"MaxPayloadInMB":1}',
-            status=http_client.OK,
-            mimetype="application/json"
-        )
-    return worker.Response(
-        response='{"MaxPayloadInMB":6}',
-        status=http_client.OK,
-        mimetype="application/json"
-    )
+        return worker.Response(response='{"MaxPayloadInMB":1}', status=http_client.OK, mimetype="application/json")
+    return worker.Response(response='{"MaxPayloadInMB":6}', status=http_client.OK, mimetype="application/json")
 
 
 def numpy_array_to_csv(array, output_keys):
@@ -358,7 +334,7 @@ def numpy_array_to_jsonlines(array, output_keys):
 
 
 encoder_factory = {
-    'text/csv': numpy_array_to_csv,
-    'application/json': numpy_array_to_json,
-    'application/jsonlines': numpy_array_to_jsonlines
+    "text/csv": numpy_array_to_csv,
+    "application/json": numpy_array_to_json,
+    "application/jsonlines": numpy_array_to_jsonlines,
 }
