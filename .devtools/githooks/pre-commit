@@ -1,0 +1,98 @@
+#!/usr/bin/env python3
+
+import os
+import sys
+import textwrap
+from subprocess import CalledProcessError, check_output
+
+
+def formater_setup() -> int:
+    requirements = ['black>=20.8b1', 'black-nb']
+    try:
+        check_output(['python'] + ['-m'] + ['pip'] + ['install'] + requirements)
+        return 0
+    except CalledProcessError as e:
+        print(
+            textwrap.dedent(
+                f'''
+                Development requirements were failed to be installed.
+                Command:
+                    python -m pip install {" ".join(requirements)}
+                '''
+            ).lstrip(),
+            file=sys.stderr,
+        )
+        return e.returncode
+
+def py_style_check() -> int:
+    git_root = (
+        check_output(['git', 'rev-parse', '--show-toplevel']).decode().strip()
+    )
+    git_files = (
+        check_output(['git', 'diff', '--name-only', '--cached'])
+        .decode()
+        .strip()
+        .split()
+    )
+
+    black_opts = []
+    black_args = [
+        os.path.join(git_root, git_file)
+        for git_file in git_files
+        if git_file.endswith('.py') and os.path.isfile(git_file)
+    ]
+
+    try:
+        check_output(['black'] + ['--check'] + black_opts + black_args)
+        return 0
+    except CalledProcessError as e:
+        print(
+            textwrap.dedent(
+                f'''
+                Black command
+                    black {" ".join(['--check'] + black_opts + black_args)}
+                returned a non-zero exit code. Fix the files listed above with
+                    black {" ".join(black_opts + black_args)}
+                '''
+            ).lstrip(),
+            file=sys.stderr,
+        )
+        return e.returncode
+
+def nb_style_check():
+    git_root = (
+        check_output(['git', 'rev-parse', '--show-toplevel']).decode().strip()
+    )
+    git_files = (
+        check_output(['git', 'diff', '--name-only', '--cached'])
+        .decode()
+        .strip()
+        .split()
+    )
+    nb_black_opts = []
+    nb_black_args = [
+        os.path.join(git_root, git_file)
+        for git_file in git_files
+        if git_file.endswith('.ipynb') and os.path.isfile(git_file)
+    ]
+
+    try:
+        check_output(['black-nb'] + ['--clear-output'] + ['--check'] + nb_black_opts + nb_black_args)
+        return 0
+    except CalledProcessError as e:
+        print(
+            textwrap.dedent(
+                f'''
+                Black command
+                    black-nb {" ".join(['--check'] + nb_black_opts + nb_black_args)}
+                returned a non-zero exit code. Fix the files listed above with
+                    black-nb {" ".join(nb_black_opts + nb_black_args)}
+                '''
+            ).lstrip(),
+            file=sys.stderr,
+        )
+        return e.returncode
+
+
+if __name__ == "__main__":
+    sys.exit(formater_setup() | py_style_check() | nb_style_check())
