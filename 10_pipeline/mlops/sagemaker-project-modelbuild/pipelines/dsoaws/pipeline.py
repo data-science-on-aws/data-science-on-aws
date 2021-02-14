@@ -122,9 +122,9 @@ def get_pipeline(region, role, default_bucket, pipeline_name, model_package_grou
         name="FeatureGroupName", default_value="reviews-feature-group-" + str(timestamp)
     )
 
-    train_instance_type = ParameterString(name="TrainingInstanceType", default_value="ml.c5.9xlarge")
+    train_instance_type = ParameterString(name="TrainInstanceType", default_value="ml.c5.9xlarge")
 
-    train_instance_count = ParameterInteger(name="TrainingInstanceCount", default_value=1)
+    train_instance_count = ParameterInteger(name="TrainInstanceCount", default_value=1)
 
     #########################
     # PROCESSING STEP
