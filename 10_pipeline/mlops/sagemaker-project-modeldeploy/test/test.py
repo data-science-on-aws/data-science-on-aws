@@ -61,9 +61,7 @@ if __name__ == "__main__":
         config = json.load(f)
 
     # Get the endpoint name from sagemaker project name
-    endpoint_name = "{}-{}".format(
-        config["Parameters"]["SageMakerProjectName"], config["Parameters"]["StageName"]
-    )
+    endpoint_name = "{}-{}".format(config["Parameters"]["SageMakerProjectName"], config["Parameters"]["StageName"])
     results = test_endpoint(endpoint_name)
 
     # Print results and write to file

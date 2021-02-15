@@ -26,7 +26,8 @@ from smexperiments.trial import Trial
 from smexperiments import tracker
 
 import boto3
-sm = boto3.Session().client(service_name='sagemaker')
+
+sm = boto3.Session().client(service_name="sagemaker")
 
 import sagemaker
 
@@ -36,9 +37,7 @@ def main():  # pragma: no cover
 
     Creates or updates the pipeline and runs it.
     """
-    parser = argparse.ArgumentParser(
-        "Creates or updates and runs the pipeline for the pipeline script."
-    )
+    parser = argparse.ArgumentParser("Creates or updates and runs the pipeline for the pipeline script.")
 
     parser.add_argument(
         "-n",
@@ -89,9 +88,7 @@ def main():  # pragma: no cover
         parsed = json.loads(pipeline.definition())
         print(json.dumps(parsed, indent=2, sort_keys=True))
 
-        upsert_response = pipeline.upsert(
-            role_arn=args.role_arn, description=args.description, tags=tags
-        )
+        upsert_response = pipeline.upsert(role_arn=args.role_arn, description=args.description, tags=tags)
         print("\n###### Created/Updated SageMaker Pipeline: Response received:")
         print(upsert_response)
 
@@ -100,125 +97,113 @@ def main():  # pragma: no cover
 
         # Now we describe execution instance and list the steps in the execution to find out more about the execution.
         execution_run = execution.describe()
-        print(execution_run)  
-        
-         # Create or Load the 'Experiment'
+        print(execution_run)
+
+        # Create or Load the 'Experiment'
         try:
             experiment = Experiment.create(
-                experiment_name=pipeline.name,
-                description='Amazon Customer Reviews BERT Pipeline Experiment'
+                experiment_name=pipeline.name, description="Amazon Customer Reviews BERT Pipeline Experiment"
             )
-        except: 
-            experiment = Experiment.load(
-                experiment_name=pipeline.name
-            )
-            
-        print('Experiment name: {}'.format(experiment.experiment_name))
-        
+        except:
+            experiment = Experiment.load(experiment_name=pipeline.name)
+
+        print("Experiment name: {}".format(experiment.experiment_name))
+
         # Add Execution Run as Trial to Experiments
-        execution_run_name = execution_run['PipelineExecutionDisplayName']
+        execution_run_name = execution_run["PipelineExecutionDisplayName"]
         print(execution_run_name)
-            
+
         # Create the `Trial`
         timestamp = int(time.time())
 
-        trial = Trial.create(trial_name=execution_run_name,
-                             experiment_name=experiment.experiment_name,
-                             sagemaker_boto_client=sm)
+        trial = Trial.create(
+            trial_name=execution_run_name, experiment_name=experiment.experiment_name, sagemaker_boto_client=sm
+        )
 
         trial_name = trial.trial_name
-        print('Trial name: {}'.format(trial_name))
-        
+        print("Trial name: {}".format(trial_name))
+
         ######################################################
         ## Parse Pipeline Definition For Processing Job Args
         ######################################################
-        
+
         processing_param_dict = {}
-        
-        for step in parsed['Steps']:
-            print('step: {}'.format(step))
-            if step['Name']=='Processing':
-                print('Step Name is Processing...')
-                arg_list = step['Arguments']['AppSpecification']['ContainerArguments']
+
+        for step in parsed["Steps"]:
+            print("step: {}".format(step))
+            if step["Name"] == "Processing":
+                print("Step Name is Processing...")
+                arg_list = step["Arguments"]["AppSpecification"]["ContainerArguments"]
                 print(arg_list)
                 num_args = len(arg_list)
                 print(num_args)
-        
-                # arguments are (key, value) pairs in this list, so we extract them in pairs 
+
+                # arguments are (key, value) pairs in this list, so we extract them in pairs
                 # using [i] and [i+1] indexes and stepping by 2 through the list
                 for i in range(0, num_args, 2):
-                    key = arg_list[i].replace('--', '')
-                    value = arg_list[i+1]
-                    print('arg key: {}'.format(key))
-                    print('arg value: {}'.format(value))
+                    key = arg_list[i].replace("--", "")
+                    value = arg_list[i + 1]
+                    print("arg key: {}".format(key))
+                    print("arg value: {}".format(value))
                     processing_param_dict[key] = value
-        
 
         ##############################
         ## Wait For Execution To Finish
         ##############################
-        
+
         print("Waiting for the execution to finish...")
         execution.wait()
-        print("\n#####Execution completed. Execution step details:")   
-        
+        print("\n#####Execution completed. Execution step details:")
+
         # List Execution Steps
-        print(execution.list_steps())  
-        
+        print(execution.list_steps())
+
         # List All Artifacts Generated By The Pipeline
-        processing_job_name=None
-        training_job_name=None
-        
+        processing_job_name = None
+        training_job_name = None
+
         from sagemaker.lineage.visualizer import LineageTableVisualizer
 
         viz = LineageTableVisualizer(sagemaker.session.Session())
         for execution_step in reversed(execution.list_steps()):
             print(execution_step)
             # We are doing this because there appears to be a bug of this LineageTableVisualizer handling the Processing Step
-            if execution_step['StepName'] == 'Processing':
-                processing_job_name=execution_step['Metadata']['ProcessingJob']['Arn'].split('/')[-1]
+            if execution_step["StepName"] == "Processing":
+                processing_job_name = execution_step["Metadata"]["ProcessingJob"]["Arn"].split("/")[-1]
                 print(processing_job_name)
-                #display(viz.show(processing_job_name=processing_job_name))
-            elif execution_step['StepName'] == 'Train':
-                training_job_name=execution_step['Metadata']['TrainingJob']['Arn'].split('/')[-1]
+                # display(viz.show(processing_job_name=processing_job_name))
+            elif execution_step["StepName"] == "Train":
+                training_job_name = execution_step["Metadata"]["TrainingJob"]["Arn"].split("/")[-1]
                 print(training_job_name)
-                #display(viz.show(training_job_name=training_job_name))
+                # display(viz.show(training_job_name=training_job_name))
             else:
-                #display(viz.show(pipeline_execution_step=execution_step))
+                # display(viz.show(pipeline_execution_step=execution_step))
                 time.sleep(5)
 
-        # Add Trial Compontents To Experiment Trial        
-        processing_job_tc = '{}-aws-processing-job'.format(processing_job_name)
+        # Add Trial Compontents To Experiment Trial
+        processing_job_tc = "{}-aws-processing-job".format(processing_job_name)
         print(processing_job_tc)
 
         # -aws-processing-job is the default name assigned by ProcessingJob
-        response = sm.associate_trial_component(
-            TrialComponentName=processing_job_tc,
-            TrialName=trial_name
-        )
-                        
+        response = sm.associate_trial_component(TrialComponentName=processing_job_tc, TrialName=trial_name)
+
         # -aws-training-job is the default name assigned by TrainingJob
-        training_job_tc = '{}-aws-training-job'.format(training_job_name)
+        training_job_tc = "{}-aws-training-job".format(training_job_name)
         print(training_job_tc)
 
-        response = sm.associate_trial_component(
-            TrialComponentName=training_job_tc,
-            TrialName=trial_name
-        )
-              
+        response = sm.associate_trial_component(TrialComponentName=training_job_tc, TrialName=trial_name)
+
         ##############
         # Log Additional Parameters within Trial
         ##############
-        print('Logging Processing Job Parameters within Experiment Trial...')
-        processing_job_tracker = tracker.Tracker.load(trial_component_name=processing_job_tc) 
-        
+        print("Logging Processing Job Parameters within Experiment Trial...")
+        processing_job_tracker = tracker.Tracker.load(trial_component_name=processing_job_tc)
+
         for key, value in processing_param_dict.items():
-            print('key: {}, value: {}'.format(key, value))
-            processing_job_tracker.log_parameters({
-                key: str(value)
-            })
+            print("key: {}, value: {}".format(key, value))
+            processing_job_tracker.log_parameters({key: str(value)})
             # must save after logging
-            processing_job_tracker.trial_component.save();
+            processing_job_tracker.trial_component.save()
 
     except Exception as e:  # pylint: disable=W0703
         print(f"Exception: {e}")
