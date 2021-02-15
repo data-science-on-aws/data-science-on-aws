@@ -1239,21 +1239,21 @@ Resources:
     DependsOn:
       - JupyterServerApp
 
-#  CopyNotebooks:
-#    Type: Custom::DownloadNotebooksFunction
-#    Properties:
-#      ServiceToken: !GetAtt DownloadNotebooksFunction.Arn
-#      Prefix: 'workshop/00_quickstart'
-#      Target: '/mnt/studio/200005'
-#      S3Bucket: 'dsoaws'
-#      BucketRegion: 'us-east-1'
-#    DependsOn:
-#      - JupyterServerApp
-#      - NAT
-#      - PrivateSubnetRouteTableAssociation
-#      - PublicSubnet1RouteTableAssociation
-#      - PublicRoute1
-#      - Route
+  CopyNotebooks:
+    Type: Custom::DownloadNotebooksFunction
+    Properties:
+      ServiceToken: !GetAtt DownloadNotebooksFunction.Arn
+      Prefix: 'workshop/00_quickstart'
+      Target: '/mnt/studio/200005'
+      S3Bucket: 'dsoaws'
+      BucketRegion: 'us-east-1'
+    DependsOn:
+      - JupyterServerApp
+      - NAT
+      - PrivateSubnetRouteTableAssociation
+      - PublicSubnet1RouteTableAssociation
+      - PublicRoute1
+      - Route
 
   LabBucket:
     Type: AWS::S3::Bucket
