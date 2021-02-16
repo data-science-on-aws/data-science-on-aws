@@ -43,9 +43,16 @@ This workshop is FREE, but would otherwise cost <25 USD.
 
 ![CloudFormation 2](img/cloud-formation-2.png)
 
+### `lab.template` S3 URL
+```
+http://dsoaws.s3.amazonaws.com/workshop/lab.template
+```
 ![CloudFormation 3](img/cloud-formation-3.png)
 
-`S3 URL: http://dsoaws.s3.amazonaws.com/workshop/lab.template`
+### `lab.template` S3 URL
+```
+http://dsoaws.s3.amazonaws.com/workshop/lab.template
+```
 
 ![CloudFormation 4](img/cloud-formation-4.png)
 
