@@ -6,7 +6,6 @@ aws s3 sync \
     --acl public-read-write \
     --acl bucket-owner-full-control \
     --exclude "*" \
-    --include "00_quickstart/*" \
     --include "lab.template" \
-    --include "lab.policy"
-
+    --include "lab.policy"  
+#    --include "00_quickstart/*" \
