@@ -33,20 +33,7 @@ This workshop is FREE, but would otherwise cost <25 USD.
 
 ## 1. Login to AWS Console
 
-Please logout of your AWS Console in all browser tabs before you continue.
-
-![AWS Console](img/account-settings.png)
-
-Take the defaults and click on **Console Access**. This will open AWS Console in a new browser tab.
-
-![AWS Console](img/alt_aws_console.png)
-
-_Double-check that your account name is something like `IibsAdminAccess-DO-NOT-DELETE...` as follows:_
-
-![IAM Role](img/alt_iibsadminaccess.png)
-
-_If not, please logout of your AWS Console in all browser tabs and re-run the steps above!_
-
+![IAM](img/aws_console.png)
 
 ## 2. Setup Environment
 
