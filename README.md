@@ -50,11 +50,11 @@ _If not, please logout of your AWS Console in all browser tabs and re-run the st
 
 ## 2. Setup Environment
 
-### Click this button:  
+### Click this button right here on this page:  
 [![Launch Stack](img/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=workshop&templateURL=https://dsoaws.s3.amazonaws.com/workshop/lab.template)  
 ** ^^^^^^^^^^^^^^^^^ **
 
-**^^ Click this button ^^**
+**^^ CLICK THIS BUTTON RIGHT HERE ON THIS PAGE ^^**
 
 ## 3. Follow these instructions after clicking the `Launch Button` button above:
 
