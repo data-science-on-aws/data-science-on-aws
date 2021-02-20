@@ -41,18 +41,18 @@ _Please logout of all AWS Console sessions in all browser tabs._
 
 ## 1. Login to the Workshop Portal (aka Event Engine). 
 
-![Event Box Event Engine Account](img/eb-aws-account-clean.png) 
+![Event Box Launch](img/eb1_launch.png) 
 
-![Event Box Launch](img/launch.png)
+![Event Box Access AWS Account](img/eb2_access_account.png)
 
-![Event Engine Terms and Conditions](img/event-engine-terms.png)
+![Event Engine Terms and Conditions](img/ee1_terms.png)
 
-![Event Engine Dashboard](img/event-engine-dashboard.png)
+![Event Engine Dashboard](img/ee2_team_dashbboard.png)
 
 
 ## 2. Login to the **AWS Console**
 
-![Event Engine AWS Console](img/event-engine-aws-console.png)
+![Event Engine AWS Console](img/ee3_open_console.png)
 
 Take the defaults and click on **Open AWS Console**. This will open AWS Console in a new browser tab.
 
@@ -73,15 +73,13 @@ If not, please logout of your AWS Console in all browser tabs and re-run the ste
 
 Open the [AWS Management Console](https://console.aws.amazon.com/console/home)
 
-![Back to SageMaker](img/bur_back_to_sagemaker_8.png)
+![Back to SageMaker](img/console1_sagemaker.png)
 
 In the AWS Console search bar, type `SageMaker` and select `Amazon SageMaker` to open the service console.
 
-![Notebook Instances](img/stu_notebook_instances_9.png)
+![SageMaker Studio](img/console2_studio.png)
 
-![Pending Studio](img/studio_pending.png)
-
-![Open Studio](img/studio_open.png)
+![Open SageMaker Studio](img/cosole3_open_studio.png)
 
 ![Loading Studio](img/studio_loading.png)
 
