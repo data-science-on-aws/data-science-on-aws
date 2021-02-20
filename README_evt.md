@@ -47,7 +47,7 @@ _Please logout of all AWS Console sessions in all browser tabs._
 
 ![Event Engine Terms and Conditions](img/ee1_terms.png)
 
-![Event Engine Dashboard](img/ee2_team_dashbboard.png)
+![Event Engine Dashboard](img/ee2_team_dashboard.png)
 
 
 ## 2. Login to the **AWS Console**
