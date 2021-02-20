@@ -79,7 +79,7 @@ In the AWS Console search bar, type `SageMaker` and select `Amazon SageMaker` to
 
 ![SageMaker Studio](img/console2_studio.png)
 
-![Open SageMaker Studio](img/cosole3_open_studio.png)
+![Open SageMaker Studio](img/console3_open_studio.png)
 
 ![Loading Studio](img/studio_loading.png)
 
