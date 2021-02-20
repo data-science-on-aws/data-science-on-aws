@@ -1,28 +1,33 @@
-# Attend our Free, Online, Full-Day Workshop!
-You must register on [**Eventbrite**](https://www.eventbrite.com/e/full-day-workshop-kubeflow-gpu-kerastensorflow-20-tf-extended-tfx-kubernetes-pytorch-xgboost-tickets-63362929227).  
+# O'Reilly Book Coming Early 2021
 
-_All instructions will come through Eventbrite.  Please make sure your Eventbrite email address is up to date._
+## Data Science on AWS
 
-# Upcoming O'Reilly Book:  _Data Science on AWS_
-Register for early access directly on our [**website**](https://datascienceonaws.com).
-
-Request one of our [**talks**](https://datascienceonaws.com) for your conference or meetup.
+YouTube Videos, Meetups, Book, and Code:  **https://datascienceonaws.com**
 
 [![Data Science on AWS](img/data-science-on-aws-book.png)](https://datascienceonaws.com)
 
 # Workshop Description
-
 In this workshop, we build a natural language processing (NLP) model to classify sample Twitter comments and customer-support emails using the state-of-the-art [BERT](https://arxiv.org/abs/1810.04805) model for language representation.
 
 To build our BERT-based NLP model, we use the [Amazon Customer Reviews Dataset](https://s3.amazonaws.com/amazon-reviews-pds/readme.html) which contains 150+ million customer reviews from Amazon.com for the 20 year period between 1995 and 2015.  In particular, we train a classifier to predict the `star_rating` (1 is bad, 5 is good) from the `review_body` (free-form review text).
 
-# Workshop Cost - FREE
+# Workshop Cost
 This workshop is FREE, but would otherwise cost <25 USD.
-
 ![Workshop Cost](img/billing.png)
 
-# Workshop Agenda
-[![Workshop Agenda](img/outline.png)](https://www.eventbrite.com/e/full-day-workshop-kubeflow-gpu-kerastensorflow-20-tf-extended-tfx-kubernetes-pytorch-xgboost-tickets-63362929227)
+# Workshop Description
+![Workshop Agenda](img/outline.png)
+
+# Workshop Paths
+
+## Quick Start (All-In-One Workshop Path)
+![Workshop Paths](img/workshop_paths1.png)
+
+## Additional Workshop Paths per Persona
+![Workshop Paths](img/workshop_paths2.png)
+
+# Workshop Contributors
+![Workshop Contributors](img/primary-contributors.png)
 
 # Workshop Instructions
 _Note:  This workshop will create an ephemeral AWS acccount for each attendee.  This ephemeral account is not accessible after the workshop.  You can, of course, clone this GitHub repo and reproduce the entire workshop in your own AWS Account._
@@ -64,77 +69,52 @@ Double-check that your account name is similar to `TeamRole/MasterKey` as follow
 If not, please logout of your AWS Console in all browser tabs and re-run the steps above!
 
 
-## 3. Launch a SageMaker Notebook Instance
+## 3. Launch SageMaker Studio
 
 Open the [AWS Management Console](https://console.aws.amazon.com/console/home)
 
-**Note:** This workshop has been tested on the US West (Oregon) (us-west-2) region. Make sure that you see **Oregon** on the top right hand corner of your AWS Management Console. If you see a different region, click the dropdown menu and select US West (Oregon).
+![Back to SageMaker](img/bur_back_to_sagemaker_8.png)
 
 In the AWS Console search bar, type `SageMaker` and select `Amazon SageMaker` to open the service console.
 
-![SageMaker Console](img/setup_aws_console.png). 
+![Notebook Instances](img/stu_notebook_instances_9.png)
 
-Select `Create notebook instance`.
+![Pending Studio](img/studio_pending.png)
 
-![SageMaker Console](img/aws-sagemaker-dashboard.png).
+![Open Studio](img/studio_open.png)
 
-![SageMaker Console](img/create-notebook-instance.png)
+![Loading Studio](img/studio_loading.png)
 
-In the Notebook instance name text box, enter `workshop`.
+## 4. Launch a New Terminal within Studio
 
-Choose `ml.c5.2xlarge`. We'll only be using this instance to launch jobs. The training job themselves will run either on a SageMaker managed cluster or an Amazon EKS cluster.
+Click `File` > `New` > `Terminal` to launch a terminal in your Jupyter instance.
 
-Volume size `250` - this is needed to explore datasets, build docker containers, and more.  During training data is copied directly from Amazon S3 to the training cluster when using SageMaker.  When using Amazon EKS, we'll setup a distributed file system that worker nodes will use to get access to training data.
+![Terminal Studio](img/studio_terminal.png)
 
-![Fill notebook instance](img/notebook-setup01.png)
+## 5. Clone this GitHub Repo in the Terminal
 
-In the IAM role box, select the default `TeamRole`.
-
-![Fill notebook instance](img/notebook-setup02.png)
-
-Click `Create notebook instance`.
-
-![Fill notebook instance](img/notebook-setup03-no-vpc.png)
-
-
-## 4. Start the Jupyter Notebook
-
-_Note:  Proceed when the status of the notebook instance changes from `Pending` to `InService` after a few minutes._
-
-![Start Jupyter](img/start_jupyter.png)
-
-
-## 5. Launch a New Terminal within the Jupyter Notebook
-
-Click `File` > `New` > [...scroll down...] `Terminal` to launch a terminal in your Jupyter instance.
-
-![](img/launch_jupyter_terminal.png)
-
-
-## 6. Clone this GitHub Repo in the Terminal
-
-Within the Jupyter terminal, run the following:
+Within the Terminal, run the following:
 
 ```
-cd ~/SageMaker && git clone https://github.com/data-science-on-aws/workshop
+cd ~ && git clone https://github.com/data-science-on-aws/workshop
 ```
 
-![](img/clone-workshop-repo.png)
-
-**REPEATING AGAIN - THIS IS IMPORTANT - MAKE SURE YOU RUN THIS IN THE JUPYTER TERMINAL**
+If you see an error like the following, just re-run the command again until it works:
 ```
-cd ~/SageMaker && git clone https://github.com/data-science-on-aws/workshop
+fatal: Unable to create '/home/sagemaker-user/workshop/.git/index.lock': File exists.
+
+Another git process seems to be running in this repository, e.g.
+an editor opened by 'git commit'. Please make sure all processes
+are terminated then try again. If it still fails, a git process
+may have crashed in this repository earlier:
+remove the file manually to continue.
 ```
+_Note:  This is not a fatal error ^^ above ^^.  Just re-run the command again until it works._
 
+## 6. Start the Workshop!
 
-## 7. Navigate Back to Notebook View
-
-![](img/back-to-jupyter-notebook.png)
-
-
-## 8. Start the Workshop!
-Navigate to `01_setup/` in your Jupyter notebook and start the workshop!
+Navigate to `00_quickstart/` in SageMaker Studio and start the workshop!
 
 _You may need to refresh your browser if you don't see the new `workshop/` directory._
 
-![Start Workshop](img/start_workshop.png)
+![Start Workshop](img/studio_start_workshop.png)
