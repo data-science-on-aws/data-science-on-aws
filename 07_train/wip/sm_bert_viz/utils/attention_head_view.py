@@ -32,7 +32,7 @@ class AttentionHeadView():
         for x in range(self.n_tokens):
             for y in range(self.n_tokens):
                 source = self.sources[counter]
-                source.line_width = tensor[x, y] * 2
+                source.line_width = tensor[x, y] + 0.0000001
                 counter += 1
                
     def select_layer(self, layer):
@@ -85,7 +85,8 @@ class AttentionHeadView():
             for y in range(self.n_tokens):
                 source = ColumnDataSource(data=dict(x=[2, 12], 
                                                     y=[self.n_tokens - x - 1, self.n_tokens - y - 1]))
-                line = Line(x="x", y="y", line_width=tensor[x, y], line_color = "blue")
+                line = Line(x="x", y="y" , line_width=tensor[x, y]+ 0.0000001, line_color = "blue")
+                
                 self.p.add_glyph(source, line)
                 self.sources.append(line)
 
