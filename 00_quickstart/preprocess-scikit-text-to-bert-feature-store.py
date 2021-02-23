@@ -412,36 +412,12 @@ def _transform_tsv_to_tfrecord(file, max_seq_length, balance_dataset, prefix, fe
 
     if balance_dataset:
         # Balance the dataset down to the minority class
-        from sklearn.utils import resample
-
-        five_star_df = df.query("star_rating == 5")
-        four_star_df = df.query("star_rating == 4")
-        three_star_df = df.query("star_rating == 3")
-        two_star_df = df.query("star_rating == 2")
-        one_star_df = df.query("star_rating == 1")
-
-        minority_count = min(
-            five_star_df.shape[0],
-            four_star_df.shape[0],
-            three_star_df.shape[0],
-            two_star_df.shape[0],
-            one_star_df.shape[0],
-        )
-
-        five_star_df = resample(five_star_df, replace=False, n_samples=minority_count, random_state=27)
-
-        four_star_df = resample(four_star_df, replace=False, n_samples=minority_count, random_state=27)
-
-        three_star_df = resample(three_star_df, replace=False, n_samples=minority_count, random_state=27)
-
-        two_star_df = resample(two_star_df, replace=False, n_samples=minority_count, random_state=27)
-
-        one_star_df = resample(one_star_df, replace=False, n_samples=minority_count, random_state=27)
-
-        df_balanced = pd.concat([five_star_df, four_star_df, three_star_df, two_star_df, one_star_df])
+        df_grouped_by = df.groupby(["star_rating"]) 
+        df_balanced = df_grouped_by.apply(lambda x: x.sample(df_grouped_by.size().min()).reset_index(drop=True))
 
         df_balanced = df_balanced.reset_index(drop=True)
         print("Shape of balanced dataframe {}".format(df_balanced.shape))
+        
         print(df_balanced["star_rating"].head(100))
 
         df = df_balanced
@@ -454,13 +430,15 @@ def _transform_tsv_to_tfrecord(file, max_seq_length, balance_dataset, prefix, fe
 
     holdout_percentage = 1.00 - args.train_split_percentage
     print("holdout percentage {}".format(holdout_percentage))
+    
     df_train, df_holdout = train_test_split(df, test_size=holdout_percentage, stratify=df["star_rating"])
 
     test_holdout_percentage = args.test_split_percentage / holdout_percentage
+    
     print("test holdout percentage {}".format(test_holdout_percentage))
+    
     df_validation, df_test = train_test_split(
-        df_holdout, test_size=test_holdout_percentage, stratify=df_holdout["star_rating"]
-    )
+        df_holdout, test_size=test_holdout_percentage, stratify=df_holdout["star_rating"])
 
     df_train = df_train.reset_index(drop=True)
     df_validation = df_validation.reset_index(drop=True)
