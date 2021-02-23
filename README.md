@@ -43,7 +43,7 @@ This workshop is FREE, but would otherwise cost <25 USD.
 
 **^^ Click this button ^^**
 
-## 3. Follow these instructions after clicking the `Launch Button` button above:
+## 3. Follow these instructions after clicking the `Launch Stack` button above:
 
 ![CloudFormation 3](img/cloud-formation-3.png)
 
