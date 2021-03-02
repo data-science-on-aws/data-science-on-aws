@@ -1,4 +1,4 @@
-# O'Reilly Book - April 7 2021 Release
+# O'Reilly Book Coming Early 2021
 
 ## Data Science on AWS
 
@@ -30,52 +30,66 @@ This workshop is FREE, but would otherwise cost <25 USD.
 ![Workshop Contributors](img/primary-contributors.png)
 
 # Workshop Instructions
+_Note:  This workshop will create an ephemeral AWS acccount for each attendee.  This ephemeral account is not accessible after the workshop.  You can, of course, clone this GitHub repo and reproduce the entire workshop in your own AWS Account._
 
-## 1. Login to AWS Console
+## 0. Logout of All AWS Consoles Across All Browser Tabs
+If you do not logout of existing AWS Consoles, things will not work properly.
 
-![IAM](img/aws_console.png)
+![AWS Account Logout](img/aws-logout.png)
 
-## 2. Setup Environment
+_Please logout of all AWS Console sessions in all browser tabs._
 
-### Click this button:  
-[![Launch Stack](img/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=workshop&templateURL=https://dsoaws.s3.amazonaws.com/workshop/lab.template)  
-** ^^^^^^^^^^^^^^^^^ **
+## 1. Login to the Workshop Portal (aka Event Engine). 
 
-**^^ Click this button ^^**
+![Event Box Launch](img/eb1_launch.png) 
 
-## 3. Follow these instructions after clicking the `Launch Stack` button above:
+![Event Box Access AWS Account](img/eb2_access_account.png)
 
-![CloudFormation 3](img/cloud-formation-3.png)
+![Event Engine Terms and Conditions](img/ee1_terms.png)
 
-![CloudFormation 4](img/cloud-formation-4.png)
+![Event Engine Dashboard](img/ee2_team_dashboard.png)
 
-![CloudFormation 5](img/cloud-formation-5.png)
 
-![CloudFormation 6](img/cloud-formation-6.png)
+## 2. Login to the **AWS Console**
 
-## 4. Launch SageMaker Studio
+![Event Engine AWS Console](img/ee3_open_console.png)
+
+Take the defaults and click on **Open AWS Console**. This will open AWS Console in a new browser tab.
+
+If you see this message, you need to logout from any previously used AWS accounts.
+
+![AWS Account Logout](img/aws-logout.png)
+
+_Please logout of all AWS Console sessions in all browser tabs._
+
+Double-check that your account name is similar to `TeamRole/MasterKey` as follows:
+
+![IAM Role](img/teamrole-masterkey.png)
+
+If not, please logout of your AWS Console in all browser tabs and re-run the steps above!
+
+
+## 3. Launch SageMaker Studio
 
 Open the [AWS Management Console](https://console.aws.amazon.com/console/home)
 
-![Back to SageMaker](img/alt_back_to_sagemaker_8.png)
+![Back to SageMaker](img/console1_sagemaker.png)
 
 In the AWS Console search bar, type `SageMaker` and select `Amazon SageMaker` to open the service console.
 
-![Notebook Instances](img/stu_notebook_instances_9.png)
+![SageMaker Studio](img/console2_studio.png)
 
-![Pending Studio](img/studio_pending.png)
-
-![Open Studio](img/studio_open.png)
+![Open SageMaker Studio](img/console3_open_studio.png)
 
 ![Loading Studio](img/studio_loading.png)
 
-## 5. Launch a New Terminal within Studio
+## 4. Launch a New Terminal within Studio
 
 Click `File` > `New` > `Terminal` to launch a terminal in your Jupyter instance.
 
 ![Terminal Studio](img/studio_terminal.png)
 
-## 6. Clone this GitHub Repo in the Terminal
+## 5. Clone this GitHub Repo in the Terminal
 
 Within the Terminal, run the following:
 
@@ -95,7 +109,7 @@ remove the file manually to continue.
 ```
 _Note:  This is not a fatal error ^^ above ^^.  Just re-run the command again until it works._
 
-## 7. Start the Workshop!
+## 6. Start the Workshop!
 
 Navigate to `00_quickstart/` in SageMaker Studio and start the workshop!
 
