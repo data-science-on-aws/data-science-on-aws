@@ -1,0 +1,1033 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: >
+  Creates the SageMaker Studio Domain, default user and default app
+
+Parameters:
+  UserProfileName:
+    Description: Name of studio user
+    Type: String
+    Default: DefaultUser
+
+Resources:
+  ####
+  # Setup VPC, Subnet, IG and Routing Table ready for Studio
+  ####
+  VPC:
+    Type: "AWS::EC2::VPC"
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsHostnames: true
+      Tags:
+        - Key: VPC
+          Value: NLP
+        - Key: Name
+          Value: NLP Lab 2.1 VPC
+  InternetGateway1:
+    Type: "AWS::EC2::InternetGateway"
+    DependsOn: VPC
+  AttachGateway:
+    Type: "AWS::EC2::VPCGatewayAttachment"
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway1
+  PublicSubnet:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.0.0/24
+      AvailabilityZone: !Select
+        - 0
+        - !GetAZs
+          Ref: AWS::Region
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: NLP Lab 3.1 Public Subnet
+  PublicRouteTable1:
+    Type: "AWS::EC2::RouteTable"
+    DependsOn:
+      - AttachGateway
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: Public Route Table
+  PublicRoute1:
+    Type: "AWS::EC2::Route"
+    DependsOn:
+      - VPC
+      - AttachGateway
+    Properties:
+      RouteTableId: !Ref PublicRouteTable1
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway1
+  PublicSubnet1RouteTableAssociation:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      SubnetId: !Ref PublicSubnet
+      RouteTableId: !Ref PublicRouteTable1
+
+  ####
+  # Private Subet
+  ####
+  PrivateSubnet:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.1.0/24
+      AvailabilityZone: !Select
+        - 0
+        - !GetAZs
+          Ref: AWS::Region
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: NLP Lab 3.1 Private Subnet
+  PrivateRouteTable:
+    Type: "AWS::EC2::RouteTable"
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: Private Route Table
+  NAT:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId:
+        Fn::GetAtt:
+          - EIP
+          - AllocationId
+      SubnetId:
+        Ref: PublicSubnet
+  EIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+  Route:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: PrivateRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId:
+        Ref: NAT
+  PrivateSubnetRouteTableAssociation:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      SubnetId: !Ref PrivateSubnet
+      RouteTableId: !Ref PrivateRouteTable
+
+  #########
+  # Create custom resource to create studio domain
+  #########
+
+  LambdaExecutionRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - "sts:AssumeRole"
+      Path: /
+  LambdaExecutionPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Path: /
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: CreateServiceLinkedRole
+            Effect: Allow
+            Action:
+              - iam:CreateServiceLinkedRole
+            Resource: "*"
+          - Sid: S3Permissions
+            Effect: Allow
+            Action:
+              - s3:Get*
+              - s3:List*
+            Resource: "*"
+          - Sid: S3LabBucket
+            Effect: Allow
+            Action:
+              - s3:*
+            Resource: "*"
+          - Sid: NetworkPermissions
+            Effect: Allow
+            Action:
+              - ec2:CreateNetworkInterface
+              - ec2:AttachNetworkInterface
+              - ec2:DescribeNetworkInterfaces
+              - ec2:DeleteNetworkInterface
+              - ec2:DetachNetworkInterface
+              - ec2:DescribeNetworkInterfaceAttribute
+              - ec2:DescribeSecurityGroups
+              - ec2:DescribeSubnets
+              - ec2:DescribeVpcs
+            Resource: "*"
+          - Sid: EFSPermissions
+            Effect: Allow
+            Action:
+              - elasticfilesystem:DescribeMountTargets
+              - elasticfilesystem:DescribeMountTargetSecurityGroups
+              - elasticfilesystem:ClientMount
+              - elasticfilesystem:ClientWrite
+            Resource: "*"
+          - Sid: CloudWatchLogsPermissions
+            Effect: Allow
+            Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Resource: !Sub "arn:${AWS::Partition}:logs:*:*:*"
+          - Sid: ServiceCatalogPermission
+            Effect: Allow
+            Action:
+              - servicecatalog:*
+            Resource: "*"
+          - Sid: ComprehendPermissions
+            Effect: Allow
+            Action:
+              - comprehend:*
+            Resource: "*"
+          - Sid: SageMakerProjectsPermission
+            Effect: Allow
+            Action:
+              - sagemaker:EnableSagemakerServicecatalogPortfolio
+              - sagemaker:DisableSagemakerServicecatalogPortfolio
+              - servicecatalog:ListAcceptedPortfolioShares
+              - servicecatalog:DisassociatePrincipalFromPortfolio
+              - servicecatalog:AssociatePrincipalWithPortfolio
+              - servicecatalog:AcceptPortfolioShare
+              - servicecatalog:RejectPortfolioShare
+              - iam:GetRole
+            Resource: "*"
+          - Sid: SageMakerDomainPermission
+            Effect: Allow
+            Action:
+              - sagemaker:CreateDomain
+              - sagemaker:DescribeDomain
+              - sagemaker:DeleteDomain
+              - sagemaker:UpdateDomain
+              - sagemaker:CreateUserProfile
+              - sagemaker:UpdateUserProfile
+              - sagemaker:DeleteUserProfile
+              - sagemaker:DescribeUserProfile
+              - sagemaker:CreateApp
+              - sagemaker:DescribeApp
+              - sagemaker:DeleteApp
+              - sagemaker:ListApps
+              - sagemaker:ListUserProfiles
+            Resource:
+              - !Sub "arn:${AWS::Partition}:sagemaker:*:*:domain/*"
+              - !Sub "arn:${AWS::Partition}:sagemaker:*:*:user-profile/*"
+              - !Sub "arn:${AWS::Partition}:sagemaker:*:*:app/*"
+          - Sid: SageMakerExecPassRole
+            Effect: Allow
+            Action:
+              - iam:PassRole
+            Resource: !GetAtt SageMakerExecutionRole.Arn
+      Roles:
+        - !Ref LambdaExecutionRole
+
+  ComprehendDataAccessRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - comprehend.amazonaws.com
+            Action:
+              - "sts:AssumeRole"
+      Path: /service-role/
+  ComprehendDataAccessPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: ComprehendPermissions
+            Effect: Allow
+            Action:
+              - comprehend:*
+              - s3:ListAllMyBuckets
+            Resource: "*"
+          - Sid: S3Permissions
+            Effect: Allow
+            Action:
+              - s3:PutObject
+              - s3:GetObjectAcl
+              - s3:GetObject
+              - s3:ListBucketMultipartUploads
+              - s3:AbortMultipartUpload
+              - s3:ListBucketVersions
+              - s3:GetObjectTagging
+              - s3:ListBucket
+              - s3:GetObjectVersion
+              - s3:ListMultipartUploadParts
+            Resource:
+              - !GetAtt LabBucket.Arn
+              - "arn:aws:s3:::*/*"
+          - Sid: IAMPermissions
+            Effect: Allow
+            Action:
+              - iam:GetRole
+            Resource: "*"
+      Roles:
+        - !Ref ComprehendDataAccessRole
+
+  SageMakerExecutionRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - sagemaker.amazonaws.com
+            Action:
+              - "sts:AssumeRole"
+      Path: /service-role/
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSageMakerFullAccess
+  SageMakerExecutionPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Path: /
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: ComprehendPermissions
+            Effect: Allow
+            Action:
+              - comprehend:*
+            Resource: "*"
+          - Sid: S3AllReadPermissions
+            Effect: Allow
+            Action:
+              - s3:Get*
+              - s3:List*
+            Resource: "*"
+          - Sid: IAMPermissions
+            Effect: Allow
+            Action:
+              - iam:GetRole
+            Resource: "*"
+          - Sid: ComprehendAssumeRolePermissions
+            Effect: Allow
+            Action:
+              - iam:PassRole
+            Resource: !GetAtt ComprehendDataAccessRole.Arn
+          - Sid: TextractPermissions
+            Effect: Allow
+            Action:
+              - textract:*
+            Resource: "*"
+          - Sid: S3Permissions
+            Effect: Allow
+            Action:
+              - comprehend:*
+              - s3:ListAllMyBuckets
+            Resource: "*"
+          - Sid: S3Permissions2
+            Effect: Allow
+            Action:
+              - s3:PutObject
+              - s3:GetObjectAcl
+              - s3:GetObject
+              - s3:ListBucketMultipartUploads
+              - s3:AbortMultipartUpload
+              - s3:ListBucketVersions
+              - s3:GetObjectTagging
+              - s3:ListBucket
+              - s3:GetObjectVersion
+              - s3:ListMultipartUploadParts
+            Resource:
+              - !GetAtt LabBucket.Arn
+              - "arn:aws:s3:::*/*"
+
+      Roles:
+        - !Ref SageMakerExecutionRole
+
+  StudioDomainFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: index.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        ZipFile: |
+          import json
+          import time
+          import boto3
+          import logging
+          import cfnresponse
+          from botocore.exceptions import ClientError
+          client = boto3.client('sagemaker')
+          def lambda_handler(event, context):
+            try:
+              if event['RequestType'] == 'Create':
+                handle_create(event, context)
+              elif event['RequestType'] == 'Update':
+                handle_update(event, context)
+              elif event['RequestType'] == 'Delete':
+                handle_delete(event, context)
+            except ClientError as exception:
+                print(exception)
+                logging.error(exception)
+                cfnresponse.send(event, context, cfnresponse.FAILED, {}, reason=str(exception))
+          def handle_create(event, context):
+            resource_config = event['ResourceProperties']
+            response_data = create_studio_domain(resource_config)
+            efs_client = boto3.client('efs')
+            efs_response = efs_client.describe_mount_targets(FileSystemId=response_data['HomeEfsFileSystemId'])
+            sg_response = efs_client.describe_mount_target_security_groups(MountTargetId = efs_response['MountTargets'][0]['MountTargetId'])
+            ec2_client = boto3.client('ec2')
+            ec2_response = ec2_client.describe_security_groups(GroupIds=sg_response['SecurityGroups'])
+            e = ec2_response['SecurityGroups'][0]['IpPermissions'][0]['UserIdGroupPairs'][0]['GroupId']
+            cfnresponse.send(event, context, cfnresponse.SUCCESS, {'DomainId': response_data['DomainId'],'EFSId':response_data['HomeEfsFileSystemId'], 'SG':e}, physicalResourceId=response_data['DomainId'])
+          def handle_delete(event, context):
+            print('Received delete event')
+            domain_id = event['PhysicalResourceId']
+            try:
+              client.describe_domain(DomainId=domain_id)
+            except ClientError as exception:
+              logging.error(exception)
+              cfnresponse.send(event, context, cfnresponse.SUCCESS, {}, physicalResourceId=event['PhysicalResourceId'])
+              return
+            delete_domain(domain_id)
+            cfnresponse.send(event, context, cfnresponse.SUCCESS, {}, physicalResourceId=event['PhysicalResourceId'])
+          def handle_update(event, context):
+            logging.info('Received Update event')
+            domain_id = event['PhysicalResourceId']
+            default_user_settings = event['ResourceProperties']['DefaultUserSettings']
+            update_domain(domain_id, default_user_settings)
+            cfnresponse.send(event, context, cfnresponse.SUCCESS, {'DomainId' : domain_id}, physicalResourceId=event['PhysicalResourceId'])
+          def create_studio_domain(config):
+            vpc_id = config['VPC']
+            subnet_ids = config['SubnetIds']
+            default_user_settings = config['DefaultUserSettings']
+            domain_name = config['DomainName']
+            response = client.create_domain(
+              DomainName=domain_name,
+              AuthMode='IAM',
+              DefaultUserSettings=default_user_settings,
+              SubnetIds=subnet_ids.split(','),
+              VpcId=vpc_id
+            )
+            domain_id = response['DomainArn'].split('/')[-1]
+            created = False
+            while not created:
+              response = client.describe_domain(DomainId=domain_id)
+              time.sleep(5)
+              if response['Status'] == 'InService':
+                created = True
+            return response
+          def delete_domain(domain_id):
+            response = client.delete_domain(DomainId=domain_id, RetentionPolicy={'HomeEfsFileSystem': 'Delete'})
+            print(response)
+            deleted = False
+            while not deleted:
+              try:
+                response = client.describe_domain(DomainId=domain_id)
+                print(response)
+              except ClientError as error:
+                print(error)
+                if error.response['Error']['Code'] == 'ResourceNotFound':
+                  print('Deleted')
+                  deleted = True
+                  return
+              time.sleep(5)
+            return response
+          def update_domain(domain_id, default_user_settings):
+            response = client.update_domain(
+              DomainId=domain_id,
+              DefaultUserSettings=default_user_settings
+            )
+            updated = False
+            while not updated:
+              response = client.describe_domain(DomainId=domain_id)
+              if response['Status'] == 'InService':
+                updated = True
+              else:
+                logging.info('Updating .. %s', response['Status'])
+              time.sleep(5)
+            return response
+      Runtime: python3.8
+      Timeout: 900
+    DependsOn:
+      - LambdaExecutionPolicy
+
+  PortfolioShareFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: index.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        ZipFile: |
+          import json
+          import time
+          import boto3
+          import logging
+          import cfnresponse
+          from botocore.exceptions import ClientError
+          client = boto3.client('sagemaker')
+          def lambda_handler(event, context):
+            try:
+              if event['RequestType'] == 'Create':
+                handle_create(event, context)
+              elif event['RequestType'] == 'Delete':
+                  handle_delete(event, context)
+                  cfnresponse.send(event, context, cfnresponse.SUCCESS, {},physicalResourceId=event['PhysicalResourceId'])
+              else:
+                  time.sleep(5)
+                  cfnresponse.send(event, context, cfnresponse.SUCCESS,{}, physicalResourceId=event['PhysicalResourceId'])
+            except ClientError as exception:                
+                logging.error(exception)
+                cfnresponse.send(event, context, cfnresponse.FAILED, {}, reason=str(exception))
+          def handle_delete(event, context):
+            sagemaker=boto3.client('sagemaker')
+            sc=boto3.client('servicecatalog')
+            studio_role_arn = event['ResourceProperties']['StudioRoleArn']
+            sagemaker.disable_sagemaker_servicecatalog_portfolio()
+            pid = event['PhysicalResourceId']
+            # sc.reject_portfolio_share(PortfolioId=pid)
+            cfnresponse.send(event, context, cfnresponse.SUCCESS,{}, physicalResourceId=pid)
+            sc.disassociate_principal_from_portfolio(PortfolioId=pid,PrincipalARN=studio_role_arn,PrincipalType='IAM')
+
+          def handle_create(event, context):
+            sagemaker=boto3.client('sagemaker')
+            sc=boto3.client('servicecatalog')
+            studio_role_arn = event['ResourceProperties']['StudioRoleArn']
+            sagemaker.enable_sagemaker_servicecatalog_portfolio()
+            response=sc.list_accepted_portfolio_shares()
+            pid = ''
+            for portfolio in response['PortfolioDetails']:
+              if portfolio['ProviderName']=='Amazon SageMaker':
+                pid=portfolio['Id']
+            sc.associate_principal_with_portfolio(PortfolioId=pid,PrincipalARN=studio_role_arn,PrincipalType='IAM')
+            cfnresponse.send(event, context, cfnresponse.SUCCESS,{}, physicalResourceId=pid)
+
+      Runtime: python3.8
+      Timeout: 900
+    DependsOn:
+      - LambdaExecutionPolicy
+
+  UserProfileFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: index.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        ZipFile: |
+          import time, logging
+          import boto3
+          import cfnresponse
+          from botocore.exceptions import ClientError
+          client = boto3.client('sagemaker')
+          logger = logging.getLogger()
+          logger.setLevel(logging.INFO)
+
+          def lambda_handler(event, context):
+            logger.info(f'event: {event}')
+            try:
+              if event['RequestType'] == 'Create':
+                handle_create(event, context)
+              elif event['RequestType'] == 'Update':
+                handle_update(event, context)
+              elif event['RequestType'] == 'Delete':
+                handle_delete(event, context)
+            except Exception as exp:
+              logger.exception(exp)
+              cfnresponse.send(event, context, cfnresponse.FAILED,{}, reason=str(exp))
+          def handle_create(event, context):
+            resource_config = event['ResourceProperties']
+            response_data = create_user_profile(resource_config)
+            cfnresponse.send(event, context, cfnresponse.SUCCESS,{'UserProfileName': response_data['UserProfileName']}, physicalResourceId=response_data['UserProfileName'])
+          def handle_delete(event, context):
+            user_profile_name = event['PhysicalResourceId']
+            domain_id = event['ResourceProperties']['DomainId']
+            paginator = client.get_paginator('list_user_profiles')
+            page_iterator = paginator.paginate(DomainIdEquals=domain_id)
+            for page in page_iterator:
+              for user_profile in page['UserProfiles']:
+                logger.info(f'Deleting user {user_profile}')
+                delete_user_profile(domain_id, user_profile['UserProfileName'])
+            cfnresponse.send(event, context, cfnresponse.SUCCESS, {},physicalResourceId=event['PhysicalResourceId'])
+            return
+          def handle_update(event, context):
+            user_profile_name = event['PhysicalResourceId']
+            domain_id = event['ResourceProperties']['DomainId']
+            user_settings = event['ResourceProperties']['UserSettings']
+            update_user_profile(domain_id, user_profile_name, user_settings)
+            cfnresponse.send(event, context, cfnresponse.SUCCESS, {},physicalResourceId=event['PhysicalResourceId'])
+          def create_user_profile(config):
+            domain_id = config['DomainId']
+            user_profile_name = config['UserProfileName']
+            user_settings = config['UserSettings']
+            response = client.create_user_profile(DomainId=domain_id, UserProfileName=user_profile_name,UserSettings=user_settings)
+            created = False
+            while not created:
+              response = client.describe_user_profile(DomainId=domain_id, UserProfileName=user_profile_name)
+              time.sleep(5)
+              if response['Status'] == 'InService':
+                created = True
+            return response
+          def delete_user_profile(domain_id, user_profile_name):
+            response = client.delete_user_profile(DomainId=domain_id, UserProfileName=user_profile_name)
+            logger.info(response)
+            deleted = False
+            while not deleted:
+              time.sleep(5)
+              try:
+                response = client.describe_user_profile(DomainId=domain_id, UserProfileName=user_profile_name)
+                if response is not None and 'Status' in response and response['Status'] == 'Deleted':
+                  deleted = True
+              except:
+                deleted = True
+            return 
+          def update_user_profile(domain_id, user_profile_name, user_settings):
+            response = client.update_user_profile(DomainId=domain_id, UserProfileName=user_profile_name, UserSettings=user_settings)
+            updated = False
+            while not updated:
+              response = client.describe_user_profile(DomainId=domain_id,UserProfileName=user_profile_name)
+              if response['Status'] == 'InService':
+                updated = True
+              else:
+                time.sleep(5)
+            return response
+      Runtime: python3.8
+      Timeout: 900
+    DependsOn:
+      - LambdaExecutionPolicy
+
+  AppFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: index.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Runtime: python3.8
+      Code:
+        ZipFile: |
+          import time, logging
+          import boto3
+          import cfnresponse
+          client = boto3.client('sagemaker')
+          log = logging.getLogger()
+          log.setLevel(logging.INFO)
+
+          def lambda_handler(event, context):
+              log.info(f'event: {event}')
+              try:
+                  if event['RequestType'] == 'Create':
+                      handle_create(event, context)
+                  elif event['RequestType'] == 'Update':
+                      cfnresponse.send(event, context, cfnresponse.SUCCESS, {}, physicalResourceId=event['PhysicalResourceId'])
+                  elif event['RequestType'] == 'Delete':
+                      handle_delete(event['ResourceProperties'])
+                      cfnresponse.send(event, context, cfnresponse.SUCCESS, {}, physicalResourceId=event['PhysicalResourceId'])
+              except Exception as exp:
+                  log.exception(exp)
+                  cfnresponse.send(event, context, cfnresponse.FAILED,{}, reason=str(exp))
+          def handle_create(event, context):
+              config=event['ResourceProperties']
+              response_data = create_app(config)
+              cfnresponse.send(event, context, cfnresponse.SUCCESS,{'AppName': config['AppName']}, physicalResourceId=config['AppName'])
+          def handle_delete(config):
+              domain_id=config['DomainId']
+              user_profile=config['UserProfileName']
+              t_app_type=config['AppType']
+              try:
+                  p = client.get_paginator('list_apps')
+                  log.info(f'Domain {domain_id}, user {user_profile}')
+                  p_i = p.paginate(DomainIdEquals=domain_id, UserProfileNameEquals=user_profile)
+                  for page in p_i:
+                      log.info(f'Page {page}')
+                      for app in page['Apps']:
+                          if not app['Status'] == 'Deleted' and not app['Status'] == 'Deleting' and (app['AppType']==t_app_type or t_app_type=='JupyterServer'):
+                            log.info(f'Deleting App {app}')
+                            client.delete_app(DomainId=domain_id,UserProfileName=user_profile,AppType=app['AppType'],AppName=app['AppName'])
+                  d = False
+                  while not d:
+                    d = True
+                    p = client.get_paginator('list_apps')
+                    p_i = p.paginate(DomainIdEquals=domain_id, UserProfileNameEquals=user_profile)
+                    for page in p_i:
+                      for app in page['Apps']:
+                        if not app['Status'] == 'Deleted' and app['AppType']==t_app_type:
+                          d=False
+                          time.sleep(5)
+              except Exception as exp:
+                  log.exception(exp)
+
+          def create_app(config):
+              domain_id = config['DomainId']
+              user_profile_name = config['UserProfileName']
+              app_name = config['AppName']
+              app_type = config['AppType']
+              if app_type == 'KernelGateway':
+                r = client.create_app(DomainId=domain_id, UserProfileName=user_profile_name,  AppType=app_type, AppName=app_name, ResourceSpec={'SageMakerImageArn': config['SageMakerArn'],'InstanceType': config['InstanceType']})
+              else:  
+                r = client.create_app(DomainId=domain_id, UserProfileName=user_profile_name,  AppType=app_type, AppName=app_name)
+              c = False
+              while not c:
+                  r = client.describe_app(DomainId=domain_id, UserProfileName=user_profile_name, AppType=app_type, AppName=app_name)
+                  time.sleep(5)
+                  if r['Status'] == 'InService':
+                      c=True
+              return r
+      Timeout: 900
+    DependsOn:
+      - LambdaExecutionPolicy
+
+  DownloadNotebooksFunction:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      Code:
+        ZipFile: |
+          import json, os, time, sys, traceback, logging
+          import boto3
+          import cfnresponse
+
+          logger = logging.getLogger()
+          logger.setLevel(logging.INFO)
+
+          def fix_notebook(notebook, replace_args):
+            filedata = None
+            with open(notebook, 'r') as nb:
+              filedata = nb.read()
+            for a in replace_args:
+              filedata = filedata.replace(a['Key'], a['Value'])
+            with open(notebook, 'w') as nb:
+              nb.write(filedata)
+
+          def fix_files(local, replace_args):
+            for dirpath, dirnames, files in os.walk(local, topdown=False):
+              for file_name in files:
+                fn = os.path.join(dirpath, file_name)
+                f_stat = os.stat(fn)
+                if f_stat.st_uid == 0:
+                  os.chown(fn, 200005, 1001) 
+                if os.path.splitext(fn)[1] == '.ipynb':
+                  fix_notebook(fn, replace_args)
+              d_stat = os.stat(dirpath)
+              if d_stat.st_uid == 0:
+                os.chown(dirpath, 200005, 1001) 
+
+          def download_dir(prefix, local, bucket, region, replace_args):
+              client = boto3.client('s3', region_name=region)
+              paginator = client.get_paginator('list_objects')
+              operation_parameters = {'Bucket': bucket, 'Prefix': prefix}
+              keys = []
+              dirs = []
+              page_iterator = paginator.paginate(**operation_parameters)
+
+              for page in page_iterator:
+                  for content in page['Contents']:
+                      k = content['Key']
+                      if k[-1] != '/':
+                          keys.append(k)
+                      else:
+                          dirs.append(k)
+              for d in dirs:
+                  dest_pathname = os.path.join(local, d).replace(prefix, '')
+                  if not os.path.exists(os.path.dirname(dest_pathname)):
+                      os.makedirs(os.path.dirname(dest_pathname), mode=0o777)
+              for k in keys:
+                  dest_pathname = os.path.join(local, k)
+                  dest_pathname = dest_pathname.replace(prefix, '')
+                  if not os.path.exists(os.path.dirname(dest_pathname)):
+                      os.makedirs(os.path.dirname(dest_pathname), mode=0o777)
+                  client.download_file(bucket, k, dest_pathname)
+              fix_files(local, replace_args)
+
+          def handle_create(event, context):
+              resource_config = event['ResourceProperties']
+              prefix = resource_config['Prefix']
+              target = resource_config['Target']
+              bucket = resource_config['S3Bucket']
+              region = resource_config['BucketRegion']
+              replace_args = resource_config['ReplaceArgs']
+              logger.info(f'calling download_dir {prefix}, {target}, {bucket}, {region}, {replace_args}')
+              download_dir(prefix, target, bucket, region, replace_args)
+
+          def lambda_handler(event, context):
+              logger.info(f'event: {event}')
+              try:
+                  if event['RequestType'] == 'Create':
+                      handle_create(event, context)
+                      cfnresponse.send(event, context, cfnresponse.SUCCESS,{}, physicalResourceId='12345678')
+                  elif event['RequestType'] == 'Delete':
+                      time.sleep(5)
+                      cfnresponse.send(event, context, cfnresponse.SUCCESS, {},physicalResourceId=event['PhysicalResourceId'])
+                  else:
+                      time.sleep(5)
+                      cfnresponse.send(event, context, cfnresponse.SUCCESS,{}, physicalResourceId='12345678')
+              except Exception as exp:
+                  logger.exception(exp)
+                  cfnresponse.send(event, context, cfnresponse.FAILED,{}, reason=str(exp))
+
+      Description: Copies notebook files into EFS filesystem created by studio
+      FileSystemConfigs:
+        - Arn: !GetAtt LabEFS.Arn
+          LocalMountPath: "/mnt/studio"
+      Handler: index.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Runtime: python3.8
+      Timeout: 300
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref LambdaSG
+          - !GetAtt StudioDomain.SG
+        SubnetIds:
+          - !Ref PrivateSubnet
+
+  CopyFilesToS3Function:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      Code:
+        ZipFile: |
+          import json, os, time, sys, traceback, logging
+          import boto3
+          import cfnresponse
+
+          logger = logging.getLogger()
+          logger.setLevel(logging.INFO)
+
+          def download_dir(source_region, source_bucket, source_key, target_region,target_bucket, target_key):
+              source_client = boto3.client('s3', region_name=source_region)
+              s3 = boto3.resource('s3', region_name=target_region)
+              copy_source = {
+                'Bucket': source_bucket,
+                'Key': source_key
+              }
+              logger.info(f'Getting Reference to Bucket')
+              bucket = s3.Bucket(target_bucket)
+              logger.info(f'Bucket {bucket}')
+              logger.info(f'Attempting to copy')
+              bucket.copy(CopySource=copy_source, Key=target_key, SourceClient=source_client)
+
+          def handle_create(event, context):
+              resource_config = event['ResourceProperties']
+              
+              source_bucket = resource_config['SourceS3Bucket']
+              source_region = resource_config['SourceBucketRegion']
+              target_bucket = resource_config['TargetS3Bucket']
+              target_region = resource_config['TargetBucketRegion']
+              
+              for f in resource_config['FileList']:
+                source_key = f['SourceKey']
+                target_key = f['TargetKey']
+                logger.info(f'Copying File from  {source_region}, {source_bucket}, {source_key}')
+                logger.info(f'Copying File to  {target_region}, {target_bucket}, {target_key}')
+                download_dir(source_region, source_bucket, source_key, target_region,target_bucket, target_key)
+
+          def lambda_handler(event, context):
+              logger.info(f'event: {event}')
+              try:
+                  if event['RequestType'] == 'Create':
+                      handle_create(event, context)
+                      cfnresponse.send(event, context, cfnresponse.SUCCESS,{}, physicalResourceId='12345678')
+                  elif event['RequestType'] == 'Delete':
+                      time.sleep(5)
+                      cfnresponse.send(event, context, cfnresponse.SUCCESS, {},physicalResourceId=event['PhysicalResourceId'])
+                  else:
+                      time.sleep(5)
+                      cfnresponse.send(event, context, cfnresponse.SUCCESS,{}, physicalResourceId='12345678')
+              except Exception as exp:
+                  logger.exception(exp)
+                  cfnresponse.send(event, context, cfnresponse.FAILED,{}, reason=str(exp))
+
+      Description: Copies notebook files into Lab Bucket
+      FileSystemConfigs:
+        - Arn: !GetAtt LabEFS.Arn
+          LocalMountPath: "/mnt/studio"
+      Handler: index.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Runtime: python3.8
+      Timeout: 300
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref LambdaSG
+          - !GetAtt StudioDomain.SG
+        SubnetIds:
+          - !Ref PrivateSubnet
+
+  S3CleanerFunction:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      Code:
+        ZipFile: |
+          import json, os, time, sys, traceback, logging
+          import boto3
+          import cfnresponse
+
+          logger = logging.getLogger()
+          logger.setLevel(logging.INFO)
+
+          def handle_delete(event, context):
+              resource_config = event['ResourceProperties']
+              s3 = boto3.resource('s3')
+              bucket = s3.Bucket(resource_config['S3Bucket'])
+              bucket.objects.all().delete()              
+
+          def lambda_handler(event, context):
+              logger.info(f'event: {event}')
+              try:
+                  if event['RequestType'] == 'Delete':
+                      handle_delete(event, context)
+                      cfnresponse.send(event, context, cfnresponse.SUCCESS, {},physicalResourceId=event['PhysicalResourceId'])
+                  else:
+                      time.sleep(1)
+                      cfnresponse.send(event, context, cfnresponse.SUCCESS,{}, physicalResourceId='12345678')
+              except Exception as exp:
+                  logger.exception(exp)
+                  cfnresponse.send(event, context, cfnresponse.SUCCESS,{}, physicalResourceId='12345678')
+
+      Description: Emtpies an S3 bucket on delete - always returns success message to cloudformation
+      Handler: index.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Runtime: python3.8
+
+  StudioDomain:
+    Type: Custom::StudioDomain
+    Properties:
+      ServiceToken: !GetAtt StudioDomainFunction.Arn
+      VPC: !Ref VPC
+      SubnetIds: !Ref PublicSubnet
+      DomainName: "MyDomainName"
+      DefaultUserSettings:
+        ExecutionRole: !GetAtt SageMakerExecutionRole.Arn
+
+  # PortfolioShare:
+  #   Type: Custom::PortfolioShare
+  #   Properties:
+  #     ServiceToken: !GetAtt PortfolioShareFunction.Arn
+  #     StudioRoleArn: !GetAtt SageMakerExecutionRole.Arn
+  #     DefaultUserSettings:
+  #       ExecutionRole: !GetAtt SageMakerExecutionRole.Arn
+
+  UserProfile:
+    Type: Custom::UserProfile
+    Properties:
+      ServiceToken: !GetAtt UserProfileFunction.Arn
+      DomainId: !GetAtt StudioDomain.DomainId
+      UserProfileName: !Ref UserProfileName
+      UserSettings:
+        ExecutionRole: !GetAtt SageMakerExecutionRole.Arn
+
+  JupyterServerApp:
+    Type: Custom::App
+    Properties:
+      ServiceToken: !GetAtt AppFunction.Arn
+      DomainId: !GetAtt StudioDomain.DomainId
+      UserProfileName: !GetAtt UserProfile.UserProfileName
+      AppName: default
+      AppType: JupyterServer
+      UserSettings:
+        ExecutionRole: !GetAtt SageMakerExecutionRole.Arn
+
+  DataScienceApp:
+    Type: Custom::App
+    Properties:
+      ServiceToken: !GetAtt AppFunction.Arn
+      DomainId: !GetAtt StudioDomain.DomainId
+      UserProfileName: !GetAtt UserProfile.UserProfileName
+      AppName: datascience-ml-t3-medium
+      AppType: KernelGateway
+      InstanceType: ml.t3.medium
+      SageMakerArn: arn:aws:sagemaker:us-east-1:081325390199:image/datascience-1.0
+      UserSettings:
+        ExecutionRole: !GetAtt SageMakerExecutionRole.Arn
+    DependsOn:
+      - JupyterServerApp
+
+  CopyNotebooksToStudio:
+    Type: Custom::DownloadNotebooksFunction
+    Properties:
+      ServiceToken: !GetAtt DownloadNotebooksFunction.Arn
+      Prefix: "CUR-TF-200-ACMNLP-1/202103"
+      Target: "/mnt/studio/200005"
+      S3Bucket: "aws-tc-largeobjects"
+      BucketRegion: "us-west-2"
+      ReplaceArgs:
+        - Key: "<S3-BUCKET-GOES-HERE>"
+          Value: !Ref LabBucket
+        - Key: "<DATA-ARN-GOES-HERE>"
+          Value: !GetAtt ComprehendDataAccessRole.Arn
+
+    DependsOn:
+      - JupyterServerApp
+      - NAT
+      - PrivateSubnetRouteTableAssociation
+      - PublicSubnet1RouteTableAssociation
+      - PublicRoute1
+      - Route
+
+  CopyFilesToS3:
+    Type: Custom::CopyFilesToS3Function
+    Properties:
+      ServiceToken: !GetAtt CopyFilesToS3Function.Arn
+      SourceS3Bucket: "aws-tc-largeobjects"
+      SourceBucketRegion: "us-west-2"
+      TargetS3Bucket: !Ref LabBucket
+      TargetBucketRegion: !Ref AWS::Region
+      FileList:
+        - SourceKey: "CUR-TF-200-ACMNLP-1/202103/lab-3.3/s3/text8.txt"
+          TargetKey: "blazingtext/text8.txt"
+        - SourceKey: "CUR-TF-200-ACMNLP-1/202103/lab-3.1/s3/employmentapp.png"
+          TargetKey: "lab51/employmentapp.png"
+        - SourceKey: "CUR-TF-200-ACMNLP-1/202103/lab-3.1/s3/simple-document-image.jpg"
+          TargetKey: "lab51/simple-document-image.jpg"
+
+  CleanS3:
+    Type: Custom::S3CleanerFunction
+    Properties:
+      ServiceToken: !GetAtt S3CleanerFunction.Arn
+      S3Bucket: !Ref LabBucket
+
+  LabBucket:
+    Type: AWS::S3::Bucket
+
+  LabEFS:
+    Type: "AWS::EFS::AccessPoint"
+    Properties:
+      ClientToken: !GetAtt StudioDomain.DomainId
+      FileSystemId: !GetAtt StudioDomain.EFSId
+      PosixUser:
+        Gid: "0"
+        Uid: "0"
+
+  LambdaSG:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: Allow Lambda outbound traffic
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+      VpcId: !Ref VPC
+
+Outputs:
+  LabAccountId:
+    Value: !Ref "AWS::AccountId"
+  LabRegion:
+    Value: !Ref "AWS::Region"
+  LabBucket:
+    Value: !Ref "LabBucket"
+  DataAccessRoleArn:
+    Value: !GetAtt ComprehendDataAccessRole.Arn
