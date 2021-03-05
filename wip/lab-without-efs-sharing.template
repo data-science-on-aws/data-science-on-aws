@@ -6,7 +6,7 @@ Parameters:
   DomainName:
     Type: String
     Description: The domain name of the Sagemaker studio instance
-    Default: 'DefaultUser'
+    Default: 'MyDomain'
   
 Mappings: 
   RegionMap: 
@@ -86,7 +86,7 @@ Resources:
         - 'arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess'
         - 'arn:aws:iam::aws:policy/AmazonS3FullAccess'
         - 'arn:aws:iam::aws:policy/IAMFullAccess'
-        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 
   SageMakerExecutionRole:
     Type: AWS::IAM::Role
@@ -129,7 +129,6 @@ Resources:
         - 'arn:aws:iam::aws:policy/AmazonS3FullAccess'
         - 'arn:aws:iam::aws:policy/AWSCloudFormationFullAccess'
         - 'arn:aws:iam::aws:policy/AWSCodePipeline_FullAccess'
-        - 'arn:aws:iam::aws:policy/AWSGlueConsoleFullAccess'
   
   LambdaExecutionPolicy:
     Type: AWS::IAM::ManagedPolicy
@@ -232,8 +231,7 @@ Resources:
       MemorySize: 512
       Role: !GetAtt LambdaExecutionRole.Arn
       Runtime: python3.7
-      Timeout: 900
-
+      Timeout: 5
   DefaultVpcFinder:
     Type: Custom::ResourceForFindingDefaultVpc
     Properties:
@@ -297,7 +295,7 @@ Resources:
       MemorySize: 512
       Role: !GetAtt LambdaExecutionRole.Arn
       Runtime: python3.7
-      Timeout: 900
+      Timeout: 5
 
   EnableProjects:
     Type: Custom::ResourceForEnablingSageMakerProjects
@@ -335,20 +333,20 @@ Resources:
           - datascience
       UserProfileName: !Ref UserProfileName
 
-  #DataWranglerApp:
-  #  Type: AWS::SageMaker::App
-  #  DependsOn: UserProfile
-  #  Properties: 
-  #    AppName: instance-event-engine-datawrangler-ml-m5-4xlarge
-  #    AppType: KernelGateway
-  #    DomainId: !GetAtt StudioDomain.DomainId
-  #    ResourceSpec: 
-  #      InstanceType:  ml.m5.4xlarge
-  #      SageMakerImageArn: !FindInMap
-  #        - RegionMap
-  #        - !Ref 'AWS::Region'
-  #        - datawrangler
-  #    UserProfileName: !Ref UserProfileName
+  DataWranglerApp:
+    Type: AWS::SageMaker::App
+    DependsOn: UserProfile
+    Properties: 
+      AppName: instance-event-engine-datawrangler-ml-m5-4xlarge
+      AppType: KernelGateway
+      DomainId: !GetAtt StudioDomain.DomainId
+      ResourceSpec: 
+        InstanceType:  ml.m5.4xlarge
+        SageMakerImageArn: !FindInMap
+          - RegionMap
+          - !Ref 'AWS::Region'
+          - datawrangler
+      UserProfileName: !Ref UserProfileName
 
 ### Roles for Sagemaker projects
   AmazonSageMakerServiceCatalogProductsLaunchRole:
