@@ -11,3 +11,4 @@ policy.json
 __pycache__/
 content/
 #data/
+profiler_report/

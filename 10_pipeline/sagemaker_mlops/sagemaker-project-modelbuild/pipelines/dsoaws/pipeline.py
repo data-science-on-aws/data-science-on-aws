@@ -387,7 +387,7 @@ def get_pipeline(region, role, default_bucket, pipeline_name, model_package_grou
 
     model_approval_status = ParameterString(name="ModelApprovalStatus", default_value="PendingManualApproval")
 
-    deploy_instance_type = ParameterString(name="DeployInstanceType", default_value="ml.m4.xlarge")
+    deploy_instance_type = ParameterString(name="DeployInstanceType", default_value="ml.m5.4xlarge")
 
     deploy_instance_count = ParameterInteger(name="DeployInstanceCount", default_value=1)
 
