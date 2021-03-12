@@ -102,6 +102,26 @@ def parse_args():
     return parser.parse_args()
 
 
+def predict(text, model, max_seq_length):
+    encode_plus_tokens = tokenizer.encode_plus(
+        text, pad_to_max_length=True, max_length=max_seq_length, truncation=True,
+        return_tensors="tf"
+    )
+    # The id from the pre-trained BERT vocabulary that represents the token.  (Padding of 0 will be used if the # of tokens is less than `max_seq_length`)
+    input_ids = encode_plus_tokens["input_ids"]
+
+    # Specifies which tokens BERT should pay attention to (0 or 1).  Padded `input_ids` will have 0 in each of these vector elements.
+    input_mask = encode_plus_tokens["attention_mask"]
+
+    outputs = model.predict(x=(input_ids, input_mask))
+
+    scores = np.exp(outputs) / np.exp(outputs).sum(-1, keepdims=True)
+
+    prediction = [{"label": config.id2label[item.argmax()], "score": item.max().item()} for item in scores]
+
+    return prediction[0]["label"]
+    
+
 def process(args):
     print("Current host: {}".format(args.current_host))
 
@@ -119,36 +139,17 @@ def process(args):
 
     model = keras.models.load_model("{}/tensorflow/saved_model/0".format(args.input_model))
     print(model)
-
-    def predict(text):
-        encode_plus_tokens = tokenizer.encode_plus(
-            text, pad_to_max_length=True, max_length=args.max_seq_length, truncation=True, return_tensors="tf"
-        )
-        # The id from the pre-trained BERT vocabulary that represents the token.  (Padding of 0 will be used if the # of tokens is less than `max_seq_length`)
-        input_ids = encode_plus_tokens["input_ids"]
-
-        # Specifies which tokens BERT should pay attention to (0 or 1).  Padded `input_ids` will have 0 in each of these vector elements.
-        input_mask = encode_plus_tokens["attention_mask"]
-
-        outputs = model.predict(x=(input_ids, input_mask))
-
-        scores = np.exp(outputs) / np.exp(outputs).sum(-1, keepdims=True)
-
-        prediction = [{"label": config.id2label[item.argmax()], "score": item.max().item()} for item in scores]
-
-        return prediction[0]["label"]
+ 
 
     print(
         """I loved it!  I will recommend this to everyone.""",
-        predict("""I loved it!  I will recommend this to everyone."""),
-    )
+        predict("""I loved it!  I will recommend this to everyone.""", model, args.max_seq_length))
 
-    print("""It's OK.""", predict("""It's OK."""))
+    print("""It's OK.""", predict("""It's OK.""", model, args.max_seq_length))
 
     print(
         """Really bad.  I hope they don't make this anymore.""",
-        predict("""Really bad.  I hope they don't make this anymore."""),
-    )
+        predict("""Really bad.  I hope they don't make this anymore.""", model, args.max_seq_length))
 
     ###########################################################################################
     # TODO:  Replace this with glob for all files and remove test_data/ from the model.tar.gz #
