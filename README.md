@@ -37,7 +37,7 @@ This workshop is FREE, but would otherwise cost <25 USD.
 
 ## 2. Setup Environment
 
-### Click this button:  
+### Click this button here (not in the AWS console, but here):
 [![Launch Stack](img/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=workshop&templateURL=https://dsoaws.s3.amazonaws.com/workshop/lab.template)  
 ** ^^^^^^^^^^^^^^^^^ **
 
