@@ -187,6 +187,32 @@ Resources:
       Roles:
         - !Ref  LambdaExecutionRole
   
+  DomainDeploymentDelay:
+    Type: 'Custom::Delay'
+    DependsOn: SageMakerExecutionRole
+    Properties:
+      ServiceToken: !GetAtt DelayLambda.Arn
+      TimeToWait: 120
+
+  DelayLambda:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Handler: "index.handler"
+      Timeout: 660
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Runtime: python3.7
+      Code:
+        ZipFile: |
+          import json
+          import cfnresponse
+          import time
+          def handler(event, context):
+            time_to_wait = int(event['ResourceProperties']['TimeToWait'])
+            print(f'Waiting for {time_to_wait} seconds')
+            time.sleep(time_to_wait)
+            print(f'Waiting finished')
+            cfnresponse.send(event, context, cfnresponse.SUCCESS, {},'')
+            
   DefaultVpcLambda:
     Type: AWS::Lambda::Function
     Properties:
@@ -241,6 +267,7 @@ Resources:
 
   StudioDomain:
     Type: AWS::SageMaker::Domain
+    DependsOn: DomainDeploymentDelay    
     Properties: 
       AppNetworkAccessType: PublicInternetOnly
       AuthMode: IAM

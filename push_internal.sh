@@ -9,3 +9,5 @@ aws s3 sync \
     --include "lab.template" \
     --include "lab.policy"  
 #    --include "00_quickstart/*" \
+
+echo "DON'T FORGET TO UPDATE THE PERMISSIONS ON THE FILES!!!!"
