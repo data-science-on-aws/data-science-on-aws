@@ -108,7 +108,10 @@ remove the file manually to continue.
 ```
 _Note:  This is not a fatal error ^^ above ^^.  Just re-run the command again until it works._
 
-## 7. Start the Workshop!
+## 7. Run a Cradle Job
+http://amzn.to/3lo3KdX
+
+## 8. Start the Workshop!
 
 Navigate to `00_quickstart/` in SageMaker Studio and start the workshop!
 
