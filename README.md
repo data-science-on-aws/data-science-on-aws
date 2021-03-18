@@ -50,10 +50,9 @@ _If not, please logout of your AWS Console in all browser tabs and re-run the st
 
 ## 2. Setup Environment
 
+Follow the instructions here and run a Cradle Job
 
-## Follow the instructions here and run a Cradle Job
 http://amzn.to/3lo3KdX
-
 
 ## 3. Launch SageMaker Studio
 
