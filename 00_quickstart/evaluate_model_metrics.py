@@ -169,7 +169,7 @@ def process(args):
     df_test_reviews.shape
     df_test_reviews.head()
 
-    y_test = df_test_reviews["review_body"].map(predict)
+    y_test = df_test_reviews["review_body"].map(predict, model, args.max_seq_length)
     y_test
 
     y_actual = df_test_reviews["star_rating"]
