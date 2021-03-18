@@ -31,14 +31,9 @@ This workshop is FREE, but would otherwise cost <25 USD.
 
 # Workshop Instructions
 
-## 1. Login to AWS Console
+## 1. Setup Environment
 
-
-## 2. Setup Environment
-
-Follow the instructions here and run a Cradle Job
-
-http://amzn.to/3lo3KdX
+Follow these instructions:  http://amzn.to/3lo3KdX
 
 ## 3. Launch SageMaker Studio
 
