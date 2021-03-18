@@ -1,4 +1,4 @@
-# O'Reilly Book - April 7 2021 Release
+# O'Reilly Book Coming Early 2021
 
 ## Data Science on AWS
 
@@ -33,17 +33,30 @@ This workshop is FREE, but would otherwise cost <25 USD.
 
 ## 1. Login to AWS Console
 
-![IAM](img/aws_console.png)
+Please logout of your AWS Console in all browser tabs before you continue.
+
+![AWS Console](img/account-settings.png)
+
+Take the defaults and click on **Console Access**. This will open AWS Console in a new browser tab.
+
+![AWS Console](img/alt_aws_console.png)
+
+_Double-check that your account name is something like `IibsAdminAccess-DO-NOT-DELETE...` as follows:_
+
+![IAM Role](img/alt_iibsadminaccess.png)
+
+_If not, please logout of your AWS Console in all browser tabs and re-run the steps above!_
+
 
 ## 2. Setup Environment
 
-### Click this button here (not in the AWS console, but here):
+### Click this button right here on this page:  
 [![Launch Stack](img/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=workshop&templateURL=https://dsoaws.s3.amazonaws.com/workshop/lab.template)  
 ** ^^^^^^^^^^^^^^^^^ **
 
-**^^ Click this button ^^**
+**^^ CLICK THIS BUTTON RIGHT HERE ON THIS PAGE ^^**
 
-## 3. Follow these instructions after clicking the `Launch Stack` button above:
+## 3. Follow these instructions after clicking the `Launch Button` button above:
 
 ![CloudFormation 3](img/cloud-formation-3.png)
 
@@ -57,7 +70,7 @@ This workshop is FREE, but would otherwise cost <25 USD.
 
 Open the [AWS Management Console](https://console.aws.amazon.com/console/home)
 
-![Back to SageMaker](img/alt_back_to_sagemaker_8.png)
+![Back to SageMaker](img/bur_back_to_sagemaker_8.png)
 
 In the AWS Console search bar, type `SageMaker` and select `Amazon SageMaker` to open the service console.
 
@@ -95,7 +108,10 @@ remove the file manually to continue.
 ```
 _Note:  This is not a fatal error ^^ above ^^.  Just re-run the command again until it works._
 
-## 7. Start the Workshop!
+## 7. Run a Cradle Job
+http://amzn.to/3lo3KdX
+
+## 8. Start the Workshop!
 
 Navigate to `00_quickstart/` in SageMaker Studio and start the workshop!
 
