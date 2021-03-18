@@ -1,4 +1,4 @@
-# O'Reilly Book Coming Early 2021
+# O'Reilly Book - April 7 2021 Release
 
 ## Data Science on AWS
 
@@ -33,18 +33,31 @@ This workshop is FREE, but would otherwise cost <25 USD.
 
 ## 1. Login to AWS Console
 
+![IAM](img/aws_console.png)
 
 ## 2. Setup Environment
 
-Follow the instructions here and run a Cradle Job
+### Click this button here (not in the AWS console, but here):
+[![Launch Stack](img/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=workshop&templateURL=https://dsoaws.s3.amazonaws.com/workshop/lab.template)  
+** ^^^^^^^^^^^^^^^^^ **
 
-http://amzn.to/3lo3KdX
+**^^ Click this button ^^**
 
-## 3. Launch SageMaker Studio
+## 3. Follow these instructions after clicking the `Launch Stack` button above:
+
+![CloudFormation 3](img/cloud-formation-3.png)
+
+![CloudFormation 4](img/cloud-formation-4.png)
+
+![CloudFormation 5](img/cloud-formation-5.png)
+
+![CloudFormation 6](img/cloud-formation-6.png)
+
+## 4. Launch SageMaker Studio
 
 Open the [AWS Management Console](https://console.aws.amazon.com/console/home)
 
-![Back to SageMaker](img/bur_back_to_sagemaker_8.png)
+![Back to SageMaker](img/alt_back_to_sagemaker_8.png)
 
 In the AWS Console search bar, type `SageMaker` and select `Amazon SageMaker` to open the service console.
 
@@ -56,13 +69,13 @@ In the AWS Console search bar, type `SageMaker` and select `Amazon SageMaker` to
 
 ![Loading Studio](img/studio_loading.png)
 
-## 4. Launch a New Terminal within Studio
+## 5. Launch a New Terminal within Studio
 
 Click `File` > `New` > `Terminal` to launch a terminal in your Jupyter instance.
 
 ![Terminal Studio](img/studio_terminal.png)
 
-## 5. Clone this GitHub Repo in the Terminal
+## 6. Clone this GitHub Repo in the Terminal
 
 Within the Terminal, run the following:
 
@@ -82,8 +95,7 @@ remove the file manually to continue.
 ```
 _Note:  This is not a fatal error ^^ above ^^.  Just re-run the command again until it works._
 
-
-## 6. Start the Workshop!
+## 7. Start the Workshop!
 
 Navigate to `00_quickstart/` in SageMaker Studio and start the workshop!
 
