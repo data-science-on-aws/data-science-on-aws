@@ -50,23 +50,12 @@ _If not, please logout of your AWS Console in all browser tabs and re-run the st
 
 ## 2. Setup Environment
 
-### Click this button right here on this page:  
-[![Launch Stack](img/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=workshop&templateURL=https://dsoaws.s3.amazonaws.com/workshop/lab.template)  
-** ^^^^^^^^^^^^^^^^^ **
 
-**^^ CLICK THIS BUTTON RIGHT HERE ON THIS PAGE ^^**
+## Follow the instructions here and run a Cradle Job
+http://amzn.to/3lo3KdX
 
-## 3. Follow these instructions after clicking the `Launch Button` button above:
 
-![CloudFormation 3](img/cloud-formation-3.png)
-
-![CloudFormation 4](img/cloud-formation-4.png)
-
-![CloudFormation 5](img/cloud-formation-5.png)
-
-![CloudFormation 6](img/cloud-formation-6.png)
-
-## 4. Launch SageMaker Studio
+## 3. Launch SageMaker Studio
 
 Open the [AWS Management Console](https://console.aws.amazon.com/console/home)
 
@@ -82,13 +71,13 @@ In the AWS Console search bar, type `SageMaker` and select `Amazon SageMaker` to
 
 ![Loading Studio](img/studio_loading.png)
 
-## 5. Launch a New Terminal within Studio
+## 4. Launch a New Terminal within Studio
 
 Click `File` > `New` > `Terminal` to launch a terminal in your Jupyter instance.
 
 ![Terminal Studio](img/studio_terminal.png)
 
-## 6. Clone this GitHub Repo in the Terminal
+## 5. Clone this GitHub Repo in the Terminal
 
 Within the Terminal, run the following:
 
@@ -108,10 +97,8 @@ remove the file manually to continue.
 ```
 _Note:  This is not a fatal error ^^ above ^^.  Just re-run the command again until it works._
 
-## 7. Run a Cradle Job
-http://amzn.to/3lo3KdX
 
-## 8. Start the Workshop!
+## 6. Start the Workshop!
 
 Navigate to `00_quickstart/` in SageMaker Studio and start the workshop!
 
