@@ -104,8 +104,7 @@ def parse_args():
 
 def predict(text, model, max_seq_length):
     encode_plus_tokens = tokenizer.encode_plus(
-        text, pad_to_max_length=True, max_length=max_seq_length, truncation=True,
-        return_tensors="tf"
+        text, pad_to_max_length=True, max_length=max_seq_length, truncation=True, return_tensors="tf"
     )
     # The id from the pre-trained BERT vocabulary that represents the token.  (Padding of 0 will be used if the # of tokens is less than `max_seq_length`)
     input_ids = encode_plus_tokens["input_ids"]
@@ -120,7 +119,7 @@ def predict(text, model, max_seq_length):
     prediction = [{"label": config.id2label[item.argmax()], "score": item.max().item()} for item in scores]
 
     return prediction[0]["label"]
-    
+
 
 def process(args):
     print("Current host: {}".format(args.current_host))
@@ -139,17 +138,18 @@ def process(args):
 
     model = keras.models.load_model("{}/tensorflow/saved_model/0".format(args.input_model))
     print(model)
- 
 
     print(
         """I loved it!  I will recommend this to everyone.""",
-        predict("""I loved it!  I will recommend this to everyone.""", model, args.max_seq_length))
+        predict("""I loved it!  I will recommend this to everyone.""", model, args.max_seq_length),
+    )
 
     print("""It's OK.""", predict("""It's OK.""", model, args.max_seq_length))
 
     print(
         """Really bad.  I hope they don't make this anymore.""",
-        predict("""Really bad.  I hope they don't make this anymore.""", model, args.max_seq_length))
+        predict("""Really bad.  I hope they don't make this anymore.""", model, args.max_seq_length),
+    )
 
     ###########################################################################################
     # TODO:  Replace this with glob for all files and remove test_data/ from the model.tar.gz #
@@ -169,7 +169,7 @@ def process(args):
     df_test_reviews.shape
     df_test_reviews.head()
 
-    y_test = df_test_reviews["review_body"].map(predict, model, args.max_seq_length)
+    y_test = [predict(review, model, args.max_seq_length) for review in df_test_reviews["review_body"]]
     y_test
 
     y_actual = df_test_reviews["star_rating"]
