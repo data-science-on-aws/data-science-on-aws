@@ -31,10 +31,6 @@ This workshop is FREE, but would otherwise cost <25 USD.
 
 # Workshop Instructions
 
-## 0. Click Play to Start the Lab
-
-[![Start Lab](img/play-button.png)](###)
-
 ## 1. Login to AWS Console
 
 ![IAM](img/aws_console.png)
