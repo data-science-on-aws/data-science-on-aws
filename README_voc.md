@@ -33,7 +33,7 @@ This workshop is FREE, but would otherwise cost <25 USD.
 
 ## 0. Start Lab
 
-![![Start Lab](http://a498411c1c64f435e87d3f00674fa58e-1385573777.us-east-1.elb.amazonaws.com/allocate)](./img/airflow-pipeline.png)
+![![Start Lab](./img/airflow-pipeline.png)](http://a498411c1c64f435e87d3f00674fa58e-1385573777.us-east-1.elb.amazonaws.com/allocate)
 
 ## 1. Login to AWS Console
 
