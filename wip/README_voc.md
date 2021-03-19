@@ -61,7 +61,7 @@ Click `File` > `New` > `Terminal` to launch a terminal in your Jupyter instance.
 
 ![Terminal Studio](img/studio_terminal.png)
 
-## 5. Clone this GitHub Repo in the Terminal
+## 4. Clone this GitHub Repo in the Terminal
 
 Within the Terminal, run the following:
 
@@ -81,7 +81,7 @@ remove the file manually to continue.
 ```
 _Note:  This is not a fatal error ^^ above ^^.  Just re-run the command again until it works._
 
-## 7. Start the Workshop!
+## 5. Start the Workshop!
 
 Navigate to `00_quickstart/` in SageMaker Studio and start the workshop!
 
