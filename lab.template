@@ -193,7 +193,7 @@ Resources:
     DependsOn: SageMakerExecutionRole
     Properties:
       ServiceToken: !GetAtt DelayLambda.Arn
-      TimeToWait: 120
+      TimeToWait: 300 
 
   DelayLambda:
     Type: 'AWS::Lambda::Function'
