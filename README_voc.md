@@ -1,4 +1,4 @@
-# O'Reilly Book Coming Early 2021
+# O'Reilly Book - April 7 2021 Release
 
 ## Data Science on AWS
 
@@ -7,62 +7,57 @@ YouTube Videos, Meetups, Book, and Code:  **https://datascienceonaws.com**
 [![Data Science on AWS](img/data-science-on-aws-book.png)](https://datascienceonaws.com)
 
 # Workshop Description
-
 In this workshop, we build a natural language processing (NLP) model to classify sample Twitter comments and customer-support emails using the state-of-the-art [BERT](https://arxiv.org/abs/1810.04805) model for language representation.
 
 To build our BERT-based NLP model, we use the [Amazon Customer Reviews Dataset](https://s3.amazonaws.com/amazon-reviews-pds/readme.html) which contains 150+ million customer reviews from Amazon.com for the 20 year period between 1995 and 2015.  In particular, we train a classifier to predict the `star_rating` (1 is bad, 5 is good) from the `review_body` (free-form review text).
 
 # Workshop Cost
 This workshop is FREE, but would otherwise cost <25 USD.
-
 ![Workshop Cost](img/billing.png)
 
-# Workshop Agenda
+# Workshop Description
 ![Workshop Agenda](img/outline.png)
 
-# Workshop Contributors
+# Workshop Paths
 
+## Quick Start (All-In-One Workshop Path)
+![Workshop Paths](img/workshop_paths1.png)
+
+## Additional Workshop Paths per Persona
+![Workshop Paths](img/workshop_paths2.png)
+
+# Workshop Contributors
 ![Workshop Contributors](img/primary-contributors.png)
 
 # Workshop Instructions
+
+## 0. Start Lab
+
+[![Start Lab](img/data-science-on-aws-book.png)](http://a498411c1c64f435e87d3f00674fa58e-1385573777.us-east-1.elb.amazonaws.com/allocate)
 
 ## 1. Login to AWS Console
 
 ![IAM](img/aws_console.png)
 
-## 2. Create `TeamRole` IAM Role
+## 2. Setup Environment
 
-![IAM](img/alt_iam_1.png)
+### Click this button here (not in the AWS console, but here):
+[![Launch Stack](img/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=workshop&templateURL=https://dsoaws.s3.amazonaws.com/workshop/lab.template)  
+** ^^^^^^^^^^^^^^^^^ **
 
-![Roles](img/alt_roles_2.png)
+**^^ Click this button ^^**
 
-![Create Role](img/alt_create_role_3.png)
+## 3. Follow these instructions after clicking the `Launch Stack` button above:
 
-![Select Service](img/alt_select_service_4.png)
+![CloudFormation 3](img/cloud-formation-3.png)
 
-![Select Policy](img/alt_select_policy_5.png)
+![CloudFormation 4](img/cloud-formation-4.png)
 
-![Add Tags](img/alt_add_tags_6.png)
+![CloudFormation 5](img/cloud-formation-5.png)
 
-![Review Name](img/alt_review_name_7.png)
+![CloudFormation 6](img/cloud-formation-6.png)
 
-## 3. Update IAM Role Policy
-
-![Select IAM](img/studio_select_iam.png)
-
-![Edit TeamRole](img/studio_edit_teamrole.png)
-
-Click `Attach Policies`.
-
-![IAM Policy](img/view_policies.png)
-              
-Select `AmazonS3FullAccess` and click on `Attach Policy`.
-
-_Note:  Reminder that you should allow access only to the resources that you need._ 
-
-![Attach Admin Policy](img/alt_attach_policies.png)
-
-## 4. Launch an Amazon SageMaker Notebook Instance
+## 4. Launch SageMaker Studio
 
 Open the [AWS Management Console](https://console.aws.amazon.com/console/home)
 
@@ -72,15 +67,13 @@ In the AWS Console search bar, type `SageMaker` and select `Amazon SageMaker` to
 
 ![Notebook Instances](img/stu_notebook_instances_9.png)
 
-![Create Studio](img/studio_create.png)
-
 ![Pending Studio](img/studio_pending.png)
 
 ![Open Studio](img/studio_open.png)
 
 ![Loading Studio](img/studio_loading.png)
 
-## 5. Launch a new Terminal within the Jupyter notebook
+## 5. Launch a New Terminal within Studio
 
 Click `File` > `New` > `Terminal` to launch a terminal in your Jupyter instance.
 
@@ -108,7 +101,7 @@ _Note:  This is not a fatal error ^^ above ^^.  Just re-run the command again un
 
 ## 7. Start the Workshop!
 
-Navigate to `01_setup/` in your Jupyter notebook and start the workshop!
+Navigate to `00_quickstart/` in SageMaker Studio and start the workshop!
 
 _You may need to refresh your browser if you don't see the new `workshop/` directory._
 
