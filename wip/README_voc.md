@@ -31,33 +31,15 @@ This workshop is FREE, but would otherwise cost <25 USD.
 
 # Workshop Instructions
 
-## 0. Click Play to Start the Lab
+## 0. Start the Lab
 
-[![Start Lab](img/play-button.png)](###)
+==> LINK WILL BE PROVIDED <==
 
 ## 1. Login to AWS Console
 
 ![IAM](img/aws_console.png)
 
-## 2. Setup Environment
-
-### Click this button here (not in the AWS console, but here):
-[![Launch Stack](img/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=workshop&templateURL=https://dsoaws.s3.amazonaws.com/workshop/lab.template)  
-** ^^^^^^^^^^^^^^^^^ **
-
-**^^ Click this button ^^**
-
-## 3. Follow these instructions after clicking the `Launch Stack` button above:
-
-![CloudFormation 3](img/cloud-formation-3.png)
-
-![CloudFormation 4](img/cloud-formation-4.png)
-
-![CloudFormation 5](img/cloud-formation-5.png)
-
-![CloudFormation 6](img/cloud-formation-6.png)
-
-## 4. Launch SageMaker Studio
+## 2. Launch SageMaker Studio
 
 Open the [AWS Management Console](https://console.aws.amazon.com/console/home)
 
@@ -73,13 +55,13 @@ In the AWS Console search bar, type `SageMaker` and select `Amazon SageMaker` to
 
 ![Loading Studio](img/studio_loading.png)
 
-## 5. Launch a New Terminal within Studio
+## 3. Launch a New Terminal within Studio
 
 Click `File` > `New` > `Terminal` to launch a terminal in your Jupyter instance.
 
 ![Terminal Studio](img/studio_terminal.png)
 
-## 6. Clone this GitHub Repo in the Terminal
+## 4. Clone this GitHub Repo in the Terminal
 
 Within the Terminal, run the following:
 
@@ -99,7 +81,7 @@ remove the file manually to continue.
 ```
 _Note:  This is not a fatal error ^^ above ^^.  Just re-run the command again until it works._
 
-## 7. Start the Workshop!
+## 5. Start the Workshop!
 
 Navigate to `00_quickstart/` in SageMaker Studio and start the workshop!
 

@@ -93,7 +93,12 @@ def predict_fn(input_data, model):
         # output is a tuple:
         # output: (tensor([[-1.9840, -0.9870,  2.8947]], grad_fn=<AddmmBackward>),
         # for torch.max() you need to pass in the tensor, output[0]
-        _, prediction = torch.max(output[0], dim=1)
+        
+        softmax_fn = nn.Softmax(dim=1)
+        softmax_output =softmax_fn(output[0])
+        print("softmax_output: {}".format(softmax_output))
+        
+        _, prediction = torch.max(softmax_output, dim=1)
 
         predicted_class_idx = prediction.item()
         predicted_class = classes[predicted_class_idx]
