@@ -23,14 +23,10 @@ subprocess.check_call([sys.executable, "-m", "pip", "install", "matplotlib==3.2.
 
 from transformers import DistilBertTokenizer
 from transformers import DistilBertConfig
-from transformers import TFDistilBertModel
-
-# from transformers import TFBertForSequenceClassification
+from transformers import TFDistilBertForSequenceClassification
 
 from tensorflow.keras.callbacks import ModelCheckpoint
 from tensorflow.keras.models import load_model
-
-# from tensorflow.keras.mixed_precision import experimental as mixed_precision
 
 
 CLASSES = [1, 2, 3, 4, 5]
@@ -81,10 +77,6 @@ def file_based_input_dataset_builder(
     def _decode_record(record, name_to_features):
         """Decodes a record to a TensorFlow example."""
         record = tf.io.parse_single_example(record, name_to_features)
-        # TODO:  wip/bert/bert_attention_head_view/train.py
-        # Convert input_ids into input_tokens with DistilBert vocabulary
-        #  if hook.get_collections()['all'].save_config.should_save_step(modes.EVAL, hook.mode_steps[modes.EVAL]):
-        #    hook._write_raw_tensor_simple("input_tokens", input_tokens)
         return record
 
     dataset = dataset.apply(
@@ -314,7 +306,7 @@ if __name__ == "__main__":
                     label2id={1: 0, 2: 1, 3: 2, 4: 3, 5: 4},
                 )
 
-                transformer_model = TFDistilBertModel.from_pretrained("distilbert-base-uncased", config=config)
+                transformer_model = TFDistilBertForSequenceClassification.from_pretrained("distilbert-base-uncased", config=config) 
 
                 input_ids = tf.keras.layers.Input(shape=(max_seq_length,), name="input_ids", dtype="int32")
                 input_mask = tf.keras.layers.Input(shape=(max_seq_length,), name="input_mask", dtype="int32")
@@ -326,7 +318,7 @@ if __name__ == "__main__":
                 X = tf.keras.layers.GlobalMaxPool1D()(X)
                 X = tf.keras.layers.Dense(50, activation="relu")(X)
                 X = tf.keras.layers.Dropout(0.2)(X)
-                X = tf.keras.layers.Dense(len(CLASSES), activation="sigmoid")(X)
+                X = tf.keras.layers.Dense(len(CLASSES), activation="softmax")(X)
 
                 model = tf.keras.Model(inputs=[input_ids, input_mask], outputs=X)
 
@@ -495,9 +487,7 @@ if __name__ == "__main__":
 
             outputs = model.predict(x=(input_ids, input_mask))
 
-            scores = np.exp(outputs) / np.exp(outputs).sum(-1, keepdims=True)
-
-            prediction = [{"label": config.id2label[item.argmax()], "score": item.max().item()} for item in scores]
+            prediction = [{"label": config.id2label[item.argmax()], "score": item.max().item()} for item in outputs]
 
             return prediction[0]["label"]
 
@@ -506,7 +496,8 @@ if __name__ == "__main__":
             predict("""I loved it!  I will recommend this to everyone."""),
         )
 
-        print("""It's OK.""", predict("""It's OK."""))
+        print("""It's OK.""", 
+              predict("""It's OK."""))
 
         print(
             """Really bad.  I hope they don't make this anymore.""",
