@@ -66,8 +66,8 @@ def output_handler(response, context):
     print("response_json: {}".format(response_json))
 
     outputs_list = response_json["predictions"]
-    print('outputs_list: {}'.format(outputs_list))
-    
+    print("outputs_list: {}".format(outputs_list))
+
     predicted_classes = []
 
     for outputs in outputs_list:

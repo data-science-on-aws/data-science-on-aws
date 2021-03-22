@@ -306,7 +306,9 @@ if __name__ == "__main__":
                     label2id={1: 0, 2: 1, 3: 2, 4: 3, 5: 4},
                 )
 
-                transformer_model = TFDistilBertForSequenceClassification.from_pretrained("distilbert-base-uncased", config=config) 
+                transformer_model = TFDistilBertForSequenceClassification.from_pretrained(
+                    "distilbert-base-uncased", config=config
+                )
 
                 input_ids = tf.keras.layers.Input(shape=(max_seq_length,), name="input_ids", dtype="int32")
                 input_mask = tf.keras.layers.Input(shape=(max_seq_length,), name="input_mask", dtype="int32")
@@ -496,8 +498,7 @@ if __name__ == "__main__":
             predict("""I loved it!  I will recommend this to everyone."""),
         )
 
-        print("""It's OK.""", 
-              predict("""It's OK."""))
+        print("""It's OK.""", predict("""It's OK."""))
 
         print(
             """Really bad.  I hope they don't make this anymore.""",
