@@ -1,3 +1,5 @@
+model_evaluation/
+generated_bias_report/
 post_train_data.csv
 __pycache__/
 tmp/
