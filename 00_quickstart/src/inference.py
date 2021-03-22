@@ -4,9 +4,6 @@ import sys
 
 subprocess.check_call([sys.executable, "-m", "pip", "install", "tensorflow==2.3.1"])
 subprocess.check_call([sys.executable, "-m", "pip", "install", "transformers==4.1.1"])
-# Workaround for https://github.com/huggingface/tokenizers/issues/120 and
-#                https://github.com/kaushaltrivedi/fast-bert/issues/174
-# subprocess.check_call([sys.executable, '-m', 'pip', 'install', '--upgrade', 'tokenizers'])
 
 import tensorflow as tf
 from transformers import DistilBertTokenizer
@@ -65,18 +62,16 @@ def output_handler(response, context):
     response_json = response.json()
     print("response_json: {}".format(response_json))
 
-    log_probabilities = response_json["predictions"]
-    print("log_probabilities: {}".format(log_probabilities))
+    outputs_list = response_json["predictions"]
+    print("outputs_list: {}".format(outputs_list))
 
     predicted_classes = []
 
-    for log_probability in log_probabilities:
-        print("log_probability in loop: {}".format(log_probability))
-        print("type(log_probability) in loop: {}".format(type(log_probability)))
+    for outputs in outputs_list:
+        print("outputs in loop: {}".format(outputs))
+        print("type(outputs) in loop: {}".format(type(outputs)))
 
-        softmax = tf.nn.softmax(log_probability)
-
-        predicted_class_idx = tf.argmax(softmax, axis=-1, output_type=tf.int32)
+        predicted_class_idx = tf.argmax(outputs, axis=-1, output_type=tf.int32)
         predicted_class = classes[predicted_class_idx]
         print("predicted_class: {}".format(predicted_class))
 
