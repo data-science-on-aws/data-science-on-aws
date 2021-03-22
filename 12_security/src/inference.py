@@ -65,18 +65,16 @@ def output_handler(response, context):
     response_json = response.json()
     print("response_json: {}".format(response_json))
 
-    log_probabilities = response_json["predictions"]
-    print("log_probabilities: {}".format(log_probabilities))
+    outputs_list = response_json["predictions"]
+    print("outputs_list: {}".format(outputs_list))
 
     predicted_classes = []
 
-    for log_probability in log_probabilities:
-        print("log_probability in loop: {}".format(log_probability))
-        print("type(log_probability) in loop: {}".format(type(log_probability)))
+    for outputs in outputs_list:
+        print("outputs in loop: {}".format(outputs))
+        print("type(outputs) in loop: {}".format(type(outputs)))
 
-        softmax = tf.nn.softmax(log_probability)
-
-        predicted_class_idx = tf.argmax(softmax, axis=-1, output_type=tf.int32)
+        predicted_class_idx = tf.argmax(outputs, axis=-1, output_type=tf.int32)
         predicted_class = classes[predicted_class_idx]
         print("predicted_class: {}".format(predicted_class))
 
