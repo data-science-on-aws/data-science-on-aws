@@ -132,9 +132,7 @@ def process(args):
 
         outputs = model.predict(x=(input_ids, input_mask))
 
-        scores = np.exp(outputs) / np.exp(outputs).sum(-1, keepdims=True)
-
-        prediction = [{"label": config.id2label[item.argmax()], "score": item.max().item()} for item in scores]
+        prediction = [{"label": config.id2label[item.argmax()], "score": item.max().item()} for item in outputs]
 
         return prediction[0]["label"]
 
@@ -164,7 +162,7 @@ def process(args):
         ["review_body", "star_rating"]
     ]
 
-    df_test_reviews = df_test_reviews.sample(n=100)
+    df_test_reviews = df_test_reviews.sample(n=1000)
     df_test_reviews.shape
     df_test_reviews.head()
 

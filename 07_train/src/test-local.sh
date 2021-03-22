@@ -14,5 +14,5 @@ SM_TRAINING_ENV={\"is_master\":true} SAGEMAKER_JOB_NAME=blah-job-name SM_CURRENT
 
 saved_model_cli show --all --dir model/tensorflow/saved_model/0/ 
 
-saved_model_cli run --dir 'model/tensorflow/saved_model/0/' --tag_set serve --signature_def serving_default \
-    --input_exprs 'input_ids=np.zeros((1,64));input_mask=np.zeros((1,64))' # ;segment_ids=np.zeros((1,64))'
+#saved_model_cli run --dir 'model/tensorflow/saved_model/0/' --tag_set serve --signature_def serving_default \
+#    --input_exprs 'input_ids=np.zeros((1,64));input_mask=np.zeros((1,64))' # ;segment_ids=np.zeros((1,64))'
