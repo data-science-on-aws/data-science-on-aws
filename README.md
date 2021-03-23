@@ -41,6 +41,8 @@ _Please logout of all AWS Console sessions in all browser tabs._
 
 ## 1. Login to the Workshop Portal (aka Event Engine). 
 
+## THE LINK WILL BE PROVIDED TO YOU
+
 ![Event Box Launch](img/eb1_launch.png) 
 
 ![Event Box Access AWS Account](img/eb2_access_account.png)
