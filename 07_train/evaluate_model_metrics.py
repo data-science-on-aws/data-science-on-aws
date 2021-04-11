@@ -162,7 +162,7 @@ def process(args):
         ["review_body", "star_rating"]
     ]
 
-    df_test_reviews = df_test_reviews.sample(n=1000)
+    df_test_reviews = df_test_reviews.sample(n=100)
     df_test_reviews.shape
     df_test_reviews.head()
 
