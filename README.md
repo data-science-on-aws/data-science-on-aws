@@ -23,24 +23,23 @@ This workshop is FREE, but would otherwise cost <25 USD.
 ## Quick Start (All-In-One Workshop Path)
 ![Workshop Paths](img/workshop_paths1.png)
 
+## Additional Workshop Paths per Persona
+![Workshop Paths](img/workshop_paths2.png)
+
 # Workshop Contributors
 ![Workshop Contributors](img/primary-contributors.png)
 
 # Workshop Instructions
 
-## 0. Start the Lab
+## 1. Setup Environment
 
-==> LINK WILL BE PROVIDED <==
+Follow these instructions:  http://amzn.to/3lo3KdX
 
-## 1. Login to AWS Console
-
-![IAM](img/aws_console.png)
-
-## 2. Launch SageMaker Studio
+## 3. Launch SageMaker Studio
 
 Open the [AWS Management Console](https://console.aws.amazon.com/console/home)
 
-![Back to SageMaker](img/alt_back_to_sagemaker_8.png)
+![Back to SageMaker](img/bur_back_to_sagemaker_8.png)
 
 In the AWS Console search bar, type `SageMaker` and select `Amazon SageMaker` to open the service console.
 
@@ -52,13 +51,13 @@ In the AWS Console search bar, type `SageMaker` and select `Amazon SageMaker` to
 
 ![Loading Studio](img/studio_loading.png)
 
-## 3. Launch a New Terminal within Studio
+## 4. Launch a New Terminal within Studio
 
 Click `File` > `New` > `Terminal` to launch a terminal in your Jupyter instance.
 
 ![Terminal Studio](img/studio_terminal.png)
 
-## 4. Clone this GitHub Repo in the Terminal
+## 5. Clone this GitHub Repo in the Terminal
 
 Within the Terminal, run the following:
 
@@ -78,7 +77,8 @@ remove the file manually to continue.
 ```
 _Note:  This is not a fatal error ^^ above ^^.  Just re-run the command again until it works._
 
-## 5. Start the Workshop!
+
+## 6. Start the Workshop!
 
 Navigate to `00_quickstart/` in SageMaker Studio and start the workshop!
 
