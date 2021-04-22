@@ -1,4 +1,4 @@
-# O'Reilly Book - April 7 2021 Release
+# O'Reilly Book 
 
 ## Data Science on AWS
 
