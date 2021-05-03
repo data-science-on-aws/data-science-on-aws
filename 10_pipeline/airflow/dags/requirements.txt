@@ -1,0 +1,5 @@
+#apache-airflow==2.0.0b2
+apache-airflow==1.10.12
+#sagemaker==2.16.3
+sagemaker==1.72.0
+s3fs==0.5.1

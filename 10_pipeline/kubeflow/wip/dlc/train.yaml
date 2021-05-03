@@ -1,0 +1,56 @@
+--- 
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bert-model-training
+spec:
+  volumes:
+  - name: fsx-opt-ml
+    persistentVolumeClaim:
+      claimName: fsx-claim
+  containers: 
+    - name: bert
+      command: 
+        - python
+        - /opt/ml/code/train.py
+        - --epochs=3
+        - --learning_rate=0.00001
+        - --epsilon=0.00000001
+        - --train_batch_size=128
+        - --validation_batch_size=64
+        - --test_batch_size=64
+        - --train_steps_per_epoch=100
+        - --validation_steps=10
+        - --test_steps=10
+        - --use_xla=True
+        - --use_amp=False
+        - --max_seq_length=64
+        - --freeze_bert_layer=True
+        - --run_validation=True
+        - --run_test=True
+        - --run_sample_predictions=True
+      image: 763104351884.dkr.ecr.us-west-2.amazonaws.com/tensorflow-training:2.1.0-cpu-py36-ubuntu18.04
+      imagePullPolicy: Always
+      securityContext:
+        privileged: true
+      volumeMounts:
+      - mountPath: /opt/ml/
+        name: fsx-opt-ml
+      env: 
+        - name: SM_NUM_GPUS
+          value: "0"
+        - name: SM_INPUT_DATA_CONFIG
+          value: "File"
+        - name: SM_MODEL_DIR
+          value: "/opt/ml/model/"     
+        - name: SM_OUTPUT_DIR
+          value: "/opt/ml/output/"
+        - name: SM_CHANNEL_TRAIN
+          value: "/opt/ml/input/data/train"
+        - name: SM_CHANNEL_VALIDATION
+          value: "/opt/ml/input/data/validation"     
+        - name: SM_CHANNEL_TEST
+          value: "/opt/ml/input/data/test"
+        - name: HDF5_USE_FILE_LOCKING
+          value: "FALSE"
+  restartPolicy: Never

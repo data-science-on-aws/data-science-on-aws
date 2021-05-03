@@ -1,0 +1,85 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "airflow:PublishMetrics",
+                "airflow:CreateEnvironment",
+                "airflow:GetEnvironment",
+                "airflow:CreateCliToken"
+            ],
+            "Resource": "arn:aws:airflow:{0}:{1}:environment/{2}"
+        },
+        { 
+            "Effect": "Deny",
+            "Action": "s3:ListAllMyBuckets",
+            "Resource": [
+                "arn:aws:s3:::{3}",
+                "arn:aws:s3:::{3}/*"
+            ]
+        },
+        { 
+            "Effect": "Allow",
+            "Action": [ 
+                "s3:GetObject*",
+                "s3:GetBucket*",
+                "s3:List*"
+            ],
+            "Resource": [
+                "arn:aws:s3:::{3}",
+                "arn:aws:s3:::{3}/*"
+            ]
+        },                          
+        {
+            "Effect": "Allow",
+            "Action": [
+                "logs:CreateLogStream",
+                "logs:CreateLogGroup",
+                "logs:PutLogEvents",
+                "logs:GetLogEvents",
+                "logs:GetLogRecord",
+                "logs:GetLogGroupFields",
+                "logs:GetQueryResults",
+                "logs:DescribeLogGroups"
+            ],
+            "Resource": [
+                "arn:aws:logs:{0}:{1}:log-group:airflow-{2}-*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": "cloudwatch:PutMetricData",
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "sqs:ChangeMessageVisibility",
+                "sqs:DeleteMessage",
+                "sqs:GetQueueAttributes",
+                "sqs:GetQueueUrl",
+                "sqs:ReceiveMessage",
+                "sqs:SendMessage"
+            ],
+            "Resource": "arn:aws:sqs:{0}:*:airflow-celery-*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "kms:Decrypt",
+                "kms:DescribeKey",
+                "kms:GenerateDataKey*",
+                "kms:Encrypt"
+            ],
+            "NotResource": "arn:aws:kms:*:{1}:key/*",
+            "Condition": {
+                "StringLike": {
+                    "kms:ViaService": [
+                        "sqs.{0}.amazonaws.com"
+                    ]
+                }
+            }
+        }
+    ]
+}

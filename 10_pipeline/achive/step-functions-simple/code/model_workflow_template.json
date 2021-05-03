@@ -1,0 +1,106 @@
+{
+  "StartAt": "Generate dataset",
+  "States": {
+    "Generate dataset": {
+      "Resource": "<<arn_of_your_lambda>>",
+      "Type": "Task",
+      "Next": "Train model (image-classification)"
+    },
+    "Train model (image-classification)": {
+      "Resource": "arn:aws:states:::sagemaker:createTrainingJob.sync",
+      "Parameters": {
+        "AlgorithmSpecification": {
+          "TrainingImage": "<<training_image_URL>>",
+          "TrainingInputMode": "File"
+        },
+        "OutputDataConfig": {
+          "S3OutputPath": "s3://<<your_output_bucket>>/models"
+        },
+        "StoppingCondition": {
+          "MaxRuntimeInSeconds": 86400
+        },
+        "ResourceConfig": {
+          "InstanceCount": 1,
+          "InstanceType": "ml.p2.xlarge",
+          "VolumeSizeInGB": 50
+        },
+        "RoleArn": "<<arn_of_your_sagemaker_execution_role>>",
+        "InputDataConfig": [
+          {
+            "DataSource": {
+              "S3DataSource": {
+                "S3DataDistributionType": "FullyReplicated",
+                "S3DataType": "S3Prefix",
+                "S3Uri": "s3://<<name_of_the_bucket_with_the_input_images>>/resize/train/"
+              }
+            },
+            "ChannelName": "train",
+            "ContentType": "application/x-image"
+          },
+          {
+            "DataSource": {
+              "S3DataSource": {
+                "S3DataDistributionType": "FullyReplicated",
+                "S3DataType": "S3Prefix",
+                "S3Uri": "s3://<<name_of_the_bucket_with_the_input_images>>/resize/test/"
+              }
+            },
+            "ChannelName": "validation",
+            "ContentType": "application/x-image"
+          },
+          {
+            "DataSource": {
+              "S3DataSource": {
+                "S3DataDistributionType": "FullyReplicated",
+                "S3DataType": "S3Prefix",
+                "S3Uri": "s3://<<name_of_the_bucket_with_the_input_images>>/resize/train-data.lst"
+              }
+            },
+            "ChannelName": "train_lst",
+            "ContentType": "application/x-image"
+          },
+          {
+            "DataSource": {
+              "S3DataSource": {
+                "S3DataDistributionType": "FullyReplicated",
+                "S3DataType": "S3Prefix",
+                "S3Uri": "s3://<<name_of_the_bucket_with_the_input_images>>/resize/test-data.lst"
+              }
+            },
+            "ChannelName": "validation_lst",
+            "ContentType": "application/x-image"
+          }
+        ],
+        "HyperParameters": {
+          "num_layers": "18",
+          "image_shape": "3,300,200",
+          "num_classes": "5",
+          "num_training_samples": "875",
+          "mini_batch_size": "35",
+          "epochs": "25",
+          "optimizer": "sgd",
+          "learning_rate": "0.01",
+          "top_k": "2",
+          "precision_dtype": "float32"
+        },
+        "TrainingJobName.$": "$$.Execution.Name"
+      },
+      "Type": "Task",
+      "Next": "Save Model"  
+    },
+    "Save Model": {
+      "Parameters": {
+        "PrimaryContainer": {
+          "Image": "<<training_image_URL>>",
+          "Environment": {},
+          "ModelDataUrl.$": "$.ModelArtifacts.S3ModelArtifacts"
+        },
+        "ExecutionRoleArn": "<<arn_of_your_sagemaker_execution_role>>",
+        "ModelName.$": "$.TrainingJobName"
+      },
+      "Resource": "arn:aws:states:::sagemaker:createModel",
+      "Type": "Task",
+      "End": true
+    }
+  }
+}

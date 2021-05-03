@@ -1,0 +1,14 @@
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: fsx-sc
+provisioner: fsx.csi.aws.com
+parameters:
+  subnetId: subnet-0a25103d821733ac0
+  securityGroupIds: sg-0ee7f41b8573a5d2b
+  s3ImportPath: s3://fsx-antje
+  s3ExportPath: s3://fsx-antje
+  autoImportPolicy: NEW_CHANGED
+  deploymentType: SCRATCH_2
+mountOptions:
+  - flock

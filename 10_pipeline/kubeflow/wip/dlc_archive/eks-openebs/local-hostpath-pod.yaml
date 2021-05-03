@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: hello-local-hostpath-pod
+spec:
+  volumes:
+  - name: local-storage
+    persistentVolumeClaim:
+      claimName: local-hostpath-pvc
+  containers:
+  - name: hello-container
+    image: busybox
+    command:
+       - sh
+       - -c
+       - 'while true; do echo "`date` [`hostname`] Hello from OpenEBS Local PV." >> /mnt/store/greet.txt; sleep $(($RANDOM % 5 + 300)); done'
+    volumeMounts:
+    - mountPath: /mnt/opt/ml
+      name: local-storage
