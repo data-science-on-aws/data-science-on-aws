@@ -1,0 +1,161 @@
+{
+  "metadata": {
+    "version": 1
+  },
+  "nodes": [
+    {
+      "node_id": "4bf236e9-309a-4ebf-8c92-2709d379ced6",
+      "type": "SOURCE",
+      "operator": "sagemaker.athena_source_0.1",
+      "parameters": {
+        "dataset_definition": {
+          "datasetSourceType": "Athena",
+          "name": "amazon_reviews_parquet",
+          "catalogName": "AwsDataCatalog",
+          "databaseName": "default",
+          "queryString": "select * from amazon_reviews_parquet",
+          "s3OutputLocation": "s3://${bucket}/query-cache/",
+          "outputFormat": "parquet"
+        }
+      },
+      "trained_parameters": {
+        "query_execution_id": "f79c830a-5033-4c37-ad6b-a540c365226a",
+        "ctas_table_name": "sagemaker_tmp_274fcda73f434cdc83ac042ec63fee32",
+        "ctas_s3_output_location": "s3://${bucket}/query-cache/274fcda73f434cdc83ac042ec63fee32/data/"
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "default",
+          "sampling": {
+            "sampling_method": "sample_by_ratio",
+            "sample_ratio": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "node_id": "76b4470a-6f43-46b8-be22-f0377a21c62d",
+      "type": "TRANSFORM",
+      "operator": "sagemaker.spark.infer_and_cast_type_0.1",
+      "parameters": {},
+      "trained_parameters": {
+        "schema": {
+          "marketplace": "string",
+          "review_id": "string",
+          "product_id": "string",
+          "product_title": "string",
+          "product_category": "string",
+          "vine": "string",
+          "verified_purchase": "string",
+          "review_headline": "string",
+          "review_body": "string",
+          "review_date": "date",
+          "customer_id": "long",
+          "product_parent": "long",
+          "star_rating": "long",
+          "helpful_votes": "long",
+          "total_votes": "long"
+        }
+      },
+      "inputs": [
+        {
+          "name": "default",
+          "node_id": "4bf236e9-309a-4ebf-8c92-2709d379ced6",
+          "output_name": "default"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "default"
+        }
+      ]
+    },
+    {
+      "node_id": "9db8c34b-2bba-4654-9a89-7e1b5c0cae15",
+      "type": "TRANSFORM",
+      "operator": "sagemaker.spark.process_numeric_0.1",
+      "parameters": {
+        "operator": "Scale values",
+        "scale_values_parameters": {
+          "scaler": "Min-max scaler",
+          "min_max_scaler_parameters": {
+            "min": -1,
+            "max": 1,
+            "input_column": "star_rating",
+            "output_column": "star_rating_scaled"
+          },
+          "standard_scaler_parameters": {
+            "input_column": "star_rating",
+            "scale": true,
+            "center": true,
+            "output_column": "star_rating_scaled"
+          }
+        }
+      },
+      "trained_parameters": {
+        "scale_values_parameters": {
+          "min_max_scaler_parameters": {
+            "_hash": -1822493288712256300,
+            "scaler_model": "P)h>@6aWAK2mm0lf>FX$s71d3002G#000vJ003=ebYWy+bYU-WVRCdWFfcGMFm=vN3&JoA2H?9tBj>GjYzlhyJP-u0C3aDZ?OOT)L)m{fDvB2&hwzg3A$QOgQ-TfncorB?Ur3~Y@hY4ZC&FAJiQbGoPJ4}(V($mCP(e11QbreG)2!rb-SITbwyWS(KTu4@j|{g$3R$DOjkV-nF$0Icq8bp_ZL1sI9glp$b#y&4d<TaU`$AUW3}f|cHDf4w>n%H(Tu|CSAMz!CWA(|Egt>x&PFQT-{fFgq`xX8^sMPxm=6Ue|P)h>@6aWAK2mm0lf>Fj2QzZ@n000aC000;O003=ebYWy+bYU+paA9(EEif=JFfcA-a$`#_N@ieSU}A7x5poCsP)h>@6aWAK2mm0lf>8hf0006200000000pH003=ebYWy+bYU-FQ&mGlMN?A)08mQ<1QY-O00;mev4T-Wrsw<$000080000M0001OWprU=VRT_HE?-ksLqkPVQ!Zn2V@obdW?*1oVgLY8O9KQH0000803fk~Q5`-f4A%kx0B{Nb07w7;0AyiwVJ~oDa&#>)FfcGMEjVE@F*i9dVl6c>H8?FaG&M6VVKO*jEj46hF*h-0FgG(YVl87ZFfcB2Zeeh6c`k5aa&dKKbnRBlZqq;%oj9&*g~tLimW`q+vS`$zU?rq6X%&egx~Pyq6)J2HLX&tLEGBm9M@d@c5BdRJbcrgyfKT8H`XQ_lLd-Z$?L0|YAQp|HXlCv?_uPAY$I9N*S7iub7Rp7)(S-oToXn>H0E1r%tR;5zley2)-*k#?DgHLR6BBh7T9(rxfJN`Ym0?sEL~oTsI*2h3pcZ3faiH@3NxY&ZOgUxpdx>0WFpT_%?PRy(RoqVUbXGgrZOAD<@9y68I>`O_-fMoqZ3KBx<>VWVYqcyJkr$Q?MF6=~+Lqtz;MEnj;bh*kjxa+mTee{}u}A9?K$VwyVtGE~29#w?a2wk`0}6+T1XFOCF<dN-y8lvI;*^|nQV?_0l&T;CWi4q!SOMfDPO>GpAlBzRcqIqf!(xUPj%H+IEri)>QoV3gr_Vdd`kG?2RRJiwN!GC6u>N7)VU`_fmy*WQ{Gw?xlW8J1CbN7_NncWwRlmYbN$Q=ar*(_Equ!mT7d7vcpOJ6Gy;FX??+bp4eW*L%zKe-8XG>G;L)|~vceYf&!p%(RNoRsY3n<F6<F+)^LG(Im;my<zvFllmEiYBHl2!up`UJu|AR1j91lZSH=abgPJ~EJx<R9X(%IsISRL^&Vrmq%N)565?)UCJ2s*Tz#l$Z`0AK))}fx$>kf;=yTj!CzPMi{rHy}?c2abNH3Q+TKMEFyGz^Ki8A{ZY9&Wrm1heQKlUvz;9ff*ORLn230|s1AFlIs5(MC7BIPOtx$vx3D|Hr^2)8(eO;#gIpK&=y5a(`{VhWj_o7M_Fht*sK)-ns)JcuRMc<+mh!JO-}M)-DsdaG$K`rlW+8z5JbEWRY`gjBC6+I1<&sv;uQdXT82OU9X_y-o1Dj@}Rx^#qW=+?1L$BzY<=V!hN~L6O=nZ3YT{+1CF!c+*(f8>d{jd2OP)h>@6aWAK2mm0lf>G$4CQ>5+001BW002z@003lRbYU+paA9(EEif=JFfc7RVKFf`IWS@^H8C|fEi^PWGc92<IAJX{WMnZnF=j9~GcsZ=V=yo<E^}^SaBz7paA9(Bb!BueV{&6lE=p!#U|?d{qU>*|Q6abc-7l9(%;)T~Emx{o3v81K1^`e?0|XQR000O8AhCi`000000ssI2000004FCWDWMOn+FJDttLqkPVQv(1{O9KQH0000803fk~QAMWb{0aa700;m801^NI0AyiwVJ|LUQ&mGlMN?BQV{&6lE=p!#U|?bZ08mQ-0u%!j0000803fk~QNmQHMZW+506qZ#022TJ00000000000HlEc0001OWprU=VRT_HaA9(EEif=JFfdR{0Rj{Q6aWAK2mm0lf>Fj2QzZ@n000aC000;O0000000000005+c@Bjb+ZDn*}WMOn+FD`Ila&#>)FfcGME@N_IP)h*<6ay3h000O8AhCi`000000ssI2000005dZ)H0000000000q=7U6003=ebYWy+bYU-FQ&mGlMN?ByO928D0~7!N00;mev4T-Wrsw<$000080000M00000000000001_fn@;z0BvP-VPs)+VJ|LUQ&mGlMN?BQV{&6qO928D0~7!N00;mev4T+@J|_&<0ssJT3IG5|00000000000001_fujKc0AyiwVJ~oDa&#>)FfcGMEjVE@F*i9dVl6c>H8?FaG&M6VVKO*jEj46hF*h-0FgG(YVl87ZFfcB2Zeeh6c`k5aa&dKKbWlqH0u%!j0000803fk~QRti|QX>EW03ZMW08Ib@00000000000HlH71ONbJVRT_HE^uLTbS*G2FfcGJIAJj{H#sn3Ej2MUI4v|ZH8U+?GB{x^HDqKlH!)@~H#0I~En_e+FfMa$VQ_GHE^uLTadl;ME@N_IP)h*<6ay3h000O8AhCi`000000ssI2000004FCWD0000000000q=9Y)003lRbYU-FQ&mGlMN?ByO928D0~7!N00;mev4T-Wrsw<$000080000I00000000000001_ftv*Y0AyiwVJ|LUQ&mGlMN?BQV{&6qO9ci10000800;nf0ssKj1poj500"
+          }
+        }
+      },
+      "inputs": [
+        {
+          "name": "df",
+          "node_id": "76b4470a-6f43-46b8-be22-f0377a21c62d",
+          "output_name": "default"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "default"
+        }
+      ]
+    },
+    {
+      "node_id": "2b17c16a-8c82-432a-9fec-11ed0b510539",
+      "type": "TRANSFORM",
+      "operator": "sagemaker.spark.custom_formula_0.1",
+      "parameters": {
+        "output_column": "star_rating_scaled_floored",
+        "formula": "floor(star_rating_scaled)"
+      },
+      "inputs": [
+        {
+          "name": "df",
+          "node_id": "9db8c34b-2bba-4654-9a89-7e1b5c0cae15",
+          "output_name": "default"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "default"
+        }
+      ]
+    },
+    {
+      "node_id": "44b83c05-b0a4-4fcc-8fcd-92fca1f86897",
+      "type": "VISUALIZATION",
+      "operator": "sagemaker.visualizations.histogram_0.1",
+      "parameters": {
+        "name": "sentiment_distribution",
+        "x_axis": "star_rating_scaled_floored",
+        "facet_by": "product_category"
+      },
+      "inputs": [
+        {
+          "name": "df",
+          "node_id": "2b17c16a-8c82-432a-9fec-11ed0b510539",
+          "output_name": "default"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "default"
+        }
+      ]
+    }
+  ]
+}
