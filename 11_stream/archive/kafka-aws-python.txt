@@ -1,0 +1,3 @@
+Kafka + AWS + Python:  https://medium.com/datamindedbe/aws-msk-secure-python-kafka-client-1d25dae39207
+
+Kafka + Lambda:  https://aws.amazon.com/blogs/compute/using-self-hosted-apache-kafka-as-an-event-source-for-aws-lambda/

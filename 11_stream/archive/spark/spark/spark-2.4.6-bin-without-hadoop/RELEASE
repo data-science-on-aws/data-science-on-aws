@@ -1,0 +1,2 @@
+Spark 2.4.6 (git revision 807e0a4) built for Hadoop 2.6.5
+Build flags: -B -Pmesos -Pyarn -Pkubernetes -Pflume -Psparkr -Pkafka-0-8 -Phadoop-provided -DzincPort=3038

@@ -1,0 +1,32 @@
+{
+    "description": "Aggregated features for each credit card, streamed intraday",
+    
+    "features": [
+          {
+              "name": "cc_num",
+              "type": "bigint",
+              "description": "Credit Card Number (Unique)"
+          },
+          {
+              "name": "num_trans_last_1w",
+              "type": "bigint",
+              "description": "Aggregated Metric: Average number of transactions for the card aggregated by past 1 week"
+          },
+          {
+              "name": "avg_amt_last_1w",
+              "type": "double",
+              "description": "Aggregated Metric: Average transaction amount for the card aggregated by past 1 week"
+          },
+          {
+              "name": "trans_time",
+              "type": "double",
+              "description": "Required feature for event timestamp"
+          }
+      ],
+    
+      "record_identifier_feature_name": "cc_num",
+      "event_time_feature_name": "trans_time",
+      "tags": [{"Key": "Environment", "Value" : "DEV"}, 
+               {"Key": "IngestionType", "Value": "Batch"},
+               {"Key": "CostCenter", "Value": "C18"}]
+}
