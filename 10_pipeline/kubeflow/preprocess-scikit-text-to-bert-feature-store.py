@@ -529,7 +529,15 @@ def _transform_tsv_to_tfrecord(file, max_seq_length, balance_dataset, prefix, fe
     feature_group.ingest(data_frame=df_fs_train_records, max_workers=3, wait=True)
     feature_group.ingest(data_frame=df_fs_validation_records, max_workers=3, wait=True)
     feature_group.ingest(data_frame=df_fs_test_records, max_workers=3, wait=True)
-    print("Feature ingest completed.")
+    
+    offline_store_status = None
+    while offline_store_status != 'Active':
+        try:
+            offline_store_status = feature_group.describe()['OfflineStoreStatus']['Status']
+        except:
+            pass
+        print('Offline store status: {}'.format(offline_store_status))    
+    print('...features ingested!')
 
 
 def process(args):
