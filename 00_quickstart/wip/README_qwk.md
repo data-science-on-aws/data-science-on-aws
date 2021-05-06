@@ -35,13 +35,7 @@ This workshop is FREE, but would otherwise cost <25 USD.
 
 ![Console](img/aws_console.png)
 
-## 2. Setup Environment
-
-![Quick Start](img/sm-quickstart.png)
-
-![Create IAM Role](img/sm-create-iam-role-s3.png)
-
-## 3. Launch SageMaker Studio
+## 2. Launch SageMaker Studio
 
 Open the [AWS Management Console](https://console.aws.amazon.com/console/home)
 
@@ -50,6 +44,10 @@ Open the [AWS Management Console](https://console.aws.amazon.com/console/home)
 In the AWS Console search bar, type `SageMaker` and select `Amazon SageMaker` to open the service console.
 
 ![Notebook Instances](img/stu_notebook_instances_9.png)
+
+![Quick Start](img/sm-quickstart.png)
+
+![Create IAM Role](img/sm-create-iam-role-s3.png)
 
 ![Pending Studio](img/studio_pending.png)
 
