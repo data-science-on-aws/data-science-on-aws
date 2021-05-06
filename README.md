@@ -1,4 +1,4 @@
-# O'Reilly Book 
+# O'Reilly Bookk
 
 ## Data Science on AWS
 
@@ -18,10 +18,13 @@ This workshop is FREE, but would otherwise cost <25 USD.
 # Workshop Description
 ![Workshop Agenda](img/outline.png)
 
-# Workshop Path
+# Workshop Paths
 
 ## Quick Start (All-In-One Workshop Path)
 ![Workshop Paths](img/workshop_paths1.png)
+
+## Additional Workshop Paths per Persona
+![Workshop Paths](img/workshop_paths2.png)
 
 # Workshop Contributors
 ![Workshop Contributors](img/primary-contributors.png)
