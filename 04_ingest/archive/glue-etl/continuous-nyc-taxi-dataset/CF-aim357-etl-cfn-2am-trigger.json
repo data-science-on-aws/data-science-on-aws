@@ -1,0 +1,295 @@
+{
+  "Description": "AWS CloudFormation for reInvent 2019 ETL Workshop.",
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Outputs": {
+    "StackArn": {
+      "Description": "The stack ID",
+      "Value": {
+        "Ref": "AWS::StackId"
+      }
+    }
+  },
+  "Resources": {
+    "InitializeInferenceWorkflowLambdaFunctionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+		  "arn:aws:iam::aws:policy/AmazonSageMakerFullAccess",
+		  "arn:aws:iam::aws:policy/AWSLambdaFullAccess",
+          "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+        ],
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    "InferenceWorkflowRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/AWSLambdaFullAccess",
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaRole",
+          "arn:aws:iam::aws:policy/AmazonSageMakerFullAccess",
+          "arn:aws:iam::aws:policy/AmazonS3FullAccess",
+          "arn:aws:iam::aws:policy/AWSStepFunctionsFullAccess",
+		  "arn:aws:iam::aws:policy/AmazonSNSFullAccess"
+        ],
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "states.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+	"ETLSNS": {
+	  "Type" : "AWS::SNS::Topic",
+	  "Properties" : {
+		  "DisplayName" : "ETLSNS",
+		  "TopicName" : "ETLSNS"
+		}
+	},
+    "ReInventETLInferenceWorkflow": {
+      "Type": "AWS::StepFunctions::StateMachine",
+      "Properties": {
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "InferenceWorkflowRole",
+            "Arn"
+          ]
+        },
+		"DefinitionString": {
+		 "Fn::Sub": "{\n  \"StartAt\": \"Initialize\",\n  \"States\": {\n    \"Initialize\": {\n      \"Type\": \"Task\",\n      \"Resource\": \"${InitializeInferenceWorkflowLambdaFunction.Arn}\",\n      \"ResultPath\": \"$\",\n      \"Next\": \"Publish to SNS\",\n      \"Catch\": [\n      {\n        \"ErrorEquals\": [\"States.ALL\"],\n        \"Next\": \"Handle Error\",\n        \"ResultPath\": \"$.Error\"\n      }\n      ]\n    },\n   \"Publish to SNS\": {\n     \"Type\": \"Task\",\n     \"Resource\": \"arn:aws:states:::sns:publish\",\n     \"Parameters\": {\n       \"TopicArn\": \"${ETLSNS}\",\n       \"Message\":{  \n               \"Input.$\":\"$\"\n       }\n     },\n     \"Next\": \"Finalize\",\n      \"Catch\": [\n      {\n        \"ErrorEquals\": [\"States.ALL\"],\n        \"Next\": \"Handle Error\",\n        \"ResultPath\": \"$.Error\"\n      }\n      ]\n    },\n    \"Finalize\": {\n      \"Type\": \"Pass\",\n      \"End\": true\n    },\n    \"Handle Error\": {\n      \"Type\": \"Pass\",\n      \"Next\": \"Failure\"\n    },\n    \"Failure\": {\n      \"Type\": \"Fail\"\n    }\n  }\n}"
+        },
+        "StateMachineName": "reinvent-etl-inference-workflow"
+      },
+	  "DependsOn" : "ETLSNS"
+    },
+    "InitializeInferenceWorkflowLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {      
+			"ZipFile": "import os \nimport io \nimport boto3 \nimport json \nimport csv \n \nruntime = boto3.client('runtime.sagemaker') \nENDPOINT_NAME = \"DeepAR-forecast-taxidata-2019-12-XXXXXXXXXXXX\" \n \ndef handler(event, context): \n \n    print(\"Received event: \" + json.dumps(event, indent=2)) \n \n    request = json.loads(json.dumps(event)) \n \n    response = runtime.invoke_endpoint(EndpointName=ENDPOINT_NAME, \n                                       ContentType='application/json', \n                                       Body=json.dumps(event)) \n     \n    result = json.loads(response['Body'].read().decode()) \n     \n    return result \n"
+        },
+        "Description": "Initializes an Inference ML workflow",
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
+        "MemorySize": 128,
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "InitializeInferenceWorkflowLambdaFunctionRole",
+            "Arn"
+          ]
+        },
+        "Timeout": 900,
+        "Runtime": "python3.6",
+        "FunctionName": "reinvent-etl-inference-initialize-workflow"
+      }
+    },
+    "SageMakerRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/AmazonSageMakerFullAccess",
+          "arn:aws:iam::aws:policy/AmazonS3FullAccess",
+		  "arn:aws:iam::aws:policy/AWSGlueConsoleSageMakerNotebookFullAccess",
+		  "arn:aws:iam::aws:policy/service-role/AWSGlueServiceNotebookRole",
+		  "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole",
+		  "arn:aws:iam::aws:policy/AmazonAthenaFullAccess"
+        ],
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "sagemaker.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+	"GlueRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+		"RoleName" : "GlueRole",
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/AmazonSageMakerFullAccess",
+          "arn:aws:iam::aws:policy/AmazonS3FullAccess",
+		  "arn:aws:iam::aws:policy/AWSGlueConsoleSageMakerNotebookFullAccess",
+		  "arn:aws:iam::aws:policy/service-role/AWSGlueServiceNotebookRole",
+		  "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole",
+		  "arn:aws:iam::aws:policy/AmazonAthenaFullAccess"
+        ],
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "glue.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+	"GlueDevEndpoint":{
+	  "Type" : "AWS::Glue::DevEndpoint",
+	  "Properties" : {
+		  "Arguments" : {"GLUE_PYTHON_VERSION": "3"},
+		  "EndpointName" : "reinvent2019",
+		  "GlueVersion" : "1.0",
+		  "NumberOfNodes" : 10,
+		  "RoleArn" : { "Fn::GetAtt" : [ "GlueRole", "Arn" ] }
+		}
+	},
+	"SageMakerLifecycleConfig":{
+	  "Type" : "AWS::SageMaker::NotebookInstanceLifecycleConfig",
+	  "Properties" : {
+		  "NotebookInstanceLifecycleConfigName" : "ReInvent2019ETLSageMakerLifecycleConfig",
+		  "OnCreate" : [ {"Content" : "IyEvYmluL2Jhc2ggCnNldCAtZXgKWyAtZSAvaG9tZS9lYzItdXNlci9nbHVlX3JlYWR5IF0gJiYgZXhpdCAwIApta2RpciAvaG9tZS9lYzItdXNlci9nbHVlCmNkIC9ob21lL2VjMi11c2VyL2dsdWUKQVNTRVRTPXMzOi8vYXdzLWdsdWUtamVzLXByb2QtdXMtZWFzdC0xLWFzc2V0cy9zYWdlbWFrZXIvYXNzZXRzLwpERVZfRU5EUE9JTlRfTkFNRT10ZXN0LXZwYwphd3MgczMgY3AgJHtBU1NFVFN9IC4gLS1yZWN1cnNpdmUKYmFzaCAiL2hvbWUvZWMyLXVzZXIvZ2x1ZS9NaW5pY29uZGEyLTQuNS4xMi1MaW51eC14ODZfNjQuc2giIC1iIC11IC1wICIvaG9tZS9lYzItdXNlci9nbHVlL21pbmljb25kYSIKc291cmNlICIvaG9tZS9lYzItdXNlci9nbHVlL21pbmljb25kYS9iaW4vYWN0aXZhdGUiIAp0YXIgLXhmIGF1dG9zc2gtMS40ZS50Z3oKY2QgYXV0b3NzaC0xLjRlCi4vY29uZmlndXJlCm1ha2UKc3VkbyBtYWtlIGluc3RhbGwKcGlwIGluc3RhbGwgcGFuZGFzPT0wLjIyLjAKbWtkaXIgLXAgL2hvbWUvZWMyLXVzZXIvLnNwYXJrbWFnaWMKY3AgL2hvbWUvZWMyLXVzZXIvZ2x1ZS9jb25maWcuanNvbiAvaG9tZS9lYzItdXNlci8uc3BhcmttYWdpYy9jb25maWcuanNvbiAKbWtkaXIgLXAgL2hvbWUvZWMyLXVzZXIvU2FnZU1ha2VyL0dsdWVcIEV4YW1wbGVzCm12IC9ob21lL2VjMi11c2VyL2dsdWUvbm90ZWJvb2stc2FtcGxlcy8qIC9ob21lL2VjMi11c2VyL1NhZ2VNYWtlci9HbHVlXCBFeGFtcGxlcy8gCnN1ZG8gY3AgL2hvbWUvZWMyLXVzZXIvZ2x1ZS9hdXRvc3NoLmNvbmYgL2V0Yy9pbml0LwpweXRob24zIC9ob21lL2VjMi11c2VyL2dsdWUvYm9vdHN0cmFwLnB5IC0tZGV2ZW5kcG9pbnRuYW1lIHJlaW52ZW50MjAxOSAtLWVuZHBvaW50IGh0dHBzOi8vZ2x1ZS51cy1lYXN0LTEuYW1hem9uYXdzLmNvbSAtLW5vdGVib29rbmFtZSBhd3MtZ2x1ZS1yZWludmVudC0yMDE5LW5iCnNvdXJjZSAiL2hvbWUvZWMyLXVzZXIvZ2x1ZS9taW5pY29uZGEvYmluL2RlYWN0aXZhdGUiCnJtIC1yZiAiL2hvbWUvZWMyLXVzZXIvZ2x1ZS9NaW5pY29uZGEyLTQuNS4xMi1MaW51eC14ODZfNjQuc2giCmNkIC9ob21lL2VjMi11c2VyL1NhZ2VNYWtlci8Kd2dldCBodHRwczovL3Jhdy5naXRodWJ1c2VyY29udGVudC5jb20vYnNuaXZlbHkvQUlNMzU3LTIwMTktRVRMLWFuZC1NTC1Xb3Jrc2hvcC9tYXN0ZXIvbm90ZWJvb2tzL0RhdGFEaXNjb3ZlcnlBbmRDb252ZXJzYXRpb24uaXB5bmIKd2dldCBodHRwczovL3Jhdy5naXRodWJ1c2VyY29udGVudC5jb20vYnNuaXZlbHkvQUlNMzU3LTIwMTktRVRMLWFuZC1NTC1Xb3Jrc2hvcC9tYXN0ZXIvbm90ZWJvb2tzL0dsdWVQeVNwYXJrTUxGZWF0dXJlRW5naW5lZXJpbmcuaXB5bmIKd2dldCBodHRwczovL3Jhdy5naXRodWJ1c2VyY29udGVudC5jb20vYnNuaXZlbHkvQUlNMzU3LTIwMTktRVRMLWFuZC1NTC1Xb3Jrc2hvcC9tYXN0ZXIvbm90ZWJvb2tzL1Rlc3RpbmdGb3JlY2FzdFJlc3VsdHMuaXB5bmIKY2htb2QgNzc3ICouaXB5bmIKbWtkaXIgaW1hZ2VzCmNobW9kIDc3NyBpbWFnZXMKY2QgaW1hZ2VzCndnZXQgaHR0cHM6Ly9naXRodWIuY29tL2Jzbml2ZWx5L0FJTTM1Ny0yMDE5LUVUTC1hbmQtTUwtV29ya3Nob3AvcmF3L21hc3Rlci9ub3RlYm9va3MvaW1hZ2VzL0VUTFN0YXJ0LnBuZwp3Z2V0IGh0dHBzOi8vZ2l0aHViLmNvbS9ic25pdmVseS9BSU0zNTctMjAxOS1FVEwtYW5kLU1MLVdvcmtzaG9wL3Jhdy9tYXN0ZXIvbm90ZWJvb2tzL2ltYWdlcy9jcmF3bGVyX2Rpc2NvdmVyZWQucG5nCndnZXQgaHR0cHM6Ly9naXRodWIuY29tL2Jzbml2ZWx5L0FJTTM1Ny0yMDE5LUVUTC1hbmQtTUwtV29ya3Nob3AvcmF3L21hc3Rlci9ub3RlYm9va3MvaW1hZ2VzL2NyZWF0ZWRhdGFiYXNlcmVzcG9uc2UucG5nCndnZXQgaHR0cHM6Ly9naXRodWIuY29tL2Jzbml2ZWx5L0FJTTM1Ny0yMDE5LUVUTC1hbmQtTUwtV29ya3Nob3AvcmF3L21hc3Rlci9ub3RlYm9va3MvaW1hZ2VzL2RlZXBhcl9mb3JlY2FzdC5wbmcKd2dldCBodHRwczovL2dpdGh1Yi5jb20vYnNuaXZlbHkvQUlNMzU3LTIwMTktRVRMLWFuZC1NTC1Xb3Jrc2hvcC9yYXcvbWFzdGVyL25vdGVib29rcy9pbWFnZXMvZGVlcGFyX3RyYWluaW5nLnBuZwp3Z2V0IGh0dHBzOi8vZ2l0aHViLmNvbS9ic25pdmVseS9BSU0zNTctMjAxOS1FVEwtYW5kLU1MLVdvcmtzaG9wL3Jhdy9tYXN0ZXIvbm90ZWJvb2tzL2ltYWdlcy9zdGFydGNyYXdsZXJ1aS5wbmcKd2dldCBodHRwczovL2dpdGh1Yi5jb20vYnNuaXZlbHkvQUlNMzU3LTIwMTktRVRMLWFuZC1NTC1Xb3Jrc2hvcC9yYXcvbWFzdGVyL25vdGVib29rcy9pbWFnZXMvc2FtcGxlX3Jlc3VsdDEucG5nCndnZXQgaHR0cHM6Ly9naXRodWIuY29tL2Jzbml2ZWx5L0FJTTM1Ny0yMDE5LUVUTC1hbmQtTUwtV29ya3Nob3AvcmF3L21hc3Rlci9ub3RlYm9va3MvaW1hZ2VzL3NhbXBsZV9yZXN1bHQyLnBuZwp3Z2V0IGh0dHBzOi8vZ2l0aHViLmNvbS9ic25pdmVseS9BSU0zNTctMjAxOS1FVEwtYW5kLU1MLVdvcmtzaG9wL3Jhdy9tYXN0ZXIvbm90ZWJvb2tzL2ltYWdlcy9zYW1wbGVfcmVzdWx0My5wbmcKc3VkbyB0b3VjaCAvaG9tZS9lYzItdXNlci9nbHVlX3JlYWR5"} ],
+		  "OnStart" : [ {"Content" : "IyEvYmluL2Jhc2ggCnNldCAtZXgKWyAtZSAvaG9tZS9lYzItdXNlci9nbHVlX3JlYWR5IF0gJiYgZXhpdCAwIApta2RpciAvaG9tZS9lYzItdXNlci9nbHVlCmNkIC9ob21lL2VjMi11c2VyL2dsdWUKQVNTRVRTPXMzOi8vYXdzLWdsdWUtamVzLXByb2QtdXMtZWFzdC0xLWFzc2V0cy9zYWdlbWFrZXIvYXNzZXRzLwpERVZfRU5EUE9JTlRfTkFNRT10ZXN0LXZwYwphd3MgczMgY3AgJHtBU1NFVFN9IC4gLS1yZWN1cnNpdmUKYmFzaCAiL2hvbWUvZWMyLXVzZXIvZ2x1ZS9NaW5pY29uZGEyLTQuNS4xMi1MaW51eC14ODZfNjQuc2giIC1iIC11IC1wICIvaG9tZS9lYzItdXNlci9nbHVlL21pbmljb25kYSIKc291cmNlICIvaG9tZS9lYzItdXNlci9nbHVlL21pbmljb25kYS9iaW4vYWN0aXZhdGUiIAp0YXIgLXhmIGF1dG9zc2gtMS40ZS50Z3oKY2QgYXV0b3NzaC0xLjRlCi4vY29uZmlndXJlCm1ha2UKc3VkbyBtYWtlIGluc3RhbGwKcGlwIGluc3RhbGwgcGFuZGFzPT0wLjIyLjAKbWtkaXIgLXAgL2hvbWUvZWMyLXVzZXIvLnNwYXJrbWFnaWMKY3AgL2hvbWUvZWMyLXVzZXIvZ2x1ZS9jb25maWcuanNvbiAvaG9tZS9lYzItdXNlci8uc3BhcmttYWdpYy9jb25maWcuanNvbiAKbWtkaXIgLXAgL2hvbWUvZWMyLXVzZXIvU2FnZU1ha2VyL0dsdWVcIEV4YW1wbGVzCm12IC9ob21lL2VjMi11c2VyL2dsdWUvbm90ZWJvb2stc2FtcGxlcy8qIC9ob21lL2VjMi11c2VyL1NhZ2VNYWtlci9HbHVlXCBFeGFtcGxlcy8gCnN1ZG8gY3AgL2hvbWUvZWMyLXVzZXIvZ2x1ZS9hdXRvc3NoLmNvbmYgL2V0Yy9pbml0LwpweXRob24zIC9ob21lL2VjMi11c2VyL2dsdWUvYm9vdHN0cmFwLnB5IC0tZGV2ZW5kcG9pbnRuYW1lIHJlaW52ZW50MjAxOSAtLWVuZHBvaW50IGh0dHBzOi8vZ2x1ZS51cy1lYXN0LTEuYW1hem9uYXdzLmNvbSAtLW5vdGVib29rbmFtZSBhd3MtZ2x1ZS1yZWludmVudC0yMDE5LW5iCnNvdXJjZSAiL2hvbWUvZWMyLXVzZXIvZ2x1ZS9taW5pY29uZGEvYmluL2RlYWN0aXZhdGUiCnJtIC1yZiAiL2hvbWUvZWMyLXVzZXIvZ2x1ZS9NaW5pY29uZGEyLTQuNS4xMi1MaW51eC14ODZfNjQuc2giCmNkIC9ob21lL2VjMi11c2VyL1NhZ2VNYWtlci8Kd2dldCBodHRwczovL3Jhdy5naXRodWJ1c2VyY29udGVudC5jb20vYnNuaXZlbHkvQUlNMzU3LTIwMTktRVRMLWFuZC1NTC1Xb3Jrc2hvcC9tYXN0ZXIvbm90ZWJvb2tzL0RhdGFEaXNjb3ZlcnlBbmRDb252ZXJzYXRpb24uaXB5bmIKd2dldCBodHRwczovL3Jhdy5naXRodWJ1c2VyY29udGVudC5jb20vYnNuaXZlbHkvQUlNMzU3LTIwMTktRVRMLWFuZC1NTC1Xb3Jrc2hvcC9tYXN0ZXIvbm90ZWJvb2tzL0dsdWVQeVNwYXJrTUxGZWF0dXJlRW5naW5lZXJpbmcuaXB5bmIKd2dldCBodHRwczovL3Jhdy5naXRodWJ1c2VyY29udGVudC5jb20vYnNuaXZlbHkvQUlNMzU3LTIwMTktRVRMLWFuZC1NTC1Xb3Jrc2hvcC9tYXN0ZXIvbm90ZWJvb2tzL1Rlc3RpbmdGb3JlY2FzdFJlc3VsdHMuaXB5bmIKY2htb2QgNzc3ICouaXB5bmIKbWtkaXIgaW1hZ2VzCmNobW9kIDc3NyBpbWFnZXMKY2QgaW1hZ2VzCndnZXQgaHR0cHM6Ly9naXRodWIuY29tL2Jzbml2ZWx5L0FJTTM1Ny0yMDE5LUVUTC1hbmQtTUwtV29ya3Nob3AvcmF3L21hc3Rlci9ub3RlYm9va3MvaW1hZ2VzL0VUTFN0YXJ0LnBuZwp3Z2V0IGh0dHBzOi8vZ2l0aHViLmNvbS9ic25pdmVseS9BSU0zNTctMjAxOS1FVEwtYW5kLU1MLVdvcmtzaG9wL3Jhdy9tYXN0ZXIvbm90ZWJvb2tzL2ltYWdlcy9jcmF3bGVyX2Rpc2NvdmVyZWQucG5nCndnZXQgaHR0cHM6Ly9naXRodWIuY29tL2Jzbml2ZWx5L0FJTTM1Ny0yMDE5LUVUTC1hbmQtTUwtV29ya3Nob3AvcmF3L21hc3Rlci9ub3RlYm9va3MvaW1hZ2VzL2NyZWF0ZWRhdGFiYXNlcmVzcG9uc2UucG5nCndnZXQgaHR0cHM6Ly9naXRodWIuY29tL2Jzbml2ZWx5L0FJTTM1Ny0yMDE5LUVUTC1hbmQtTUwtV29ya3Nob3AvcmF3L21hc3Rlci9ub3RlYm9va3MvaW1hZ2VzL2RlZXBhcl9mb3JlY2FzdC5wbmcKd2dldCBodHRwczovL2dpdGh1Yi5jb20vYnNuaXZlbHkvQUlNMzU3LTIwMTktRVRMLWFuZC1NTC1Xb3Jrc2hvcC9yYXcvbWFzdGVyL25vdGVib29rcy9pbWFnZXMvZGVlcGFyX3RyYWluaW5nLnBuZwp3Z2V0IGh0dHBzOi8vZ2l0aHViLmNvbS9ic25pdmVseS9BSU0zNTctMjAxOS1FVEwtYW5kLU1MLVdvcmtzaG9wL3Jhdy9tYXN0ZXIvbm90ZWJvb2tzL2ltYWdlcy9zdGFydGNyYXdsZXJ1aS5wbmcKd2dldCBodHRwczovL2dpdGh1Yi5jb20vYnNuaXZlbHkvQUlNMzU3LTIwMTktRVRMLWFuZC1NTC1Xb3Jrc2hvcC9yYXcvbWFzdGVyL25vdGVib29rcy9pbWFnZXMvc2FtcGxlX3Jlc3VsdDEucG5nCndnZXQgaHR0cHM6Ly9naXRodWIuY29tL2Jzbml2ZWx5L0FJTTM1Ny0yMDE5LUVUTC1hbmQtTUwtV29ya3Nob3AvcmF3L21hc3Rlci9ub3RlYm9va3MvaW1hZ2VzL3NhbXBsZV9yZXN1bHQyLnBuZwp3Z2V0IGh0dHBzOi8vZ2l0aHViLmNvbS9ic25pdmVseS9BSU0zNTctMjAxOS1FVEwtYW5kLU1MLVdvcmtzaG9wL3Jhdy9tYXN0ZXIvbm90ZWJvb2tzL2ltYWdlcy9zYW1wbGVfcmVzdWx0My5wbmcKc3VkbyB0b3VjaCAvaG9tZS9lYzItdXNlci9nbHVlX3JlYWR5"} ]
+		}
+	},
+	"NotebookInstance":{
+	  "Type" : "AWS::SageMaker::NotebookInstance",
+	  "DependsOn" : "GlueDevEndpoint",
+	  "Properties" : {
+		  "InstanceType" : "ml.t2.medium",
+		  "NotebookInstanceName" : "aws-glue-reinvent-2019-nb",
+		  "LifecycleConfigName" : "ReInvent2019ETLSageMakerLifecycleConfig",
+		  "RoleArn": { "Fn::GetAtt" : [ "SageMakerRole", "Arn" ] }
+		}
+	},
+	"GlueETLJobGreen": {
+      "Type": "AWS::Glue::Job",
+      "Properties": {
+		"GlueVersion" : "1.0",
+		"Name": "2019reinvent_green",
+        "Role": {
+          "Ref": "GlueRole"
+        },
+        "Command": {
+          "Name": "glueetl",
+		  "PythonVersion" : "3",
+          "ScriptLocation": "s3://kk-public-ws-bucket/deepar-etl-ws-reinvent-2019/2019reinvent_green.py"
+        },
+	  "DefaultArguments": {
+          "--output_location": {"Fn::Sub": "s3://${2019ReinventETLBucket}/canonical"}
+        }
+      }
+    },
+	"GlueETLJobYellow": {
+      "Type": "AWS::Glue::Job",
+      "Properties": {
+		"GlueVersion" : "1.0",
+		"Name": "2019reinvent_yellow",
+        "Role": {
+          "Ref": "GlueRole"
+        },
+        "Command": {
+          "Name": "glueetl",
+		  "PythonVersion" : "3",
+          "ScriptLocation": "s3://kk-public-ws-bucket/deepar-etl-ws-reinvent-2019/2019reinvent_yellow.py"
+        },
+	  "DefaultArguments": {
+          "--output_location": {"Fn::Sub": "s3://${2019ReinventETLBucket}/canonical"}
+        }
+      }
+    },
+	"GlueETLJobFHV": {
+      "Type": "AWS::Glue::Job",
+      "Properties": {
+		"GlueVersion" : "1.0",
+		"Name": "2019reinvent_fhv",
+        "Role": {
+          "Ref": "GlueRole"
+        },
+        "Command": {
+          "Name": "glueetl",
+		  "PythonVersion" : "3",
+          "ScriptLocation": "s3://kk-public-ws-bucket/deepar-etl-ws-reinvent-2019/2019reinvent_fhv.py"
+        },
+	  "DefaultArguments": {
+          "--output_location": {"Fn::Sub": "s3://${2019ReinventETLBucket}/canonical"}
+        }
+      }
+    },
+	"YellowJobTrigger": {
+      "Type": "AWS::Glue::Trigger",
+	  "DependsOn" : "GlueETLJobYellow",
+      "Properties": {
+        "Type": "SCHEDULED",
+		"Schedule": "cron(0 2 * * ? *)",
+		"StartOnCreation" : "true",
+        "Description": "Triggers the 2019reinvent_yellow Glue ETL Job",
+        "Actions": [
+          {
+            "JobName": "2019reinvent_yellow"
+          }
+        ],
+        "Name": "2019reinvent-yellow-trigger"
+      }
+    },
+	"FHVJobTrigger": {
+      "Type": "AWS::Glue::Trigger",
+	  "DependsOn" : "GlueETLJobFHV",
+      "Properties": {
+        "Type": "SCHEDULED",
+		"Schedule": "cron(5 2 * * ? *)",
+		"StartOnCreation" : "true",
+        "Description": "Triggers the 2019reinvent_fhv Glue ETL Job",
+        "Actions": [
+          {
+            "JobName": "2019reinvent_fhv"
+          }
+        ],
+        "Name": "2019reinvent-fhv-trigger"
+      }
+    },
+    "2019ReinventETLBucket": {
+      "Type": "AWS::S3::Bucket"
+    }
+  }
+}

@@ -1,0 +1,276 @@
+{
+  "metadata": {
+    "version": 1
+  },
+  "nodes": [
+    {
+      "node_id": "14039109-2da9-49b4-8eee-df39306c9c47",
+      "type": "SOURCE",
+      "operator": "sagemaker.athena_source_0.1",
+      "parameters": {
+        "dataset_definition": {
+          "datasetSourceType": "Athena",
+          "name": "amazon_reviews",
+          "catalogName": "AwsDataCatalog",
+          "databaseName": "dsoaws",
+          "queryString": "select * from amazon_reviews_parquet",
+          "s3OutputLocation": "s3://sagemaker-us-east-1-835319576252/athena/",
+          "outputFormat": "parquet"
+        }
+      },
+      "trained_parameters": {
+        "query_execution_id": "967a8fb3-2549-428c-8fb5-58403c7ac21c",
+        "ctas_table_name": "sagemaker_tmp_1372013f120b4618b60d328d18969f3b",
+        "ctas_s3_output_location": "s3://sagemaker-us-east-1-835319576252/athena/1372013f120b4618b60d328d18969f3b/data/"
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "default",
+          "sampling": {
+            "sampling_method": "sample_by_limit",
+            "limit_rows": 50000
+          }
+        }
+      ]
+    },
+    {
+      "node_id": "98b4c198-d379-42ab-af96-165dcd1a01d8",
+      "type": "TRANSFORM",
+      "operator": "sagemaker.spark.infer_and_cast_type_0.1",
+      "parameters": {},
+      "trained_parameters": {
+        "schema": {
+          "marketplace": "string",
+          "review_id": "string",
+          "product_id": "string",
+          "product_title": "string",
+          "vine": "string",
+          "verified_purchase": "string",
+          "review_headline": "string",
+          "review_body": "string",
+          "product_category": "string",
+          "customer_id": "long",
+          "product_parent": "long",
+          "star_rating": "long",
+          "helpful_votes": "long",
+          "total_votes": "long",
+          "year": "long",
+          "review_date": "object"
+        }
+      },
+      "inputs": [
+        {
+          "name": "default",
+          "node_id": "14039109-2da9-49b4-8eee-df39306c9c47",
+          "output_name": "default"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "default"
+        }
+      ]
+    },
+    {
+      "node_id": "4cb0e19b-626b-4c60-aca9-1b1a8a5ea264",
+      "type": "VISUALIZATION",
+      "operator": "sagemaker.visualizations.bias_report_0.1",
+      "parameters": {
+        "name": "product_category_bias_report",
+        "is_label_value_or_threshold": "value",
+        "is_facet_value_or_threshold": "value",
+        "default_metrics": {
+          "CI": true,
+          "DPL": true,
+          "JS": true,
+          "CDDL": false
+        },
+        "group_name": "",
+        "show_additional_metrics": "yes",
+        "label_values": "5;4",
+        "facet_values": "",
+        "additional_metrics": {
+          "KL": true,
+          "LP": true,
+          "TVD": true,
+          "KS": true
+        },
+        "label_name": "star_rating",
+        "facet_name": "product_category",
+        "metrics": {
+          "CI": true,
+          "DPL": true,
+          "JS": true,
+          "CDDL": false,
+          "KL": true,
+          "LP": true,
+          "TVD": true,
+          "KS": true
+        }
+      },
+      "inputs": [
+        {
+          "name": "df",
+          "node_id": "98b4c198-d379-42ab-af96-165dcd1a01d8",
+          "output_name": "default"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "default"
+        }
+      ]
+    },
+    {
+      "node_id": "7d6bd728-2172-47c8-8d03-e4b194f44c7c",
+      "type": "VISUALIZATION",
+      "operator": "sagemaker.visualizations.quick_model_0.1",
+      "parameters": {
+        "name": "feature_importance",
+        "label": "star_rating"
+      },
+      "inputs": [
+        {
+          "name": "df",
+          "node_id": "98b4c198-d379-42ab-af96-165dcd1a01d8",
+          "output_name": "default"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "default"
+        }
+      ]
+    },
+    {
+      "node_id": "93919dab-601b-4aa2-93d3-d223b6f46e25",
+      "type": "TRANSFORM",
+      "operator": "sagemaker.spark.process_numeric_0.1",
+      "parameters": {
+        "operator": "Scale values",
+        "scale_values_parameters": {
+          "scaler": "Min-max scaler",
+          "min_max_scaler_parameters": {
+            "min": -1,
+            "max": 1,
+            "input_column": "star_rating",
+            "output_column": "star_rating_min_max_scaled_builtin"
+          },
+          "standard_scaler_parameters": {}
+        }
+      },
+      "trained_parameters": {
+        "scale_values_parameters": {
+          "min_max_scaler_parameters": {
+            "_hash": -1822493288712256300,
+            "scaler_model": "P)h>@6aWAK2msCqIZ~3chX=v{002G#000vJ003=ebYWy+bYU-WVRCdWFfcGMFm=vNYr`-M2H^XChR%s`V%jFX_8ce_b~PeVS~EK~{(!QQ|6Z+QqZE1*()&K>2BXE4U=Kc?1qK{1BvQcmC7cyAVJ?xxV3q-|rx7j1!B1qNf@~b6j4r^w**48aZFgO#x?Kg2`X|L?{KBvjQpg(J_fkvl6*KYjS=4PysOCxaZQpZ(>*xk#_y!KI><d|eGmO=b(U%-bK6uNJ&g6m~z12UsS^f`ydsr)&XvSjm@jWbG-M0^F{TqXI{kQ{AO9KQH000080L}<GQZt4SL=FG|01N;C02lxO0BvP-VPs)+VJ|LlVRCdWFfcGMFfL<qV@obdW?*1oVqkCIGzkDuO9KQH000080L}<GQUCw|00IC20000001*HH0BvP-VPs)+VJ}}(RYOBXQ&R%~P)h>@6aWAK2msCqIZ{QY=llu)000O8000&M003=ebYWy+bYU+pUsF{>Lq$_lE@N_IOD;-gU|?Wk002-+0|XQR000O8&ImbD)p&iU*8%_la0&nbNB{r;WMOn+FK}UUbS*G2FfcGJWMnclIWsaeEo5OeW-T-`VKgl`GGa0<Gc#r~GB9FeVq-BjEn_e+FfMa$VQ_GHE^uLTadl;M?N-Zf(?ArRIIe4j#{x2zjiM^DXw;%$C8RNF6^SCcsE|MvDr^u!lXx5~CU)vaNm}I(`T<>Zi7LK;Pv8ssA*>NX%s5W%JV{v~7LB54X6`xn+<Sb-%HGpgWe8vv%0<Z0g#g8z%%=bVgI@`(C3f_axzEwxbc$^${x-Z56Ll6^meV1CMeo6tVN@7IZ<Rtih%pbK7Gq>_pz{4myrLycIc4&DiCk$gjQoe~WVhp0+)nazRy)~k$SFVX?%wn|$o=@<Ykt6O1bI;9<QtA_wJaNv7nTi00J&A#mf!2()fKkkWZtumFhed|wqZ4~N9z(mm6v&9c|PO@lx0kC8{0ku3WtaUQ*fCvTr7>c|594wl$>%>5OdU&DiB0vEonkn0pui3vL&}5*5^EUB?sBVVulxvW@KY6gxP9Ry>L{g&pXNbnqst7ASk;@*0A5O{$br=mK|xAlE%~gqG>XdX(Bf!vwTiTUs9A+zrsyP>Yb;jb&I;A-kqlxHSd(4k#EGkQ+~Yf3x0}ys5{@ji-|O6OH=Ga-9OlOwp72u%}nS?XM#ivD9W<qwlvg1^g3$c&D0LD>sgL1FIBXXRs!<+1j0KY8eJR&*w<X=lh(#QGLVntAL6mf>{qu`&v%2SuNGC)!o={@t+&UjjoK`fm<}2r;4gWB!AMPlJTHWfNw<kc7`LUp!A;+BU+?Twc&GO)B6NE5aJ2CKQMox~hKON(YNO|~ogEN@8ibyhh<LcD4tu9L`~Bi2nGH=$wrn4_usg!1!n5ho@J!l+To?7|aWo41<N2G8?IX+fUQ(T?#{R;pgIQZt)Nlfp@~<@C^%t)yaT~73<$7FZA%OfmdM7<>yZPuPmM?4Nl2*>IH3Ewm`I5P5m>U%Xn`Wa{GmXb)P1kipujrfQ+Qy?wrDSgC4P$d%ImrPq^$Why_vs$}ulXBLO9KQH000080L}<GQrY3vyCMJp03ZMW08Ib@0AyiwVJ|LlVRCdWFfcGMFfC+cGBi0eGBhn@VKrtgG&5l|EjTh_GA%PRW->A`Vq;=sF*Yq@FfcGKb8ca9aCt6pVRCVGWpplMa$`#_N@ieSU}D&!>~9#|^4?vU$?yU5IlFAjl`7T(+hl?PP)h>@6aWAK2msCqIZ^-s0006200000000dD003lRbYU-FQ&mGlMN?A)08mQ<1QY-O00;oi2su(krsw<$000080000I0001FVRT_HE?-ksLqkPVQ!Zn2V@obdW?*1oVgLY8O928D0~7!N00;oi2su)cvWEx40000!0RR9K00000000000001_fdBvi0BvP-VPs)+VJ~oDa&#>)FfcGMP)h*<6ay3h000O8&ImbDGlmdE4gdfE3;+NC7ytkO0000000000q=EAQ003=ebYWy+bYU+paA9(EEif=JFfcA-a$`_S0Rj{Q6aWAK2msCqIZ^-s0006200000000pH0000000000005+cHvs?uZDn*}WMOn+FJDttLqkPVQ&39*0u%!j000080L}<GQbnfc{0aa700;m802TlM00000000000HlFv0RRAPWprU=VRT_HE?-ksLqkPVQ!Zn2V^B*00u%!j000080L}<GQq_2Ur`G}i0B{Nb07w7;00000000000HlGY0RRAGVRT_HaA9(EEif=JFfc7-WHK~4Gcq(SWMMUCEi^M>G%YwXVlpi=GiEX}Fk)k3V=*=@V=yo<E^}^SaBz7paA9(Bb!Bu=O928D0~7!N00;oi2su*O;nlk$0000W0000@00000000000001_f#U=K0AyiwVJ|LlVRCdWFfcGMFfC+cGBi0eGBhn@VKrtgG&5l|EjTh_GA%PRW->A`Vq;=sF*Yq@FfcGKb8ca9aCt6pVRCVGWpplMa$`_S0Rj{Q6aWAK2msCqIZ^-s0006200000000dD0000000000005+ca0LJWWMOn+FJDttLqkPVQ&39*0u%!j000080L}<GQbnfc{0aa700;m801^NI00000000000HlGP1pokKVRT_HE?-ksLqkPVQ!Zn2V^B*41^@s600;mG0CoZZ0M`Wo0000"
+          }
+        }
+      },
+      "inputs": [
+        {
+          "name": "df",
+          "node_id": "98b4c198-d379-42ab-af96-165dcd1a01d8",
+          "output_name": "default"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "default"
+        }
+      ]
+    },
+    {
+      "node_id": "019d2a9b-9601-4cca-8395-9a976db0ada5",
+      "type": "TRANSFORM",
+      "operator": "sagemaker.spark.custom_pyspark_0.1",
+      "parameters": {
+        "code": "# Table is available as variable `df`\nfrom pyspark.sql.functions import stddev, mean, col, floor\ndf = df.withColumn(\"sentiment\", (floor(col(\"star_rating_min_max_scaled_builtin\"))))"
+      },
+      "inputs": [
+        {
+          "name": "df",
+          "node_id": "93919dab-601b-4aa2-93d3-d223b6f46e25",
+          "output_name": "default"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "default"
+        }
+      ]
+    },
+    {
+      "node_id": "96b88833-dd43-4945-a0a2-ad60a51fdb68",
+      "type": "VISUALIZATION",
+      "operator": "sagemaker.visualizations.bias_report_0.1",
+      "parameters": {
+        "name": "bias_product_category",
+        "is_label_value_or_threshold": "value",
+        "is_facet_value_or_threshold": "value",
+        "default_metrics": {
+          "CI": true,
+          "DPL": true,
+          "JS": true,
+          "CDDL": false
+        },
+        "group_name": "",
+        "show_additional_metrics": "yes",
+        "label_values": "5;4",
+        "facet_values": "",
+        "additional_metrics": {
+          "KL": true,
+          "LP": true,
+          "TVD": true,
+          "KS": true
+        },
+        "label_name": "star_rating",
+        "facet_name": "product_category",
+        "metrics": {
+          "CI": true,
+          "DPL": true,
+          "JS": true,
+          "CDDL": false,
+          "KL": true,
+          "LP": true,
+          "TVD": true,
+          "KS": true
+        }
+      },
+      "inputs": [
+        {
+          "name": "df",
+          "node_id": "019d2a9b-9601-4cca-8395-9a976db0ada5",
+          "output_name": "default"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "default"
+        }
+      ]
+    },
+    {
+      "node_id": "b6cb0190-7f65-42f1-a79c-5ce10393db23",
+      "type": "VISUALIZATION",
+      "operator": "sagemaker.visualizations.quick_model_0.1",
+      "parameters": {
+        "name": "feature_importance",
+        "label": "star_rating"
+      },
+      "inputs": [
+        {
+          "name": "df",
+          "node_id": "019d2a9b-9601-4cca-8395-9a976db0ada5",
+          "output_name": "default"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "default"
+        }
+      ]
+    }
+  ]
+}

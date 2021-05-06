@@ -1,0 +1,9 @@
+sbt/
+logs/
+sbt-0.13.18.tgz
+.classpath
+.project
+.settings/
+.eclipse-generated/
+project/
+target/

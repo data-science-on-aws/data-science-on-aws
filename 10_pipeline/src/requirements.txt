@@ -1,0 +1,10 @@
+# Add python dependencies here...
+# SageMaker bug that requires us to do this in the code directly.
+#scikit-learn==0.20.3
+#tensorflow-hub==0.7.0
+#bert-tensorflow==1.0.2
+#tensorflow==2.1.0
+#grpcio
+#tqdm
+#bert-for-tf2
+#sentencepiece

@@ -1,0 +1,16 @@
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: fsx-sc
+provisioner: fsx.csi.aws.com
+# Notes:
+#   S3 Bucket in ``s3ImportPath` and `s3ExportPath` must be same, otherwise the driver can not create FSx for lustre successfully.
+#   s3ImportPath can stand alone and a random path will be created automatically like s3://<your-unique-s3-bucket>/FSxLustre20190308T012310Z
+#   s3ExportPath can not be given without specifying S3ImportPath.
+parameters:
+  subnetId: SUBNET_ID 
+  securityGroupIds: SECURITY_GROUP_ID
+  s3ImportPath: s3://S3_BUCKET
+  s3ExportPath: s3://S3_BUCKET/export
+  apiVersion: v1
+volumeBindingMode: Immediate

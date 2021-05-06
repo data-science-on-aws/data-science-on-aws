@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: tf-bert-training
+spec:
+  restartPolicy: OnFailure
+  containers:
+  - name: tf-bert-training
+    image: 763104351884.dkr.ecr.us-east-1.amazonaws.com/tensorflow-training:2.1.0-cpu-py36-ubuntu18.04
+    command:
+      - "/bin/sh"
+      - "-c"
+    args:
+      - ["curl https://raw.githubusercontent.com/data-science-on-aws/workshop/master/12_kubeflow/wip/dlc/code/train.py && python train.py"]

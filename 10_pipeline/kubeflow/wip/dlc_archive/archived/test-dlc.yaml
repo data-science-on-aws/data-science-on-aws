@@ -1,0 +1,75 @@
+--- 
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: tf-bert-training
+spec: 
+  containers: 
+    - 
+      args: 
+        - "python3 code/train_eks.py"
+        - "--train_data s3://sagemaker-us-west-2-231218423789/training-pipeline-2020-09-05-16-19-31/processing/output/bert-train"
+        - "--validation_data s3://sagemaker-us-west-2-231218423789/training-pipeline-2020-09-05-16-19-31/processing/output/bert-validation"
+        - "--test_data s3://sagemaker-us-west-2-231218423789/training-pipeline-2020-09-05-16-19-31/processing/output/bert-test"
+      command: 
+        - /bin/sh
+        - "-c"
+      env: 
+        - 
+          name: SM_TRAINING_ENV
+          value: "{\"is_master\":true}"
+        - 
+          name: SAGEMAKER_JOB_NAME
+          value: "tf-bert-training-eks"
+        - 
+          name: SM_CURRENT_HOST
+          value: "localhost"
+        - 
+          name: SM_NUM_GPUS
+          value: "0"
+        - 
+          name: SM_HOSTS
+          value: "{\"hosts\":\"localhost\"}"
+        - 
+          name: SM_MODEL_DIR
+          value: "model/"     
+        - 
+          name: SM_OUTPUT_DIR
+          value: "output/"
+        - 
+          name: SM_OUTPUT_DATA_DIR
+          value: "output/data/"
+        - 
+          name: SM_CHANNEL_TRAIN
+          value: "../data-tfrecord/bert-train"
+        - 
+          name: SM_CHANNEL_VALIDATION
+          value: "../data-tfrecord/bert-validation"     
+        - 
+          name: SM_CHANNEL_TEST
+          value: "../data-tfrecord/bert-test"   
+# TODO: Need to map all of the directories above using PVs/PVCs and local host provisioner
+
+
+      image: "763104351884.dkr.ecr.us-west-2.amazonaws.com/tensorflow-training:2.1.0-cpu-py36-ubuntu18.04"
+      name: tf-bert-training
+  restartPolicy: Never
+
+
+# https://docs.aws.amazon.com/sagemaker/latest/dg/amazon-sagemaker-toolkits.html
+
+# /opt/ml
+# ├── input
+# │   ├── config
+# │   │   ├── hyperparameters.json
+# │   │   └── resourceConfig.json
+# │   └── data
+# │       └── <channel_name>
+# │           └── <input data>
+# ├── model
+# │
+# ├── code
+# │
+# ├── output
+# │
+# └── failure
