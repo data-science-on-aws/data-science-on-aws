@@ -1,4 +1,4 @@
-# O'Reilly Bookk
+# O'Reilly Book
 
 ## Data Science on AWS
 
