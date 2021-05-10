@@ -70,13 +70,13 @@ In the AWS Console search bar, type `SageMaker` and select `Amazon SageMaker` to
 
 ![Loading Studio](img/studio_loading.png)
 
-## 4. Launch a New Terminal within Studio
+## 3. Launch a New Terminal within Studio
 
 Click `File` > `New` > `Terminal` to launch a terminal in your Jupyter instance.
 
 ![Terminal Studio](img/studio_terminal.png)
 
-## 5. Clone this GitHub Repo in the Terminal
+## 4. Clone this GitHub Repo in the Terminal
 
 Within the Terminal, run the following:
 
@@ -96,7 +96,7 @@ remove the file manually to continue.
 ```
 _Note:  This is not a fatal error ^^ above ^^.  Just re-run the command again until it works._
 
-## 6. Start the Workshop!
+## 5. Start the Workshop!
 
 Navigate to `00_quickstart/` in SageMaker Studio and start the workshop!
 
