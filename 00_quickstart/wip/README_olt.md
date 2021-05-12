@@ -1,5 +1,5 @@
-# Upcoming O'Reilly Book:  _Data Science on AWS_
-Pre-Order the book on [**Amazon.com**](https://www.amazon.com/dp/1492079391/).
+# O'Reilly Book:  _Data Science on AWS_
+Order the book on [**Amazon.com**](https://www.amazon.com/dp/1492079391/).
 
 Request one of our [**talks**](https://datascienceonaws.com) for your conference or meetup.
 
