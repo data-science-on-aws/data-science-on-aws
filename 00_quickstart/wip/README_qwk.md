@@ -30,7 +30,7 @@ Attendees will learn how to do the following:
 This workshop is FREE, but would otherwise cost <25 USD.
 ![Workshop Cost](img/billing.png)
 
-# Workshop Agenda
+# Workshop Description
 ![Workshop Agenda](img/outline.png)
 
 # Workshop Paths
