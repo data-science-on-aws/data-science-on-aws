@@ -160,7 +160,7 @@ def create_or_load_feature_group(prefix, feature_group_name):
             record_identifier_name=record_identifier_feature_name,
             event_time_feature_name=event_time_feature_name,
             role_arn=role,
-            enable_online_store=True,
+            enable_online_store=False,
         )
         print("Creating Feature Group. Completed.")
 
