@@ -47,6 +47,14 @@ Follow these instructions:  http://amzn.to/3lo3KdX
 
 Open the [AWS Management Console](https://console.aws.amazon.com/console/home)
 
+Configure IAM to run the workshop.
+
+![IAM 1](img/sagemaker-iam-1.png)
+
+![IAM 2](img/sagemaker-iam-2.png)
+
+![IAM 3](img/sagemaker-iam-3.png)
+
 ![Back to SageMaker](img/bur_back_to_sagemaker_8.png)
 
 In the AWS Console search bar, type `SageMaker` and select `Amazon SageMaker` to open the service console.
