@@ -30,7 +30,7 @@ Attendees will learn how to do the following:
 # Extended Workshop (8-hour)
 ![Workshop Paths](img/workshop_paths2.png)
 
-## Learning Objectives
+## Extended Learning Objectives
 Attendees will learn how to do the following:
 * Perform automated machine learning (AutoML) to find the best model from just your dataset with low-code
 * Find the best hyper-parameters for your custom model using SageMaker Hyper-parameter Tuning Jobs
