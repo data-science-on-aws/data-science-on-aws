@@ -25,13 +25,16 @@ Attendees will learn how to do the following:
 * Deploy a model to a REST Inference Endpoint using SageMaker Endpoints
 * Automate ML workflow steps by building end-to-end model pipelines using SageMaker Pipelines
 
-# Workshop Cost - FREE
-This workshop is FREE, but would otherwise cost <25 USD.
-
-![Workshop Cost](img/billing.png)
-
 # Workshop Agenda
 ![Workshop Agenda](img/outline.png)
+
+# Workshop Paths
+
+## Quick Start (All-In-One Workshop Path)
+![Workshop Paths](img/workshop_paths1.png)
+
+## Additional Workshop Paths per Persona
+![Workshop Paths](img/workshop_paths2.png)
 
 # Workshop Instructions
 _Note:  This workshop will create an ephemeral AWS acccount for each attendee.  This ephemeral account is not accessible after the workshop.  You can, of course, clone this GitHub repo and reproduce the entire workshop in your own AWS Account._
