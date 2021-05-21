@@ -26,10 +26,6 @@ Attendees will learn how to do the following:
 * Deploy a model to a REST Inference Endpoint using SageMaker Endpoints
 * Automate ML workflow steps by building end-to-end model pipelines using SageMaker Pipelines
 
-# Workshop Cost
-This workshop is FREE, but would otherwise cost <25 USD.
-![Workshop Cost](img/billing.png)
-
 # Workshop Agenda
 ![Workshop Agenda](img/outline.png)
 
