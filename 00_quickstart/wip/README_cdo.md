@@ -32,6 +32,9 @@ Attendees will learn how to do the following:
 # Workshop Path
 ![Workshop Path](img/workshop_paths1.png)
 
+## Additional Workshop Paths per Persona
+![Workshop Paths](img/workshop_paths2.png)
+
 # Workshop Instructions
 
 ## 1. Setup Environment
