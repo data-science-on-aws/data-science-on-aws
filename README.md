@@ -98,7 +98,7 @@ _Note:  This is not a fatal error ^^ above ^^.  Just re-run the command again un
 
 ## 5. Start the Workshop!
 
-Navigate to `00_quickstart/` in SageMaker Studio and start the workshop!
+Navigate to `workshop/00_quickstart/` in SageMaker Studio and start the workshop!
 
 _You may need to refresh your browser if you don't see the new `workshop/` directory._
 
