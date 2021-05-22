@@ -1,9 +1,7 @@
-# Data Science on AWS
-YouTube Videos, Meetups, Book, and Code:  **https://datascienceonaws.com**
-
+# Data Science on AWS - O'Reilly Book
 [![Data Science on AWS](img/data-science-on-aws-book.png)](https://www.amazon.com/Data-Science-AWS-End-End/dp/1492079391/)
 
-## O'Reilly Book Outline
+## Book Outline
 ![Book Outline](img/outline.png)
 
 # Quick Start Workshop (4-hours)
