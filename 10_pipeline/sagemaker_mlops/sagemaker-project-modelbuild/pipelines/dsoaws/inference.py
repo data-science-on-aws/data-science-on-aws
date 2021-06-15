@@ -3,7 +3,7 @@ import subprocess
 import sys
 
 subprocess.check_call([sys.executable, "-m", "pip", "install", "tensorflow==2.3.1"])
-subprocess.check_call([sys.executable, "-m", "pip", "install", "transformers==4.1.1"])
+subprocess.check_call([sys.executable, "-m", "pip", "install", "transformers==3.5.1"])
 # Workaround for https://github.com/huggingface/tokenizers/issues/120 and
 #                https://github.com/kaushaltrivedi/fast-bert/issues/174
 # subprocess.check_call([sys.executable, '-m', 'pip', 'install', '--upgrade', 'tokenizers'])
