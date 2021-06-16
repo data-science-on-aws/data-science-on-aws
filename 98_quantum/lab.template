@@ -1,0 +1,212 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: ---
+
+Parameters: 
+  UserName:
+    Type: String
+    Default: your-user-name
+    Description: 'Specify your username'
+  Password:
+    Type: String
+    NoEcho: true
+    Description: 'Specify the password for your user. The password is required to have a minimum length is 8 characters and to include a minimum of three of the following mix of character types: uppercase, lowercase, numbers, and ! @ # $ % ^ & * ( ) _ + - = [ ] { } |'
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Parameters:
+          - UserName 
+          - Password
+
+
+Resources: 
+  IamUser:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Ref UserName
+      LoginProfile:
+        Password: !Ref Password
+
+  UserPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub amazon-braket-user-policy-${UserName}
+      Users:
+        - !Ref IamUser
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - s3:ListAllMyBuckets
+              - s3:GetAccountPublicAccessBlock
+              - s3:GetBucketPublicAccessBlock
+              - s3:GetBucketPolicyStatus
+              - s3:GetBucketAcl
+              - s3:ListAccessPoints
+              - s3:GetBucketVersioning
+            Resource: "*"
+          - Effect: Allow
+            Action:
+              - s3:GetObject
+              - s3:PutObject
+              - s3:ListBucket
+            Resource: 
+              - !Sub arn:aws:s3:::amazon-braket-${AWS::AccountId}-${UserName}*
+          - Effect: Allow
+            Action:
+              - logs:Describe*
+              - logs:Get*
+              - logs:List*
+              - logs:StartQuery
+              - logs:StopQuery
+              - logs:TestMetricFilter
+              - logs:FilterLogEvents
+            Resource: arn:aws:logs:*:*:log-group:/aws/braket:*
+          - Effect: Allow
+            Action:
+              - iam:ListRoles
+              - iam:ListRolePolicies
+              - iam:GetRole
+              - iam:GetRolePolicy
+              - iam:ListAttachedRolePolicies
+              - iam:ChangePassword
+            Resource: "*"
+          - Effect: Allow
+            Action:
+              - iam:PassRole
+            Resource:
+              - !GetAtt NotebookServiceRole.Arn
+            Condition:
+              StringLike:
+                "iam:PassedToService":
+                  - sagemaker.amazonaws.com
+          - Effect: Allow
+            Action:
+              - sagemaker:ListNotebookInstances
+              - sagemaker:ListCodeRepositories
+            Resource: "*"
+          - Effect: Allow
+            Action:
+              - sagemaker:DescribeNotebookInstance
+              - sagemaker:StartNotebookInstance
+              - sagemaker:StopNotebookInstance
+              - sagemaker:ListTags
+              - sagemaker:AddTags
+              - sagemaker:DeleteTags
+            Resource: !Sub arn:aws:sagemaker:*:${AWS::AccountId}:notebook-instance/amazon-braket-${UserName}
+          - Effect: Allow
+            Action:
+              - sagemaker:CreatePresignedNotebookInstanceUrl
+            Resource: 
+              - !Sub arn:aws:sagemaker:*:${AWS::AccountId}:notebook-instance/amazon-braket-${UserName}*
+          - Effect: Allow
+            Action:
+              - sagemaker:DescribeNotebookInstanceLifecycleConfig
+              - sagemaker:ListNotebookInstanceLifecycleConfigs
+            Resource: !Sub arn:aws:sagemaker:*:${AWS::AccountId}:notebook-instance-lifecycle-config/amazon-braket-${UserName}
+          - Effect: Allow
+            Action:
+              - braket:*
+            Resource: "*"
+          # - Effect: Deny
+          #   Action:
+          #     - braket:CreateQuantumTask
+          #   Resource:
+          #     - !Sub arn:aws:braket::${AWS::AccountId}:device/qpu/*
+
+  NotebookPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub AmazonBraketServiceSageMakerNotebookPolicy-${UserName}
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - s3:GetObject
+              - s3:PutObject
+              - s3:ListBucket
+            Resource:
+              - !Sub arn:aws:s3:::amazon-braket-${AWS::AccountId}-${UserName}*
+              - arn:aws:s3:::braketnotebookcdk-*
+          - Effect: Allow
+            Action:
+              - logs:CreateLogStream
+              - logs:DescribeLogStreams
+              - logs:PutLogEvents
+              - logs:CreateLogGroup
+            Resource: !Sub arn:aws:logs:*:${AWS::AccountId}:log-group:/aws/sagemaker/*
+          - Effect: Allow
+            Action:
+              - braket:*
+            Resource: "*"
+          # - Effect: Deny
+          #   Action:
+          #     - braket:CreateQuantumTask
+          #   Resource:
+          #     - !Sub arn:aws:braket::${AWS::AccountId}:device/qpu/*
+          
+  NotebookServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub AmazonBraketServiceSageMakerNotebookRole-${UserName}
+      Path: /service-role/
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - sagemaker.amazonaws.com
+            Action: 
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - !Ref NotebookPolicy
+
+  NotebookInstance:
+    Type: AWS::SageMaker::NotebookInstance
+    DependsOn: NotebookInstanceLifecycleConfig
+    Properties:
+      InstanceType: ml.t3.medium
+      LifecycleConfigName: !Sub amazon-braket-${UserName}
+      NotebookInstanceName: !Sub amazon-braket-${UserName}
+      RoleArn: !GetAtt NotebookServiceRole.Arn
+      VolumeSizeInGB: 5
+
+  NotebookInstanceLifecycleConfig:
+    Type: AWS::SageMaker::NotebookInstanceLifecycleConfig
+    Properties:
+      NotebookInstanceLifecycleConfigName: !Sub amazon-braket-${UserName}
+      OnStart:
+        - Content:
+            Fn::Base64: |
+              #!/usr/bin/env bash
+
+              sudo -u ec2-user -i <<EOS
+              TMPDIR=$(mktemp -d)
+              cd "$TMPDIR"
+
+              aws s3 cp s3://braketnotebookcdk-notebooklccs3bucketb3089b50-1w1epzvg1km1k/notebook/braket-notebook-lcc.zip braket-notebook-lcc.zip
+              unzip braket-notebook-lcc.zip
+              ./install.sh
+
+              nohup rm -fr "$TMPDIR" &
+              EOS
+
+              exit 0
+
+  s3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub amazon-braket-${AWS::AccountId}-${UserName}
+      AccessControl: Private
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
