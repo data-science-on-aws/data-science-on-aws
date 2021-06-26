@@ -44,7 +44,15 @@ Attendees will learn how to do the following:
 
 ## 0. Start the Lab
 
-==> LINK WILL BE PROVIDED <==
+https://labs.vocareum.com  (Username and password will be provided)
+
+![](img/voc-student-lab-access.png)
+
+Click through Terms and Conditions.
+
+Click <b>Start Lab</b>.
+
+Click <AWS> in upper left.
 
 ## 1. Login to AWS Console
 
