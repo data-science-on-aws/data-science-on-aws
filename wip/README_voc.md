@@ -53,6 +53,8 @@ Click through Terms and Conditions.
 Click <b>Start Lab</b>.
 
 Click <AWS> in upper left.
+  
+![](img/voc-start-lab.png)
 
 ## 1. Login to AWS Console
 
