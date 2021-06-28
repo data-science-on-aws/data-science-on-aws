@@ -29,13 +29,8 @@ Attendees will learn how to do the following:
 # Workshop Agenda
 ![Workshop Agenda](img/outline.png)
 
-# Workshop Paths
-
-## Quick Start (All-In-One Workshop Path)
+# Quick Start (All-In-One Workshop Path)
 ![Workshop Paths](img/workshop_paths1.png)
-
-## Additional Workshop Paths per Persona
-![Workshop Paths](img/workshop_paths2.png)
 
 # Workshop Contributors
 ![Workshop Contributors](img/primary-contributors.png)
@@ -44,7 +39,7 @@ Attendees will learn how to do the following:
 
 ## 0. Start the Lab
 
-https://labs.vocareum.com  (Username and password will be provided)
+Click here:  <LINK WILL BE PROVIDED>
 
 ![](img/voc-student-lab-access.png)
 
