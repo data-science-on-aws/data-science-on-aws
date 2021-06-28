@@ -44,7 +44,7 @@ Attendees will learn how to do the following:
 
 ## 0. Start the Lab
 
-https://labs.vocareum.com  (Username and password will be provided)
+Click here:  https://eventbox.dev?code=SFTAK7GBM2
 
 ![](img/voc-student-lab-access.png)
 
