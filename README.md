@@ -1,21 +1,19 @@
-# O'Reilly Book
+# Data Science on AWS - O'Reilly Book
+[![Data Science on AWS](img/data-science-on-aws-book.png)](https://www.amazon.com/Data-Science-AWS-End-End/dp/1492079391/)
 
-## Data Science on AWS
+## Book Outline
+![Book Outline](img/outline.png)
 
-YouTube Videos, Meetups, Book, and Code:  **https://datascienceonaws.com**
+# Quick Start Workshop (4-hours)
+![Workshop Paths](img/workshop_paths1.png)
 
-[![Data Science on AWS](img/data-science-on-aws-book.png)](https://datascienceonaws.com)
+In this quick start hands-on workshop, you will build an end-to-end AI/ML pipeline for natural language processing with Amazon SageMaker.  You will train and tune a text classifier to predict the star rating (1 is bad, 5 is good) for product reviews using the state-of-the-art [BERT](https://arxiv.org/abs/1810.04805) model for language representation.  To build our BERT-based NLP text classifier, you will use a product reviews dataset where each record contains some review text and a star rating (1-5).
 
-# Workshop Description
-In this hands-on workshop, we will build an end-to-end AI/ML pipeline for natural language processing with Amazon SageMaker.  We will train and tune a text classifier to classify text-based product reviews using the state-of-the-art [BERT](https://arxiv.org/abs/1810.04805) model for language representation.
-
-To build our BERT-based NLP model, we use the [Amazon Customer Reviews Dataset](https://s3.amazonaws.com/amazon-reviews-pds/readme.html) which contains 150+ million customer reviews from Amazon.com for the 20 year period between 1995 and 2015.  In particular, we train a classifier to predict the `star_rating` (1 is bad, 5 is good) from the `review_body` (free-form review text).
-
-# Learning Objectives
+## Quick Start Workshop Learning Objectives
 Attendees will learn how to do the following:
 * Ingest data into S3 using Amazon Athena and the Parquet data format
 * Visualize data with pandas, matplotlib on SageMaker notebooks
-* Run data bias analysis with SageMaker Clarify
+* Detect statistical data bias with SageMaker Clarify
 * Perform feature engineering on a raw dataset using Scikit-Learn and SageMaker Processing Jobs
 * Store and share features using SageMaker Feature Store
 * Train and evaluate a custom BERT model using TensorFlow, Keras, and SageMaker Training Jobs
@@ -23,17 +21,20 @@ Attendees will learn how to do the following:
 * Track model artifacts using Amazon SageMaker ML Lineage Tracking
 * Run model bias and explainability analysis with SageMaker Clarify
 * Register and version models using SageMaker Model Registry
-* Deploy a model to a REST Inference Endpoint using SageMaker Endpoints
+* Deploy a model to a REST endpoint using SageMaker Hosting and SageMaker Endpoints
 * Automate ML workflow steps by building end-to-end model pipelines using SageMaker Pipelines
 
-# Workshop Description
-![Workshop Agenda](img/outline.png)
-
-# Workshop Path
-![Workshop Path](img/workshop_paths1.png)
-
-## Additional Workshop Paths per Persona
+# Extended Workshop (8-hours)
 ![Workshop Paths](img/workshop_paths2.png)
+
+In the extended hands-on workshop, you will get hands-on with advanced model training and deployment techniques such as hyper-parameter tuning, A/B testing, and auto-scaling.  You will also setup a real-time, streaming analytics and data science pipeline to perform window-based aggregations and anomaly detection.
+
+## Extended Workshop Learning Objectives
+Attendees will learn how to do the following:
+* Perform automated machine learning (AutoML) to find the best model from just your dataset with low-code
+* Find the best hyper-parameters for your custom model using SageMaker Hyper-parameter Tuning Jobs
+* Deploy multiple model variants into a live, production A/B test to compare online performance, live-shift prediction traffic, and autoscale the winning variant using SageMaker Hosting and SageMaker Endpoints
+* Setup a streaming analytics and continuous machine learning application using Amazon Kinesis and SageMaker
 
 # Workshop Instructions
 
