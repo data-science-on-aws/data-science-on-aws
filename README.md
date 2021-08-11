@@ -47,7 +47,7 @@ Follow these instructions:  http://amzn.to/3lo3KdX
 
 Open the [AWS Management Console](https://console.aws.amazon.com/console/home)
 
-Configure IAM to run the workshop.
+Verify the IAM roles were setup correctly by the CloudFormation template.
 
 ![IAM 1](img/sagemaker-iam-1.png)
 
