@@ -43,7 +43,7 @@ Attendees will learn how to do the following:
 Follow these instructions:  http://amzn.to/3lo3KdX
 
 
-## 2. Launch SageMaker Studio
+## 2. Verify IAM Roles
 
 Open the [AWS Management Console](https://console.aws.amazon.com/console/home)
 
@@ -57,6 +57,8 @@ Verify the IAM roles were setup correctly by the CloudFormation template.
 
 ![Back to SageMaker](img/bur_back_to_sagemaker_8.png)
 
+
+## 3. Lauch SageMaker Studio
 In the AWS Console search bar, type `SageMaker` and select `Amazon SageMaker` to open the service console.
 
 ![Notebook Instances](img/stu_notebook_instances_9.png)
@@ -68,14 +70,14 @@ In the AWS Console search bar, type `SageMaker` and select `Amazon SageMaker` to
 ![Loading Studio](img/studio_loading.png)
 
 
-## 3. Launch a New Terminal within Studio
+## 4. Launch a New Terminal within Studio
 
 Click `File` > `New` > `Terminal` to launch a terminal in your Jupyter instance.
 
 ![Terminal Studio](img/studio_terminal.png)
 
 
-## 4. Clone this GitHub Repo in the Terminal
+## 5. Clone this GitHub Repo in the Terminal
 
 Within the Terminal, run the following:
 
@@ -96,7 +98,7 @@ remove the file manually to continue.
 _Note:  This is not a fatal error ^^ above ^^.  Just re-run the command again until it works._
 
 
-## 5. Start the Workshop!
+## 6. Start the Workshop!
 
 Navigate to `00_quickstart/` in SageMaker Studio and start the workshop!
 
