@@ -37,7 +37,11 @@ Attendees will learn how to do the following:
 
 # Workshop Instructions
 
-## 0. Start the Lab
+## 0. Login and Start the Lab
+
+You will be provided a username and password to login to Vocareum.
+
+![](img/voc-login.png)
 
 Click here:  <LINK WILL BE PROVIDED>
 
