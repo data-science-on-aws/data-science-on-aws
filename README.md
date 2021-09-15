@@ -29,56 +29,37 @@ Attendees will learn how to do the following:
 # Workshop Agenda
 ![Workshop Agenda](img/outline.png)
 
-# Workshop Paths
-
-## Quick Start (All-In-One Workshop Path)
+# Quick Start (All-In-One Workshop Path)
 ![Workshop Paths](img/workshop_paths1.png)
-
-## Additional Workshop Paths per Persona
-![Workshop Paths](img/workshop_paths2.png)
 
 # Workshop Contributors
 ![Workshop Contributors](img/primary-contributors.png)
 
 # Workshop Instructions
 
+## 0. Login and Start the Lab
+
+You will be provided a username and password to login to Vocareum.
+
+![](img/voc-login.png)
+
+Click here:  <LINK WILL BE PROVIDED>
+
+![](img/voc-student-lab-access.png)
+
+Click through Terms and Conditions.
+
+Click <b>Start Lab</b>.
+
+Click <AWS> in upper left.
+  
+![](img/voc-start-lab.png)
+
 ## 1. Login to AWS Console
 
 ![IAM](img/aws_console.png)
 
-## 2. Create `TeamRole` IAM Role
-
-![IAM](img/alt_iam_1.png)
-
-![Roles](img/alt_roles_2.png)
-
-![Create Role](img/alt_create_role_3.png)
-
-![Select Service](img/alt_select_service_4.png)
-
-![Select Policy](img/alt_select_policy_5.png)
-
-![Add Tags](img/alt_add_tags_6.png)
-
-![Review Name](img/alt_review_name_7.png)
-
-## 3. Update IAM Role Policy
-
-![Select IAM](img/studio_select_iam.png)
-
-![Edit TeamRole](img/studio_edit_teamrole.png)
-
-Click `Attach Policies`.
-
-![IAM Policy](img/view_policies.png)
-              
-Select `AmazonS3FullAccess` and click on `Attach Policy`.
-
-_Note:  Reminder that you should allow access only to the resources that you need._ 
-
-![Attach Admin Policy](img/alt_attach_policies.png)
-
-## 4. Launch SageMaker Studio
+## 2. Launch SageMaker Studio
 
 Open the [AWS Management Console](https://console.aws.amazon.com/console/home)
 
@@ -88,21 +69,19 @@ In the AWS Console search bar, type `SageMaker` and select `Amazon SageMaker` to
 
 ![Notebook Instances](img/stu_notebook_instances_9.png)
 
-![Create Studio](img/studio_create.png)
-
 ![Pending Studio](img/studio_pending.png)
 
 ![Open Studio](img/studio_open.png)
 
 ![Loading Studio](img/studio_loading.png)
 
-## 5. Launch a new Terminal within Studio
+## 3. Launch a New Terminal within Studio
 
 Click `File` > `New` > `Terminal` to launch a terminal in your Jupyter instance.
 
 ![Terminal Studio](img/studio_terminal.png)
 
-## 6. Clone this GitHub Repo in the Terminal
+## 4. Clone this GitHub Repo in the Terminal
 
 Within the Terminal, run the following:
 
@@ -122,9 +101,9 @@ remove the file manually to continue.
 ```
 _Note:  This is not a fatal error ^^ above ^^.  Just re-run the command again until it works._
 
-## 7. Start the Workshop!
+## 5. Start the Workshop!
 
-Navigate to `00_quickstart/` or `01_oreilly_book/` in your Jupyter notebook and start the workshop!
+Navigate to `workshop/00_quickstart/` in SageMaker Studio and start the workshop!
 
 _You may need to refresh your browser if you don't see the new `workshop/` directory._
 
