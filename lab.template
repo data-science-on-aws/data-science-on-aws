@@ -131,7 +131,6 @@ Resources:
         - 'arn:aws:iam::aws:policy/AWSCodePipeline_FullAccess'
         - 'arn:aws:iam::aws:policy/AWSGlueConsoleFullAccess'
         - 'arn:aws:iam::aws:policy/AmazonAthenaFullAccess'
-        - 'arn:aws:iam::aws:policy/ComprehendFullAccess'
   
   LambdaExecutionPolicy:
     Type: AWS::IAM::ManagedPolicy
