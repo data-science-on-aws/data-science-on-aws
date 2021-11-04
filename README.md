@@ -54,11 +54,13 @@ Configure IAM to run the workshop.
 
 ![IAM 3](img/sagemaker-iam-3.png)
 
-![Back to SageMaker](img/alt_back_to_sagemaker_8.png)
-
 In the AWS Console search bar, type `SageMaker` and select `Amazon SageMaker` to open the service console.
 
-![Notebook Instances](img/SageMaker-landing-page-RStudio.png)
+![Back to SageMaker](img/alt_back_to_sagemaker_8.png)
+
+Click on SageMaker Studio to set up Studio.
+
+![Studio](img/SageMaker-landing-page-RStudio.png)
 
 ![Quick Start](img/sm-quickstart-iam-existing.png)
 
