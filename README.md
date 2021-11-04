@@ -92,4 +92,6 @@ Navigate to `workshop/00_quickstart/` in SageMaker Studio and start the workshop
 
 _You may need to refresh your browser if you don't see the new `workshop/` directory._
 
-![Start Workshop](img/studio_start_workshop.png)
+![Select Workshop](img/select-workshop.png)
+![Select Quickstart](img/select-quickstart.png)
+![Select Overview](img/select-overview.png)
