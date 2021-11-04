@@ -88,7 +88,9 @@ _Note:  This is not a fatal error ^^ above ^^.  Just re-run the command again un
 
 ## 5. Start the Workshop!
 
-Navigate to `workshop/00_quickstart/` in SageMaker Studio and start the workshop!
+Navigate to `workshop/00_quickstart/00_Overview.ipynb` in SageMaker Studio (see screenshot below) and start the workshop by running the steps in that notebook!
+When you get to the end of each notebook, then move on to the next notebook in the navigation pane on the left-hand side of the screen.
+Ther are a total of 13 notebooks to complete (i.e., 00_Overview.ipynb - 12_Cleanup.ipynb)
 
 _You may need to refresh your browser if you don't see the new `workshop/` directory._
 
