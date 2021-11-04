@@ -88,9 +88,11 @@ _Note:  This is not a fatal error ^^ above ^^.  Just re-run the command again un
 
 ## 5. Start the Workshop!
 
-* Now, in the navigation pane on the left-hand side of the screen in SageMaker Studio, navigate to `workshop/00_quickstart/00_Overview.ipynb` (see screenshot below) and start the workshop by running the steps in that notebook. (You can press Shift+Enter on each cell in the notebook to run each cell.)
+* Now, in the navigation pane on the left-hand side of the screen in SageMaker Studio, navigate to `workshop/00_quickstart/00_Overview.ipynb` (see screenshot below). _You may need to refresh your browser if you don't see the new `workshop/` directory._ 
+* Start the workshop by running the steps in that notebook. (You can press Shift+Enter on each cell in the notebook to run each cell.)
+** While each cell is running, you will see an asterix next to that cell.
+** When the cell completes, the asterix will change to a number, and you will see the output of the code below that cell.
 
-_You may need to refresh your browser if you don't see the new `workshop/` directory._
 
 ![Select Workshop](img/select-workshop.png)
 -----
