@@ -66,7 +66,7 @@ Click on SageMaker Studio to set up Studio.
 
 ![Pending Studio](img/studio_pending.png)
 
-![Open Studio](img/studio_open.png)
+![Open Studio](img/open-studio.png)
 
 ![Loading Studio](img/studio_loading.png)
 
