@@ -58,7 +58,7 @@ Configure IAM to run the workshop.
 
 In the AWS Console search bar, type `SageMaker` and select `Amazon SageMaker` to open the service console.
 
-![Notebook Instances](img/stu_notebook_instances_9.png)
+![Notebook Instances](img/SageMaker-landing-page-RStudio.png)
 
 ![Quick Start](img/sm-quickstart-iam-existing.png)
 
