@@ -1,7 +1,4 @@
-# Data Science on AWS - O'Reilly Book
-[![Data Science on AWS](img/data-science-on-aws-book.png)](https://www.amazon.com/Data-Science-AWS-End-End/dp/1492079391/)
-
-## Book Outline
+## Workshop/Book Outline
 ![Book Outline](img/outline.png)
 
 # Quick Start Workshop (4-hours)
