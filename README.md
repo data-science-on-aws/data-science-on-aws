@@ -79,12 +79,12 @@ Click `File` > `New` > `Terminal` to launch a terminal in your Jupyter instance.
 Within the Terminal, run the following:
 
 ```
-cd ~ && git clone https://github.com/data-science-on-aws/workshop
+cd ~ && git clone https://github.com/data-science-on-aws/oreilly_book
 ```
 
 If you see an error like the following, just re-run the command again until it works:
 ```
-fatal: Unable to create '/home/sagemaker-user/workshop/.git/index.lock': File exists.
+fatal: Unable to create '/home/sagemaker-user/oreilly_book/.git/index.lock': File exists.
 
 Another git process seems to be running in this repository, e.g.
 an editor opened by 'git commit'. Please make sure all processes
