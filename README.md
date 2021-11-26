@@ -96,8 +96,8 @@ _Note:  This is not a fatal error ^^ above ^^.  Just re-run the command again un
 
 ## 5. Start the Workshop!
 
-Navigate to `workshop/00_quickstart/` in SageMaker Studio and start the workshop!
+Navigate to `oreilly_book/99_workshop/` in SageMaker Studio and start the workshop!
 
-_You may need to refresh your browser if you don't see the new `workshop/` directory._
+_You may need to refresh your browser if you don't see the new `oreilly_book/` directory._
 
 ![Start Workshop](img/studio_start_workshop.png)
