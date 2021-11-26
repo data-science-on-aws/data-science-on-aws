@@ -1,0 +1,8 @@
+# To use:
+#   $ conda env create -f environment.yml
+#   $ conda activate data_science_on_aws
+name: data_science_on_aws
+dependencies:
+  - python=3.7
+  - ipykernel
+  - pip
