@@ -5,4 +5,5 @@ name: data_science_on_aws
 dependencies:
   - python=3.7
   - ipykernel
+  - ipywidgets
   - pip
