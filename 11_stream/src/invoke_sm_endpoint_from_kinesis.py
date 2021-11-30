@@ -39,7 +39,7 @@ def lambda_handler(event, context):
         inputs = [{"features": [review_body]}]
 
         response = runtime.invoke_endpoint(
-            EndpointName=pytorch_endpoint_name,
+            EndpointName=ENDPOINT_NAME,
             ContentType="application/jsonlines",
             Accept="application/jsonlines",
             Body=json.dumps(inputs).encode("utf-8"),
