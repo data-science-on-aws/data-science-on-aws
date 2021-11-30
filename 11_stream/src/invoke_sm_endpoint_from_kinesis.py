@@ -5,13 +5,23 @@ import os
 import io
 import boto3
 import json
+from sagemaker.predictor import Predictor
+from sagemaker.serializers import JSONLinesSerializer
+from sagemaker.deserializers import JSONLinesDeserializer
 
 # grab environment variables
 ENDPOINT_NAME = os.environ["ENDPOINT_NAME"]
 print("Endpoint: {}".format(ENDPOINT_NAME))
 runtime = boto3.client("runtime.sagemaker")
 
-print("Loading function")
+sess = sagemaker.Session()
+
+predictor = Predictor(
+    endpoint_name=ENDPOINT_NAME,
+    serializer=JSONLinesSerializer(),
+    deserializer=JSONLinesDeserializer(),
+    sagemaker_session=sess
+)
 
 
 def lambda_handler(event, context):
@@ -38,12 +48,7 @@ def lambda_handler(event, context):
 
         inputs = [{"features": [review_body]}]
 
-        response = runtime.invoke_endpoint(
-            EndpointName=ENDPOINT_NAME,
-            ContentType="application/jsonlines",
-            Accept="application/jsonlines",
-            Body=json.dumps(inputs).encode("utf-8"),
-        )
+        response = predictor.predict(inputs)
         print("response: {}".format(response))
 
         predicted_classes_str = response["Body"].read().decode()
