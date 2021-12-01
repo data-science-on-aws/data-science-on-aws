@@ -1,9 +1,10 @@
 # Data Science on AWS - O'Reilly Book
 
+[![Open In SageMaker Studio Lab](img/studiolab.svg)](https://studiolab.sagemaker.aws/import/github/data-science-on-aws/oreilly_book/blob/master/00_quickstart/00_Overview.ipynb)
+
 ## Get the book on [Amazon.com](https://www.amazon.com/Data-Science-AWS-End-End/dp/1492079391)
 
 [![Data Science on AWS](img/data-science-on-aws-book.png)](https://www.amazon.com/Data-Science-AWS-End-End/dp/1492079391/)
-
 
 ## Book Outline
 ![Book Outline](img/outline.png)
@@ -42,43 +43,51 @@ Attendees will learn how to do the following:
 
 # Workshop Instructions
 
-## 1. Login to AWS Console
+[![Open In SageMaker Studio Lab](img/studiolab.svg)](https://studiolab.sagemaker.aws/import/github/data-science-on-aws/oreilly_book/blob/master/00_quickstart/00_Overview.ipynb)
 
-![Console](img/aws_console.png)
 
-## 2. Launch SageMaker Studio
+[Amazon SageMaker Studio Lab](https://studiolab.sagemaker.aws/) is a free service that enables anyone to learn and experiment with ML without needing an AWS account, credit card, or cloud configuration knowledge.
 
-Open the [AWS Management Console](https://console.aws.amazon.com/console/home)
+## 1. Request Amazon SageMaker Studio Lab Account
 
-Configure IAM to run the workshop.
+Go to [Amazon SageMaker Studio Lab](https://studiolab.sagemaker.aws/), and request a free acount by providing a valid email address. 
 
-![IAM 1](img/sagemaker-iam-1.png)
+![Amazon SageMaker Studio Lab](img/smsl.png)
+![Amazon SageMaker Studio Lab - Request Account](img/smsl_request_account.png)
 
-![IAM 2](img/sagemaker-iam-2.png)
+Note that Amazon SageMaker Studio Lab is currently in public preview. The number of new account registrations will be limited to ensure a high quality of experience for all customers.
 
-![IAM 3](img/sagemaker-iam-3.png)
+## 2. Create Studio Lab Account
 
-![Back to SageMaker](img/alt_back_to_sagemaker_8.png)
+When your account request is approved, you will receive an email with a link to the Studio Lab account registration page. 
 
-In the AWS Console search bar, type `SageMaker` and select `Amazon SageMaker` to open the service console.
+You can now create your account with your approved email address and set a password and your username. This account is separate from an AWS account and doesn't require you to provide any billing information.
 
-![Notebook Instances](img/stu_notebook_instances_9.png)
+![Amazon SageMaker Studio Lab - Create Account](img/smsl_create_account.png)
 
-![Quick Start](img/sm-quickstart-iam-existing.png)
+## 3. Sign in to your Studio Lab Account
 
-![Pending Studio](img/studio_pending.png)
+You are now ready to sign in to your account. 
 
-![Open Studio](img/studio_open.png)
+![Amazon SageMaker Studio Lab - Sign In](img/smsl_signin.png)
 
-![Loading Studio](img/studio_loading.png)
+## 4. Select your Compute instance, Start runtime, and Open project
 
-## 3. Launch a New Terminal within Studio
 
-Click `File` > `New` > `Terminal` to launch a terminal in your Jupyter instance.
+### CPU Option
+Select CPU as the compute type and click `Start runtime`.
 
-![Terminal Studio](img/studio_terminal.png)
+![Amazon SageMaker Studio Lab - CPU](img/smsl_cpu.png)
 
-## 4. Clone this GitHub Repo in the Terminal
+Once the Status shows `Running`, click `Open project`
+
+![Amazon SageMaker Studio Lab - GPU Running](img/smsl_cpu_running.png)
+
+## 5. Launch a New Terminal within Studio Lab
+
+![Amazon SageMaker Studio Lab - New Terminal](img/smsl_new_terminal.png)
+
+## 6. Clone this GitHub Repo in the Terminal
 
 Within the Terminal, run the following:
 
@@ -86,22 +95,32 @@ Within the Terminal, run the following:
 cd ~ && git clone https://github.com/data-science-on-aws/oreilly_book
 ```
 
-If you see an error like the following, just re-run the command again until it works:
+![Amazon SageMaker Studio Lab - Clone Repo](img/smsl_terminal_clone.png)
+
+## 7. Create `data_science_on_aws` Conda kernel
+
+Within the Terminal, run the following:
+
 ```
-fatal: Unable to create '/home/sagemaker-user/oreilly_book/.git/index.lock': File exists.
-
-Another git process seems to be running in this repository, e.g.
-an editor opened by 'git commit'. Please make sure all processes
-are terminated then try again. If it still fails, a git process
-may have crashed in this repository earlier:
-remove the file manually to continue.
+cd ~/oreilly_book/ && conda env create -f environment.yml || conda env update -f environment.yml && conda activate data_science_on_aws
 ```
-_Note:  This is not a fatal error ^^ above ^^.  Just re-run the command again until it works._
 
-## 5. Start the Workshop!
+![Amazon SageMaker Studio Lab - Create Kernel](img/smsl_create_kernel.png)
 
-Navigate to `oreilly_book/00_quickstart/` in SageMaker Studio and start the workshop!
+If you see an error like the following, just ignore it. This will appear if you already have an existing Conda environment with this name. In this case, we will update the environment. 
+
+```
+CondaValueError: prefix already exists: /home/studio-lab-user/.conda/envs/data_science_on_aws
+```
+
+## 8. Start the Workshop!
+
+Navigate to `oreilly_book/00_quickstart/` in SageMaker Studio Lab and start the workshop! 
 
 _You may need to refresh your browser if you don't see the new `oreilly_book/` directory._
 
-![Start Workshop](img/studio_start_workshop.png)
+![Amazon SageMaker Studio Lab - Start Workshop](img/smsl_workshop_start.png)
+
+When you open the notebooks, make sure to select the `data_science_on_aws` kernel. 
+
+![Amazon SageMaker Studio Lab - Select Kernel](img/smsl_select_kernel.png)
