@@ -1,5 +1,9 @@
 # Data Science on AWS - O'Reilly Book
+
+## Get the book on [Amazon.com](https://www.amazon.com/Data-Science-AWS-End-End/dp/1492079391)
+
 [![Data Science on AWS](img/data-science-on-aws-book.png)](https://www.amazon.com/Data-Science-AWS-End-End/dp/1492079391/)
+
 
 ## Book Outline
 ![Book Outline](img/outline.png)
@@ -79,12 +83,12 @@ Click `File` > `New` > `Terminal` to launch a terminal in your Jupyter instance.
 Within the Terminal, run the following:
 
 ```
-cd ~ && git clone https://github.com/data-science-on-aws/workshop
+cd ~ && git clone https://github.com/data-science-on-aws/oreilly_book
 ```
 
 If you see an error like the following, just re-run the command again until it works:
 ```
-fatal: Unable to create '/home/sagemaker-user/workshop/.git/index.lock': File exists.
+fatal: Unable to create '/home/sagemaker-user/oreilly_book/.git/index.lock': File exists.
 
 Another git process seems to be running in this repository, e.g.
 an editor opened by 'git commit'. Please make sure all processes
@@ -96,8 +100,8 @@ _Note:  This is not a fatal error ^^ above ^^.  Just re-run the command again un
 
 ## 5. Start the Workshop!
 
-Navigate to `workshop/00_quickstart/` in SageMaker Studio and start the workshop!
+Navigate to `oreilly_book/00_quickstart/` in SageMaker Studio and start the workshop!
 
-_You may need to refresh your browser if you don't see the new `workshop/` directory._
+_You may need to refresh your browser if you don't see the new `oreilly_book/` directory._
 
 ![Start Workshop](img/studio_start_workshop.png)
