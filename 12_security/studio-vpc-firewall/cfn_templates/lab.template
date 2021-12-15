@@ -32,14 +32,17 @@ Resources:
       Parameters:
         ProjectName:
           Ref: ProjectName
-      TemplateURL: https://dlai-practical-data-science.s3.amazonaws.com/cfn_templates/iam.yaml
+#      TemplateURL: https://[BUCKET].s3.amazonaws.com/cfn_templates/iam.yaml
+      TemplateURL: %vcli files get asnlib/iam.yaml%
+
   S3:
     Type: AWS::CloudFormation::Stack
     Properties:
       Parameters:
         ProjectName:
           Ref: ProjectName
-      TemplateURL: https://dlai-practical-data-science.s3.amazonaws.com/cfn_templates/s3.yaml
+#      TemplateURL: https://[BUCKET].s3.amazonaws.com/cfn_templates/s3.yaml
+      TemplateURL: %vcli files get asnlib/s3.yaml%
   VPC:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -54,7 +57,8 @@ Resources:
           Ref: NATGatewaySubnetCIDR
         SageMakerStudioSubnetCIDR:
           Ref: SageMakerStudioSubnetCIDR
-      TemplateURL: https://dlai-practical-data-science.s3.amazonaws.com/cfn_templates/vpc.yaml
+#      TemplateURL: https://[BUCKET].s3.amazonaws.com/cfn_templates/vpc.yaml
+      TemplateURL: %vcli files get asnlib/vpc.yaml%
   SageMakerStudio:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -81,7 +85,8 @@ Resources:
           Fn::GetAtt:
           - IAM
           - Outputs.ExecutionRoleArn
-      TemplateURL: https://dlai-practical-data-science.s3.amazonaws.com/cfn_templates/sagemaker-studio.yaml
+#      TemplateURL: https://[BUCKET].s3.amazonaws.com/cfn_templates/sagemaker-studio.yaml
+      TemplateURL: %vcli files get asnlib/sagemaker-studio.yaml%
 Outputs:
   VPCId:
     Description: The ID of VPC where SageMaker Studio will reside
