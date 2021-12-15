@@ -1,0 +1,146 @@
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: MIT-0
+
+AWSTemplateFormatVersion: 2010-09-09
+Description: Create S3 Buckets
+Parameters:
+#  DataBucketName:
+#    Type: String
+#  ModelBucketName:
+#    Type: String
+  ProjectName:
+    Type: String
+
+Resources:
+  KMSCMK:
+    Type: 'AWS::KMS::Key'
+    Properties:
+      Description: KMS key for S3 buckets
+      KeyPolicy:
+        Id: key-policy-1
+        Version: 2012-10-17
+        Statement:
+          - Sid: Enable IAM User Permissions
+            Effect: Allow
+            Principal:
+              AWS: !Sub "arn:aws:iam::${AWS::AccountId}:root"
+            Action: 'kms:*'
+            Resource: '*'
+          - Sid: Allow access for Key Users
+            Effect: Allow
+            Principal:
+              AWS: !Sub "arn:aws:iam::${AWS::AccountId}:root"
+            Action:
+              - 'kms:Encrypt'
+              - 'kms:Decrypt'
+              - 'kms:ReEncrypt*'
+              - 'kms:GenerateDataKey'
+              - 'kms:DescribeKey'
+            Resource: '*'
+#            Condition:
+#              StringNotEquals:
+#                'aws:sourceVpce': 
+#                  Fn::ImportValue: 
+#                    !Sub "s3-endpoint-${ProjectName}-id"
+      Tags:
+        - Key: Name
+          Value: !Ref ProjectName
+
+  KMSCMKAlias:
+    Type: 'AWS::KMS::Alias'
+    Properties:
+      AliasName: !Sub "alias/kms-cmk-${ProjectName}"
+      TargetKeyId: !Ref KMSCMK
+
+  KMSCMKArn:
+    Type: 'AWS::SSM::Parameter'
+    Properties:
+      Name: !Sub "kms-cmk-${ProjectName}-arn"
+      Type: String
+      Value: !GetAtt 
+        - KMSCMK
+        - Arn
+      Description: SageMakerExecRole ARN
+
+#  DataBucket:
+#    Type: AWS::S3::Bucket
+#    Properties:
+#      BucketName: !Ref DataBucketName
+#      AccessControl: Private
+#      PublicAccessBlockConfiguration:
+#        BlockPublicAcls: TRUE
+#        BlockPublicPolicy: TRUE
+#        IgnorePublicAcls: TRUE
+#        RestrictPublicBuckets: TRUE
+#      BucketEncryption:
+#        ServerSideEncryptionConfiguration:
+#          - ServerSideEncryptionByDefault:
+#              SSEAlgorithm: 'aws:kms'
+#              KMSMasterKeyID: !Ref KMSCMK
+
+#  ModelBucket:
+#    Type: AWS::S3::Bucket
+#    Properties:
+#      BucketName: !Ref ModelBucketName
+#      AccessControl: Private
+#      PublicAccessBlockConfiguration:
+#        BlockPublicAcls: TRUE
+#        BlockPublicPolicy: TRUE
+#        IgnorePublicAcls: TRUE
+#        RestrictPublicBuckets: TRUE
+#      BucketEncryption:
+#        ServerSideEncryptionConfiguration:
+#          - ServerSideEncryptionByDefault:
+#              SSEAlgorithm: 'aws:kms'
+#              KMSMasterKeyID: !Ref KMSCMK
+
+#  DataBucketPolicy:
+#    Type: 'AWS::S3::BucketPolicy'
+#    Properties:
+#      Bucket: !Ref DataBucket
+#      PolicyDocument:
+#        Statement:
+#          - Action:
+#              - 's3:GetObject'
+#              - 's3:PutObject'
+#              - 's3:ListBucket'
+#            Effect: Deny
+#            Resource:
+#              - !Sub "arn:aws:s3:::${DataBucketName}/*"
+#              - !Sub "arn:aws:s3:::${DataBucketName}"
+#            Principal: '*'
+#            Condition:
+#              StringNotEquals:
+#                'aws:sourceVpce': 
+#                  Fn::ImportValue: 
+#                    !Sub "s3-endpoint-${ProjectName}-id"
+
+#  ModelBucketPolicy:
+#    Type: 'AWS::S3::BucketPolicy'
+#    Properties:
+#      Bucket: !Ref ModelBucket
+#      PolicyDocument:
+#        Statement:
+#          - Action:
+#              - 's3:GetObject'
+#              - 's3:PutObject'
+#              - 's3:ListBucket'
+#            Effect: Deny
+#            Resource:
+#              - !Sub "arn:aws:s3:::${ModelBucketName}/*"
+#              - !Sub "arn:aws:s3:::${ModelBucketName}"
+#            Principal: '*'
+#            Condition:
+#              StringNotEquals:
+#                'aws:sourceVpce': 
+#                  Fn::ImportValue: 
+#                    !Sub "s3-endpoint-${ProjectName}-id"
+
+Outputs:
+#  DataBucketName:
+#    Value: !Ref DataBucketName
+#  ModelBucketName:
+#    Value: !Ref ModelBucketName
+  KMSKeyArn:
+    Description: KMS Key ARN for the S3 buckets
+    Value: !GetAtt KMSCMK.Arn

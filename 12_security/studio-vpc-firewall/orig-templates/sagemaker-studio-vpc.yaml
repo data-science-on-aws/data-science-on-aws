@@ -1,0 +1,116 @@
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: MIT-0
+
+AWSTemplateFormatVersion: 2010-09-09
+Description: "Amazon SageMaker Studio secure deployment demo. The deployment creates all necessary network infrastructure and SageMaker Studio domain."
+
+Parameters:
+  ProjectName:
+    Type: String
+    Default: sagemaker-studio-vpc-firewall
+  DomainName:
+    Description: SageMaker domain name
+    Type: String
+    Default: sagemaker-domain
+  UserProfileName:
+    Description: User profile name for the SageMaker domain
+    Type: String
+    Default: sagemaker-user-profile
+  VPCCIDR:
+    Type: String
+    Default: 10.2.0.0/16
+  FirewallSubnetCIDR:
+    Type: String
+    Default: 10.2.1.0/24
+  NATGatewaySubnetCIDR:
+    Type: String
+    Default: 10.2.2.0/24
+  SageMakerStudioSubnetCIDR:
+    Type: String
+    Default: 10.2.3.0/24
+
+Resources:
+
+  # IAM SageMaker Execution role and KMS key for EBS encryption
+  IAM:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        ProjectName: !Ref ProjectName
+#        DataBucketName: !GetAtt S3.Outputs.DataBucketName
+#        ModelBucketName: !GetAtt S3.Outputs.ModelBucketName
+      TemplateURL: iam.yaml
+
+  # S3 buckets (data, model) and bucket policies, KMS key for bucket encryption
+  S3:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        ProjectName: !Ref ProjectName
+#        DataBucketName: !GetAtt VPC.Outputs.DataBucketName
+#        ModelBucketName: !GetAtt VPC.Outputs.ModelBucketName
+      TemplateURL: s3.yaml
+
+  # VPC with Firewall Network, Nat Gateway, and a private subnet for SageMaker deployment
+  VPC:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        ProjectName: !Ref ProjectName
+        VPCCIDR: !Ref VPCCIDR
+        FirewallSubnetCIDR: !Ref FirewallSubnetCIDR
+        NATGatewaySubnetCIDR: !Ref NATGatewaySubnetCIDR
+        SageMakerStudioSubnetCIDR: !Ref SageMakerStudioSubnetCIDR
+#        DataBucketName: !Sub ${ProjectName}-${AWS::Region}-data
+#        ModelBucketName: !Sub ${ProjectName}-${AWS::Region}-models
+      TemplateURL: vpc.yaml
+  
+  # SageMaker domain, user profile and pre-signed URL
+  SageMakerStudio:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        DomainName: !Sub ${DomainName}-${AWS::Region}
+        UserProfileName: !Sub ${UserProfileName}-${AWS::Region}
+        ProjectName: !Ref ProjectName
+        VPCId: !GetAtt VPC.Outputs.VPCId
+        SageMakerStudioSubnetIds: !GetAtt VPC.Outputs.SageMakerStudioSubnetId
+        SageMakerSecurityGroupIds: !GetAtt VPC.Outputs.SageMakerSecurityGroupId
+        SageMakerExecutionRoleArn: !GetAtt IAM.Outputs.ExecutionRoleArn
+      TemplateURL: sagemaker-studio.yaml
+
+Outputs:
+  VPCId:
+    Description: The ID of VPC where SageMaker Studio will reside
+    Value: !GetAtt VPC.Outputs.VPCId
+#  S3VPCEndpointId: 
+#    Description: The ID of the S3 VPC endpoint
+#    Value: !GetAtt VPC.Outputs.S3VPCEndpointId
+  SageMakerStudioSubnetId:
+    Description: The ID of the SageMaker subnet
+    Value: !GetAtt VPC.Outputs.SageMakerStudioSubnetId
+  SageMakerStudioSecurityGroupId:
+    Description: The ID the SageMaker security group
+    Value: !GetAtt VPC.Outputs.SageMakerSecurityGroupId
+  SageMakerExecutionRoleArn:
+    Description: IAM Execution role for SageMaker Studio and SageMaker notebooks
+    Value: !GetAtt IAM.Outputs.ExecutionRoleArn
+  KMSKeyEBSArn:
+    Description: KMS key arn for SageMaker notebooks EBS encryption
+    Value: !GetAtt IAM.Outputs.KMSKeyArn
+  KMSKeyS3bucketsArn:
+    Description: KMS key arn for data encryption in S3 buckets
+    Value: !GetAtt S3.Outputs.KMSKeyArn
+#  SageMakerS3bucketData:
+#    Description: Name of S3 bucket for data
+#    Value: !GetAtt S3.Outputs.DataBucketName
+#  SageMakerS3bucketModels:
+#    Description: Name of S3 bucket for models
+#    Value: !GetAtt S3.Outputs.ModelBucketName
+  SageMakerStudioDomainId:
+    Description: SageMaker Studio domain id
+    Value: !GetAtt SageMakerStudio.Outputs.SageMakerStudioDomainId
+  UserProfileName:
+    Description: SageMaker user profile name
+    Value: !GetAtt SageMakerStudio.Outputs.UserProfileName
+
