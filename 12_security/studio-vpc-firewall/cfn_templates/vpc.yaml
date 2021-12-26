@@ -395,18 +395,31 @@ Resources:
       VpcId:
         Ref: VPC
       PolicyDocument:
-        Fn::Sub: "{\n  \"Version\":\"2012-10-17\",\n  \"Statement\":[{\n    \"Effect\"\
-          :\"Allow\",\n    \"Principal\": \"*\",\n    \"Action\":[\n      \"s3:GetBucketLocation\"\
-          ,\n      \"s3:CreateBucket\",\n      \"s3:GetObject\",\n      \"s3:PutObject\"\
-          ,\n      \"s3:ListBucket\"\n    ],\n    \"Resource\": [\n        \"arn:aws:s3:::dlai-practical-data-science\"\
-          ,\n        \"arn:aws:s3:::dlai-practical-data-science/*\",\n        \"arn:aws:s3:::reviews-feature-store-*\"\
-          ,\n        \"arn:aws:s3:::reviews-feature-store-*/*\",\n        \"arn:aws:s3:::aws-athena-query-results-*\"\
-          ,\n        \"arn:aws:s3:::dsoaws/*\",\n        \"arn:aws:s3:::dsoaws\"\
-          ,\n        \"arn:aws:s3:::aws-athena-query-results-*/*\",              \
-          \  \n        \"arn:aws:s3:::sagemaker-*\",\n        \"arn:aws:s3:::sagemaker-*/*\"\
-          ,                \n        \"arn:aws:s3:::binstar-cio-packages-prod\",\n\
-          \        \"arn:aws:s3:::binstar-cio-packages-prod/*\",\n        \"arn:aws:s3:::models.huggingface.co\"\
-          ,\n        \"arn:aws:s3:::models.huggingface.co/*\"\n    ]\n  }]\n}\n"
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Principal: '*'
+          Action: 
+          - s3:GetBucketLocation
+          - s3:CreateBucket
+          - s3:GetObject
+          - s3:PutObject
+          - s3:ListBucket
+          Resource:
+          - arn:aws:s3:::dlai-practical-data-science
+          - arn:aws:s3:::dlai-practical-data-science/*
+          - arn:aws:s3:::reviews-feature-store-*
+          - arn:aws:s3:::reviews-feature-store-*/*
+          - arn:aws:s3:::aws-athena-query-results-*
+          - arn:aws:s3:::aws-athena-query-results-*/*
+          - arn:aws:s3:::dsoaws
+          - arn:aws:s3:::dsoaws/*
+          - arn:aws:s3:::sagemaker-*
+          - arn:aws:s3:::sagemaker-*/*
+          - arn:aws:s3:::binstar-cio-packages-prod
+          - arn:aws:s3:::binstar-cio-packages-prod/*
+          - arn:aws:s3:::models.huggingface.co
+          - arn:aws:s3:::models.huggingface.co/*
       RouteTableIds:
       - Ref: SageMakerStudioRouteTable
   VPCEndpointS3Id:
