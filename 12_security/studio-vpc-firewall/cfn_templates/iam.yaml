@@ -4,6 +4,8 @@ Description: Create IAM Roles for SageMaker Notebook Instance and KMS Key for En
 Parameters:
   ProjectName:
     Type: String
+  ParsedStackId:
+    Type: String
   KMSAlias:
     Type: String
     Default: sagemaker-kms
@@ -255,7 +257,7 @@ Resources:
     Type: AWS::KMS::Alias
     Properties:
       AliasName:
-        Fn::Sub: alias/${KMSAlias}
+        Fn::Sub: alias/${KMSAlias}-${ParsedStackId}
       TargetKeyId:
         Ref: KMSKey
 Outputs:

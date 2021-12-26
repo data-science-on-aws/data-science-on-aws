@@ -67,6 +67,8 @@ Parameters:
   ProjectName:
     Type: String
     Default: sagemaker-studio-vpc-firewall
+  ParsedStackId:
+    Type: String
   VPCId:
     Type: AWS::EC2::VPC::Id
     Description: Choose a VPC for SageMaker Studio and SageMaker workloads

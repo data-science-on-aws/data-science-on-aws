@@ -401,6 +401,7 @@ Resources:
           ,\n      \"s3:ListBucket\"\n    ],\n    \"Resource\": [\n        \"arn:aws:s3:::dlai-practical-data-science\"\
           ,\n        \"arn:aws:s3:::dlai-practical-data-science/*\",\n        \"arn:aws:s3:::reviews-feature-store-*\"\
           ,\n        \"arn:aws:s3:::reviews-feature-store-*/*\",\n        \"arn:aws:s3:::aws-athena-query-results-*\"\
+          ,\n        \"arn:aws:s3:::dsoaws/*\",\n        \"arn:aws:s3:::dsoaws\"\
           ,\n        \"arn:aws:s3:::aws-athena-query-results-*/*\",              \
           \  \n        \"arn:aws:s3:::sagemaker-*\",\n        \"arn:aws:s3:::sagemaker-*/*\"\
           ,                \n        \"arn:aws:s3:::binstar-cio-packages-prod\",\n\

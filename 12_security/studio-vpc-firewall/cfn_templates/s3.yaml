@@ -3,6 +3,8 @@ Description: Create S3 Buckets
 Parameters:
   ProjectName:
     Type: String
+  ParsedStackId:
+    Type: String
 Resources:
   KMSCMK:
     Type: AWS::KMS::Key
@@ -34,12 +36,12 @@ Resources:
       Tags:
       - Key: Name
         Value:
-          Ref: ProjectName
+          Fn::Sub: ${ProjectName}-${ParsedStackId}
   KMSCMKAlias:
     Type: AWS::KMS::Alias
     Properties:
       AliasName:
-        Fn::Sub: alias/kms-cmk-${ProjectName}
+        Fn::Sub: alias/kms-cmk-${ProjectName}-${ParsedStackId}
       TargetKeyId:
         Ref: KMSCMK
   KMSCMKArn:
