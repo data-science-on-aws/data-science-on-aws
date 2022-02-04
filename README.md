@@ -27,6 +27,7 @@ Attendees will learn how to do the following:
 # Workshop Instructions
 _Note:  This workshop will create an ephemeral AWS acccount for each attendee.  This ephemeral account is not accessible after the workshop.  You can, of course, clone this GitHub repo and reproduce the entire workshop in your own AWS Account._
 
+
 ## 0. Logout of All AWS Consoles Across All Browser Tabs
 If you do not logout of existing AWS Consoles, things will not work properly.
 
@@ -34,13 +35,8 @@ If you do not logout of existing AWS Consoles, things will not work properly.
 
 _Please logout of all AWS Console sessions in all browser tabs._
 
+
 ## 1. Login to the Workshop Portal (aka Event Engine). 
-
-## THE LINK WILL BE PROVIDED TO YOU
-
-![Event Box Launch](img/eb1_launch.png) 
-
-![Event Box Access AWS Account](img/eb2_access_account.png)
 
 ![Event Engine Terms and Conditions](img/ee1_terms.png)
 
@@ -82,11 +78,13 @@ In the AWS Console search bar, type `SageMaker` and select `Amazon SageMaker` to
 
 ![Loading Studio](img/studio_loading.png)
 
+
 ## 4. Launch a New Terminal within Studio
 
 Click `File` > `New` > `Terminal` to launch a terminal in your Jupyter instance.
 
 ![Terminal Studio](img/studio_terminal.png)
+
 
 ## 5. Clone this GitHub Repo in the Terminal
 
