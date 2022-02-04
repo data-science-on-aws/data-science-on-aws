@@ -1,1 +1,0 @@
-COPY amazon_reviews_parquet FROM 's3://sagemaker-us-east-1-806570384721/amazon-reviews-pds/parquet/' IAM_ROLE 'arn:aws:iam::806570384721:role/Redshift_S3_AmazonReviews' FORMAT AS PARQUET;
