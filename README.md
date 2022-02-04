@@ -1,6 +1,6 @@
 # Data Science on AWS Workshop
 
-Based on this O'Reilly book:  [![Data Science on AWS](img/book_full_color_sm.png)](https://datascienceonaws.com)
+Based on this O'Reilly book:  [![Data Science on AWS](img/book_full_color_sm.png)](https://www.amazon.com/Data-Science-AWS-End-End/dp/1492079391/)
 
 
 ## Workshop Description
@@ -20,6 +20,7 @@ Attendees will learn how to do the following:
 * Register and version models using SageMaker Model Registry
 * Deploy a model to a REST endpoint using SageMaker Hosting and SageMaker Endpoints
 * Automate ML workflow steps by building end-to-end model pipelines
+
 
 ## Workshop Instructions
 _Note:  This workshop will create an ephemeral AWS acccount for each attendee.  This ephemeral account is not accessible after the workshop.  You can, of course, clone this GitHub repo and reproduce the entire workshop in your own AWS Account._
