@@ -88,6 +88,29 @@ Resources:
           - IAM
           - Outputs.ExecutionRoleArn
       TemplateURL: https://dsoaws.s3.amazonaws.com/cfn_templates/sagemaker-studio.yaml
+  SageMakerNotebook:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        NotebookName:
+          Ref: ProjectName
+        VPCId:
+          Fn::GetAtt:
+          - VPC
+          - Outputs.VPCId
+        SageMakerStudioSubnetIds:
+          Fn::GetAtt:
+          - VPC
+          - Outputs.SageMakerStudioSubnetId
+        SageMakerSecurityGroupIds:
+          Fn::GetAtt:
+          - VPC
+          - Outputs.SageMakerSecurityGroupId
+        SageMakerExecutionRoleArn:
+          Fn::GetAtt:
+          - IAM
+          - Outputs.ExecutionRoleArn
+      TemplateURL: https://dsoaws.s3.amazonaws.com/cfn_templates/sagemaker-notebook.yaml
 Outputs:
   VPCId:
     Description: The ID of VPC where SageMaker Studio will reside
