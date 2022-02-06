@@ -25,19 +25,19 @@ Parameters:
 Resources:
   SageMakerNotebookInstance:
     Type: "AWS::SageMaker::NotebookInstance"
-      Properties:
-        NotebookInstanceName:
-          Ref: NotebookName 
-        InstanceType: "ml.t3.medium"
-        SubnetId: !Select [ 0, !Ref SageMakerStudioSubnetIds]
-        SecurityGroupIds: 
-          Ref: SageMakerSecurityGroupIds
-        RoleArn: 
-          Ref: SageMakerExecutionRoleArn
-        DirectInternetAccess:
-	  Ref: DirectInternetAccess
-        VolumeSizeInGB: 50
-        RootAccess: "Enabled"
+    Properties:
+      NotebookInstanceName:
+        Ref: NotebookName 
+      InstanceType: "ml.t3.medium"
+      SubnetId: !Select [ 0, !Ref SageMakerStudioSubnetIds]
+      SecurityGroupIds: 
+        Ref: SageMakerSecurityGroupIds
+      RoleArn: 
+        Ref: SageMakerExecutionRoleArn
+      DirectInternetAccess:
+        Ref: DirectInternetAccess
+      VolumeSizeInGB: 50
+      RootAccess: "Enabled"
 Outputs:
   NotebookName:
     Description: SageMaker Notebook name
