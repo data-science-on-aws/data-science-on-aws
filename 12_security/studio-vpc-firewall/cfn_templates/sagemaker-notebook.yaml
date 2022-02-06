@@ -29,7 +29,7 @@ Resources:
       NotebookInstanceName:
         Ref: NotebookName 
       InstanceType: "ml.t3.medium"
-      SubnetId: !Select [ 0, !Ref SageMakerStudioSubnetIds]
+      SubnetId: !Select [ 0, !Ref SageMakerStudioSubnetIds ]
       SecurityGroupIds: 
         Ref: SageMakerSecurityGroupIds
       RoleArn: 
