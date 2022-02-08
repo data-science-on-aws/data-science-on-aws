@@ -125,11 +125,11 @@ Select Parameter Store
 
 ![Paramter-Store-2](/img/Parameter-Store-2.png)
 
-We can see the Cloudformation has created three parameters in the parameter store.
+We can see the Cloudformation has created ISTIO_URL in the parameter store.
 
 ![Paramter-Store-3v1](/img/Parameter-Store-3v1.png)
 
-You can check for value of each parameter by selecting respective entry. For example below screenshot shows the value of ISTIO_URL.
+Click on ISTIO_URL to go to next screen and check the value of the parameter.
 
 ![Paramter-Store-4](/img/Parameter-Store-4.png)
 
