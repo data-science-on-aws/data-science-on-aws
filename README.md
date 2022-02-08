@@ -112,3 +112,41 @@ Navigate to `01_introduction/` in SageMaker Studio and start the workshop!
 _You may need to refresh your browser if you don't see the new `01_introduction/` directory._
 
 ![Start Workshop](img/studio_start_workshop.png)
+
+### 7. Instructions to access Kubeflow! 
+
+We will need to access Kubeflow for Chapter 10_pipeline. Navigate to `Parameter Store` in AWS Console 
+
+From AWS Console, open Systems Manager.
+
+![Paramter-Store-1](/images/Parameter-Store-1.png)
+
+Select Parameter Store
+
+![Paramter-Store-2](/images/Parameter-Store-2.png)
+
+We can see the Cloudformation has created three parameters in the parameter store.
+
+![Paramter-Store-3v1](/images/Parameter-Store-3v1.png)
+
+You can check for value of each parameter by selecting respective entry. For example below screenshot shows the value of ISTIO_URL.
+
+![Paramter-Store-4](/images/Parameter-Store-4.png)
+
+
+#### Take a note of the Value of ISTIO_URL
+
+Open ISTIO_URL in a new browser window on your workstation.
+
+### Note that this is a public URL and will only be accessible during the workshop.
+
+![accessing-eks-ingress-kubeflow-browser](/images/accessing-eks-ingress-kubeflow-browser.png)
+
+Accessing the Kubeflow dashboard.
+
+![kubeflow-screenshot-1](/images/kubeflow-screenshot-1.png)
+
+![kubeflow-screenshot-2](/images/kubeflow-screenshot-2.png)
+
+
+
