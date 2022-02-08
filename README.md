@@ -119,19 +119,19 @@ We will need to access Kubeflow for Chapter 10_pipeline. Navigate to `Parameter 
 
 From AWS Console, open Systems Manager.
 
-![Paramter-Store-1](/images/Parameter-Store-1.png)
+![Paramter-Store-1](/img/Parameter-Store-1.png)
 
 Select Parameter Store
 
-![Paramter-Store-2](/images/Parameter-Store-2.png)
+![Paramter-Store-2](/img/Parameter-Store-2.png)
 
 We can see the Cloudformation has created three parameters in the parameter store.
 
-![Paramter-Store-3v1](/images/Parameter-Store-3v1.png)
+![Paramter-Store-3v1](/img/Parameter-Store-3v1.png)
 
 You can check for value of each parameter by selecting respective entry. For example below screenshot shows the value of ISTIO_URL.
 
-![Paramter-Store-4](/images/Parameter-Store-4.png)
+![Paramter-Store-4](/img/Parameter-Store-4.png)
 
 
 #### Take a note of the Value of ISTIO_URL
