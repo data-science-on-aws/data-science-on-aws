@@ -1,6 +1,8 @@
 # Data Science on AWS Workshop
 
-Based on this O'Reilly book:  [![Data Science on AWS](img/book_full_color_sm.png)](https://www.amazon.com/Data-Science-AWS-End-End/dp/1492079391/)
+Based on this O'Reilly book:  
+
+[![Data Science on AWS](img/book_full_color_sm.png)](https://www.amazon.com/Data-Science-AWS-End-End/dp/1492079391/)
 
 
 ## Workshop Description
