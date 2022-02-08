@@ -115,7 +115,7 @@ _You may need to refresh your browser if you don't see the new `01_introduction/
 
 ### 7. Instructions to access Kubeflow! 
 
-We will need to access Kubeflow for Chapter 10_pipeline. Navigate to `Parameter Store` in AWS Console 
+We will need to access Kubeflow for Chapter 10_pipeline.
 
 From AWS Console, open Systems Manager.
 
