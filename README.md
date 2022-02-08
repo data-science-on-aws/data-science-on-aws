@@ -16,7 +16,6 @@ Attendees will learn how to do the following:
 * Train and evaluate a custom BERT model using TensorFlow, Keras, and SageMaker Training Jobs
 * Evaluate the model using SageMaker Processing Jobs
 * Track model artifacts using Amazon SageMaker ML Lineage Tracking
-* Run model bias and explainability analysis with SageMaker Clarify
 * Register and version models using SageMaker Model Registry
 * Deploy a model to a REST endpoint using SageMaker Hosting and SageMaker Endpoints
 * Automate ML workflow steps by building end-to-end model pipelines
@@ -113,9 +112,10 @@ _You may need to refresh your browser if you don't see the new `01_introduction/
 
 ![Start Workshop](img/studio_start_workshop.png)
 
-### 7. Instructions to access Kubeflow! 
 
-We will need to access Kubeflow for Chapter 10_pipeline.
+### 7. Instructions to access Kubeflow!
+
+We will need to access Kubeflow for Chapter `10_pipeline/`.
 
 From AWS Console, open Systems Manager.
 
@@ -137,6 +137,7 @@ Click on ISTIO_URL to go to next screen and check the value of the parameter.
 #### Take a note of the Value of ISTIO_URL
 
 Open ISTIO_URL in a new browser window on your workstation.
+
 
 ### Note that this is a public URL and will only be accessible during the workshop.
 
