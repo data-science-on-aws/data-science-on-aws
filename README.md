@@ -140,13 +140,13 @@ Open ISTIO_URL in a new browser window on your workstation.
 
 ### Note that this is a public URL and will only be accessible during the workshop.
 
-![accessing-eks-ingress-kubeflow-browser](/images/accessing-eks-ingress-kubeflow-browser.png)
+![accessing-eks-ingress-kubeflow-browser](/img/accessing-eks-ingress-kubeflow-browser.png)
 
 Accessing the Kubeflow dashboard.
 
-![kubeflow-screenshot-1](/images/kubeflow-screenshot-1.png)
+![kubeflow-screenshot-1](/img/kubeflow-screenshot-1.png)
 
-![kubeflow-screenshot-2](/images/kubeflow-screenshot-2.png)
+![kubeflow-screenshot-2](/img/kubeflow-screenshot-2.png)
 
 
 
