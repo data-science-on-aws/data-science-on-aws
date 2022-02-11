@@ -178,13 +178,6 @@ Resources:
             pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".huggingface.co";
             endswith; msg:"Allowed HTTPS domain"; sid:22; rev:1;)
 
-
-            pass http $HOME_NET any -> $EXTERNAL_NET any (http.host; dotprefix; content:".archive.ics.uci.edu";
-            endswith; msg:"Allowed HTTP domain"; sid:21; rev:1;)
-
-            pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".archive.ics.uci.edu";
-            endswith; msg:"Allowed HTTPS domain"; sid:22; rev:1;)
-
             pass http $HOME_NET any -> $EXTERNAL_NET any (http.host; dotprefix; content:".s3-us-east-1.amazonaws.com";
             endswith; msg:"Allowed HTTP domain"; sid:23; rev:1;)
 
@@ -214,6 +207,12 @@ Resources:
 
             pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".api.ngc.nvidia.com";
             endswith; msg:"Allowed HTTPS domain"; sid:32; rev:1;)
+
+            pass http $HOME_NET any -> $EXTERNAL_NET any (http.host; dotprefix; content:".archive.ics.uci.edu";
+            endswith; msg:"Allowed HTTP domain"; sid:33; rev:1;)
+
+            pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".archive.ics.uci.edu";
+            endswith; msg:"Allowed HTTPS domain"; sid:34; rev:1;)
 
 
             drop http $HOME_NET any -> $EXTERNAL_NET any (http.header_names; content:"|0d
