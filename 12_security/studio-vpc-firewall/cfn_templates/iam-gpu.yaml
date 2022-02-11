@@ -131,6 +131,7 @@ Resources:
               - ml.m5.xlarge
               - ml.m5.2xlarge
               - ml.m5.4xlarge
+              - ml.c5.large
               - ml.c5.xlarge
               - ml.c5.2xlarge
               - ml.c5.9xlarge
