@@ -180,34 +180,34 @@ Resources:
 
 
             pass http $HOME_NET any -> $EXTERNAL_NET any (http.host; dotprefix; content:".s3-us-east-1.amazonaws.com";
-            endswith; msg:"Allowed HTTP domain"; sid:21; rev:1;)
+            endswith; msg:"Allowed HTTP domain"; sid:23; rev:1;)
 
             pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".s3-us-east-1.amazonaws.com";
-            endswith; msg:"Allowed HTTPS domain"; sid:22; rev:1;)
+            endswith; msg:"Allowed HTTPS domain"; sid:24; rev:1;)
 
             pass http $HOME_NET any -> $EXTERNAL_NET any (http.host; dotprefix; content:".s3-us-west-2.amazonaws.com";
-            endswith; msg:"Allowed HTTP domain"; sid:21; rev:1;)
+            endswith; msg:"Allowed HTTP domain"; sid:25; rev:1;)
 
             pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".s3-us-west-2.amazonaws.com";
-            endswith; msg:"Allowed HTTPS domain"; sid:22; rev:1;)
+            endswith; msg:"Allowed HTTPS domain"; sid:26; rev:1;)
 
             pass http $HOME_NET any -> $EXTERNAL_NET any (http.host; dotprefix; content:".transtats.bts.gov";
-            endswith; msg:"Allowed HTTP domain"; sid:21; rev:1;)
+            endswith; msg:"Allowed HTTP domain"; sid:27; rev:1;)
 
             pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".transtats.bts.gov";
-            endswith; msg:"Allowed HTTPS domain"; sid:22; rev:1;)
+            endswith; msg:"Allowed HTTPS domain"; sid:28; rev:1;)
 
             pass http $HOME_NET any -> $EXTERNAL_NET any (http.host; dotprefix; content:".ourairports.co";
-            endswith; msg:"Allowed HTTP domain"; sid:21; rev:1;)
+            endswith; msg:"Allowed HTTP domain"; sid:29; rev:1;)
 
             pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".ourairports.co";
-            endswith; msg:"Allowed HTTPS domain"; sid:22; rev:1;)
+            endswith; msg:"Allowed HTTPS domain"; sid:30; rev:1;)
 
             pass http $HOME_NET any -> $EXTERNAL_NET any (http.host; dotprefix; content:".api.ngc.nvidia.com";
-            endswith; msg:"Allowed HTTP domain"; sid:21; rev:1;)
+            endswith; msg:"Allowed HTTP domain"; sid:31; rev:1;)
 
             pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".api.ngc.nvidia.com";
-            endswith; msg:"Allowed HTTPS domain"; sid:22; rev:1;)
+            endswith; msg:"Allowed HTTPS domain"; sid:32; rev:1;)
 
 
             drop http $HOME_NET any -> $EXTERNAL_NET any (http.header_names; content:"|0d
