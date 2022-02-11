@@ -214,6 +214,17 @@ Resources:
             pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".archive.ics.uci.edu";
             endswith; msg:"Allowed HTTPS domain"; sid:34; rev:1;)
 
+            pass http $HOME_NET any -> $EXTERNAL_NET any (http.host; dotprefix; content:".dcc.fc.up.pt"; 
+            endswith; msg:"Allowed HTTP domain"; sid:35; rev:1;)
+
+            pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".dcc.fc.up.pt"; 
+            endswith; msg:"Allowed HTTPS domain"; sid:36; rev:1;)
+
+            pass http $HOME_NET any -> $EXTERNAL_NET any (http.host; dotprefix; content:".figshare.com"; 
+            endswith; msg:"Allowed HTTP domain"; sid:37; rev:1;)
+            
+            pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".figshare.com"; 
+            endswith; msg:"Allowed HTTPS domain"; sid:38; rev:1;)
 
             drop http $HOME_NET any -> $EXTERNAL_NET any (http.header_names; content:"|0d
             0a|"; startswith; msg:"not matching any HTTP allowlisted FQDNs"; flow:to_server,
