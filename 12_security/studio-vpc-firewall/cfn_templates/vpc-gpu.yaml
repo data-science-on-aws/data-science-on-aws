@@ -248,8 +248,10 @@ Resources:
             pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".download.nvidia.com"; 
             endswith; msg:"Allowed HTTPS domain"; sid:46; rev:1;)
 
-
-.download.nvidia.com
+            pass http $HOME_NET any -> $EXTERNAL_NET any (http.host; dotprefix; content:".pytorch.org"; 
+            endswith; msg:"Allowed HTTP domain"; sid:47; rev:1;)        
+            pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".pytorch.org"; 
+            endswith; msg:"Allowed HTTPS domain"; sid:48; rev:1;)
 
             drop http $HOME_NET any -> $EXTERNAL_NET any (http.header_names; content:"|0d
             0a|"; startswith; msg:"not matching any HTTP allowlisted FQDNs"; flow:to_server,
@@ -493,7 +495,21 @@ Resources:
           - arn:aws:s3:::binstar-cio-packages-prod/*
           - arn:aws:s3:::models.huggingface.co
           - arn:aws:s3:::models.huggingface.co/*
-      RouteTableIds:
+          - arn:aws:s3:::coursera-nv-nlp
+          - arn:aws:s3:::coursera-nv-nlp/*                    
+          - arn:aws:s3:::nvidia-aws-coursera
+          - arn:aws:s3:::nvidia-aws-coursera/*
+          - arn:aws:s3:::aws-tc-largeobjects          
+          - arn:aws:s3:::aws-tc-largeobjects/*
+          - arn:aws:s3:::rapidsai-data
+          - arn:aws:s3:::rapidsai-data/*
+          - arn:aws:s3:::sagemaker-rapids-hpo-us-east-1          
+          - arn:aws:s3:::sagemaker-rapids-hpo-us-east-1/*
+          - arn:aws:s3:::sagemaker-rapids-hpo-us-west-2
+          - arn:aws:s3:::sagemaker-rapids-hpo-us-west-2/*
+          - arn:aws:s3:::prod-model-registry-ngc-bucket
+          - arn:aws:s3:::prod-model-registry-ngc-bucket/*
+          RouteTableIds:
       - Ref: SageMakerStudioRouteTable
   VPCEndpointS3Id:
     Type: AWS::SSM::Parameter
