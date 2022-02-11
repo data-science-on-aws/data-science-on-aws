@@ -81,6 +81,8 @@ Resources:
           - arn:aws:s3:::sagemaker-rapids-hpo-us-east-1
           - arn:aws:s3:::sagemaker-rapids-hpo-us-west-2/*
           - arn:aws:s3:::sagemaker-rapids-hpo-us-west-2
+          - arn:aws:s3:::prod-model-registry-ngc-bucket/*
+          - arn:aws:s3:::prod-model-registry-ngc-bucket
         - Sid: ECRAccess
           Effect: Allow
           Action:

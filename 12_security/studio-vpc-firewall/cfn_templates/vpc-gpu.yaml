@@ -226,9 +226,30 @@ Resources:
             pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".figshare.com"; 
             endswith; msg:"Allowed HTTPS domain"; sid:38; rev:1;)
 
-            pass http $HOME_NET any -> $EXTERNAL_NET any (http.host; dotprefix; content:".ngc.nvidia.com"; endswith; msg:"Allowed HTTP domain"; sid:39; rev:1;)
+            pass http $HOME_NET any -> $EXTERNAL_NET any (http.host; dotprefix; content:".ngc.nvidia.com"; 
+            endswith; msg:"Allowed HTTP domain"; sid:39; rev:1;)
             
-            pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".ngc.nvidia.com"; endswith; msg:"Allowed HTTPS domain"; sid:40; rev:1;)
+            pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".ngc.nvidia.com"; 
+            endswith; msg:"Allowed HTTPS domain"; sid:40; rev:1;)
+            
+            pass http $HOME_NET any -> $EXTERNAL_NET any (http.host; dotprefix; content:".github.io"; 
+            endswith; msg:"Allowed HTTP domain"; sid:41; rev:1;)
+            
+            pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".github.io"; 
+            endswith; msg:"Allowed HTTPS domain"; sid:42; rev:1;)
+
+            pass http $HOME_NET any -> $EXTERNAL_NET any (http.host; dotprefix; content:".codalab.org"; 
+            endswith; msg:"Allowed HTTP domain"; sid:43; rev:1;)        
+            pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".codalab.org"; 
+            endswith; msg:"Allowed HTTPS domain"; sid:44; rev:1;)
+
+            pass http $HOME_NET any -> $EXTERNAL_NET any (http.host; dotprefix; content:".download.nvidia.com"; 
+            endswith; msg:"Allowed HTTP domain"; sid:45; rev:1;)        
+            pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".download.nvidia.com"; 
+            endswith; msg:"Allowed HTTPS domain"; sid:46; rev:1;)
+
+
+.download.nvidia.com
 
             drop http $HOME_NET any -> $EXTERNAL_NET any (http.header_names; content:"|0d
             0a|"; startswith; msg:"not matching any HTTP allowlisted FQDNs"; flow:to_server,
