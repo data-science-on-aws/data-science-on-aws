@@ -510,7 +510,7 @@ Resources:
           - arn:aws:s3:::prod-model-registry-ngc-bucket
           - arn:aws:s3:::prod-model-registry-ngc-bucket/*
           RouteTableIds:
-      - Ref: SageMakerStudioRouteTable
+          - Ref: SageMakerStudioRouteTable
   VPCEndpointS3Id:
     Type: AWS::SSM::Parameter
     Properties:
