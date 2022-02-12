@@ -4,7 +4,7 @@ Description: Amazon SageMaker Studio secure deployment demo. The deployment crea
 Parameters:
   ProjectName:
     Type: String
-    Default: sagemaker-studio-vpc-firewall
+    Default: sagemaker
   DomainName:
     Description: SageMaker domain name
     Type: String

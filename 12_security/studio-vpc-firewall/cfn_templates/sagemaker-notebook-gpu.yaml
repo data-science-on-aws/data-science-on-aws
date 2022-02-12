@@ -3,10 +3,10 @@ Description: Creates SageMaker Notebook
 Parameters:
   NotebookName:
     Type: String
-    Default: sagemaker-notebook-vpc-firewall
+    Default: sagemaker
   VPCId:
     Type: AWS::EC2::VPC::Id
-    Description: Choose a VPC for SageMaker Studio and SageMaker workloads
+    Description: Choose a VPC for SageMaker services
   SageMakerStudioSubnetIds:
     Type: List<AWS::EC2::Subnet::Id>
     Description: Choose subnets
@@ -23,6 +23,57 @@ Parameters:
     Description: Choose how SageMaker Noteook accesses resources over the Network
     Default: Disabled 
 Resources:
+
+CFNNotebookInstanceLifeCycleConfig:
+    Type: "AWS::SageMaker::NotebookInstanceLifecycleConfig"
+    Properties:
+      NotebookInstanceLifecycleConfigName: !Join ["-", ["initialize-notebook", !Ref "AWS::StackName"]]
+      OnStart:
+        - Content:
+            Fn::Base64:
+              !Sub |
+              #!/bin/bash
+
+              set -e
+
+              sudo -u ec2-user -i <<'EOF'
+
+              sudo sed -i 's%runtimes%data-root": "/home/ec2-user/SageMaker/docker", "runtimes%g' /etc/docker/daemon.json 
+              mkdir /home/ec2-user/SageMaker/docker
+              sudo service docker restart
+              sudo service docker reload
+
+              curl "%vcli files get asnlib/rapids-aws.tgz%" > /home/ec2-user/SageMaker/rapids-aws.tgz
+              pushd .
+              cd /home/ec2-user/SageMaker/
+              tar -xf rapids-aws.tgz
+              rm rapids-aws.tgz
+              popd
+
+              mkdir -p rapids_kernel
+              cd rapids_kernel
+              wget -q https://rapidsai-data.s3.us-east-2.amazonaws.com/conda-pack/rapidsai/rapids0.18_cuda11.0_py3.8.tar.gz
+              echo "wget completed"
+              tar -xzf *.gz
+              echo "unzip completed"
+              source /home/ec2-user/rapids_kernel/bin/activate
+              conda-unpack 
+              echo "unpack completed"
+
+              echo "installing packages with pip"
+              source /home/ec2-user/rapids_kernel/bin/activate && pip install seaborn matplotlib pytest dask_cudf sagemaker
+              echo "completed installing pip packages"
+              
+              # optionally install AutoGluon for AutoML GPU demo
+              # source /home/ec2-user/rapids_kernel/bin/activate && pip install --pre autogluon
+              
+              python -m ipykernel install --user --name AWS-RAPIDS-Coursera
+              echo "kernel install completed"
+
+              # TODO:
+              # aws s3 cp labfiles /workspace
+              EOF
+              
   SageMakerNotebookInstance:
     Type: "AWS::SageMaker::NotebookInstance"
     Properties:
@@ -36,8 +87,9 @@ Resources:
         Ref: SageMakerExecutionRoleArn
       DirectInternetAccess:
         Ref: DirectInternetAccess
-      VolumeSizeInGB: 50
+      VolumeSizeInGB: 100
       RootAccess: "Enabled"
+      LifecycleConfigName: !GetAtt CFNNotebookInstanceLifeCycleConfig.NotebookInstanceLifecycleConfigName      
 Outputs:
   NotebookName:
     Description: SageMaker Notebook name
