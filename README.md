@@ -35,7 +35,9 @@ Attendees will learn how to do the following:
 Follow the instructions here:  
 
 English: https://aws.amazon.com/premiumsupport/knowledge-center/create-and-activate-aws-account/
-
+German: https://aws.amazon.com/de/premiumsupport/knowledge-center/create-and-activate-aws-account/
+Japanese: https://aws.amazon.com/jp/premiumsupport/knowledge-center/create-and-activate-aws-account/
+Portuguese: https://aws.amazon.com/pt/premiumsupport/knowledge-center/create-and-activate-aws-account/
 
 ## 1. Login to AWS Console
 
