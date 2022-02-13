@@ -237,31 +237,34 @@ Resources:
             
             pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".github.io"; 
             endswith; msg:"Allowed HTTPS domain"; sid:42; rev:1;)
-
+            
             pass http $HOME_NET any -> $EXTERNAL_NET any (http.host; dotprefix; content:".codalab.org"; 
-            endswith; msg:"Allowed HTTP domain"; sid:43; rev:1;)        
+            endswith; msg:"Allowed HTTP domain"; sid:43; rev:1;)    
+            
             pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".codalab.org"; 
             endswith; msg:"Allowed HTTPS domain"; sid:44; rev:1;)
 
             pass http $HOME_NET any -> $EXTERNAL_NET any (http.host; dotprefix; content:".download.nvidia.com"; 
             endswith; msg:"Allowed HTTP domain"; sid:45; rev:1;)        
+            
             pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".download.nvidia.com"; 
             endswith; msg:"Allowed HTTPS domain"; sid:46; rev:1;)
 
             pass http $HOME_NET any -> $EXTERNAL_NET any (http.host; dotprefix; content:".pytorch.org"; 
             endswith; msg:"Allowed HTTP domain"; sid:47; rev:1;)        
+            
             pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".pytorch.org"; 
             endswith; msg:"Allowed HTTPS domain"; sid:48; rev:1;)
 
-            drop http $HOME_NET any -> $EXTERNAL_NET any (http.header_names; content:"|0d
-            0a|"; startswith; msg:"not matching any HTTP allowlisted FQDNs"; flow:to_server,
-            established; sid:97; rev:1;)
+            drop http $HOME_NET any -> $EXTERNAL_NET any (http.header_names; content:"|0d0a|"; 
+            startswith; msg:"not matching any HTTP allowlisted FQDNs"; flow:to_server,established; sid:97; rev:1;)
 
             drop tls $HOME_NET any -> $EXTERNAL_NET any (msg:"not matching any TLS
             allowlisted FQDNs"; flow:to_server, established; sid:98; rev:1;)
 
             drop ip $HOME_NET any -> $EXTERNAL_NET any (msg:"Drop any remaining IP
             traffic including TCP and UDP"; flow:to_server, established; sid:99; rev:1;)
+            
             '
       Tags:
       - Key: Name
