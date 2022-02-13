@@ -32,7 +32,9 @@ Attendees will learn how to do the following:
 # Instructions to Run the Book Examples
 ## 0. Create an AWS Account if you don't already have one
 
-Follow the instructions here:  https://aws.amazon.com/de/premiumsupport/knowledge-center/create-and-activate-aws-account/
+Follow the instructions here:  
+
+English: https://aws.amazon.com/premiumsupport/knowledge-center/create-and-activate-aws-account/
 
 
 ## 1. Login to AWS Console
@@ -41,18 +43,6 @@ Follow the instructions here:  https://aws.amazon.com/de/premiumsupport/knowledg
 
 
 ## 2. Launch SageMaker Studio
-
-Open the [AWS Management Console](https://console.aws.amazon.com/console/home)
-
-Configure IAM to run the book examples.
-
-![IAM 1](img/sagemaker-iam-1.png)
-
-![IAM 2](img/sagemaker-iam-2.png)
-
-![IAM 3](img/sagemaker-iam-3.png)
-
-![Back to SageMaker](img/alt_back_to_sagemaker_8.png)
 
 In the AWS Console search bar, type `SageMaker` and select `Amazon SageMaker` to open the service console.
 
@@ -67,14 +57,29 @@ In the AWS Console search bar, type `SageMaker` and select `Amazon SageMaker` to
 ![Loading Studio](img/studio_loading.png)
 
 
-## 3. Launch a New Terminal within Studio
+## 3. Update IAM Role
+
+Open the [AWS Management Console](https://console.aws.amazon.com/console/home)
+
+Configure IAM to run the book examples.
+
+![IAM 1](img/sagemaker-iam-1.png)
+
+![IAM 2](img/sagemaker-iam-2.png)
+
+![IAM 3](img/sagemaker-iam-3.png)
+
+![Back to SageMaker](img/alt_back_to_sagemaker_8.png)
+
+
+## 4. Launch a New Terminal within Studio
 
 Click `File` > `New` > `Terminal` to launch a terminal in your Jupyter instance.
 
 ![Terminal Studio](img/studio_terminal.png)
 
 
-## 4. Clone this GitHub Repo in the Terminal
+## 5. Clone this GitHub Repo in the Terminal
 
 Within the Terminal, run the following:
 
@@ -95,7 +100,7 @@ remove the file manually to continue.
 _Note:  This is not a fatal error ^^ above ^^.  Just re-run the command again until it works._
 
 
-## 5. Start the Book Examples!
+## 6. Start the Book Examples!
 
 Navigate to `oreilly_book/` in SageMaker Studio and start the book examples!!
 
