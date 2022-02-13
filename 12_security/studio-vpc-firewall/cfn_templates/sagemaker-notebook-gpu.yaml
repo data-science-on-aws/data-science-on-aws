@@ -23,8 +23,7 @@ Parameters:
     Description: Choose how SageMaker Noteook accesses resources over the Network
     Default: Disabled 
 Resources:
-
-CFNNotebookInstanceLifeCycleConfig:
+  CFNNotebookInstanceLifeCycleConfig:
     Type: "AWS::SageMaker::NotebookInstanceLifecycleConfig"
     Properties:
       NotebookInstanceLifecycleConfigName: !Join ["-", ["initialize-notebook", !Ref "AWS::StackName"]]
