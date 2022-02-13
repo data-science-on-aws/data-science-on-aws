@@ -262,7 +262,6 @@ Resources:
 
             drop ip $HOME_NET any -> $EXTERNAL_NET any (msg:"Drop any remaining IP
             traffic including TCP and UDP"; flow:to_server, established; sid:99; rev:1;)
-
             '
       Tags:
       - Key: Name
@@ -509,8 +508,8 @@ Resources:
           - arn:aws:s3:::sagemaker-rapids-hpo-us-west-2/*
           - arn:aws:s3:::prod-model-registry-ngc-bucket
           - arn:aws:s3:::prod-model-registry-ngc-bucket/*
-          RouteTableIds:
-          - Ref: SageMakerStudioRouteTable
+      RouteTableIds:
+      - Ref: SageMakerStudioRouteTable
   VPCEndpointS3Id:
     Type: AWS::SSM::Parameter
     Properties:
