@@ -1,1 +1,0 @@
-SELECT DATE_FORMAT(DATE_ADD('day', review_date, DATE_PARSE('1970-01-01','%Y-%m-%d')), '%Y-%m-%d') FROM amazon_reviews_parquet LIMIT 10;

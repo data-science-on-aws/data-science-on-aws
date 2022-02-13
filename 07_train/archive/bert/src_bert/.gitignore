@@ -1,6 +1,0 @@
-# keep the data/ until we switch to use SM_TRAIN_CHANNEL
-#data/
-cache/
-outputs/
-tensorboard/
-bert-model
