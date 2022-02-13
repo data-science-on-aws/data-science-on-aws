@@ -262,6 +262,30 @@ Resources:
             pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".cocodataset.org";
             endswith; msg:"Allowed HTTPS domain"; sid:50; rev:1;)
 
+            pass http $HOME_NET any -> $EXTERNAL_NET any (http.host; dotprefix; content:".images.cocodataset.org";
+            endswith; msg:"Allowed HTTP domain"; sid:51; rev:1;)
+
+            pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".images.cocodataset.org";
+            endswith; msg:"Allowed HTTPS domain"; sid:52; rev:1;)
+
+            pass http $HOME_NET any -> $EXTERNAL_NET any (http.host; dotprefix; content:".docker.io";
+            endswith; msg:"Allowed HTTP domain"; sid:53; rev:1;)
+
+            pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".docker.io";
+            endswith; msg:"Allowed HTTPS domain"; sid:54; rev:1;)
+
+            pass http $HOME_NET any -> $EXTERNAL_NET any (http.host; dotprefix;content:".registry-1.docker.io";
+            endswith; msg:"Allowed HTTP domain"; sid:55; rev:1;)
+
+            pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".registry-1.docker.io";
+            endswith; msg:"Allowed HTTPS domain"; sid:56; rev:1;)
+
+            pass http $HOME_NET any -> $EXTERNAL_NET any (http.host; dotprefix;content:".index.docker.io";
+            endswith; msg:"Allowed HTTP domain"; sid:57; rev:1;)
+
+            pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".index.docker.io";
+            endswith; msg:"Allowed HTTPS domain"; sid:58; rev:1;)
+
             drop http $HOME_NET any -> $EXTERNAL_NET any (http.header_names; content:"|0d0a|"; 
             startswith; msg:"not matching any HTTP allowlisted FQDNs"; flow:to_server,established; sid:97; rev:1;)
 
