@@ -256,6 +256,12 @@ Resources:
             pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".pytorch.org"; 
             endswith; msg:"Allowed HTTPS domain"; sid:48; rev:1;)
 
+            pass http $HOME_NET any -> $EXTERNAL_NET any (http.host; dotprefix; content:".cocodataset.org";
+            endswith; msg:"Allowed HTTP domain"; sid:49; rev:1;)
+
+            pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".cocodataset.org";
+            endswith; msg:"Allowed HTTPS domain"; sid:50; rev:1;)
+
             drop http $HOME_NET any -> $EXTERNAL_NET any (http.header_names; content:"|0d0a|"; 
             startswith; msg:"not matching any HTTP allowlisted FQDNs"; flow:to_server,established; sid:97; rev:1;)
 

@@ -42,7 +42,7 @@ Resources:
               sudo service docker restart
               sudo service docker reload
 
-              curl "%vcli files get asnlib/rapids-aws.tgz%" > /home/ec2-user/SageMaker/rapids-aws.tgz
+              curl https://dsoaws.s3.amazonaws.com/cfn_templates/rapids-aws.tgz > /home/ec2-user/SageMaker/rapids-aws.tgz
               pushd .
               cd /home/ec2-user/SageMaker/
               tar -xf rapids-aws.tgz
