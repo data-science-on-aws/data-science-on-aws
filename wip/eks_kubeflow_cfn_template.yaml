@@ -1,0 +1,156 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  AWS CloudFormation Sample Template for Installing EKS, KubeFlow and Sagemaker
+  Operators
+Mappings:
+  AWSInstanceType2Arch:
+    t2.micro:
+      Arch: HVM64
+    t2.small:
+      Arch: HVM64
+    t2.medium:
+      Arch: HVM64
+    t2.large:
+      Arch: HVM64
+  AWSRegionArch2AMI:
+    us-east-1:
+      HVM64: ami-0fc61db8544a617ed
+      HVMG2: ami-0a584ac55a7631c0c
+    us-west-2:
+      HVM64: ami-0ce21b51cb31a48b8
+      HVMG2: ami-0e09505bc235aa82d
+    us-west-1:
+      HVM64: ami-09a7fe78668f1e2c0
+      HVMG2: ami-066ee5fd4a9ef77f1
+    eu-west-1:
+      HVM64: ami-04d5cc9b88f9d1d39
+      HVMG2: ami-0a7c483d527806435
+    eu-west-2:
+      HVM64: ami-0cb790308f7591fa6
+      HVMG2: NOT_SUPPORTED
+    eu-west-3:
+      HVM64: ami-07eda9385feb1e969
+      HVMG2: NOT_SUPPORTED
+    eu-central-1:
+      HVM64: ami-0ec1ba09723e5bfac
+      HVMG2: ami-06223d46a6d0661c7
+    ap-northeast-1:
+      HVM64: ami-052652af12b58691f
+      HVMG2: ami-053cdd503598e4a9d
+    ap-northeast-2:
+      HVM64: ami-0db78afd3d150fc18
+      HVMG2: NOT_SUPPORTED
+    ap-northeast-3:
+      HVM64: ami-075b14c8e2f90fd84
+      HVMG2: NOT_SUPPORTED
+    ap-southeast-1:
+      HVM64: ami-0cbc6aae997c6538a
+      HVMG2: ami-0be9df32ae9f92309
+    ap-southeast-2:
+      HVM64: ami-08fdde86b93accf1c
+      HVMG2: ami-0a9ce9fecc3d1daf8
+    ap-south-1:
+      HVM64: ami-03b5297d565ef30a6
+      HVMG2: ami-097b15e89dbdcfcf4
+    us-east-2:
+      HVM64: ami-0e01ce4ee18447327
+      HVMG2: NOT_SUPPORTED
+    ca-central-1:
+      HVM64: ami-0bf54ac1b628cf143
+      HVMG2: NOT_SUPPORTED
+    sa-east-1:
+      HVM64: ami-0b032e878a66c3b68
+      HVMG2: NOT_SUPPORTED
+Resources:
+  WebServerInstance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      ImageId: !FindInMap 
+        - AWSRegionArch2AMI
+        - !Ref 'AWS::Region'
+        - !FindInMap 
+          - AWSInstanceType2Arch
+          - t2.large
+          - Arch
+      InstanceType: t2.large
+      IamInstanceProfile: !Ref RootInstanceProfile
+      SecurityGroups:
+        - !Ref WebServerSecurityGroup
+      UserData: !Base64 
+        'Fn::Join':
+          - ''
+          - - |
+              #!/bin/bash -xe
+            - |
+              yum install -y aws-cfn-bootstrap git
+            - >
+              cd /home/ec2-user && git clone --branch kubeflow102
+              https://github.com/kalawat1985/eks-kubeflow-cloudformation-quick-start.git
+            - |
+              cd /home/ec2-user/eks-kubeflow-cloudformation-quick-start
+            - >
+              /bin/su - ec2-user bash -c
+              /home/ec2-user/eks-kubeflow-cloudformation-quick-start/scriptv1.sh
+            - >
+              /bin/su - ec2-user bash -c
+              /home/ec2-user/eks-kubeflow-cloudformation-quick-start/scriptv2.sh
+            - >
+              /bin/su - ec2-user bash -c
+              /home/ec2-user/eks-kubeflow-cloudformation-quick-start/scriptv3.sh
+            - >
+              /bin/su - ec2-user bash -c
+              /home/ec2-user/eks-kubeflow-cloudformation-quick-start/scriptv4.sh
+    CreationPolicy: {}
+  RootRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+  RolePolicies:
+    Type: 'AWS::IAM::Policy'
+    Properties:
+      PolicyName: root
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: '*'
+            Resource: '*'
+      Roles:
+        - !Ref RootRole
+  RootInstanceProfile:
+    Type: 'AWS::IAM::InstanceProfile'
+    Properties:
+      Path: /
+      Roles:
+        - !Ref RootRole
+  WebServerSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Enable HTTP access via port 80
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '80'
+          ToPort: '80'
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: 0.0.0.0/0
+Outputs:
+  LinuxJumpBox:
+    Description: Linux Jump Box
+    Value: !Join 
+      - ''
+      - - ''
+        - !GetAtt 
+          - WebServerInstance
+          - PublicDnsName
