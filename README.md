@@ -6,7 +6,7 @@
 ## Book Outline
 ![Book Outline](img/outline.png)
 
-## Book Examples (8 hours)
+## Book Examples (12 hours)
 Throughout these book examples, you will build an end-to-end AI/ML pipeline for natural language processing with Amazon SageMaker.  You will train and tune a text classifier to predict the star rating (1 is bad, 5 is good) for product reviews using the state-of-the-art [BERT](https://arxiv.org/abs/1810.04805) model for language representation.  To build our BERT-based NLP text classifier, you will use a product reviews dataset where each record contains some review text and a star rating (1-5).  You will also get hands-on with advanced model training and deployment techniques such as hyper-parameter tuning, A/B testing, and auto-scaling.  Lastly, you will setup a real-time, streaming analytics and data science pipeline to perform window-based aggregations and anomaly detection.
 
 ## Learning Objectives for the Book Examples
@@ -22,7 +22,7 @@ Attendees will learn how to do the following:
 * Run model bias and explainability analysis with SageMaker Clarify
 * Register and version models using SageMaker Model Registry
 * Deploy a model to a REST endpoint using SageMaker Hosting and SageMaker Endpoints
-* Automate ML workflow steps by building end-to-end model pipelines using SageMaker Pipelines
+* Automate ML workflow steps by building end-to-end model pipelines using SageMaker Pipelines, Airflow, AWS Step Functions, Kubeflow Pipelines, TFX, and MLflow
 * Perform automated machine learning (AutoML) to find the best model from just your dataset with low-code
 * Find the best hyper-parameters for your custom model using SageMaker Hyper-parameter Tuning Jobs
 * Deploy multiple model variants into a live, production A/B test to compare online performance, live-shift prediction traffic, and autoscale the winning variant using SageMaker Hosting and SageMaker Endpoints
@@ -38,6 +38,7 @@ Follow the instructions here:
 * German: https://aws.amazon.com/de/premiumsupport/knowledge-center/create-and-activate-aws-account/
 * Japanese: https://aws.amazon.com/jp/premiumsupport/knowledge-center/create-and-activate-aws-account/
 * Portuguese: https://aws.amazon.com/pt/premiumsupport/knowledge-center/create-and-activate-aws-account/
+
 
 ## 1. Login to AWS Console
 
