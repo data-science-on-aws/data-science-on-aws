@@ -496,7 +496,7 @@ Resources:
           - arn:aws:s3:::models.huggingface.co
           - arn:aws:s3:::models.huggingface.co/*
           - arn:aws:s3:::coursera-nv-nlp
-          - arn:aws:s3:::coursera-nv-nlp/*                    
+          - arn:aws:s3:::coursera-nv-nlp/*       
           - arn:aws:s3:::nvidia-aws-coursera
           - arn:aws:s3:::nvidia-aws-coursera/*
           - arn:aws:s3:::aws-tc-largeobjects          
