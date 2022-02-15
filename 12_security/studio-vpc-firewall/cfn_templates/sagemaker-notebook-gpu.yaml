@@ -26,7 +26,7 @@ Resources:
   CFNNotebookInstanceLifeCycleConfig:
     Type: "AWS::SageMaker::NotebookInstanceLifecycleConfig"
     Properties:
-      NotebookInstanceLifecycleConfigName: !Join ["-", ["initialize-notebook", !Ref "AWS::StackName"]]
+      NotebookInstanceLifecycleConfigName: !Join ["-", ["nb", !Ref "AWS::StackName"]]
       OnStart:
         - Content:
             Fn::Base64:
