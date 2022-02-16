@@ -3,10 +3,10 @@ Description: Creates SageMaker Notebook
 Parameters:
   NotebookName:
     Type: String
-    Default: sagemaker-notebook-vpc-firewall
+    Default: sagemaker
   VPCId:
     Type: AWS::EC2::VPC::Id
-    Description: Choose a VPC for SageMaker Studio and SageMaker workloads
+    Description: Choose a VPC for SageMaker services 
   SageMakerStudioSubnetIds:
     Type: List<AWS::EC2::Subnet::Id>
     Description: Choose subnets
