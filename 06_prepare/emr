@@ -1,0 +1,603 @@
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: MIT-0
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  StudioName:
+    Type: "String"
+    Description: "Studio Name - can include letters (A-Z and a-z), numbers (0-9), and dashes (-)."
+    AllowedPattern: ^[a-zA-Z0-9-]*$
+    ConstraintDescription: "Must only include letters (A-Z and a-z), numbers (0-9), and dashes (-)."
+
+  # Use public Systems Manager Parameter for Latest AMI ID for Amazon Linux 2
+  LatestAmiId:
+    Type: "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>"
+    Default: "/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2"
+
+Conditions:
+  InUsEast1:
+    Fn::Equals:
+      - { Ref: "AWS::Region" }
+      - us-east-1
+
+Resources:
+  # S3 Bucket for storing our Studio notebooks
+  EmrStudioStorageBucket:
+    Type: AWS::S3::Bucket
+
+  # IAM resources
+  # We create our own EMR Cluster service role utilizing EMR v2 policies
+  EMRClusterServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - elasticmapreduce.amazonaws.com
+            Action:
+              - "sts:AssumeRole"
+      Description: "Service role for EMR Clusters"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEMRFullAccessPolicy_v2
+        - arn:aws:iam::aws:policy/service-role/AmazonEMRServicePolicy_v2
+      Policies:
+        - PolicyName: PassRoleToEC2
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: PassRoleToEC2
+                Effect: Allow
+                Action:
+                  - iam:PassRole
+                Resource:
+                  - !GetAtt EMREC2InstanceRole.Arn
+                Condition:
+                  StringLike:
+                    "iam:PassedToService": "ec2.amazonaws.com*"
+
+  # We create our own service role for EC2 instances that allows full access to our S3 bucket
+  EMREC2InstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - "sts:AssumeRole"
+      Description: "Service role for EMR EC2 Instances"
+      Policies:
+        - PolicyName: S3Access
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: AllowEMRBasicActions
+                Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:GetObject
+                  - s3:GetEncryptionConfiguration
+                  - s3:ListBucket
+                  - s3:DeleteObject
+                Resource:
+                  - !Sub "arn:aws:s3:::${EmrStudioStorageBucket}"
+                  - !Sub "arn:aws:s3:::${EmrStudioStorageBucket}/*"
+
+  # This is the instance profile to be used with EMR
+  EMREC2InstanceProfile:
+    Type: "AWS::IAM::InstanceProfile"
+    Properties:
+      Path: /
+      Roles:
+        - !Ref EMREC2InstanceRole
+
+  # We create a small EMR Cluster with a Step Action that copies Hudi and Iceberg jars to HDFS so EMR Studio can reference them
+  EMRCluster:
+    Type: AWS::EMR::Cluster
+    Properties:
+      Applications:
+        - Name: Spark
+        - Name: Livy
+        - Name: JupyterEnterpriseGateway
+        - Name: Hive
+      Configurations:
+        - Classification: spark
+          ConfigurationProperties:
+            maximizeResourceAllocation: true
+        - Classification: spark-defaults
+          ConfigurationProperties:
+            spark.executor.instances: 5
+            spark.executor.cores: 3
+            spark.executor.memory: 1536M
+      EbsRootVolumeSize: "10"
+      CustomAmiId: !Ref LatestAmiId
+      Instances:
+        TerminationProtected: false
+        Ec2SubnetId: !Ref PrivateSubnet1
+        EmrManagedMasterSecurityGroup: !Ref EMRPrimarySecurityGroup
+        EmrManagedSlaveSecurityGroup: !Ref EMRCoreTaskSecurityGroup
+        ServiceAccessSecurityGroup: !Ref EMRServiceSecurityGroup
+        MasterInstanceGroup:
+          InstanceCount: 1
+          InstanceType: "c5.4xlarge"
+        CoreInstanceGroup:
+          InstanceCount: 1
+          InstanceType: "c5.4xlarge"
+          Market: ON_DEMAND
+          Name: Core
+      Name: data-lakes
+      JobFlowRole: !Ref EMREC2InstanceProfile
+      ServiceRole: !Ref EMRClusterServiceRole
+      ReleaseLabel: emr-6.5.0
+      VisibleToAllUsers: true
+      LogUri: !Sub "s3://${EmrStudioStorageBucket}/emr-logs/"
+      Tags:
+        - Key: for-use-with-amazon-emr-managed-policies
+          Value: true
+
+  # This EMR Step copies Hudi and Iceberg jars to HDFS so EMR Studio can load them
+  EMRMoveJarsStep:
+    Type: AWS::EMR::Step
+    Properties:
+      ActionOnFailure: CONTINUE
+      HadoopJarStep:
+        Args:
+          - bash
+          - -c
+          - "hdfs dfs -mkdir -p /apps/hudi/lib; hdfs dfs -copyFromLocal /usr/lib/hudi/hudi-spark-bundle.jar /apps/hudi/lib/hudi-spark-bundle.jar; hdfs dfs -copyFromLocal /usr/lib/spark/external/lib/spark-avro.jar /apps/hudi/lib/spark-avro.jar  ; hdfs dfs -mkdir -p /apps/iceberg/lib; hdfs dfs -copyFromLocal /usr/share/aws/iceberg/lib/iceberg-spark3-runtime.jar /apps/iceberg/lib/iceberg-spark3-runtime.jar"
+        Jar: command-runner.jar
+
+      JobFlowId: !Ref EMRCluster
+      Name: CopyJarsToHDFS
+
+  # EMR Studio requires a service role for connecting to EMR Clusters and saving notebooks to S3
+  EMRStudioServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - elasticmapreduce.amazonaws.com
+            Action:
+              - "sts:AssumeRole"
+      Description: "Service role for EMR Studio"
+      RoleName:
+        Fn::Join: ["_", [!Ref "StudioName", "EMRStudio_Service_Role"]]
+
+  EMRStudioServiceRolePolicy:
+    Type: "AWS::IAM::ManagedPolicy"
+    Properties:
+      Roles:
+        - Ref: "EMRStudioServiceRole"
+      ManagedPolicyName:
+        Fn::Join: ["_", [!Ref "StudioName", "EMRStudioServiceRolePolicy"]]
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: AllowEMRReadOnlyActions
+            Effect: Allow
+            Action:
+              - elasticmapreduce:ListInstances
+              - elasticmapreduce:DescribeCluster
+              - elasticmapreduce:ListSteps
+            Resource: "*"
+
+          - Sid: AllowEC2ENIActionsWithEMRTags
+            Effect: Allow
+            Action:
+              - ec2:CreateNetworkInterfacePermission
+              - ec2:DeleteNetworkInterface
+            Resource: !Sub "arn:${AWS::Partition}:ec2:*:*:network-interface/*"
+            Condition:
+              StringEquals:
+                "aws:ResourceTag/for-use-with-amazon-emr-managed-policies": "true"
+
+          - Sid: AllowEC2ENIAttributeAction
+            Effect: Allow
+            Action:
+              - ec2:ModifyNetworkInterfaceAttribute
+            Resource:
+              - !Sub "arn:${AWS::Partition}:ec2:*:*:instance/*"
+              - !Sub "arn:${AWS::Partition}:ec2:*:*:network-interface/*"
+              - !Sub "arn:${AWS::Partition}:ec2:*:*:security-group/*"
+
+          - Sid: AllowEC2SecurityGroupActionsWithEMRTags
+            Effect: Allow
+            Action:
+              - ec2:AuthorizeSecurityGroupEgress
+              - ec2:AuthorizeSecurityGroupIngress
+              - ec2:RevokeSecurityGroupEgress
+              - ec2:RevokeSecurityGroupIngress
+              - ec2:DeleteNetworkInterfacePermission
+            Resource: "*"
+            Condition:
+              StringEquals:
+                "aws:ResourceTag/for-use-with-amazon-emr-managed-policies": "true"
+
+          - Sid: AllowDefaultEC2SecurityGroupsCreationWithEMRTags
+            Effect: Allow
+            Action:
+              - ec2:CreateSecurityGroup
+            Resource: !Sub "arn:${AWS::Partition}:ec2:*:*:security-group/*"
+            Condition:
+              StringEquals:
+                "aws:RequestTag/for-use-with-amazon-emr-managed-policies": "true"
+
+          - Sid: AllowDefaultEC2SecurityGroupsCreationInVPCWithEMRTags
+            Effect: Allow
+            Action:
+              - ec2:CreateSecurityGroup
+            Resource: !Sub "arn:${AWS::Partition}:ec2:*:*:vpc/*"
+            Condition:
+              StringEquals:
+                "aws:ResourceTag/for-use-with-amazon-emr-managed-policies": "true"
+
+          - Sid: AllowAddingEMRTagsDuringDefaultSecurityGroupCreation
+            Effect: Allow
+            Action:
+              - ec2:CreateTags
+            Resource: !Sub "arn:${AWS::Partition}:ec2:*:*:security-group/*"
+            Condition:
+              StringEquals:
+                "aws:RequestTag/for-use-with-amazon-emr-managed-policies": "true"
+                "ec2:CreateAction": "CreateSecurityGroup"
+
+          - Sid: AllowEC2ENICreationWithEMRTags
+            Effect: Allow
+            Action:
+              - ec2:CreateNetworkInterface
+            Resource: !Sub "arn:${AWS::Partition}:ec2:*:*:network-interface/*"
+            Condition:
+              StringEquals:
+                "aws:RequestTag/for-use-with-amazon-emr-managed-policies": "true"
+
+          - Sid: AllowEC2ENICreationInSubnetAndSecurityGroupWithEMRTags
+            Effect: Allow
+            Action:
+              - ec2:CreateNetworkInterface
+            Resource:
+              - !Sub "arn:${AWS::Partition}:ec2:*:*:subnet/*"
+              - !Sub "arn:${AWS::Partition}:ec2:*:*:security-group/*"
+            Condition:
+              StringEquals:
+                "aws:ResourceTag/for-use-with-amazon-emr-managed-policies": "true"
+
+          - Sid: AllowAddingTagsDuringEC2ENICreation
+            Effect: Allow
+            Action:
+              - ec2:CreateTags
+            Resource: !Sub "arn:${AWS::Partition}:ec2:*:*:network-interface/*"
+            Condition:
+              StringEquals:
+                "ec2:CreateAction": "CreateNetworkInterface"
+
+          - Sid: AllowEC2ReadOnlyActions
+            Effect: Allow
+            Action:
+              - ec2:DescribeSecurityGroups
+              - ec2:DescribeNetworkInterfaces
+              - ec2:DescribeTags
+              - ec2:DescribeInstances
+              - ec2:DescribeSubnets
+              - ec2:DescribeVpcs
+            Resource: "*"
+
+          - Sid: AllowSecretsManagerReadOnlyActionsWithEMRTags
+            Effect: Allow
+            Action:
+              - secretsmanager:GetSecretValue
+            Resource: !Sub "arn:${AWS::Partition}:secretsmanager:*:*:secret:*"
+            Condition:
+              StringEquals:
+                "aws:ResourceTag/for-use-with-amazon-emr-managed-policies": "true"
+
+          - Sid: AllowS3NotebookStorage
+            Effect: Allow
+            Action:
+              - s3:PutObject
+              - s3:GetObject
+              - s3:GetEncryptionConfiguration
+              - s3:ListBucket
+              - s3:DeleteObject
+            Resource:
+              - !Sub "arn:aws:s3:::${EmrStudioStorageBucket}"
+              - !Sub "arn:aws:s3:::${EmrStudioStorageBucket}/*"
+
+          - Sid: KmsPermission
+            Effect: Allow
+            Action:
+              - "kms:Decrypt"
+              - "kms:ReEncrypt*"
+              - "kms:GenerateDataKey*"
+              - "kms:DescribeKey"
+            Resource: "*"
+
+  # Security Groups for EMR Studio
+  WorkspaceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Metadata: { Comment: "Security group attached to workspace" }
+    Properties:
+      GroupDescription: Security group attached to workspace to communicate with cluster
+      VpcId:
+        Ref: VPC
+      # needed for git
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: "0.0.0.0/0"
+      Tags:
+        - Key: for-use-with-amazon-emr-managed-policies
+          Value: true
+
+  EngineSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Metadata: { Comment: "Security group attached to cluster master instance" }
+    Properties:
+      GroupDescription: Security group attached to cluster master to communicate with workspace
+      VpcId:
+        Ref: VPC
+      Tags:
+        - Key: for-use-with-amazon-emr-managed-policies
+          Value: true
+
+  EngineSecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: Allow inbound traffic to EngineSecurityGroup ( from notebook to cluster for port 18888 )
+      GroupId:
+        Ref: EngineSecurityGroup
+      SourceSecurityGroupId:
+        Ref: WorkspaceSecurityGroup
+      IpProtocol: tcp
+      FromPort: 18888
+      ToPort: 18888
+
+  WorkspaceSecurityGroupEgress:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      Description: Allow outbound traffic from WorkspaceSecurityGroup ( from notebook to cluster for port 18888 )
+      GroupId:
+        Ref: WorkspaceSecurityGroup
+      DestinationSecurityGroupId:
+        Ref: EngineSecurityGroup
+      IpProtocol: tcp
+      FromPort: 18888
+      ToPort: 18888
+
+  # Security Groups for EMR Clusters
+  EMRPrimarySecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Metadata: { Comment: "Security group for EMR Primary Nodes" }
+    Properties:
+      GroupName: EMRPrimarySecurityGroup
+      GroupDescription: Security group for EMR Primary Nodes to communicate with cluster
+      VpcId:
+        Ref: VPC
+      Tags:
+        - Key: for-use-with-amazon-emr-managed-policies
+          Value: true
+
+  EMRCoreTaskSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Metadata:
+      { Comment: "Security group attached to cluster core and task nodes" }
+    Properties:
+      GroupDescription: Security group attached to cluster master to communicate with workspace
+      GroupName: EMRCoreTaskSecurityGroup
+      VpcId:
+        Ref: VPC
+      Tags:
+        - Key: for-use-with-amazon-emr-managed-policies
+          Value: true
+
+  EMRServiceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Metadata: { Comment: "Security group for EMR service access" }
+    Properties:
+      GroupDescription: Security group for EMR service access
+      VpcId:
+        Ref: VPC
+      # Needed for inter-clulster communication: https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-man-sec-groups.html#emr-sg-elasticmapreduce-sa-private
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 9443
+          ToPort: 9443
+          SourceSecurityGroupId: !Ref EMRPrimarySecurityGroup
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 8443
+          ToPort: 8443
+          SourceSecurityGroupId: !Ref EMRPrimarySecurityGroup
+        - IpProtocol: tcp
+          FromPort: 8443
+          ToPort: 8443
+          SourceSecurityGroupId: !Ref EMRCoreTaskSecurityGroup
+      Tags:
+        - Key: for-use-with-amazon-emr-managed-policies
+          Value: true
+
+  EMRPrimarySecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: Allow inbound traffic to EMRPrimarySecurityGroup ( from notebook to cluster for port 18888 )
+      GroupId:
+        Ref: EMRPrimarySecurityGroup
+      SourceSecurityGroupId:
+        Ref: WorkspaceSecurityGroup
+      IpProtocol: tcp
+      FromPort: 18888
+      ToPort: 18888
+
+  # Network resources
+  VPC:
+    Properties:
+      # Default CIDR block for public subnet
+      CidrBlock: 172.31.0.0/16
+      EnableDnsHostnames: "true"
+      Tags:
+        - Key: for-use-with-amazon-emr-managed-policies
+          Value: true
+    Type: AWS::EC2::VPC
+
+  VPCDHCPAssociation:
+    Properties:
+      DhcpOptionsId: { Ref: VPCDHCPOptions }
+      VpcId: { Ref: VPC }
+    Type: AWS::EC2::VPCDHCPOptionsAssociation
+
+  VPCDHCPOptions:
+    Properties:
+      DomainName:
+        Fn::If:
+          - InUsEast1
+          - ec2.internal
+          - Fn::Sub: "${AWS::Region}.compute.internal"
+      DomainNameServers: [AmazonProvidedDNS]
+    Type: AWS::EC2::DHCPOptions
+
+  # CIDR block for private subnets
+  VpcCidrBlock1:
+    Type: AWS::EC2::VPCCidrBlock
+    Properties:
+      VpcId: { Ref: VPC }
+      CidrBlock: 172.16.0.0/16
+
+  GatewayAttachment:
+    Properties:
+      InternetGatewayId: { Ref: InternetGateway }
+      VpcId: { Ref: VPC }
+    Type: AWS::EC2::VPCGatewayAttachment
+  InternetGateway: { Type: "AWS::EC2::InternetGateway" }
+  PublicRouteTableIGWRoute:
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: { Ref: InternetGateway }
+      RouteTableId: { Ref: PublicRouteTable }
+    Type: AWS::EC2::Route
+  PublicRouteTable:
+    Properties:
+      Tags:
+        - Key: Name
+          Value: Public Route Table
+      VpcId: { Ref: VPC }
+    Type: AWS::EC2::RouteTable
+  PublicSubnetRouteTableAssociation:
+    Properties:
+      RouteTableId: { Ref: PublicRouteTable }
+      SubnetId: { Ref: PublicSubnet1 }
+    Type: AWS::EC2::SubnetRouteTableAssociation
+  PublicSubnet1:
+    DependsOn: VpcCidrBlock1
+    Properties:
+      Tags:
+        - Key: Name
+          Value: PublicSubnet1
+        - Key: for-use-with-amazon-emr-managed-policies
+          Value: true
+      VpcId: { Ref: VPC }
+      MapPublicIpOnLaunch: "true"
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs: { Ref: "AWS::Region" }
+      CidrBlock: 172.16.0.0/20
+    Type: AWS::EC2::Subnet
+  NATGateway:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt ElasticIPAddress.AllocationId
+      SubnetId: !Ref PublicSubnet1
+      Tags:
+        - Key: Name
+          Value: NAT
+  ElasticIPAddress:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: VPC
+  # private subnets
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      Tags:
+        - Key: Name
+          Value: Private Route Table
+      VpcId: { Ref: VPC }
+  PrivateRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: { Ref: PrivateRouteTable }
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: { Ref: NATGateway }
+  PrivateSubnet1:
+    DependsOn: VpcCidrBlock1
+    Type: AWS::EC2::Subnet
+    Properties:
+      Tags:
+        - Key: Name
+          Value: PrivateSubnet1
+        - Key: for-use-with-amazon-emr-managed-policies
+          Value: true
+      VpcId: { Ref: VPC }
+      MapPublicIpOnLaunch: "false"
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs: { Ref: "AWS::Region" }
+      CidrBlock: 172.31.0.0/20
+  PrivateSubnetRouteTableAssociation1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: { Ref: PrivateRouteTable }
+      SubnetId: { Ref: PrivateSubnet1 }
+  PrivateSubnet2:
+    DependsOn: VpcCidrBlock1
+    Type: AWS::EC2::Subnet
+    Properties:
+      Tags:
+        - Key: Name
+          Value: PrivateSubnet2
+        - Key: for-use-with-amazon-emr-managed-policies
+          Value: true
+      VpcId: { Ref: VPC }
+      MapPublicIpOnLaunch: "false"
+      AvailabilityZone:
+        Fn::Select:
+          - 1
+          - Fn::GetAZs: { Ref: "AWS::Region" }
+      CidrBlock: 172.31.16.0/20
+  PrivateSubnetRouteTableAssociation2:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: { Ref: PrivateRouteTable }
+      SubnetId: { Ref: PrivateSubnet2 }
+
+  TestEmrStudio:
+    Type: AWS::EMR::Studio
+    Properties:
+      AuthMode: IAM
+      DefaultS3Location: !Sub "s3://${EmrStudioStorageBucket}"
+      Description: modern-data-lakes
+      EngineSecurityGroupId: !Ref EngineSecurityGroup
+      Name: !Ref StudioName
+      ServiceRole: !GetAtt EMRStudioServiceRole.Arn
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      VpcId: !Ref VPC
+      WorkspaceSecurityGroupId: !Ref WorkspaceSecurityGroup
+
+Outputs:
+  EmrStudioUrl:
+    Value: !GetAtt TestEmrStudio.Url
+  EmrStudioStorageBucket:
+    Value: !Ref EmrStudioStorageBucket
