@@ -479,7 +479,11 @@ if __name__ == "__main__":
 
         def predict(text):
             encode_plus_tokens = tokenizer.encode_plus(
-                text, pad_to_max_length=True, max_length=max_seq_length, truncation=True, return_tensors="tf"
+                text, 
+                padding='max_length', 
+                max_length=max_seq_length, 
+                truncation=True, 
+                return_tensors="tf"
             )
             # The id from the pre-trained BERT vocabulary that represents the token.  (Padding of 0 will be used if the # of tokens is less than `max_seq_length`)
             input_ids = encode_plus_tokens["input_ids"]

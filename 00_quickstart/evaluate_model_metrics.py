@@ -5,7 +5,8 @@ from datetime import datetime
 import subprocess
 import sys
 
-subprocess.check_call([sys.executable, "-m", "conda", "install", "-c", "anaconda", "tensorflow==2.3.0", "-y"])
+#subprocess.check_call([sys.executable, "-m", "conda", "install", "-c", "anaconda", "tensorflow==2.3.0", "-y"])
+subprocess.check_call([sys.executable, "-m", "pip", "install", "tensorflow==2.3.1"])
 import tensorflow as tf
 from tensorflow import keras
 
@@ -104,7 +105,11 @@ def parse_args():
 
 def predict(text, model, max_seq_length):
     encode_plus_tokens = tokenizer.encode_plus(
-        text, pad_to_max_length=True, max_length=max_seq_length, truncation=True, return_tensors="tf"
+        text, 
+        padding='max_length', 
+        max_length=max_seq_length, 
+        truncation=True, 
+        return_tensors="tf"
     )
     # The id from the pre-trained BERT vocabulary that represents the token.  (Padding of 0 will be used if the # of tokens is less than `max_seq_length`)
     input_ids = encode_plus_tokens["input_ids"]
