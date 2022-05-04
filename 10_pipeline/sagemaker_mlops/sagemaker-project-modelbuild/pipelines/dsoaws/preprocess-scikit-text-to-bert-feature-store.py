@@ -22,7 +22,9 @@ import subprocess
 ## PIP INSTALLS ##
 # This is 2.3.0 (vs. 2.3.1 everywhere else) because we need to
 # use anaconda and anaconda only supports 2.3.0 at this time
-subprocess.check_call([sys.executable, "-m", "conda", "install", "-c", "anaconda", "tensorflow==2.3.0", "-y"])
+#subprocess.check_call([sys.executable, "-m", "conda", "install", "-c", "anaconda", "tensorflow==2.3.0", "-y"])
+subprocess.check_call([sys.executable, "-m", "pip", "install", "tensorflow==2.3.1"])
+
 import tensorflow as tf
 from tensorflow import keras
 
@@ -230,9 +232,9 @@ def convert_input(the_input, max_seq_length):
     #
     encode_plus_tokens = tokenizer.encode_plus(
         the_input.text,
-        pad_to_max_length=True,
+        padding='max_length',
         max_length=max_seq_length,
-        #                                               truncation=True
+        truncation=True
     )
 
     # The id from the pre-trained BERT vocabulary that represents the token.  (Padding of 0 will be used if the # of tokens is less than `max_seq_length`)

@@ -78,7 +78,7 @@ def predict_fn(input_data, model):
             max_length=max_seq_length,
             add_special_tokens=True,
             return_token_type_ids=False,
-            pad_to_max_length=True,
+            padding='max_length', 
             return_attention_mask=True,
             return_tensors="pt",
             truncation=True,

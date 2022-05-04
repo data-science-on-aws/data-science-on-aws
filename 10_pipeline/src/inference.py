@@ -39,7 +39,10 @@ def input_handler(data, context):
         print("""review_body: {}""".format(review_body))
 
         encode_plus_tokens = tokenizer.encode_plus(
-            review_body, pad_to_max_length=True, max_length=max_seq_length, truncation=True
+            review_body, 
+            padding='max_length', 
+            max_length=max_seq_length, 
+            truncation=True
         )
 
         # Convert the text-based tokens to ids from the pre-trained BERT vocabulary
