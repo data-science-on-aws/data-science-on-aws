@@ -11,7 +11,7 @@ spark = raydp.init_spark(
 
 df_from_csv = spark.read.option('delimiter', '\t') \
                         .option('header', True) \
-                        .csv('s3a://dsoaws/amazon_reviews_us_Digital_Software_v1_00.tsv')
+                        .csv('s3://dsoaws/amazon_reviews_us_Digital_Software_v1_00.tar.gz')
 
 print(df_from_csv)
 
