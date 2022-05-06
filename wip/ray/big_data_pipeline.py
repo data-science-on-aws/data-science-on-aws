@@ -112,7 +112,7 @@ def create_large_shuffle_pipeline(
 
 
 if args.large_scale_test:
-    NUM_TRAINING_WORKERS = 16
+    NUM_TRAINING_WORKERS = 10 # 16
     NUM_EPOCHS = 5
     NUM_COLUMNS = 10
     GiB = 1024 * 1024 * 1024
@@ -134,7 +134,7 @@ if args.large_scale_test:
     # Note we set num_gpus=1 for workers so that
     # the workers will only run on GPU nodes.
     training_workers = [
-        TrainingWorker.options(num_gpus=1).remote(rank, shard)
+        TrainingWorker.options(num_gpus=0).remote(rank, shard)
         for rank, shard in enumerate(splits)
     ]
 
