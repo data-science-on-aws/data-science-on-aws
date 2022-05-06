@@ -4,9 +4,9 @@ import raydp
 ray.init(address="auto")
 spark = raydp.init_spark(
   app_name = "example",
-  num_executors = 10,
-  executor_cores = 64,
-  executor_memory = "256GB"
+  num_executors = 2,
+  executor_cores = 8,
+  executor_memory = "16GB"
 )
 
 df_from_csv = spark.read.option('delimiter', '\t') \
