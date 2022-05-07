@@ -6,6 +6,6 @@ import requests
 
 input_text = "Ray Serve eases the pain of model serving"
 
-result = requests.get("http://127.0.0.1:8000/sentiment", data=input_text).text
+result = requests.get("http://127.0.0.1:8001/sentiment", data=input_text).text
 
 print("Result for '{}': {}".format(input_text, result))

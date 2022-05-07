@@ -86,27 +86,9 @@ with InputNode() as dag_input:
     # Each serve dag has a driver deployment as ingress that can be user provided.
     serve_dag = DAGDriver.options(route_prefix="/my-dag").bind(dag)
 
-
+# Note: Trying to change port, but only available through ray.serve.start 
+# http_options={"port": 8002}
 dag_handle = serve.run(serve_dag)
 
 # Warm up
 ray.get(dag_handle.predict.remote(["0", [0, 0], "sum"]))
-
-# Python handle 
-cur = time.time()
-print(ray.get(dag_handle.predict.remote(["5", [1, 2], "sum"])))
-print(f"Time spent: {round(time.time() - cur, 2)} secs.")
-# Http endpoint
-cur = time.time()
-print(requests.post("http://127.0.0.1:8000/my-dag", json=["5", [1, 2], "sum"]).text)
-print(f"Time spent: {round(time.time() - cur, 2)} secs.")
-
-# Python handle 
-cur = time.time()
-print(ray.get(dag_handle.predict.remote(["1", [0, 2], "max"])))
-print(f"Time spent: {round(time.time() - cur, 2)} secs.")
-
-# Http endpoint
-cur = time.time()
-print(requests.post("http://127.0.0.1:8000/my-dag", json=["1", [0, 2], "max"]).text)
-print(f"Time spent: {round(time.time() - cur, 2)} secs.")

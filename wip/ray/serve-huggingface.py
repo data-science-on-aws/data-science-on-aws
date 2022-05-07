@@ -16,6 +16,7 @@ class SentimentDeployment:
         [result] = self.classifier(str(data))
         return result["label"]
 
-serve.start(detached=True)
+serve.start(detached=True, 
+            http_options={"port": 8001})
 
 SentimentDeployment.deploy()
