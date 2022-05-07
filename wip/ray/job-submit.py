@@ -6,7 +6,13 @@ res = client.submit_job(
     entrypoint="python scikit-distributed.py",
     runtime_env={
         "working_dir": "./",
-        "pip": ['scikit-learn==0.23.0']
+        "conda": {
+             "dependencies": [
+                 { 
+		    "pip": ['scikit-learn==0.23.0']
+		 }
+	      ]
+        }
     }
 ) 
 
