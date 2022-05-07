@@ -19,5 +19,8 @@ print(ray.get(counter.get.remote()))  # get the latest count
 
 # in your envs
 counter = ray.get_actor("global_counter")
-counter.inc.remote(1)  # async call to increment the global count
+for i in range(1000):
+    counter.inc.remote(1)  # async call to increment the global count
 
+time.sleep(5)
+ray.get(counter.get.remote())

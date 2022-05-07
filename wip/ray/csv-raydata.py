@@ -21,9 +21,9 @@ class InvalidRowHandler:
 
 skip_handler = InvalidRowHandler('skip')
 
-df = ray.data.read_csv(paths="s3://dsoaws/amazon_reviews_us_Digital_Software_v1_00.tsv", 
-                       parse_options=ParseOptions(delimiter="\t"))
-#                                                  invalid_row_handler=skip_handler))
+df = ray.data.read_csv(paths='s3://dsoaws/amazon_reviews_us_Digital_Software_v1_00.tsv',
+                       parse_options=ParseOptions(delimiter='\t',
+                                                  invalid_row_handler=skip_handler))
 
 
 print(df)

@@ -15,6 +15,7 @@ def create_shuffle_pipeline(
 ) -> List[DatasetPipeline]:
 
     return (
+#        ray.data.read_parquet('s3://dsoaws/parquet/') #training_data_dir)
         ray.data.read_parquet(training_data_dir)
         .repeat(num_epochs)
         .random_shuffle_each_window()
@@ -116,7 +117,7 @@ if args.large_scale_test:
     NUM_EPOCHS = 5
     NUM_COLUMNS = 10
     GiB = 1024 * 1024 * 1024
-    SIZE_100GiB = 100 * GiB
+    SIZE_500GiB = 500 * GiB
     TOTAL_NUM_NODES = 10 # 70 + 16 + 1
 
     # use the AWS cluster we just set up.
@@ -128,7 +129,7 @@ if args.large_scale_test:
         time.sleep(5)
 
     splits = create_large_shuffle_pipeline(
-        SIZE_100GiB, NUM_EPOCHS, NUM_COLUMNS, NUM_TRAINING_WORKERS
+        SIZE_500GiB, NUM_EPOCHS, NUM_COLUMNS, NUM_TRAINING_WORKERS
     )
 
     # Note we set num_gpus=1 for workers so that
@@ -143,7 +144,7 @@ if args.large_scale_test:
     # Let's run the large scale test.
     ray.get([worker.train.remote() for worker in training_workers])
     print(f"total ingestion time: {int(time.time() - start)}s")
-    throughput = SIZE_100GiB * NUM_EPOCHS / (time.time() - start) / GiB
+    throughput = SIZE_500GiB * NUM_EPOCHS / (time.time() - start) / GiB
     print("throughput: {0:0.2f}GiB/s".format(throughput))
 
 

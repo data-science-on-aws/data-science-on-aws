@@ -601,19 +601,19 @@ def main():
     args = parse_args()
     config = {"args": args}
 
-    if args.start_local or args.address or args.num_workers > 1 or args.use_gpu:
-        if args.start_local:
-            # Start a local Ray runtime.
-            ray.init(num_cpus=args.num_workers)
-        else:
+#    if args.start_local or args.address or args.num_workers > 1 or args.use_gpu:
+#        if args.start_local:
+#            # Start a local Ray runtime.
+#            ray.init(num_cpus=args.num_workers)
+#        else:
             # Connect to a Ray cluster for distributed training.
-            ray.init(address=args.address)
-        trainer = Trainer("torch", num_workers=args.num_workers, use_gpu=args.use_gpu)
-        trainer.start()
-        trainer.run(train_func, config)
-    else:
+    ray.init(address=args.address)
+    trainer = Trainer("torch", num_workers=args.num_workers, use_gpu=args.use_gpu)
+    trainer.start()
+    trainer.run(train_func, config)
+#    else:
         # Run training locally.
-        train_func(config)
+#        train_func(config)
 
 
 if __name__ == "__main__":
