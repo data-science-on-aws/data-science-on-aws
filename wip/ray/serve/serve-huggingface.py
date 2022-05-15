@@ -1,15 +1,17 @@
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from transformers import pipeline
 from ray import serve
 import ray
 
 ray.init(address="auto",
-         namespace="huggingface-classifier",
          ignore_reinit_error=True)
 
 @serve.deployment(route_prefix="/sentiment", name="sentiment")
 class SentimentDeployment:
     def __init__(self):
-        self.classifier = pipeline("sentiment-analysis")
+        tokenizer = AutoTokenizer.from_pretrained("roberta-base")
+        model = AutoModelForSequenceClassification.from_pretrained("./transformer/")
+        self.classifier = pipeline(task="text-classification", model=model, tokenizer=tokenizer)
 
     async def __call__(self, request):
         data = await request.body()
