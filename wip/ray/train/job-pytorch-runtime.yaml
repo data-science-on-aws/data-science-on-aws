@@ -6,4 +6,5 @@ conda:
       - torch
       - datasets
       - accelerate
+      - scikit-learn
 
