@@ -82,7 +82,7 @@ def parse_args():
     
     parser.add_argument('--backend', 
                         type=str, 
-                        default=None)
+                        default='gloo')
     
     parser.add_argument('--max_seq_length', 
                         type=int, 
@@ -93,14 +93,15 @@ def parse_args():
                         default=False)
         
     # Container environment  
-    
-    parser.add_argument('--hosts', 
-                        type=list, 
-                        default='127.0.0.1')
-    
-    parser.add_argument('--current_host', 
-                        type=str, 
-                        default='127.0.0.1')
+ 
+# BEFORE RAY   
+#    parser.add_argument('--hosts', 
+#                        type=list, 
+#                        default='127.0.0.1')
+# BEFORE RAY 
+#    parser.add_argument('--current_host', 
+#                        type=str, 
+#                        default='127.0.0.1')
     
     parser.add_argument('--model_dir', 
                         type=str, 
@@ -152,6 +153,7 @@ MODEL_NAME = 'model.pth'
 PRE_TRAINED_MODEL_NAME = 'roberta-base'
 
 def create_list_input_files(path):
+    print('************* path {}'.format(path))
     input_files = glob.glob('{}/*.tsv'.format(path))
     print(input_files)
     return input_files
@@ -343,9 +345,10 @@ if __name__ == '__main__':
     
     # Check if distributed training
     
-    is_distributed = len(args.hosts) > 1 and args.backend is not None
-    
-    print("Distributed training - {}".format(is_distributed))
+    #is_distributed = len(args.hosts) > 1 and args.backend is not None
+   # is_distributed = True
+
+    #print("Distributed training - {}".format(is_distributed))
     use_cuda = args.num_gpus > 0
     print("Number of gpus available - {}".format(args.num_gpus))
     kwargs = {'num_workers': 1, 'pin_memory': True} if use_cuda else {}
@@ -354,15 +357,18 @@ if __name__ == '__main__':
 
     # Initialize the distributed environment.
     
-    if is_distributed:
-        world_size = len(args.hosts)
-        os.environ['WORLD_SIZE'] = str(world_size)
-        host_rank = args.hosts.index(args.current_host)
-        os.environ['RANK'] = str(host_rank)
-        dist.init_process_group(backend=args.backend, rank=host_rank, world_size=world_size)
-        print('Initialized the distributed environment: \'{}\' backend on {} nodes. '.format(
-            args.backend, dist.get_world_size()) + 'Current host rank is {}. Number of gpus: {}'.format(
-            dist.get_rank(), args.num_gpus))
+    #if is_distributed:
+        # BEFORE RAY world_size = len(args.hosts)
+        #world_size = num_workers 
+        #os.environ['WORLD_SIZE'] = str(world_size)
+        #host_rank = num_workers
+        
+	# BEFORE RAY host_rank = args.hosts.index(args.current_host)
+        #os.environ['RANK'] = str(host_rank)
+        #dist.init_process_group(backend=args.backend, rank=host_rank, world_size=world_size)
+        #print('Initialized the distributed environment: \'{}\' backend on {} nodes. '.format(
+        #    args.backend, dist.get_world_size()) + 'Current host rank is {}. Number of gpus: {}'.format(
+        #    dist.get_rank(), args.num_gpus))
     
     # Set the seed for generating random numbers
     
@@ -433,7 +439,7 @@ if __name__ == '__main__':
 #    )
 
     ray.init(address="auto")
-    trainer = Trainer("torch", num_workers=8, use_gpu=False)
+    trainer = Trainer("torch", num_workers=40, use_gpu=False)
     trainer.start()
 
     config = {
