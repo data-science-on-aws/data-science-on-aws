@@ -312,6 +312,7 @@ def train_func(config: Dict[str, Any]):
             # A useful fast method:
             # https://huggingface.co/docs/datasets/package_reference/main_classes.html#datasets.Dataset.unique # noqa:E501
     label_list = raw_datasets["train"].unique("star_rating")
+    print(label_list)
     label_list.sort()  # Let's sort it for determinism
     num_labels = len(label_list)
 
@@ -320,7 +321,8 @@ def train_func(config: Dict[str, Any]):
     # In distributed training, the .from_pretrained methods guarantee that
     # only one local process can concurrently download model & vocab.
     config = AutoConfig.from_pretrained(
-        args.model_name_or_path, num_labels=num_labels, #finetuning_task=args.task_name
+        args.model_name_or_path, num_labels=num_labels, 
+        #finetuning_task=args.task_name
     )
     tokenizer = AutoTokenizer.from_pretrained(
         args.model_name_or_path, use_fast=not args.use_slow_tokenizer
@@ -399,16 +401,16 @@ def train_func(config: Dict[str, Any]):
             *texts, padding=padding, max_length=args.max_length, truncation=True
         )
 
-        if "label" in examples:
+        if "star_rating" in examples:
             if label_to_id is not None:
                 # Map labels to IDs (not necessary for GLUE tasks)
                 result["labels"] = [
-                    label_to_id[l] for l in examples["label"]  # noqa:E741
+                    label_to_id[l] for l in examples["star_rating"]  # noqa:E741
                 ]
             else:
                 # In all cases, rename the column to labels because the model
                 # will expect that.
-                result["labels"] = examples["label"]
+                result["labels"] = examples["star_rating"]
         return result
 
     processed_datasets = raw_datasets.map(
