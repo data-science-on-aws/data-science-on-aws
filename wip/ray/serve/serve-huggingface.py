@@ -15,7 +15,7 @@ ray.init(address="auto",
          ignore_reinit_error=True)
 
 @serve.deployment(route_prefix="/invocations", name="invocations")
-class SentimentDeployment:
+class InvocationsDeployment:
     def __init__(self):
         tokenizer = AutoTokenizer.from_pretrained("roberta-base")
         model = AutoModelForSequenceClassification.from_pretrained("./transformer/")
@@ -41,4 +41,5 @@ class PingDeployment:
 serve.start(detached=True, 
             http_options={"port": 8080})
 
-SentimentDeployment.deploy()
+InvocationsDeployment.deploy()
+PingDeployment.deploy()
