@@ -7,5 +7,5 @@ import requests
 input_text_list = ["Ray Serve is great!", "Serving frameworks without DAG support are not great."]
 
 for input_text in input_text_list:
-    result = requests.get("http://127.0.0.1:8001/sentiment", data=input_text).text
+    result = requests.get("http://127.0.0.1:8080/sentiment", data=input_text).text
     print("Result for '{}': {}".format(input_text, result))
