@@ -43,8 +43,8 @@ def main():
     print('Deploying local mode endpoint')
     
     model = Model(
-        image_uri="ray-serve-sagemaker:1.0",
-        model_data="ray/transformer/model.tar.gz",
+        image_uri="dsoaws/ray-serve-sagemaker:1.0",
+        model_data="s3://dsoaws/model.tar.gz",
         role=role,
         name="ray-serve-model"
     )
