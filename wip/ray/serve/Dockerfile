@@ -11,6 +11,8 @@ ENV PATH="/opt/ml/code:${PATH}"
 COPY serve-huggingface.py /opt/ml/code/
 COPY transformer/ /opt/ml/code/transformer/
 
+RUN sudo mkdir -p ~/tmp/ray && sudo chmod -R a+w ~/tmp/ray
+
 WORKDIR /opt/ml/code
 ENTRYPOINT ["python", "serve-huggingface.py"]
 EXPOSE 8080
