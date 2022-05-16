@@ -6,6 +6,7 @@ import time
 
 ray_cluster = subprocess.Popen(['ray', 'start', '--head', '--include-dashboard', 'false'])
 
+print('Sleeping for 10 seconds...')
 time.sleep(10)
 
 from ray import serve

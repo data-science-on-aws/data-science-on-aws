@@ -1,7 +1,7 @@
 FROM rayproject/ray:1.13.0rc0-py37-cpu
 
 RUN pip install --no-cache-dir --upgrade pip
-RUN pip install --no-cache-dir transformers==4.19.1
+RUN pip install --no-cache-dir transformers==4.19.1 torch==1.11.0
 
 ENV PYTHONUNBUFFERED=TRUE
 ENV PYTHONDONTWRITEBYTECODE=TRUE
