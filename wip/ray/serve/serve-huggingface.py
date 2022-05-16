@@ -4,10 +4,10 @@ import subprocess
 import time
 #from fastapi import Response, status
 
-ray_cluster = subprocess.Popen(['ray', 'start', '--head', '--include-dashboard', 'false'])
+ray_cluster = subprocess.Popen(['ray', 'start', '--head', '--include-dashboard', 'false', '--disable-usage-stats'])
 
-print('Sleeping for 10 seconds...')
-time.sleep(10)
+print('Sleeping for 20 seconds...')
+time.sleep(20)
 
 from ray import serve
 import ray
