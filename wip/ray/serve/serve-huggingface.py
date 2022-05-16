@@ -1,16 +1,20 @@
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from transformers import pipeline
+import subprocess
+import time
+#from fastapi import Response, status
+
+ray_cluster = subprocess.Popen(['ray', 'start', '--head', '--include-dashboard', 'false'])
+
+time.sleep(10)
+
 from ray import serve
 import ray
 
-#from fastapi import Response, status
+ray.init(address="auto",
+         ignore_reinit_error=True)
 
-#ray.init(address="auto",
-#         ignore_reinit_error=True)
-
-ray.init()
-
-@serve.deployment(route_prefix="/sentiment", name="sentiment")
+@serve.deployment(route_prefix="/invocations", name="invocations")
 class SentimentDeployment:
     def __init__(self):
         tokenizer = AutoTokenizer.from_pretrained("roberta-base")
