@@ -12,7 +12,7 @@ import time
 from ray import serve
 import ray
 
-ray.init()
+ray.init(_temp_dir="~/tmp/ray/")
 #address="127.0.0.1:10001",
 #         ignore_reinit_error=True)
 
