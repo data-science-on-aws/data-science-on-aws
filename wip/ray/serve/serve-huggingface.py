@@ -4,16 +4,17 @@ import subprocess
 import time
 #from fastapi import Response, status
 
-ray_cluster = subprocess.Popen(['ray', 'start', '--head', '--include-dashboard', 'false', '--disable-usage-stats'])
+#ray_cluster = subprocess.Popen(['ray', 'start', '--head', '--include-dashboard', 'false', '--disable-usage-stats'])
 
-print('Sleeping for 20 seconds...')
-time.sleep(20)
+#print('Sleeping for 20 seconds...')
+#time.sleep(20)
 
 from ray import serve
 import ray
 
-ray.init(address="auto",
-         ignore_reinit_error=True)
+ray.init()
+#address="127.0.0.1:10001",
+#         ignore_reinit_error=True)
 
 @serve.deployment(route_prefix="/invocations", name="invocations")
 class InvocationsDeployment:
@@ -44,3 +45,6 @@ serve.start(detached=True,
 
 InvocationsDeployment.deploy()
 PingDeployment.deploy()
+
+while True:
+    time.sleep(10)
