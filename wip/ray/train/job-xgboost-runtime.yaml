@@ -1,0 +1,5 @@
+conda:
+    dependencies:
+    - pip:
+      - xgboost_ray
+      - scikit-learn==0.23.0

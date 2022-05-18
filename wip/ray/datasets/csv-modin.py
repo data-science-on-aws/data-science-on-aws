@@ -3,9 +3,8 @@ import ray
 
 ray.init(address="auto")
 
-df = pd.read_csv("s3://dsoaws/amazon_reviews_us_Digital_Software_v1_00.tsv", 
-                 sep='\t',
+df = pd.read_csv("data/train/part-algo-1-womens_clothing_ecommerce_reviews.csv", 
+                 sep=',',
                  header=0)
 
-print(df)
-print('blah')
+print(df.groupby("sentiment").count())

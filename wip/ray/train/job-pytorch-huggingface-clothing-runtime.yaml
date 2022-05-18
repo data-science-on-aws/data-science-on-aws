@@ -1,0 +1,10 @@
+conda:
+    dependencies:
+    - pip:
+      - transformers==4.18.0
+      - pandas
+      - torch
+      - datasets
+      - accelerate
+      - scikit-learn
+

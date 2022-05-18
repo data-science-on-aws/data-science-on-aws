@@ -1,620 +1,466 @@
-# coding=utf-8
-# This is a modified example originally from The HuggingFace Inc. team.
-# Modified by Matthew Deng.
-# Copyright 2021 The HuggingFace Inc. team. All rights reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-""" Finetuning a 🤗 Transformers model for sequence classification on GLUE."""
+#########################
+# Import required modules
+#########################
+
 import argparse
+import pprint
+import json
 import logging
-import math
 import os
+import sys
+import pandas as pd
 import random
-from typing import Dict, Any
+import time
+import glob
+import numpy as np
+from collections import defaultdict
 
-import datasets
+import torch
+import torch.distributed as dist
+import torch.nn as nn
+import torch.nn.functional as F
+import torch.optim as optim
+import torch.utils.data
+import torch.utils.data.distributed
+from torch.utils.data import Dataset, DataLoader
+
+from transformers import RobertaModel, RobertaConfig
+from transformers import RobertaForSequenceClassification
+from transformers import AdamW, get_linear_schedule_with_warmup
+
 import ray
-import transformers
-from accelerate import Accelerator
-from datasets import load_dataset, load_metric
 from ray.train import Trainer
-from torch.utils.data.dataloader import DataLoader
-from tqdm.auto import tqdm
-from transformers import (
-    AdamW,
-    AutoConfig,
-    AutoModelForSequenceClassification,
-    AutoTokenizer,
-    DataCollatorWithPadding,
-    PretrainedConfig,
-    SchedulerType,
-    default_data_collator,
-    get_scheduler,
-    set_seed,
-)
-from transformers.utils.versions import require_version
 
-logger = logging.getLogger(__name__)
-
-require_version(
-    "datasets>=1.8.0",
-    "To fix: pip install -r examples/pytorch/text-classification/requirements.txt",
-)
-
-task_to_keys = {
-    "cola": ("sentence", None),
-    "mnli": ("premise", "hypothesis"),
-    "mrpc": ("sentence1", "sentence2"),
-    "qnli": ("question", "sentence"),
-    "qqp": ("question1", "question2"),
-    "rte": ("sentence1", "sentence2"),
-    "sst2": ("sentence", None),
-    "stsb": ("sentence1", "sentence2"),
-    "wnli": ("sentence1", "sentence2"),
-}
-
-
+#######################
+# Parse input arguments
+#######################
 def parse_args():
-    parser = argparse.ArgumentParser(
-        description="Finetune a transformers model on a text classification task"
-    )
-    parser.add_argument(
-        "--task_name",
-        type=str,
-        default=None,
-        help="The name of the glue task to train on.",
-        choices=list(task_to_keys.keys()),
-    )
-    parser.add_argument(
-        "--train_file",
-        type=str,
-        default=None,
-        help="A csv or a json file containing the training data.",
-    )
-    parser.add_argument(
-        "--validation_file",
-        type=str,
-        default=None,
-        help="A csv or a json file containing the validation data.",
-    )
-    parser.add_argument(
-        "--max_length",
-        type=int,
-        default=128,
-        help=(
-            "The maximum total input sequence length after tokenization. "
-            "Sequences longer than this will be truncated, sequences shorter "
-            "will be padded if `--pad_to_max_lengh` is passed."
-        ),
-    )
-    parser.add_argument(
-        "--pad_to_max_length",
-        action="store_true",
-        help="If passed, pad all samples to `max_length`. Otherwise, dynamic "
-        "padding is used.",
-    )
-    parser.add_argument(
-        "--model_name_or_path",
-        type=str,
-        help="Path to pretrained model or model identifier from "
-        "huggingface.co/models.",
-        required=True,
-    )
-    parser.add_argument(
-        "--use_slow_tokenizer",
-        action="store_true",
-        help="If passed, will use a slow tokenizer (not backed by the 🤗 "
-        "Tokenizers library).",
-    )
-    parser.add_argument(
-        "--per_device_train_batch_size",
-        type=int,
-        default=8,
-        help="Batch size (per device) for the training dataloader.",
-    )
-    parser.add_argument(
-        "--per_device_eval_batch_size",
-        type=int,
-        default=8,
-        help="Batch size (per device) for the evaluation dataloader.",
-    )
-    parser.add_argument(
-        "--learning_rate",
-        type=float,
-        default=5e-5,
-        help="Initial learning rate (after the potential warmup period) to use.",
-    )
-    parser.add_argument(
-        "--weight_decay", type=float, default=0.0, help="Weight decay to use."
-    )
-    parser.add_argument(
-        "--num_train_epochs",
-        type=int,
-        default=1,
-        help="Total number of training epochs to perform.",
-    )
-    parser.add_argument(
-        "--max_train_steps",
-        type=int,
-        default=None,
-        help="Total number of training steps to perform. If provided, "
-        "overrides num_train_epochs.",
-    )
-    parser.add_argument(
-        "--gradient_accumulation_steps",
-        type=int,
-        default=1,
-        help="Number of updates steps to accumulate before performing a "
-        "backward/update pass.",
-    )
-    parser.add_argument(
-        "--lr_scheduler_type",
-        type=SchedulerType,
-        default="linear",
-        help="The scheduler type to use.",
-        choices=[
-            "linear",
-            "cosine",
-            "cosine_with_restarts",
-            "polynomial",
-            "constant",
-            "constant_with_warmup",
-        ],
-    )
-    parser.add_argument(
-        "--num_warmup_steps",
-        type=int,
-        default=0,
-        help="Number of steps for the warmup in the lr scheduler.",
-    )
-    parser.add_argument(
-        "--output_dir", type=str, default=None, help="Where to store the final model."
-    )
-    parser.add_argument(
-        "--seed", type=int, default=None, help="A seed for reproducible training."
-    )
 
-    # Ray arguments.
-    parser.add_argument(
-        "--start_local", action="store_true", help="Starts Ray on local machine."
+    parser = argparse.ArgumentParser()
+    
+    # CLI args
+    
+    parser.add_argument('--train_batch_size', 
+                        type=int, 
+                        default=64)
+    
+    parser.add_argument('--train_steps_per_epoch',
+                        type=int,
+                        default=64)
+
+    parser.add_argument('--validation_batch_size', 
+                        type=int, 
+                        default=64)
+    
+    parser.add_argument('--validation_steps_per_epoch',
+                        type=int,
+                        default=64)
+
+    parser.add_argument('--epochs', 
+                        type=int, 
+                        default=1)
+    
+    parser.add_argument('--freeze_bert_layer', 
+                        type=eval, 
+                        default=False)
+    
+    parser.add_argument('--learning_rate', 
+                        type=float, 
+                        default=0.01)
+    
+    parser.add_argument('--momentum', 
+                        type=float, 
+                        default=0.5)
+    
+    parser.add_argument('--seed', 
+                        type=int, 
+                        default=42)
+    
+    parser.add_argument('--log_interval', 
+                        type=int, 
+                        default=100)
+    
+    parser.add_argument('--backend', 
+                        type=str, 
+                        default='gloo')
+    
+    parser.add_argument('--max_seq_length', 
+                        type=int, 
+                        default=128)
+    
+    parser.add_argument('--run_validation', 
+                        type=eval,
+                        default=False)
+        
+    # Container environment  
+ 
+# BEFORE RAY   
+#    parser.add_argument('--hosts', 
+#                        type=list, 
+#                        default='127.0.0.1')
+# BEFORE RAY 
+#    parser.add_argument('--current_host', 
+#                        type=str, 
+#                        default='127.0.0.1')
+    
+    parser.add_argument('--model_dir', 
+                        type=str, 
+                        default='./model/')
+
+    parser.add_argument('--train_data', 
+                        type=str, 
+                        default='./data/train/')
+    
+    parser.add_argument('--validation_data', 
+                        type=str, 
+                        default='./data/validation/')
+        
+    parser.add_argument('--output_dir', 
+                        type=str, 
+                        default='./output')
+    
+    parser.add_argument('--num_gpus', 
+                        type=int, 
+                        default=0)
+
+    # Debugger args
+    
+#    parser.add_argument("--save-frequency", 
+#                        type=int, 
+#                        default=10, 
+#                        help="frequency with which to save steps")
+    
+#    parser.add_argument("--smdebug_path",
+#                        type=str,
+#                        help="output directory to save data in",
+#                        default="/opt/ml/output/tensors",)
+    
+#    parser.add_argument("--hook-type",
+#                        type=str,
+#                        choices=["saveall", "module-input-output", "weights-bias-gradients"],
+#                        default="saveall",)
+
+    return parser.parse_args()
+
+#####################
+# Tools and variables
+#####################
+
+# Model name according to the PyTorch documentation: 
+# https://github.com/aws/sagemaker-pytorch-inference-toolkit/blob/6936c08581e26ff3bac26824b1e4946ec68ffc85/src/sagemaker_pytorch_serving_container/torchserve.py#L45
+MODEL_NAME = 'model.pth'
+# Hugging face list of models: https://huggingface.co/models
+PRE_TRAINED_MODEL_NAME = 'roberta-base'
+
+def create_list_input_files(path):
+    print('************* path {}'.format(path))
+    input_files = glob.glob('{}/*.tsv'.format(path))
+    print(input_files)
+    return input_files
+
+def save_transformer_model(model, model_dir):
+    path = '{}/transformer'.format(model_dir)
+    os.makedirs(path, exist_ok=True)                              
+    print('Saving Transformer model to {}'.format(path))
+    model.save_pretrained(path)
+
+def save_pytorch_model(model, model_dir):
+    os.makedirs(model_dir, exist_ok=True) 
+    print('Saving PyTorch model to {}'.format(model_dir))
+    save_path = os.path.join(model_dir, MODEL_NAME)
+    torch.save(model.state_dict(), save_path)
+
+#####################
+# Configure the model
+#####################
+def configure_model():
+    classes = [-1, 0, 1]
+
+    config = RobertaConfig.from_pretrained(
+        PRE_TRAINED_MODEL_NAME, 
+        num_labels=len(classes),
+        id2label={
+            ### BEGIN SOLUTION - DO NOT delete this comment for grading purposes
+            0: -1, # Replace all None
+            1: 0, # Replace all None
+            2: 1, # Replace all None
+            ### END SOLUTION - DO NOT delete this comment for grading purposes
+        },
+        label2id={
+            -1: 0,
+            0: 1,
+            1: 2,
+        }
     )
-    parser.add_argument(
-        "--address", type=str, default=None, help="Ray address to connect to."
+    
+    config.output_attentions=True
+
+    return config
+
+################################
+# PyTorch Dataset and DataLoader
+################################
+
+# PyTorch dataset retrieves the dataset’s features and labels one sample at a time
+# Create a custom Dataset class for the reviews
+class ReviewDataset(Dataset):
+    
+    def __init__(self, input_ids_list, label_id_list):
+        self.input_ids_list = input_ids_list
+        self.label_id_list = label_id_list
+
+    def __len__(self):
+        return len(self.input_ids_list)
+
+    def __getitem__(self, item):
+        # convert list of token_ids into an array of PyTorch LongTensors
+        input_ids = json.loads(self.input_ids_list[item]) 
+        label_id = self.label_id_list[item]
+
+        input_ids_tensor = torch.LongTensor(input_ids)
+        label_id_tensor = torch.tensor(label_id, dtype=torch.long)
+
+        return input_ids_tensor, label_id_tensor
+
+# PyTorch DataLoader helps to to organise the input training data in “minibatches” and reshuffle the data at every epoch
+# It takes Dataset as an input
+def create_data_loader(path, batch_size): 
+    print("Get data loader")
+
+    df = pd.DataFrame(columns=['input_ids', 'label_id'])
+    
+    input_files = create_list_input_files(path)
+
+    for file in input_files:
+        df_temp = pd.read_csv(file, 
+                              sep='\t', 
+                              usecols=['input_ids', 'label_id'])
+        df = df.append(df_temp)
+        
+    ds = ReviewDataset(
+        input_ids_list=df.input_ids.to_numpy(),
+        label_id_list=df.label_id.to_numpy(),
     )
-    parser.add_argument(
-        "--num_workers", type=int, default=1, help="Number of workers to use."
-    )
-    parser.add_argument(
-        "--use_gpu", action="store_true", help="If training should be done on GPUs."
-    )
-
-    args = parser.parse_args()
-
-    # Sanity checks
-    if (
-        args.task_name is None
-        and args.train_file is None
-        and args.validation_file is None
-    ):
-        raise ValueError("Need either a task name or a training/validation file.")
-    else:
-        if args.train_file is not None:
-            extension = args.train_file.split(".")[-1]
-            assert extension in [
-                "csv",
-                "json",
-            ], "`train_file` should be a csv or a json file."
-        if args.validation_file is not None:
-            extension = args.validation_file.split(".")[-1]
-            assert extension in [
-                "csv",
-                "json",
-            ], "`validation_file` should be a csv or a json file."
-
-    if args.output_dir is not None:
-        os.makedirs(args.output_dir, exist_ok=True)
-
-    return args
-
-
-def train_func(config: Dict[str, Any]):
-    args = config["args"]
-    # Initialize the accelerator. We will let the accelerator handle device
-    # placement for us in this example.
-    accelerator = Accelerator()
-    # Make one log on every process with the configuration for debugging.
-    logging.basicConfig(
-        format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
-        datefmt="%m/%d/%Y %H:%M:%S",
-        level=logging.INFO,
-    )
-    logger.info(accelerator.state)
-
-    # Setup logging, we only want one process per machine to log things on
-    # the screen. accelerator.is_local_main_process is only True for one
-    # process per machine.
-    logger.setLevel(
-        logging.INFO if accelerator.is_local_main_process else logging.ERROR
-    )
-    if accelerator.is_local_main_process:
-        datasets.utils.logging.set_verbosity_warning()
-        transformers.utils.logging.set_verbosity_info()
-    else:
-        datasets.utils.logging.set_verbosity_error()
-        transformers.utils.logging.set_verbosity_error()
-
-    # If passed along, set the training seed now.
-    if args.seed is not None:
-        set_seed(args.seed)
-
-    # Get the datasets: you can either provide your own CSV/JSON training and
-    # evaluation files (see below) or specify a GLUE benchmark task (the
-    # dataset will be downloaded automatically from the datasets Hub).
-
-    # For CSV/JSON files, this script will use as labels the column called
-    # 'label' and as pair of sentences the sentences in columns called
-    # 'sentence1' and 'sentence2' if such column exists or the first two
-    # columns not named label if at least two columns are provided.
-
-    # If the CSVs/JSONs contain only one non-label column, the script does
-    # single sentence classification on this single column. You can easily
-    # tweak this behavior (see below)
-
-    # In distributed training, the load_dataset function guarantee that only
-    # one local process can concurrently download the dataset.
-    if args.task_name is not None:
-        # Downloading and loading a dataset from the hub.
-        raw_datasets = load_dataset("glue", args.task_name)
-    else:
-        # Loading the dataset from local csv or json file.
-        data_files = {}
-        if args.train_file is not None:
-            data_files["train"] = args.train_file
-        if args.validation_file is not None:
-            data_files["validation"] = args.validation_file
-        extension = (
-            args.train_file if args.train_file is not None else args.valid_file
-        ).split(".")[-1]
-        raw_datasets = load_dataset(extension, data_files=data_files)
-    # See more about loading any type of standard or custom dataset at
-    # https://huggingface.co/docs/datasets/loading_datasets.html.
-
-    # Labels
-    if args.task_name is not None:
-        is_regression = args.task_name == "stsb"
-        if not is_regression:
-            label_list = raw_datasets["train"].features["label"].names
-            num_labels = len(label_list)
-        else:
-            num_labels = 1
-    else:
-        # Trying to have good defaults here, don't hesitate to tweak to your
-        # needs.
-        is_regression = raw_datasets["train"].features["label"].dtype in [
-            "float32",
-            "float64",
-        ]
-        if is_regression:
-            num_labels = 1
-        else:
-            # A useful fast method:
-            # https://huggingface.co/docs/datasets/package_reference/main_classes.html#datasets.Dataset.unique # noqa:E501
-            label_list = raw_datasets["train"].unique("label")
-            label_list.sort()  # Let's sort it for determinism
-            num_labels = len(label_list)
-
-    # Load pretrained model and tokenizer
-    #
-    # In distributed training, the .from_pretrained methods guarantee that
-    # only one local process can concurrently download model & vocab.
-    config = AutoConfig.from_pretrained(
-        args.model_name_or_path, num_labels=num_labels, finetuning_task=args.task_name
-    )
-    tokenizer = AutoTokenizer.from_pretrained(
-        args.model_name_or_path, use_fast=not args.use_slow_tokenizer
-    )
-    model = AutoModelForSequenceClassification.from_pretrained(
-        args.model_name_or_path,
-        from_tf=bool(".ckpt" in args.model_name_or_path),
-        config=config,
-    )
-
-    # Preprocessing the datasets
-    if args.task_name is not None:
-        sentence1_key, sentence2_key = task_to_keys[args.task_name]
-    else:
-        # Again, we try to have some nice defaults but don't hesitate to
-        # tweak to your use case.
-        non_label_column_names = [
-            name for name in raw_datasets["train"].column_names if name != "label"
-        ]
-        if (
-            "sentence1" in non_label_column_names
-            and "sentence2" in non_label_column_names
-        ):
-            sentence1_key, sentence2_key = "sentence1", "sentence2"
-        else:
-            if len(non_label_column_names) >= 2:
-                sentence1_key, sentence2_key = non_label_column_names[:2]
-            else:
-                sentence1_key, sentence2_key = non_label_column_names[0], None
-
-    # Some models have set the order of the labels to use,
-    # so let's make sure we do use it.
-    label_to_id = None
-    if (
-        model.config.label2id != PretrainedConfig(num_labels=num_labels).label2id
-        and args.task_name is not None
-        and not is_regression
-    ):
-        # Some have all caps in their config, some don't.
-        label_name_to_id = {k.lower(): v for k, v in model.config.label2id.items()}
-        if list(sorted(label_name_to_id.keys())) == list(  # noqa:C413
-            sorted(label_list)
-        ):  # noqa:C413
-            logger.info(
-                f"The configuration of the model provided the following label "
-                f"correspondence: {label_name_to_id}. Using it!"
-            )
-            label_to_id = {
-                i: label_name_to_id[label_list[i]] for i in range(num_labels)
-            }
-        else:
-            logger.warning(
-                "Your model seems to have been trained with labels, "
-                "but they don't match the dataset: ",
-                f"model labels: {list(sorted(label_name_to_id.keys()))}, "  # noqa:C413,E501
-                f"dataset labels: {list(sorted(label_list))}."  # noqa:C413
-                "\nIgnoring the model labels as a result.",
-            )
-    elif args.task_name is None:
-        label_to_id = {v: i for i, v in enumerate(label_list)}
-
-    if label_to_id is not None:
-        model.config.label2id = label_to_id
-        model.config.id2label = {id: label for label, id in config.label2id.items()}
-
-    padding = "max_length" if args.pad_to_max_length else False
-
-    def preprocess_function(examples):
-        # Tokenize the texts
-        texts = (
-            (examples[sentence1_key],)
-            if sentence2_key is None
-            else (examples[sentence1_key], examples[sentence2_key])
-        )
-        result = tokenizer(
-            *texts, padding=padding, max_length=args.max_length, truncation=True
-        )
-
-        if "label" in examples:
-            if label_to_id is not None:
-                # Map labels to IDs (not necessary for GLUE tasks)
-                result["labels"] = [
-                    label_to_id[l] for l in examples["label"]  # noqa:E741
-                ]
-            else:
-                # In all cases, rename the column to labels because the model
-                # will expect that.
-                result["labels"] = examples["label"]
-        return result
-
-    processed_datasets = raw_datasets.map(
-        preprocess_function,
-        batched=True,
-        remove_columns=raw_datasets["train"].column_names,
-        desc="Running tokenizer on dataset",
-    )
-
-    train_dataset = processed_datasets["train"]
-    eval_dataset = processed_datasets[
-        "validation_matched" if args.task_name == "mnli" else "validation"
-    ]
-
-    # Log a few random samples from the training set:
-    for index in random.sample(range(len(train_dataset)), 3):
-        logger.info(f"Sample {index} of the training set: {train_dataset[index]}.")
-
-    # DataLoaders creation:
-    if args.pad_to_max_length:
-        # If padding was already done ot max length, we use the default data
-        # collator that will just convert everything to tensors.
-        data_collator = default_data_collator
-    else:
-        # Otherwise, `DataCollatorWithPadding` will apply dynamic padding for
-        # us (by padding to the maximum length of the samples passed). When
-        # using mixed precision, we add `pad_to_multiple_of=8` to pad all
-        # tensors to multiple of 8s, which will enable the use of Tensor
-        # Cores on NVIDIA hardware with compute capability >= 7.5 (Volta).
-        data_collator = DataCollatorWithPadding(
-            tokenizer, pad_to_multiple_of=(8 if accelerator.use_fp16 else None)
-        )
-
-    train_dataloader = DataLoader(
-        train_dataset,
+    
+    return DataLoader(
+        ds,
+        batch_size=batch_size,
         shuffle=True,
-        collate_fn=data_collator,
-        batch_size=args.per_device_train_batch_size,
-    )
-    eval_dataloader = DataLoader(
-        eval_dataset,
-        collate_fn=data_collator,
-        batch_size=args.per_device_eval_batch_size,
-    )
+        drop_last=True,
+    ), df
 
-    # Optimizer
-    # Split weights in two groups, one with weight decay and the other not.
-    no_decay = ["bias", "LayerNorm.weight"]
-    optimizer_grouped_parameters = [
-        {
-            "params": [
-                p
-                for n, p in model.named_parameters()
-                if not any(nd in n for nd in no_decay)
-            ],
-            "weight_decay": args.weight_decay,
-        },
-        {
-            "params": [
-                p
-                for n, p in model.named_parameters()
-                if any(nd in n for nd in no_decay)
-            ],
-            "weight_decay": 0.0,
-        },
-    ]
-    optimizer = AdamW(optimizer_grouped_parameters, lr=args.learning_rate)
+#############
+# Train model
+#############
 
-    # Prepare everything with our `accelerator`.
-    model, optimizer, train_dataloader, eval_dataloader = accelerator.prepare(
-        model, optimizer, train_dataloader, eval_dataloader
-    )
+def train_model(config):
+#                model,
+#                train_data_loader,
+#                df_train,
+#                val_data_loader, 
+#                df_val,
+#                args):
+   
+    model = config["model"]
+    train_data_loader = config["train_data_loader"]
+    df_train = config["df_train"]
+    val_data_loader = config["val_data_loader"]
+    df_val = config["df_val"]
+    args = config["args"]
+ 
+    loss_function = nn.CrossEntropyLoss()    
+    optimizer = optim.Adam(params=model.parameters(), lr=args.learning_rate)
+    
+    if args.freeze_bert_layer:
+        print('Freezing BERT base layers...')
+        for name, param in model.named_parameters():
+            if 'classifier' not in name:  # classifier layer
+                param.requires_grad = False
+        print('Set classifier layers to `param.requires_grad=False`.')        
+    
+    train_correct = 0
+    train_total = 0
 
-    # Note -> the training dataloader needs to be prepared before we grab
-    # his length below (cause its length will be shorter in multiprocess)
+    for epoch in range(args.epochs):
+        print('EPOCH -- {}'.format(epoch))
 
-    # Scheduler and math around the number of training steps.
-    num_update_steps_per_epoch = math.ceil(
-        len(train_dataloader) / args.gradient_accumulation_steps
-    )
-    if args.max_train_steps is None:
-        args.max_train_steps = args.num_train_epochs * num_update_steps_per_epoch
-    else:
-        args.num_train_epochs = math.ceil(
-            args.max_train_steps / num_update_steps_per_epoch
-        )
-
-    lr_scheduler = get_scheduler(
-        name=args.lr_scheduler_type,
-        optimizer=optimizer,
-        num_warmup_steps=args.num_warmup_steps,
-        num_training_steps=args.max_train_steps,
-    )
-
-    # Get the metric function
-    if args.task_name is not None:
-        metric = load_metric("glue", args.task_name)
-    else:
-        metric = load_metric("accuracy")
-
-    # Train!
-    total_batch_size = (
-        args.per_device_train_batch_size
-        * accelerator.num_processes
-        * args.gradient_accumulation_steps
-    )
-
-    logger.info("***** Running training *****")
-    logger.info(f"  Num examples = {len(train_dataset)}")
-    logger.info(f"  Num Epochs = {args.num_train_epochs}")
-    logger.info(
-        f"  Instantaneous batch size per device ="
-        f" {args.per_device_train_batch_size}"
-    )
-    logger.info(
-        f"  Total train batch size (w. parallel, distributed & accumulation) "
-        f"= {total_batch_size}"
-    )
-    logger.info(f"  Gradient Accumulation steps = {args.gradient_accumulation_steps}")
-    logger.info(f"  Total optimization steps = {args.max_train_steps}")
-    # Only show the progress bar once on each machine.
-    progress_bar = tqdm(
-        range(args.max_train_steps), disable=not accelerator.is_local_main_process
-    )
-    completed_steps = 0
-
-    for epoch in range(args.num_train_epochs):
-        model.train()
-        for step, batch in enumerate(train_dataloader):
-            outputs = model(**batch)
-            loss = outputs.loss
-            loss = loss / args.gradient_accumulation_steps
-            accelerator.backward(loss)
-            if (
-                step % args.gradient_accumulation_steps == 0
-                or step == len(train_dataloader) - 1
-            ):
-                optimizer.step()
-                lr_scheduler.step()
+        for i, (sent, label) in enumerate(train_data_loader):
+            if i < args.train_steps_per_epoch:
+                model.train()
                 optimizer.zero_grad()
-                progress_bar.update(1)
-                completed_steps += 1
+                sent = sent.squeeze(0)
+                if torch.cuda.is_available():
+                    sent = sent.cuda()
+                    label = label.cuda()
+                output = model(sent)[0]
+                _, predicted = torch.max(output, 1)
 
-            if completed_steps >= args.max_train_steps:
-                break
+                loss = loss_function(output, label)
+                loss.backward()
+                optimizer.step()
+            
+                if args.run_validation and i % args.validation_steps_per_epoch == 0:
+                    print('RUNNING VALIDATION:')
+                    correct = 0
+                    total = 0
+                    model.eval()
 
-        model.eval()
-        for step, batch in enumerate(eval_dataloader):
-            outputs = model(**batch)
-            predictions = (
-                outputs.logits.argmax(dim=-1)
-                if not is_regression
-                else outputs.logits.squeeze()
-            )
-            metric.add_batch(
-                predictions=accelerator.gather(predictions),
-                references=accelerator.gather(batch["labels"]),
-            )
+                    for sent, label in val_data_loader:
+                        sent = sent.squeeze(0)
+                        if torch.cuda.is_available():
+                            sent = sent.cuda()
+                            label = label.cuda()
+                        output = model(sent)[0]
+                        _, predicted = torch.max(output.data, 1)
 
-        eval_metric = metric.compute()
-        logger.info(f"epoch {epoch}: {eval_metric}")
+                        total += label.size(0)
+                        correct += (predicted.cpu() ==label.cpu()).sum()
 
-    if args.output_dir is not None:
-        accelerator.wait_for_everyone()
-        unwrapped_model = accelerator.unwrap_model(model)
-        unwrapped_model.save_pretrained(args.output_dir, save_function=accelerator.save)
+                    accuracy = 100.00 * correct.numpy() / total
+                    print('[epoch/step: {0}/{1}] val_loss: {2:.2f} - val_acc: {3:.2f}%'.format(epoch, i, loss.item(), accuracy))
+            else:
+                break           
 
-    if args.task_name == "mnli":
-        # Final evaluation on mismatched validation set
-        eval_dataset = processed_datasets["validation_mismatched"]
-        eval_dataloader = DataLoader(
-            eval_dataset,
-            collate_fn=data_collator,
-            batch_size=args.per_device_eval_batch_size,
-        )
-        eval_dataloader = accelerator.prepare(eval_dataloader)
+    print('TRAINING COMPLETED.')
+    return model
 
-        model.eval()
-        for step, batch in enumerate(eval_dataloader):
-            outputs = model(**batch)
-            predictions = outputs.logits.argmax(dim=-1)
-            metric.add_batch(
-                predictions=accelerator.gather(predictions),
-                references=accelerator.gather(batch["labels"]),
-            )
+######
+# Main
+######
 
-        eval_metric = metric.compute()
-        logger.info(f"mnli-mm: {eval_metric}")
-
-
-def main():
+if __name__ == '__main__':
+    
+    # Parse args
+    
     args = parse_args()
-    config = {"args": args}
+    print('Loaded arguments:')
+    print(args)
 
-#    if args.start_local or args.address or args.num_workers > 1 or args.use_gpu:
-#        if args.start_local:
-#            # Start a local Ray runtime.
-#            ray.init(num_cpus=args.num_workers)
-#        else:
-            # Connect to a Ray cluster for distributed training.
-    ray.init(address=args.address)
-    trainer = Trainer("torch", num_workers=args.num_workers, use_gpu=args.use_gpu)
+    # Get environment variables
+    
+    env_var = os.environ 
+    print('Environment variables:')
+    pprint.pprint(dict(env_var), width = 1) 
+    
+    
+    # Check if distributed training
+    
+    #is_distributed = len(args.hosts) > 1 and args.backend is not None
+   # is_distributed = True
+
+    #print("Distributed training - {}".format(is_distributed))
+    use_cuda = args.num_gpus > 0
+    print("Number of gpus available - {}".format(args.num_gpus))
+    kwargs = {'num_workers': 1, 'pin_memory': True} if use_cuda else {}
+
+    device = torch.device('cuda' if use_cuda else 'cpu')
+
+    # Initialize the distributed environment.
+    
+    #if is_distributed:
+        # BEFORE RAY world_size = len(args.hosts)
+        #world_size = num_workers 
+        #os.environ['WORLD_SIZE'] = str(world_size)
+        #host_rank = num_workers
+        
+	# BEFORE RAY host_rank = args.hosts.index(args.current_host)
+        #os.environ['RANK'] = str(host_rank)
+        #dist.init_process_group(backend=args.backend, rank=host_rank, world_size=world_size)
+        #print('Initialized the distributed environment: \'{}\' backend on {} nodes. '.format(
+        #    args.backend, dist.get_world_size()) + 'Current host rank is {}. Number of gpus: {}'.format(
+        #    dist.get_rank(), args.num_gpus))
+    
+    # Set the seed for generating random numbers
+    
+    torch.manual_seed(args.seed)
+    if use_cuda:
+        torch.cuda.manual_seed(args.seed) 
+    
+    # Instantiate model
+    
+    config = None
+    model = None
+    
+    successful_download = False
+    retries = 0
+    
+    while (retries < 5 and not successful_download):
+        try:
+            # Configure model
+            config = configure_model()
+            model = RobertaForSequenceClassification.from_pretrained(
+                'roberta-base',
+                config=config
+            )
+
+            model.to(device)
+            successful_download = True
+            print('Sucessfully downloaded after {} retries.'.format(retries))
+        
+        except:
+            retries = retries + 1
+            random_sleep = random.randint(1, 30)
+            print('Retry #{}.  Sleeping for {} seconds'.format(retries, random_sleep))
+            time.sleep(random_sleep)
+ 
+    if not model:
+         print('Not properly initialized...')
+    
+    # Create data loaders
+    
+    train_data_loader, df_train = create_data_loader(args.train_data, args.train_batch_size)
+    val_data_loader, df_val = create_data_loader(args.validation_data, args.validation_batch_size)
+    
+    print("Processes {}/{} ({:.0f}%) of train data".format(
+        len(train_data_loader.sampler), len(train_data_loader.dataset),
+        100. * len(train_data_loader.sampler) / len(train_data_loader.dataset)
+    ))
+
+    print("Processes {}/{} ({:.0f}%) of validation data".format(
+        len(val_data_loader.sampler), len(val_data_loader.dataset),
+        100. * len(val_data_loader.sampler) / len(val_data_loader.dataset)
+    )) 
+       
+    print('model_dir: {}'.format(args.model_dir))    
+    print('model summary: {}'.format(model))
+    
+    callbacks = []
+    initial_epoch_number = 0
+   
+    # Start training
+
+#    model = train_model(
+#        model,
+#        train_data_loader,
+#        df_train,
+#        val_data_loader, 
+#        df_val,
+#        args
+#    )
+
+    ray.init(address="auto")
+    trainer = Trainer("torch", num_workers=40, use_gpu=False)
     trainer.start()
-    trainer.run(train_func, config)
-#    else:
-        # Run training locally.
-#        train_func(config)
 
+    config = {
+        "model": model,
+        "train_data_loader": train_data_loader,
+        "df_train": df_train,
+        "val_data_loader": val_data_loader,
+        "df_val": df_val,
+        "args": args
+    }
 
-if __name__ == "__main__":
-    main()
+    model = trainer.run(train_model, config)
+    
+    save_transformer_model(model, args.model_dir)
+    save_pytorch_model(model, args.model_dir)
+    
+    # Prepare for inference which will be used in deployment
+    # You will need three files for it: inference.py, requirements.txt, config.json
+    
+    inference_path = os.path.join(args.model_dir, "code/")
+    os.makedirs(inference_path, exist_ok=True)
+    os.system("cp inference.py {}".format(inference_path))
+    os.system("cp requirements.txt {}".format(inference_path))
+    os.system("cp config.json {}".format(inference_path))
