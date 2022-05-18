@@ -1,0 +1,7 @@
+conda:
+    dependencies:
+    - pip:
+      - scikit-learn==0.23.0
+      - torch
+      - transformers
+      - ray[serve]

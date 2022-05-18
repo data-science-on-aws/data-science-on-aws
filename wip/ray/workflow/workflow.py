@@ -1,7 +1,10 @@
 import ray
 from ray import workflow
 
-ray.init(address="auto", storage="/tmp")
+ray.init(
+#         address="auto", 
+         storage="/tmp"
+        )
 workflow.init()
 
 # RuntimeError: Unable to initialize storage: /tmp/_valid file created during init not found. Check that configured cluster storage path is readable from all worker nodes of the cluster.

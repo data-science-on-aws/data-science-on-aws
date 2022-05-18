@@ -7,7 +7,7 @@ from ray import serve
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from transformers import pipeline
 
-ray.init()
+ray.init(address="auto")
 
 from ray.experimental.dag.input_node import InputNode
 
@@ -78,7 +78,7 @@ with InputNode() as dag_input:
     ) 
     
     # Each serve dag has a driver deployment as ingress that can be user provided.
-    serve_dag = DAGDriver.options(route_prefix="/invocations").bind(dag)
+    serve_dag = DAGDriver.options(route_prefix="/invocations2").bind(dag)
 
 dag_handle = serve.run(serve_dag)
 
