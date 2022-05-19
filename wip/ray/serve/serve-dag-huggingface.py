@@ -6,10 +6,9 @@ import ray
 from ray import serve
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from transformers import pipeline
+from ray.experimental.dag.input_node import InputNode
 
 ray.init(address="auto")
-
-from ray.experimental.dag.input_node import InputNode
 
 @serve.deployment
 class Model:
