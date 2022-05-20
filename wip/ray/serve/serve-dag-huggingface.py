@@ -43,7 +43,7 @@ class Combiner:
  
 
 @serve.deployment(num_replicas=1,
-                  route_prefix="/invocations2")
+                  route_prefix="/invocations")
 class DAGDriver:
     def __init__(self, dag):
         self.dag = dag
