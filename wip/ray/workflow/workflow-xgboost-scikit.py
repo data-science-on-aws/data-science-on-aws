@@ -68,7 +68,7 @@ def validate(classifier, preprocessed_data):
 #pred_ray = clf.predict(X_test, ray_params=RayParams(num_actors=2))
 #print(pred_ray)
 
-#ray.init()
+#ray.init(address="auto", storage=None)
 
 # Initialize workflow storage.
 workflow.init()
