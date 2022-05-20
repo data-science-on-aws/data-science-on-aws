@@ -7,5 +7,5 @@ import requests
 input_text_list = ["Ray Serve is great!", "Serving frameworks without DAG support are not great."]
 
 for input_text in input_text_list:
-    prediction = requests.get("http://127.0.0.1:8000/invocations", data=input_text).text
+    prediction = requests.get("http://127.0.0.1:8000/invocations2", data=input_text).text
     print("Average prediction for '{}' is {}".format(input_text, prediction))
