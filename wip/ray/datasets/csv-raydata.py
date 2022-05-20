@@ -1,30 +1,13 @@
 import ray
-from pyarrow.csv import ParseOptions
+import os
 
-class InvalidRowHandler:
-    def __init__(self, result):
-        self.result = result
-        self.rows = []
+ray.init(address="auto")
 
-    def __call__(self, row):
-        self.rows.append(row)
-        return self.result
+print(os.getcwd())
 
-    def __eq__(self, other):
-        return (isinstance(other, InvalidRowHandler) and
-                other.result == self.result)
+files = os.listdir('.')
+print(files)
 
-    def __ne__(self, other):
-        return (not isinstance(other, InvalidRowHandler) or
-                other.result != self.result)
+df = ray.data.read_csv(paths="data/train/part-algo-1-womens_clothing_ecommerce_reviews.csv")
 
-
-skip_handler = InvalidRowHandler('skip')
-
-df = ray.data.read_csv(paths='s3://dsoaws/amazon_reviews_us_Digital_Software_v1_00.tsv',
-                       parse_options=ParseOptions(delimiter='\t')
-#                                                  invalid_row_handler=skip_handler))
-
-
-print(df)
-print('blah')
+df.groupby("sentiment").count()

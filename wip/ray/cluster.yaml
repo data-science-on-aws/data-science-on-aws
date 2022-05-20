@@ -129,6 +129,11 @@ head_node_type: ray.head.default
 file_mounts: {
 #    "/path1/on/remote/machine": "/path1/on/local/machine",
 #    "/path2/on/remote/machine": "/path2/on/local/machine",
+#    "./train/transformer/": "/home/ray/transformer/",
+#    "./train/transformer1/": "/home/ray/transformer1/",
+#    "./train/transformer2/": "/home/ray/transformer2/",
+#    "./datasets/data/", "/home/ray/data/",
+#    "./train/data/", "/home/ray/data/"
 }
 
 # Files or directories to copy from the head node to the worker nodes. The format is a
@@ -139,7 +144,7 @@ cluster_synced_files: []
 
 # Whether changes to directories in file_mounts or cluster_synced_files in the head node
 # should sync to the worker node continuously
-file_mounts_sync_continuously: False
+file_mounts_sync_continuously: True
 
 # Patterns for files to exclude when running rsync up or rsync down
 rsync_exclude:
