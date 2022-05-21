@@ -26,7 +26,7 @@ Install and run JupyterLab on the head node of the Ray cluster:
 ```
 pip install jupyterlab
 
-jupyterlab
+jupyter lab
 ```
 
 Back on your local laptop, tunnel port 8888 to the Ray cluster:
