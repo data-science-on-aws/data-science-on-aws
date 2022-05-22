@@ -16,7 +16,7 @@ Tear down your Ray cluster from your local laptop:
 ray down cluster.yaml
 ```
 
-## Run JupyterLab in the Ray cluster
+## Run JupyterLab on the head node of the Ray cluster
 Attach to the head node of the Ray cluster
 ```
 ray attach cluster.yaml
@@ -62,6 +62,34 @@ http://127.0.0.1:8888
 ```
 
 ![image](https://user-images.githubusercontent.com/1438064/169604655-97f32435-681d-4068-b636-ec06ad3abaa1.png)
+
+## Run MLflow on the head node of the Ray cluster
+Attach to the head node of the Ray cluster
+```
+ray attach cluster.yaml
+```
+
+Install MLflow on the head node of the Ray cluster
+```
+pip install mlflow
+```
+
+Run MLflow UI on the head node of the Ray cluster
+```
+nohup mlflow ui --host 0.0.0.0 --port 5001 > mlflow.out &
+```
+
+Back on your local laptop, tunnel port 5001 to the Ray cluster:
+```
+ray attach cluster.yaml -p 5001
+```
+
+Navigate your browser to the following URL to start using JupyterLab:
+```
+http://127.0.0.1:5001
+```
+
+<img width="1793" alt="image" src="https://user-images.githubusercontent.com/1438064/169713719-9047362d-e7b0-4fb7-aed2-185c4ab06145.png">
 
 ## References
 * Customize your Ray cluster on AWS as shown here:  https://docs.ray.io/en/master/cluster/cloud.html
