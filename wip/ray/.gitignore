@@ -1,3 +1,5 @@
+mlruns/
+*.out
 dump/
 ray_experiments/
 model/

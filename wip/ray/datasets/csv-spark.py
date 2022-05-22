@@ -10,7 +10,7 @@ configs={
 spark = raydp.init_spark(
   app_name = "example",
   num_executors = 1,
-  executor_cores = 1,
+  executor_cores = 8,
   executor_memory = "1GB",
   configs = configs
 )

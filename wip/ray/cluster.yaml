@@ -127,11 +127,11 @@ head_node_type: ray.head.default
 # Files or directories to copy to the head and worker nodes. The format is a
 file_mounts: {
 #   REMOTE_PATH: LOCAL_PATH.
-    "/home/ray/data/": "./datasets/data/",
-    "/home/ray/data/": "./train/data/",
-    "/home/ray/transformer/": "./serve/transformer/",
-    "/home/ray/transformer1/": "./serve/transformer1/",
-    "/home/ray/transformer2/": "./serve/transformer2/"
+#    "/home/ray/data/": "./datasets/data/",
+#    "/home/ray/data/": "./train/data/",
+#    "/home/ray/transformer/": "./serve/transformer/",
+#    "/home/ray/transformer1/": "./serve/transformer1/",
+#    "/home/ray/transformer2/": "./serve/transformer2/"
 }
 
 # Files or directories to copy from the head node to the worker nodes. The format is a
@@ -167,17 +167,27 @@ setup_commands:
     # below with a git checkout <your_sha> (and possibly a recompile).
     # To run the nightly version of ray (as opposed to the latest), either use a rayproject docker image
     # that has the "nightly" (e.g. "rayproject/ray-ml:nightly-gpu") or uncomment the following line:
-#    - pip install -U ray==1.12.0
     - pip install -U "ray[default] @ https://s3-us-west-2.amazonaws.com/ray-wheels/latest/ray-3.0.0.dev0-cp37-cp37m-manylinux2014_x86_64.whl"
-    - pip install raydp
-#    - pip install -U http://d168575n8y1h5x.cloudfront.net/latest/amzn_ray-1.9.2-cp37-cp37m-manylinux2014_x86_64.whl
+    - pip install -U raydp
     - pip install -U s3fs
     - pip install -U xgboost_ray
+    - pip install -U mlflow
     - sudo apt-get update
     - sudo apt-get install -y default-jre
 
 # Custom commands that will be run on the head node after common setup.
-head_setup_commands: []
+head_setup_commands:
+    - sudo apt-get install curl
+    - curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+#     - sudo apt-get install -y npm
+    - pip install jupyterlab
+    - pip install jupyterlab-s3-browser
+    - jupyter labextension install jupyterlab-s3-browser
+    - jupyter serverextension enable --py jupyterlab_s3_browser
+    - pip install jupyterlab_execute_time
+    - pip install jupyterlab_scheduler
+    - jupyter labextension install jupyterlab_scheduler
+    - jupyter lab build
 
 # Custom commands that will be run on worker nodes after common setup.
 worker_setup_commands: []
@@ -185,6 +195,9 @@ worker_setup_commands: []
 # Command to start ray on the head node. You don't need to change this.
 head_start_ray_commands:
     - ray stop
+    - nohup mlflow ui --host 0.0.0.0 --port 5001 > mlflow.out &
+#    - sudo initctl restart jupyter-server --no-wait
+    - nohup jupyter lab > jupyterlab.out &
     - ray start --head --port=6379 --object-manager-port=8076 --autoscaling-config=~/ray_bootstrap_config.yaml
 
 # Command to start ray on worker nodes. You don't need to change this.

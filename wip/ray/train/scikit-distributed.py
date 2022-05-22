@@ -17,7 +17,10 @@ search = RandomizedSearchCV(model, param_space, cv=5, n_iter=300, verbose=10)
 
 import joblib
 from ray.util.joblib import register_ray
+
 register_ray()
-ray.init(address="auto")
+
+ray.init(address="127.0.0.1:6379")
+
 with joblib.parallel_backend('ray'):
     search.fit(digits.data, digits.target)
