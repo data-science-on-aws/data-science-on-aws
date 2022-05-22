@@ -31,6 +31,8 @@ Install S3 Browser extension for JupyterLab
 ```
 pip install jupyterlab-s3-browser
 
+jupyter labextension install jupyterlab-s3-browser
+
 jupyter serverextension enable --py jupyterlab_s3_browser
 ```
 
