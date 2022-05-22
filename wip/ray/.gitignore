@@ -1,3 +1,4 @@
+*-output.ipynb
 mlruns/
 *.out
 dump/
