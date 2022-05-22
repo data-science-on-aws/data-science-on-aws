@@ -22,9 +22,29 @@ Attach to the head node of the Ray cluster
 ray attach cluster.yaml
 ```
 
-Install and run JupyterLab on the head node of the Ray cluster:
+Install Jupyter Lab on the head node of the Ray cluster:
 ```
 pip install jupyterlab
+```
+
+Install S3 Browser extension for JupyterLab
+```
+pip install jupyterlab-s3-browser
+
+jupyter serverextension enable --py jupyterlab_s3_browser
+```
+
+Install Scheduler extension for JupyterLab
+```
+pip install jupyterlab_scheduler
+
+jupyter labextension install jupyterlab_scheduler
+
+jupyter lab build
+```
+
+Run JupyterLab on the head node of the Ray cluster
+```
 
 nohup jupyter lab > jupyterlab.out &
 ```
