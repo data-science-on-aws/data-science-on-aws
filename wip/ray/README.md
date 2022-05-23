@@ -47,7 +47,6 @@ jupyter lab build
 
 Run JupyterLab on the head node of the Ray cluster
 ```
-
 nohup jupyter lab > jupyterlab.out &
 ```
 
