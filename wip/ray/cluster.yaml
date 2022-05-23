@@ -75,7 +75,7 @@ available_node_types:
         # http://boto3.readthedocs.io/en/latest/reference/services/ec2.html#EC2.ServiceResource.create_instances
         node_config:
             #SubnetIds: [subnet-51369e37,subnet-a61974a8,subnet-25661d68,subnet-b3cb7fec,subnet-999e28b8] 
-            InstanceType: m6i.12xlarge
+            InstanceType: m6i.4xlarge
 #            ImageId: ami-0cd43cad722dc3ae6
             #ImageId: ami-0a2363a9cff180a64 # Deep Learning AMI (Ubuntu) Version 30
             # You can provision additional disk space with a conf as follows
