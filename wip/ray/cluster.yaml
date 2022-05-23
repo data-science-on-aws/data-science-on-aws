@@ -75,7 +75,7 @@ available_node_types:
         # http://boto3.readthedocs.io/en/latest/reference/services/ec2.html#EC2.ServiceResource.create_instances
         node_config:
             #SubnetIds: [subnet-51369e37,subnet-a61974a8,subnet-25661d68,subnet-b3cb7fec,subnet-999e28b8] 
-            InstanceType: m5.8xlarge
+            InstanceType: m6i.12xlarge
 #            ImageId: ami-0cd43cad722dc3ae6
             #ImageId: ami-0a2363a9cff180a64 # Deep Learning AMI (Ubuntu) Version 30
             # You can provision additional disk space with a conf as follows
@@ -177,14 +177,16 @@ setup_commands:
 
 # Custom commands that will be run on the head node after common setup.
 head_setup_commands:
+    - echo "export USER=ray" > ~/.bashrc
+    - pip install papermill
+    - sudo apt-get install -y cron
     - sudo apt-get install curl
     - curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
-#     - sudo apt-get install -y npm
+    - sudo apt-get install -y nodejs
     - pip install jupyterlab
     - pip install jupyterlab-s3-browser
     - jupyter labextension install jupyterlab-s3-browser
     - jupyter serverextension enable --py jupyterlab_s3_browser
-    - pip install jupyterlab_execute_time
     - pip install jupyterlab_scheduler
     - jupyter labextension install jupyterlab_scheduler
     - jupyter lab build
@@ -196,7 +198,6 @@ worker_setup_commands: []
 head_start_ray_commands:
     - ray stop
     - nohup mlflow ui --host 0.0.0.0 --port 5001 > mlflow.out &
-#    - sudo initctl restart jupyter-server --no-wait
     - nohup jupyter lab > jupyterlab.out &
     - ray start --head --port=6379 --object-manager-port=8076 --autoscaling-config=~/ray_bootstrap_config.yaml
 
