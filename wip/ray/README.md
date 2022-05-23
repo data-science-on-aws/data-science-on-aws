@@ -16,7 +16,7 @@ Tear down your Ray cluster from your local laptop:
 ray down cluster.yaml
 ```
 
-## Run JupyterLab on the head node of the Ray cluster
+## Install JupyterLab and MLflow
 Attach to the head node of the Ray cluster
 ```
 ray attach cluster.yaml
@@ -45,18 +45,45 @@ jupyter labextension install jupyterlab_scheduler
 jupyter lab build
 ```
 
-Run JupyterLab on the head node of the Ray cluster
+Install MLflow on the head node of the Ray cluster
+```
+pip install mlflow
 ```
 
+## Run JupyterLab and MLflow on the head node of the Ray cluster
+From your local laptop, Attach to the head node of the Ray cluster
+```
+ray attach cluster.yaml
+```
+
+Run JupyterLab on the head node of the Ray cluster
+```
 nohup jupyter lab > jupyterlab.out &
 ```
 
-Back on your local laptop, tunnel port 8888 to the Ray cluster:
+Run MLflow UI on the head node of the Ray cluster
+```
+nohup mlflow ui --host 0.0.0.0 --port 5001 > mlflow.out &
+```
+
+## Tunnel ports from local laptop to the head node of the Ray cluster
+From your local laptop, tunnel port 8888 to the Ray cluster:
 ```
 ray attach cluster.yaml -p 8888
 ```
 
-Back on your local laptop, run this command to get the JupyterLab url (and `?token=`) 
+From your local laptop, tunnel port 5001 to the Ray cluster:
+```
+ray attach cluster.yaml -p 5001
+```
+
+From your local laptop, start the dashboard and tunnel port 8265 to the Ray cluster:
+```
+ray dashboard cluster.yaml # This implicitly tunnels port 8265
+```
+
+## Navigate to the JupyterLab and MLflow UIs
+From your local laptop, run this command to get the JupyterLab url (and `?token=`) 
 ```
 ray exec cluster.yaml "jupyter server list"
 ```
@@ -68,28 +95,7 @@ http://127.0.0.1:8888?token=...
 
 ![image](https://user-images.githubusercontent.com/1438064/169604655-97f32435-681d-4068-b636-ec06ad3abaa1.png)
 
-## Run MLflow on the head node of the Ray cluster
-Attach to the head node of the Ray cluster
-```
-ray attach cluster.yaml
-```
-
-Install MLflow on the head node of the Ray cluster
-```
-pip install mlflow
-```
-
-Run MLflow UI on the head node of the Ray cluster
-```
-nohup mlflow ui --host 0.0.0.0 --port 5001 > mlflow.out &
-```
-
-Back on your local laptop, tunnel port 5001 to the Ray cluster:
-```
-ray attach cluster.yaml -p 5001
-```
-
-Navigate your browser to the following URL to start using JupyterLab:
+Navigate your browser to the following URL to start using MLflow:
 ```
 http://127.0.0.1:5001
 ```
