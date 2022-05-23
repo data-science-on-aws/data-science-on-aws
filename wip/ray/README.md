@@ -77,6 +77,11 @@ From your local laptop, tunnel port 5001 to the Ray cluster:
 ray attach cluster.yaml -p 5001
 ```
 
+From your local laptop, start the dashboard and tunnel port 8265 to the Ray cluster:
+```
+ray dashboard cluster.yaml # This implicitly tunnels port 8265
+```
+
 ## Navigate to the JupyterLab and MLflow UIs
 From your local laptop, run this command to get the JupyterLab url (and `?token=`) 
 ```
