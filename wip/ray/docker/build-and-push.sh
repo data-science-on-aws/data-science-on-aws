@@ -1,6 +1,6 @@
 docker build -t dsoaws/ray-fluxcapacitor:1.0 .
 
-docker tag dsoaws/ray-fluxcapacitor:1.0 079002598131.dkr.ecr.us-east-1.amazonaws.com/dsoaws/ray-fluxcapacitor:1.0
+#docker tag dsoaws/ray-fluxcapacitor:1.0 079002598131.dkr.ecr.us-east-1.amazonaws.com/dsoaws/ray-fluxcapacitor:1.0
 
 docker tag dsoaws/ray-fluxcapacitor:1.0 datascienceonaws/ray-fluxcapacitor:1.0
 

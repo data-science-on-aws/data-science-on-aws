@@ -6,6 +6,7 @@ RUN pip install -U s3fs
 RUN pip install -U xgboost_ray
 RUN pip install -U mlflow
 RUN sudo apt-get update
+RUN sudo apt-get install -y s3fs
 RUN sudo apt-get install -y default-jre
 
 RUN echo "export USER=ray" >> ~/.bashrc
