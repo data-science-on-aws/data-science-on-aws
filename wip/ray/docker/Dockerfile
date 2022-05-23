@@ -23,5 +23,5 @@ RUN jupyter labextension install jupyterlab_scheduler
 RUN jupyter lab build
 
 EXPOSE 8265 8888 5001
-ENTRYPOINT ["ray", "start", "--head"]
+#ENTRYPOINT ["ray", "start", "--head"]
 
