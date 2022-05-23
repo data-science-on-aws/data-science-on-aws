@@ -8,7 +8,7 @@ RUN pip install -U mlflow
 RUN sudo apt-get update
 RUN sudo apt-get install -y default-jre
 
-RUN echo "export USER=ray" > ~/.bashrc
+RUN echo "export USER=ray" >> ~/.bashrc
 RUN pip install papermill
 RUN sudo apt-get install -y cron
 RUN sudo apt-get install curl
