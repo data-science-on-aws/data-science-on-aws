@@ -1,5 +1,27 @@
 FROM rayproject/ray-ml:1.13.0rc0-cpu
 
-EXPOSE 8265
+RUN pip install -U "ray[default] @ https://s3-us-west-2.amazonaws.com/ray-wheels/latest/ray-3.0.0.dev0-cp37-cp37m-manylinux2014_x86_64.whl"
+RUN pip install -U raydp
+RUN pip install -U s3fs
+RUN pip install -U xgboost_ray
+RUN pip install -U mlflow
+RUN sudo apt-get update
+RUN sudo apt-get install -y default-jre
+
+RUN echo "export USER=ray" > ~/.bashrc
+RUN pip install papermill
+RUN sudo apt-get install -y cron
+RUN sudo apt-get install curl
+RUN curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+RUN sudo apt-get install -y nodejs
+RUN pip install jupyterlab
+RUN pip install jupyterlab-s3-browser
+RUN jupyter labextension install jupyterlab-s3-browser
+RUN jupyter serverextension enable --py jupyterlab_s3_browser
+RUN pip install jupyterlab_scheduler
+RUN jupyter labextension install jupyterlab_scheduler
+RUN jupyter lab build
+
+EXPOSE 8265 8888 5001
 ENTRYPOINT ["ray", "start", "--head"]
 
