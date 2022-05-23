@@ -16,7 +16,8 @@ upscaling_speed: 1
 # Empty string means disabled.
 docker:
     # image: "rayproject/ray-ml:nightly-cpu" # You can change this to latest-cpu if you don't need GPU support and want a faster startup
-    image: "rayproject/ray-ml:1.13.0rc0-cpu"
+#    image: "rayproject/ray-ml:1.13.0rc0-cpu"
+    image: "datascienceonaws/ray-fluxcapacitor:1.0"
     # image: rayproject/ray-ml:latest-gpu   # use this one if you don't need ML dependencies, it's faster to pull
     container_name: "ray_container"
     # If true, pulls latest version of image. Otherwise, `docker run` will only pull the image
@@ -28,11 +29,11 @@ docker:
 
     # Example of running a GPU head with CPU workers
     #head_image: "rayproject/ray-ml:nightly-cpu"
-    head_image: "rayproject/ray-ml:1.13.0rc0-cpu"
+    head_image: "datascienceonaws/ray-fluxcapacitor:1.0"
     # Allow Ray to automatically detect GPUs
 
     #worker_image: "rayproject/ray-ml:nightly-cpu"
-    worker_image: "rayproject/ray-ml:1.13.0rc0-cpu"
+    worker_image: "datascienceonaws/ray-fluxcapacitor:1.0"
     # worker_run_options: []
 
 # If a node is idle for this many minutes, it will be removed.
@@ -127,8 +128,8 @@ head_node_type: ray.head.default
 # Files or directories to copy to the head and worker nodes. The format is a
 file_mounts: {
 #   REMOTE_PATH: LOCAL_PATH.
-#    "/home/ray/data/": "./datasets/data/",
-#    "/home/ray/data/": "./train/data/",
+    "/home/ray/data/": "./datasets/data/",
+    "/home/ray/data/": "./train/data/",
 #    "/home/ray/transformer/": "./serve/transformer/",
 #    "/home/ray/transformer1/": "./serve/transformer1/",
 #    "/home/ray/transformer2/": "./serve/transformer2/"
