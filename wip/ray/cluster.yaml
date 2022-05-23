@@ -183,9 +183,9 @@ head_setup_commands: []
 #    - pip install jupyterlab-s3-browser
 #    - jupyter labextension install jupyterlab-s3-browser
 #    - jupyter serverextension enable --py jupyterlab_s3_browser
-#    - pip install jupyterlab_scheduler
-#    - jupyter labextension install jupyterlab_scheduler
-#    - jupyter lab build
+##    - pip install jupyterlab_scheduler
+##    - jupyter labextension install jupyterlab_scheduler
+##    - jupyter lab build
 
 # Custom commands that will be run on worker nodes after common setup.
 worker_setup_commands: []

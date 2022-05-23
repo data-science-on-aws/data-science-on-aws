@@ -19,9 +19,9 @@ RUN pip install jupyterlab
 RUN pip install jupyterlab-s3-browser
 RUN jupyter labextension install jupyterlab-s3-browser
 RUN jupyter serverextension enable --py jupyterlab_s3_browser
-RUN pip install jupyterlab_scheduler
-RUN jupyter labextension install jupyterlab_scheduler
-RUN jupyter lab build
+#RUN pip install jupyterlab_scheduler
+#RUN jupyter labextension install jupyterlab_scheduler
+#RUN jupyter lab build
 
 EXPOSE 8265 8888 5001
 #ENTRYPOINT ["ray", "start", "--head"]
