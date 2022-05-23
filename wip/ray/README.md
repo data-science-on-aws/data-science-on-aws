@@ -56,9 +56,14 @@ Back on your local laptop, tunnel port 8888 to the Ray cluster:
 ray attach cluster.yaml -p 8888
 ```
 
-Navigate your browser to the following URL to start using JupyterLab:
+Back on your local laptop, run this command to get the JupyterLab url (and `?token=`) 
 ```
-http://127.0.0.1:8888
+ray exec cluster.yaml "jupyter server list"
+```
+
+Navigate your browser to the URL from above to start using JupyterLab:
+```
+http://127.0.0.1:8888?token=...
 ```
 
 ![image](https://user-images.githubusercontent.com/1438064/169604655-97f32435-681d-4068-b636-ec06ad3abaa1.png)
