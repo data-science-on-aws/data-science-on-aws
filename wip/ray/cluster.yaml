@@ -3,7 +3,7 @@ cluster_name: cluster
 
 # The maximum number of workers nodes to launch in addition to the head
 # node.
-max_workers: 5 
+max_workers: 2 
 
 # The autoscaler will scale up the cluster faster with higher upscaling speed.
 # E.g., if the task requires adding more nodes then autoscaler will gradually
@@ -83,6 +83,9 @@ available_node_types:
         # http://boto3.readthedocs.io/en/latest/reference/services/ec2.html#EC2.ServiceResource.create_instances
         node_config:
             #SubnetIds: [subnet-51369e37,subnet-a61974a8,subnet-25661d68,subnet-b3cb7fec,subnet-999e28b8] 
+            Placement:
+                GroupName: ray
+                AvailabilityZone: us-east-1a
             InstanceType: r5dn.2xlarge
             ImageId: ami-069f2811478f86c20
 #            InstanceType: p3dn.24xlarge
@@ -92,18 +95,18 @@ available_node_types:
 #            ImageId: ami-0cd43cad722dc3ae6
             #ImageId: ami-0a2363a9cff180a64 # Deep Learning AMI (Ubuntu) Version 30
             # You can provision additional disk space with a conf as follows
-            BlockDeviceMappings:
-                - DeviceName: /dev/sda1
-                  Ebs:
-                      VolumeSize: 500 
+#            BlockDeviceMappings:
+#                - DeviceName: /dev/sda1
+#                  Ebs:
+#                      VolumeSize: 500 
             # Additional options in the boto docs.
     ray.worker.default:
         # The minimum number of worker nodes of this type to launch.
         # This number should be >= 0.
-        min_workers: 5 
+        min_workers: 2 
         # The maximum number of worker nodes of this type to launch.
         # This takes precedence over min_workers.
-        max_workers: 5 
+        max_workers: 2
         # The node type's CPU and GPU resources are auto-detected based on AWS instance type.
         # If desired, you can override the autodetected CPU and GPU resources advertised to the autoscaler.
         # You can also set custom resources.
@@ -116,6 +119,8 @@ available_node_types:
         # http://boto3.readthedocs.io/en/latest/reference/services/ec2.html#EC2.ServiceResource.create_instances
         node_config:
             #SubnetIds: [subnet-8731ceb6,subnet-51369e37,subnet-a61974a8,subnet-25661d68,subnet-b3cb7fec,subnet-999e28b8]
+            Placement:
+                GroupName: ray
             InstanceType: r5dn.2xlarge
             ImageId: ami-069f2811478f86c20
 #            InstanceType: p3dn.24xlarge
@@ -124,10 +129,10 @@ available_node_types:
                 Name: ray-autoscaler-cloudwatch-v1
 #            ImageId: ami-0cd43cad722dc3ae6
             #ImageId: ami-0a2363a9cff180a64 # Deep Learning AMI (Ubuntu) Version 30
-            BlockDeviceMappings:
-                - DeviceName: /dev/sda1
-                  Ebs:
-                      VolumeSize: 500 
+#            BlockDeviceMappings:
+#                - DeviceName: /dev/sda1
+#                  Ebs:
+#                      VolumeSize: 500 
             # Run workers on spot by default. Comment this out to use on-demand.
             # NOTE: If relying on spot instances, it is best to specify multiple different instance
             # types to avoid interruption when one instance type is experiencing heightened demand.
@@ -143,14 +148,14 @@ available_node_types:
 head_node_type: ray.head.default
 
 # Files or directories to copy to the head and worker nodes. The format is a
-file_mounts: {
+#file_mounts: {
 #   REMOTE_PATH: LOCAL_PATH.
-    "/home/ray/data/": "./datasets/data/",
-    "/home/ray/data/": "./train/data/",
+#    "/home/ray/data/": "./datasets/data/",
+#    "/home/ray/data/": "./train/data/",
 #    "/home/ray/transformer/": "./serve/transformer/",
 #    "/home/ray/transformer1/": "./serve/transformer1/",
 #    "/home/ray/transformer2/": "./serve/transformer2/"
-}
+#}
 
 # Files or directories to copy from the head node to the worker nodes. The format is a
 # list of paths. The same path on the head node will be copied to the worker node.
@@ -179,13 +184,14 @@ rsync_filter:
 initialization_commands: []
 
 # List of shell commands to run to set up nodes.
-setup_commands: [] 
+setup_commands: []
 #    - pip install -U "ray[default] @ https://s3-us-west-2.amazonaws.com/ray-wheels/latest/ray-3.0.0.dev0-cp37-cp37m-manylinux2014_x86_64.whl"
 #    - pip install -U raydp
 #    - pip install -U s3fs
 #    - pip install -U xgboost_ray
 #    - pip install -U mlflow
 #    - sudo apt-get update
+#    - sudo apt-get install -y amazon-cloudwatch-agent
 #    - sudo apt-get install -y s3fs
 #    - sudo apt-get install -y default-jre
 
