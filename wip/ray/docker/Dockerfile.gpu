@@ -1,4 +1,4 @@
-FROM rayproject/ray-ml:1.13.0-cpu
+FROM rayproject/ray-ml:1.13.0rc0-gpu
 
 RUN pip install -U "ray[default] @ https://s3-us-west-2.amazonaws.com/ray-wheels/latest/ray-3.0.0.dev0-cp37-cp37m-manylinux2014_x86_64.whl"
 RUN pip install -U raydp
@@ -21,3 +21,4 @@ RUN jupyter labextension install jupyterlab-s3-browser
 RUN jupyter serverextension enable --py jupyterlab_s3_browser
 
 EXPOSE 8265 8888 5001
+
