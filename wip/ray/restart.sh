@@ -1,4 +1,4 @@
-ray down -y cluster.yaml --no-config-cache
+ray down -y cluster.yaml 
 aws ssm delete-parameter --name AmazonCloudWatch-ray_dashboard_config_cluster
 aws ssm delete-parameter --name AmazonCloudWatch-ray_agent_config_cluster
 ray up -y cluster.yaml --no-config-cache
