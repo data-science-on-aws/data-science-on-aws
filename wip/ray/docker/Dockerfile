@@ -1,6 +1,7 @@
-FROM rayproject/ray-ml:1.13.0-cpu
+FROM rayproject/ray-ml:1.13.0-py38-cpu
 
-RUN pip install -U "ray[default] @ https://s3-us-west-2.amazonaws.com/ray-wheels/latest/ray-3.0.0.dev0-cp37-cp37m-manylinux2014_x86_64.whl"
+#RUN pip install -U "ray[default] @ https://s3-us-west-2.amazonaws.com/ray-wheels/latest/ray-3.0.0.dev0-cp37-cp37m-manylinux2014_x86_64.whl"
+RUN pip install torch torchvision torchaudio
 RUN pip install -U raydp
 RUN pip install -U s3fs
 RUN pip install -U xgboost_ray
