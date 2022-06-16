@@ -2,7 +2,7 @@ ray down -y cluster-gpu.yaml
 aws ssm delete-parameter --name AmazonCloudWatch-ray_dashboard_config_cluster
 aws ssm delete-parameter --name AmazonCloudWatch-ray_agent_config_cluster
 ray up -y cluster-gpu.yaml --no-config-cache
-ray exec cluster.yaml "git clone https://github.com/data-science-on-aws/data-science-on-aws.git"
+ray exec cluster-gpu.yaml "git clone https://github.com/data-science-on-aws/data-science-on-aws.git"
 echo "JupyterLab..."
 ray exec cluster-gpu.yaml "jupyter server list" --no-config-cache
 nohup ray attach cluster-gpu.yaml -p 8888 --no-config-cache > attach-jupyterlab.out &

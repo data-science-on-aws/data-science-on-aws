@@ -87,7 +87,8 @@ available_node_types:
                 GroupName: ray
                 AvailabilityZone: us-east-1a
             InstanceType: g4dn.2xlarge
-            ImageId: ami-069f2811478f86c20
+            ImageId: ami-0e3c68b57d50caf64 # Deep Learning AMI (Ubuntu 18.04) Version 50.0
+#            ImageId: ami-069f2811478f86c20
 #            InstanceType: p3dn.24xlarge
 #            ImageId: ami-0c95d845ca0320a78
             IamInstanceProfile:
@@ -95,10 +96,10 @@ available_node_types:
 #            ImageId: ami-0cd43cad722dc3ae6
             #ImageId: ami-0a2363a9cff180a64 # Deep Learning AMI (Ubuntu) Version 30
             # You can provision additional disk space with a conf as follows
-#            BlockDeviceMappings:
-#                - DeviceName: /dev/sda1
-#                  Ebs:
-#                      VolumeSize: 500 
+            BlockDeviceMappings:
+                - DeviceName: /dev/sda1
+                  Ebs:
+                      VolumeSize: 500 
             # Additional options in the boto docs.
     ray.worker.default:
         # The minimum number of worker nodes of this type to launch.
@@ -122,17 +123,18 @@ available_node_types:
             Placement:
                 GroupName: ray
             InstanceType: g4dn.2xlarge
-            ImageId: ami-069f2811478f86c20
+            ImageId:  ami-0e3c68b57d50caf64 # Deep Learning AMI (Ubuntu 18.04) Version 50.0
+#            ImageId: ami-069f2811478f86c20
 #            InstanceType: p3dn.24xlarge
 #            ImageId: ami-0c95d845ca0320a78
             IamInstanceProfile:
                 Name: ray-autoscaler-cloudwatch-v1
 #            ImageId: ami-0cd43cad722dc3ae6
             #ImageId: ami-0a2363a9cff180a64 # Deep Learning AMI (Ubuntu) Version 30
-#            BlockDeviceMappings:
-#                - DeviceName: /dev/sda1
-#                  Ebs:
-#                      VolumeSize: 500 
+            BlockDeviceMappings:
+                - DeviceName: /dev/sda1
+                  Ebs:
+                      VolumeSize: 500 
             # Run workers on spot by default. Comment this out to use on-demand.
             # NOTE: If relying on spot instances, it is best to specify multiple different instance
             # types to avoid interruption when one instance type is experiencing heightened demand.
@@ -183,7 +185,19 @@ rsync_filter:
 # is setup.
 initialization_commands: 
     - nvidia-smi
+#    - pip3 list
+#    - sudo apt-get update
+#    - pip3 install -U torch
+#    - python3 -c "import torch; print(torch.cuda.is_available())"
+#    - sudo apt-get install -y nvidia-docker2
+#    - sudo systemctl restart docker
+#    - sudo ls -al /etc/docker/
+#    - sudo cat /etc/docker/daemon.json
+#    - sudo sed -i '0,/{/a "default-runtime": "nvidia",' /etc/docker/daemon.json
+    - docker run nvidia/cuda:11.0.3-base-ubuntu20.04 nvidia-smi
+    - cat /etc/docker/daemon.json
 
+#    - nvidia-docker run nvidia/cuda:11.0.3-base-ubuntu20.04 'pip install torch; python -c "import torch; print(torch.cuda.is_available())"'
 # List of shell commands to run to set up nodes.
 setup_commands: []
 #    - pip install -U "ray[default] @ https://s3-us-west-2.amazonaws.com/ray-wheels/latest/ray-3.0.0.dev0-cp37-cp37m-manylinux2014_x86_64.whl"
@@ -223,7 +237,7 @@ worker_setup_commands: []
 
 # Command to start ray on the head node. You don't need to change this.
 head_start_ray_commands:
-    - ray stop
+    - python -c "import torch; print(torch.cuda.is_available())"
     - nohup mlflow ui --host 0.0.0.0 --port 5001 > mlflow.out &
     - nohup jupyter lab > jupyterlab.out &
     - export AUTOSCALER_MAX_NUM_FAILURES=inf; ray start --head --port=6379 --object-manager-port=8076 --autoscaling-config=~/ray_bootstrap_config.yaml
