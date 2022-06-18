@@ -26,11 +26,11 @@ idle_timeout_minutes: 5
 # Cloud-provider specific configuration.
 provider:
     type: aws
-    region: us-east-1
+    region: us-west-2
     # Availability zone(s), comma-separated, that nodes may be launched in.
     # Nodes will be launched in the first listed availability zone and will
     # be tried in the subsequent availability zones if launching fails.
-    availability_zone: us-east-1a
+    availability_zone: us-west-2a
 
 # How Ray will authenticate with newly launched nodes.
 auth:
@@ -45,22 +45,22 @@ auth:
 # The node config specifies the launch config and physical instance type.
 available_node_types:
     # GPU head node.
-    ray.head.gpu:
+    ray.head.default:
         # worker_image: rayproject/ray:latest-gpu   # use this one if you don't need ML dependencies, it's faster to pull
         # The node type's CPU and GPU resources are auto-detected based on AWS instance type.
         # If desired, you can override the autodetected CPU and GPU resources advertised to the autoscaler.
         # You can also set custom resources.
         # For example, to mark a node type as having 1 CPU, 1 GPU, and 5 units of a resource called "custom", set
         # resources: {"CPU": 1, "GPU": 1, "custom": 5}
-        resources: {"CPU": 0, "GPU": 0}
+#        resources: {"CPU": 0, "GPU": 0}
         # Provider-specific config for this node type, e.g. instance type. By default
         # Ray will auto-configure unspecified fields such as SubnetId and KeyName.
         # For more documentation on available fields, see:
         # http://boto3.readthedocs.io/en/latest/reference/services/ec2.html#EC2.ServiceResource.create_instances
         node_config:
-            InstanceType: r5dn.2xlarge
-            ImageId: ami-029510cec6d69f121
-#            ImageId: ami-0a2363a9cff180a64 # Deep Learning AMI (Ubuntu) Version 30
+            InstanceType: p2.xlarge
+#            ImageId: ami-029510cec6d69f121 # us-east-1 DL AMI Ubuntu Version 30
+            ImageId: ami-0a2363a9cff180a64 # us-west-2 DL AMI Ubuntu Version 30
             # You can provision additional disk space with a conf as follows
             BlockDeviceMappings:
                 - DeviceName: /dev/sda1
@@ -73,7 +73,7 @@ available_node_types:
         # This node type will run a CPU image,
         # rather than the GPU image specified in the global docker settings.
         docker:
-            worker_image: "rayproject/ray-ml:latest-cpu"
+            worker_image: "rayproject/ray-ml:latest-gpu"
         # The minimum number of nodes of this type to launch.
         # This number should be >= 0.
         min_workers: 2 
@@ -92,7 +92,8 @@ available_node_types:
         # http://boto3.readthedocs.io/en/latest/reference/services/ec2.html#EC2.ServiceResource.create_instances
         node_config:
             InstanceType: p2.xlarge
-            ImageId: ami-029510cec6d69f121
+#            ImageId: ami-029510cec6d69f121 # us-east-1 DL AMI Ubuntu Version 30
+            ImageId: ami-0a2363a9cff180a64 # us-west-2 DL AMI Ubuntu Version 30
             BlockDeviceMappings:
                 - DeviceName: /dev/sda1
                   Ebs:
@@ -107,7 +108,7 @@ available_node_types:
             # Additional options in the boto docs.
 
 # Specify the node type of the head node (as configured above).
-head_node_type: ray.head.gpu
+head_node_type: ray.head.default
 
 # Files or directories to copy to the head and worker nodes. The format is a
 file_mounts: {
@@ -121,8 +122,10 @@ file_mounts: {
 
 # List of shell commands to run to set up nodes.
 # NOTE: rayproject/ray:latest has ray latest bundled
-setup_commands: []
-    # - pip install -U https://s3-us-west-2.amazonaws.com/ray-wheels/latest/ray-3.0.0.dev0-cp36-cp36m-manylinux2014_x86_64.whl
+setup_commands: 
+    - pip install -U torch 
+    - conda install -y cudatoolkit
+    #- pip install -U https://s3-us-west-2.amazonaws.com/ray-wheels/latest/ray-3.0.0.dev0-cp36-cp36m-manylinux2014_x86_64.whl
     # - pip install -U "ray[default] @ https://s3-us-west-2.amazonaws.com/ray-wheels/latest/ray-3.0.0.dev0-cp37-cp37m-manylinux2014_x86_64.whl"
 
 # Custom commands that will be run on the head node after common setup.
