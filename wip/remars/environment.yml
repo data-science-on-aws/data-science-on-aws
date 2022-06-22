@@ -23,4 +23,7 @@ dependencies:
     - pyproj
     - earthpy
     - sentinelhub
+    - torch
+    - torchvision
+    - scikit-learn
 
