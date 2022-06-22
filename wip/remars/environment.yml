@@ -1,0 +1,26 @@
+name: reMars2022
+dependencies:
+  - python=3.9
+  - ipykernel
+  - pip
+  - pip:
+    - matplotlib
+    - plotly_express
+    - folium
+    - seaborn
+    - geotiff
+    - geojson
+    - numpy
+    - numba
+    - cuda-python
+    - pandas
+    - geopandas
+    - OSMPythonTools
+    - pystac
+    - rasterio
+    - shapely
+    - timm
+    - pyproj
+    - earthpy
+    - sentinelhub
+
