@@ -156,7 +156,7 @@ def parse_args():
         "--address", type=str, default=None, help="Ray address to connect to."
     )
     parser.add_argument(
-        "--num_workers", type=int, default=1, help="Number of workers to use."
+        "--num_workers", type=int, default=3, help="Number of workers to use."
     )
     parser.add_argument(
         "--use_gpu", action="store_true", help="If training should be done on GPUs."
@@ -480,7 +480,7 @@ def train_func(config: Dict[str, Any]):
 def main():
     args = parse_args()
     config = {"args": args}
-
+    args.use_gpu = True
     if args.start_local or args.address or args.num_workers > 1 or args.use_gpu:
         if args.start_local:
             # Start a local Ray runtime.
@@ -489,7 +489,7 @@ def main():
             # Connect to a Ray cluster for distributed training.
             ray.init(address=args.address)
         trainer = Trainer("torch", num_workers=args.num_workers, use_gpu=args.use_gpu,
-                          resources_per_worker={'CPU': 4, 'GPU': 0})
+                          resources_per_worker={'CPU': 4, 'GPU': 1})
         trainer.start()
         trainer.run(train_func, config)
     else:
