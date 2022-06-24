@@ -156,7 +156,7 @@ def parse_args():
         "--address", type=str, default=None, help="Ray address to connect to."
     )
     parser.add_argument(
-        "--num_workers", type=int, default=2, help="Number of workers to use."
+        "--num_workers", type=int, default=3, help="Number of workers to use."
     )
     parser.add_argument(
         "--use_gpu", action="store_true", help="If training should be done on GPUs."
@@ -467,9 +467,14 @@ def train_func(config: Dict[str, Any]):
                 references=accelerator.gather(batch["labels"]),
             )
 
+        mlflow.log_param("use_gpu", args.use_gpu)
+        mlflow.log_param("batch_size", args.per_device_train_batch_size)
+        mlflow.log_param("learning_rate", args.learning_rate)
+        mlflow.log_param("weight_decay", args.weight_decay)
+        mlflow.log_param("max_length", args.max_length)
+
         eval_metric = metric.compute()
-        mlflow.log_metric("eval_accuracy", eval_metric['accuracy'])
-        logger.info(f"epoch {epoch}: {eval_metric}")
+        mlflow.log_metric("accuracy", eval_metric['accuracy'])
 
     if args.output_dir is not None:
         accelerator.wait_for_everyone()
