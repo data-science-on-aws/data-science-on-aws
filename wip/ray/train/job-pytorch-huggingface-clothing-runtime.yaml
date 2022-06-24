@@ -7,4 +7,5 @@ conda:
       - datasets
       - accelerate
       - scikit-learn
+      - mlflow
 
