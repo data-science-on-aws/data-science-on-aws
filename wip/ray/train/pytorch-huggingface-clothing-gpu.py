@@ -156,7 +156,7 @@ def parse_args():
         "--address", type=str, default=None, help="Ray address to connect to."
     )
     parser.add_argument(
-        "--num_workers", type=int, default=3, help="Number of workers to use."
+        "--num_workers", type=int, default=2, help="Number of workers to use."
     )
     parser.add_argument(
         "--use_gpu", action="store_true", help="If training should be done on GPUs."
