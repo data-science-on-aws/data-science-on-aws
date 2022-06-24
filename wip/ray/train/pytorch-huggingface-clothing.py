@@ -3,10 +3,11 @@ import argparse
 import logging
 import math
 import os
+os.environ["TOKENIZERS_PARALLELISM"] = "true"
 import random
-import mlflow
 import torch
 
+import mlflow
 mlflow.set_tracking_uri('http://127.0.0.1:5001')
 
 from typing import Dict, Any

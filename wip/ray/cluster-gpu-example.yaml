@@ -31,6 +31,16 @@ provider:
     # Nodes will be launched in the first listed availability zone and will
     # be tried in the subsequent availability zones if launching fails.
     availability_zone: us-west-2a
+    cache_stopped_nodes: False # If not present, the default is True.
+    cloudwatch:
+        agent:
+            # Path to Unified CloudWatch Agent config file
+            config: "cloudwatch/cloudwatch-agent-config.json"
+        dashboard:
+            # CloudWatch Dashboard name
+            name: "RayDashboard"
+            # Path to the CloudWatch Dashboard config file
+            config: "cloudwatch/cloudwatch-dashboard-config.json"
 
 # How Ray will authenticate with newly launched nodes.
 auth:
