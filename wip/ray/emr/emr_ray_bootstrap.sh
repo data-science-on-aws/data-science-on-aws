@@ -21,19 +21,19 @@ then
     python3 --version
     pip3 --version
 
-    # Update notebook env to use 3.7.10
-    #sudo /emr/notebook-env/bin/conda install --name base -y python==3.7.10
-    #sudo /emr/notebook-env/bin/conda install -y python==3.7.10
-
-    # Install libraries
-    #sudo /emr/notebook-env/bin/pip install -U torch transformers pandas datasets accelerate scikit-learn mlflow ray[all]
-
     export PATH=/home/hadoop/.local/bin:$PATH
-    pip3 install -U scikit-learn ray[all]         #torch transformers pandas datasets accelerate scikit-learn mlflow ray[all]
 
-    aws s3 cp s3://dsoaws/emr/leader_hostname.txt .
-    RAY_HEAD_IP=$(<leader_hostname.txt)
-    echo "$RAY_HEAD_IP"
+    # Update notebook env to use 3.7.10
+
+    # Install libraries    
+    pip3 install -U scikit-learn ray[all]  # torch transformers pandas datasets accelerate scikit-learn mlflow ray[all]
+
+    # Replace this...
+#    aws s3 cp s3://dsoaws/emr/leader_hostname.txt .
+#    RAY_HEAD_IP=$(<leader_hostname.txt)
+#    echo "$RAY_HEAD_IP"
+ 
+     RAY_HEAD_IP=$(grep "\"masterHost\":" /emr/instance-controller/lib/info/extraInstanceData.json | cut -f2 -d: | cut -f2 -d\")
 
     sudo mkdir -p /tmp/ray/
     sudo chmod a+rwx -R /tmp/ray/
@@ -47,8 +47,8 @@ fi
 # MASTER NODE
 #############
 
-echo $HOSTNAME > leader_hostname.txt
-aws s3 cp leader_hostname.txt s3://dsoaws/emr/
+#echo $HOSTNAME > leader_hostname.txt
+#aws s3 cp leader_hostname.txt s3://dsoaws/emr/
 
 #########################################
 sudo yum install -y amazon-linux-extras
@@ -61,11 +61,21 @@ pip3 --version
 
 export PATH=/home/hadoop/.local/bin:$PATH
 
-# Update notebook env to use 3.7.10
+COMPLETED=
+echo -n "Waiting for EMR to provision..."
+while [ -z "$COMPLETED" ]; do
+    echo -n "."
+    sleep 10
+
+    COMPLETED=$(grep "status: SUCCESSFUL" /emr/instance-controller/lib/info/job-flow-state.txt)
+done
+
+echo "EMR provisioned! Continuing with installation..."
+
+
+# Update notebook env to use python 3.7.10 and install libs
 sudo /emr/notebook-env/bin/conda install --name base -y python==3.7.10
 sudo /emr/notebook-env/bin/conda install -y python==3.7.10
-
-# Install libraries
 sudo /emr/notebook-env/bin/pip install -U scikit-learn ray[all]  # torch transformers pandas datasets accelerate scikit-learn mlflow ray[all]
 
 pip3 install -U scikit-learn ray[all] # torch transformers pandas datasets accelerate scikit-learn mlflow ray[all]
