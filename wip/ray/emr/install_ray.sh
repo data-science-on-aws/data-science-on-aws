@@ -16,7 +16,7 @@ if grep isMaster /mnt/var/lib/info/instance.json | grep false; then
 echo -n "Waiting for Ray leader node..."
 while ( ! nc -z -v $RAY_HEAD_IP 6379); do echo -n "."; sleep 5; done
 echo -e "\nRay available...starting!"
-sudo ray start --address=$RAY_HEAD_IP:6379 --object-manager-port=8076 --disable-usage-stats
+ray start --address=$RAY_HEAD_IP:6379 --object-manager-port=8076 --disable-usage-stats
 EOF
 
     chmod +x /tmp/start_ray.sh
@@ -55,7 +55,7 @@ sudo pip3 install -U scikit-learn ray[all] # torch transformers pandas datasets 
 sudo mkdir -p /tmp/ray/
 sudo chmod a+rwx -R /tmp/ray/
 
-sudo ray start --head --port=6379 --object-manager-port=8076 --disable-usage-stats
+ray start --head --port=6379 --object-manager-port=8076 --disable-usage-stats
 EOF
 
 # Execute the script in the background
