@@ -1,0 +1,6 @@
+torchmetrics>=0.3 
+lightning-bolts 
+pytorch-lightning>=1.3
+ray[default]
+ray_lightning
+optuna
