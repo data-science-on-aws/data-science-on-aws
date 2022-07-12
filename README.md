@@ -87,12 +87,12 @@ Click `File` > `New` > `Terminal` to launch a terminal in your Jupyter instance.
 Within the Terminal, run the following:
 
 ```
-cd ~ && git clone -b main https://github.com/data-science-on-aws/oreilly_book
+cd ~ && git clone -b main https://github.com/data-science-on-aws/workshop
 ```
 
 If you see an error like the following, just re-run the command again until it works:
 ```
-fatal: Unable to create '/home/sagemaker-user/oreilly_book/.git/index.lock': File exists.
+fatal: Unable to create '/home/sagemaker-user/workshop/.git/index.lock': File exists.
 
 Another git process seems to be running in this repository, e.g.
 an editor opened by 'git commit'. Please make sure all processes
@@ -105,8 +105,8 @@ _Note:  This is not a fatal error ^^ above ^^.  Just re-run the command again un
 
 ## 6. Start the Book Examples!
 
-Navigate to `oreilly_book/` in SageMaker Studio and start the book examples!!
+Navigate to `workshop/` in SageMaker Studio and start the book examples!!
 
-_You may need to refresh your browser if you don't see the new `oreilly_book/` directory._
+_You may need to refresh your browser if you don't see the new `workshop/` directory._
 
 ![Start Workshop](img/studio_start_workshop.png)
