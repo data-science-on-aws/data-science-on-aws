@@ -47,7 +47,7 @@ Configure IAM to run the workshop.
 
 ![IAM 3](img/sagemaker-iam-3.png)
 
-![Back to SageMaker](img/alt_back_to_sagemaker_8.png)
+![Search Box SageMaker](img/search-box-sagemaker.png)
 
 In the AWS Console search bar, type `SageMaker` and select `Amazon SageMaker` to open the service console.
 
