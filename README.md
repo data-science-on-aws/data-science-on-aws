@@ -73,7 +73,7 @@ If not, please logout of your AWS Console in all browser tabs and re-run the ste
 
 Open the [AWS Management Console](https://console.aws.amazon.com/console/home)
 
-![Back to SageMaker](img/console1_sagemaker.png)
+![Search Box SageMaker](img/search-box-sagemaker.png)
 
 In the AWS Console search bar, type `SageMaker` and select `Amazon SageMaker` to open the service console.
 
