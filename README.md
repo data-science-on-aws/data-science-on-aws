@@ -28,17 +28,6 @@ Attendees will learn how to do the following:
 * Deploy a model to a REST endpoint using SageMaker Hosting and SageMaker Endpoints
 * Automate ML workflow steps by building end-to-end model pipelines using SageMaker Pipelines
 
-# Extended Workshop (8-hours)
-![Workshop Paths](img/workshop_paths2.png)
-
-In the extended hands-on workshop, you will get hands-on with advanced model training and deployment techniques such as hyper-parameter tuning, A/B testing, and auto-scaling.  You will also setup a real-time, streaming analytics and data science pipeline to perform window-based aggregations and anomaly detection.
-
-## Extended Workshop Learning Objectives
-Attendees will learn how to do the following:
-* Perform automated machine learning (AutoML) to find the best model from just your dataset with low-code
-* Find the best hyper-parameters for your custom model using SageMaker Hyper-parameter Tuning Jobs
-* Deploy multiple model variants into a live, production A/B test to compare online performance, live-shift prediction traffic, and autoscale the winning variant using SageMaker Hosting and SageMaker Endpoints
-* Setup a streaming analytics and continuous machine learning application using Amazon Kinesis and SageMaker
 
 # Workshop Instructions
 
