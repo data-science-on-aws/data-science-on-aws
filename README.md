@@ -49,6 +49,8 @@ Follow the instructions here:
 
 In the AWS Console search bar, type `SageMaker` and select `Amazon SageMaker` to open the service console.
 
+![Search Box - SageMaker](img/search-box-sagemaker.png)
+
 ![Notebook Instances](img/stu_notebook_instances_9.png)
 
 ![Quick Start](img/sm-quickstart-iam-existing.png)
