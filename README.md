@@ -10,6 +10,8 @@ In this hands-on workshop, we will build an end-to-end AI/ML pipeline for natura
 
 To build our BERT-based NLP model, we use the [Amazon Customer Reviews Dataset](https://s3.amazonaws.com/amazon-reviews-pds/readme.html) which contains 150+ million customer reviews from Amazon.com for the 20 year period between 1995 and 2015.  In particular, we train a classifier to predict the `star_rating` (1 is bad, 5 is good) from the `review_body` (free-form review text).
 
+You will get hands-on with advanced model training and deployment techniques such as hyper-parameter tuning, A/B testing, and auto-scaling.  You will also setup a real-time, streaming analytics and data science pipeline to perform window-based aggregations and anomaly detection.
+
 Attendees will learn how to do the following:
 * Ingest data into S3 using Amazon Athena and the Parquet data format
 * Visualize data with pandas, matplotlib on SageMaker notebooks
@@ -21,6 +23,10 @@ Attendees will learn how to do the following:
 * Register and version models using SageMaker Model Registry
 * Deploy a model to a REST endpoint using SageMaker Hosting and SageMaker Endpoints
 * Automate ML workflow steps by building end-to-end model pipelines
+* Perform automated machine learning (AutoML) to find the best model from just your dataset with low-code
+* Find the best hyper-parameters for your custom model using SageMaker Hyper-parameter Tuning Jobs
+* Deploy multiple model variants into a live, production A/B test to compare online performance, live-shift prediction traffic, and autoscale the winning variant using SageMaker Hosting and SageMaker Endpoints
+* Setup a streaming analytics and continuous machine learning application using Amazon Kinesis and SageMaker
 
 
 ## Workshop Instructions
