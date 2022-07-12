@@ -87,12 +87,12 @@ Click `File` > `New` > `Terminal` to launch a terminal in your Jupyter instance.
 Within the Terminal, run the following:
 
 ```
-cd ~ && git clone -b main https://github.com/data-science-on-aws/workshop
+cd ~ && git clone -b main https://github.com/data-science-on-aws/data-science-on-aws
 ```
 
 If you see an error like the following, just re-run the command again until it works:
 ```
-fatal: Unable to create '/home/sagemaker-user/workshop/.git/index.lock': File exists.
+fatal: Unable to create '.git/index.lock': File exists.
 
 Another git process seems to be running in this repository, e.g.
 an editor opened by 'git commit'. Please make sure all processes
@@ -100,13 +100,13 @@ are terminated then try again. If it still fails, a git process
 may have crashed in this repository earlier:
 remove the file manually to continue.
 ```
-_Note:  This is not a fatal error ^^ above ^^.  Just re-run the command again until it works._
+_Note:  Just re-run the command again until it works._
 
 
 ## 6. Start the Book Examples!
 
-Navigate to `workshop/` in SageMaker Studio and start the book examples!!
+Navigate to `data-science-on-aws/` in SageMaker Studio and start the book examples!!
 
-_You may need to refresh your browser if you don't see the new `workshop/` directory._
+_You may need to refresh your browser if you don't see the new `data-science-on-aws/` directory._
 
 ![Start Workshop](img/studio_start_workshop.png)
