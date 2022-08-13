@@ -1,4 +1,4 @@
-name: reMars2022
+name: disaster_response_hackathon 
 dependencies:
   - python=3.9
   - ipykernel
