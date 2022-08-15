@@ -128,7 +128,6 @@
          "stacked":false,
          "metrics":[
             [ { "expression": "SUM(SEARCH('{{cluster_name}-ray-CWAgent,InstanceId} disk_used_percent', 'Average', 300))", "label": "cluster disk used percent sum", "id": "e7", "period": 300 } ]
-​
          ],
          "region":"{region}",
          "title":"Cluster Disk Usage"
