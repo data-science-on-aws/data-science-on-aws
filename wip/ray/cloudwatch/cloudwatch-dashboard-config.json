@@ -145,7 +145,6 @@
          "metrics":[
             [ { "expression": "AVG(SEARCH('{{cluster_name}-ray-CWAgent,InstanceId} disk_used_percent', 'Average', 300))", "id": "e8", "label": "cluster disk used percent average", "period": 300 } ],
             [ { "expression": "MAX(SEARCH('{{cluster_name}-ray-CWAgent,InstanceId} disk_used_percent', 'Maximum', 300))", "id": "e9", "label": "cluster disk used percent maximum", "period": 300 } ]
-​
          ],
          "region":"{region}",
          "title":"Single Node Disk Usage (Avg and Max)"
@@ -160,7 +159,6 @@
       "properties": {
           "metrics": [
               [ { "expression": "SUM(SEARCH('{{cluster_name}-ray-CWAgent,InstanceId} mem_used_percent', 'Average', 300))", "id": "e10", "label": "cluster mem used percent sum", "period": 300 } ]
-​
           ],
           "view": "timeSeries",
           "stacked": false,

@@ -37,6 +37,10 @@ available_node_types:
                 AvailabilityZone: us-east-1a
             InstanceType: r5dn.2xlarge
             ImageId: ami-069f2811478f86c20
+            BlockDeviceMappings:
+                - DeviceName: /dev/sda1
+                  Ebs:
+                      VolumeSize: 500
             IamInstanceProfile:
                 Name: ray-autoscaler-cloudwatch-v1
     ray.worker.default:
@@ -48,6 +52,10 @@ available_node_types:
                 GroupName: ray
             InstanceType: r5dn.2xlarge
             ImageId: ami-069f2811478f86c20
+            BlockDeviceMappings:
+                - DeviceName: /dev/sda1
+                  Ebs:
+                      VolumeSize: 500
             IamInstanceProfile:
                 Name: ray-autoscaler-cloudwatch-v1
 
