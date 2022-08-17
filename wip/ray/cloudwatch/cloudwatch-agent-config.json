@@ -162,7 +162,7 @@
              "clocks_current_memory",
              "clocks_current_video"
 	  ],
-          "metrics_collection_interval": 60		  
+          "metrics_collection_interval": 60
        },
        "processes": {
          "measurement": [

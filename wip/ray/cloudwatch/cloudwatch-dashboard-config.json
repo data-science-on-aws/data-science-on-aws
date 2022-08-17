@@ -128,6 +128,7 @@
          "stacked":false,
          "metrics":[
             [ { "expression": "SUM(SEARCH('{{cluster_name}-ray-CWAgent,InstanceId} disk_used_percent', 'Average', 300))", "label": "cluster disk used percent sum", "id": "e7", "period": 300 } ]
+
          ],
          "region":"{region}",
          "title":"Cluster Disk Usage"
@@ -145,6 +146,7 @@
          "metrics":[
             [ { "expression": "AVG(SEARCH('{{cluster_name}-ray-CWAgent,InstanceId} disk_used_percent', 'Average', 300))", "id": "e8", "label": "cluster disk used percent average", "period": 300 } ],
             [ { "expression": "MAX(SEARCH('{{cluster_name}-ray-CWAgent,InstanceId} disk_used_percent', 'Maximum', 300))", "id": "e9", "label": "cluster disk used percent maximum", "period": 300 } ]
+
          ],
          "region":"{region}",
          "title":"Single Node Disk Usage (Avg and Max)"
@@ -159,6 +161,7 @@
       "properties": {
           "metrics": [
               [ { "expression": "SUM(SEARCH('{{cluster_name}-ray-CWAgent,InstanceId} mem_used_percent', 'Average', 300))", "id": "e10", "label": "cluster mem used percent sum", "period": 300 } ]
+
           ],
           "view": "timeSeries",
           "stacked": false,
@@ -231,20 +234,21 @@
           "title": "Cluster Object Store Available Memory"
       }
    },
-   {
-      "type": "metric",
-      "x": 0,
-      "y": 32,
-      "width": 12,
-      "height": 6,
-      "properties": {
-          "view": "timeSeries",
-          "stacked": false,
-          "metrics": [
-              [ "{cluster_name}-ray-CWAgent", "mem_used_percent", "InstanceId", "{instance_id}" ]
-          ],
-          "region": "{region}",
-          "title": "mem_used_percent"
-      }
-   }
+    {
+        "type": "metric",
+        "x": 0,
+        "y": 32,
+        "width": 12,
+        "height": 6,
+        "properties": {
+            "view": "timeSeries",
+            "stacked": false,
+            "metrics": [
+                [ "{cluster_name}-ray-CWAgent", "mem_used_percent", "InstanceId", "{instance_id}" ]
+            ],
+            "region": "{region}",
+            "title": "head_node_mem_used_percent"
+        }
+     }
 ]
+
