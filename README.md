@@ -43,6 +43,7 @@ _Please logout of all AWS Console sessions in all browser tabs._
 ### 0.5 Click on this link to enter the workshop
 
 https://eventbox.dev?code=L8KB7SLVTZ!
+
 Click on the link below:
 
 ![Event Engine Account](img/event_box_tmp_ee_account.png)
