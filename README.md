@@ -23,11 +23,7 @@ Attendees will learn how to do the following:
 * Register and version models using SageMaker Model Registry
 * Deploy a model to a REST endpoint using SageMaker Hosting and SageMaker Endpoints
 * Automate ML workflow steps by building end-to-end model pipelines
-* Perform automated machine learning (AutoML) to find the best model from just your dataset with low-code
 * Find the best hyper-parameters for your custom model using SageMaker Hyper-parameter Tuning Jobs
-* Deploy multiple model variants into a live, production A/B test to compare online performance, live-shift prediction traffic, and autoscale the winning variant using SageMaker Hosting and SageMaker Endpoints
-* Setup a streaming analytics and continuous machine learning application using Amazon Kinesis and SageMaker
-
 
 ## Workshop Instructions
 _Note:  This workshop will create an ephemeral AWS acccount for each attendee.  This ephemeral account is not accessible after the workshop.  You can, of course, clone this GitHub repo and reproduce the entire workshop in your own AWS Account._
