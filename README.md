@@ -40,6 +40,13 @@ If you do not logout of existing AWS Consoles, things will not work properly.
 
 _Please logout of all AWS Console sessions in all browser tabs._
 
+### 0.5 Click on this link to enter the workshop
+
+https://eventbox.dev?code=L8KB7SLVTZ
+
+
+Follow the rest of these instructions...
+
 
 ### 1. Login to the Workshop Portal (aka Event Engine). 
 
