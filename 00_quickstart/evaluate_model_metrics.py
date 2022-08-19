@@ -14,7 +14,7 @@ subprocess.check_call([sys.executable, "-m", "conda", "install", "-c", "conda-fo
 from transformers import DistilBertTokenizer
 from transformers import DistilBertConfig
 
-subprocess.check_call([sys.executable, "-m", "pip", "install", "matplotlib==3.2.1"])
+#subprocess.check_call([sys.executable, "-m", "pip", "install", "matplotlib==3.2.1"])
 import pandas as pd
 import os
 import re
@@ -29,7 +29,7 @@ from pathlib import Path
 import tarfile
 import itertools
 from sklearn.metrics import confusion_matrix
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 from tensorflow import keras
 from sklearn.metrics import classification_report
 from sklearn.metrics import accuracy_score
@@ -183,43 +183,43 @@ def process(args):
     accuracy = accuracy_score(y_true=y_test, y_pred=y_actual)
     print("Test accuracy: ", accuracy)
 
-    def plot_conf_mat(cm, classes, title, cmap):
-        print(cm)
-        plt.imshow(cm, interpolation="nearest", cmap=cmap)
-        plt.title(title)
-        plt.colorbar()
-        tick_marks = np.arange(len(classes))
-        plt.xticks(tick_marks, classes, rotation=45)
-        plt.yticks(tick_marks, classes)
+#     def plot_conf_mat(cm, classes, title, cmap):
+#         print(cm)
+#         plt.imshow(cm, interpolation="nearest", cmap=cmap)
+#         plt.title(title)
+#         plt.colorbar()
+#         tick_marks = np.arange(len(classes))
+#         plt.xticks(tick_marks, classes, rotation=45)
+#         plt.yticks(tick_marks, classes)
 
-        fmt = "d"
-        thresh = cm.max() / 2.0
-        for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
-            plt.text(
-                j,
-                i,
-                format(cm[i, j], fmt),
-                horizontalalignment="center",
-                color="black" if cm[i, j] > thresh else "black",
-            )
+#         fmt = "d"
+#         thresh = cm.max() / 2.0
+#         for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+#             plt.text(
+#                 j,
+#                 i,
+#                 format(cm[i, j], fmt),
+#                 horizontalalignment="center",
+#                 color="black" if cm[i, j] > thresh else "black",
+#             )
 
-            plt.tight_layout()
-            plt.ylabel("True label")
-            plt.xlabel("Predicted label")
+#             plt.tight_layout()
+#             plt.ylabel("True label")
+#             plt.xlabel("Predicted label")
 
-    cm = confusion_matrix(y_true=y_test, y_pred=y_actual)
+#     cm = confusion_matrix(y_true=y_test, y_pred=y_actual)
 
-    plt.figure()
-    fig, ax = plt.subplots(figsize=(10, 5))
-    plot_conf_mat(cm, classes=CLASSES, title="Confusion Matrix", cmap=plt.cm.Greens)
+#     plt.figure()
+#     fig, ax = plt.subplots(figsize=(10, 5))
+#     plot_conf_mat(cm, classes=CLASSES, title="Confusion Matrix", cmap=plt.cm.Greens)
 
-    # Save the confusion matrix
-    plt.show()
+#     # Save the confusion matrix
+#     plt.show()
 
     # Model Output
     metrics_path = os.path.join(args.output_data, "metrics/")
     os.makedirs(metrics_path, exist_ok=True)
-    plt.savefig("{}/confusion_matrix.png".format(metrics_path))
+#     plt.savefig("{}/confusion_matrix.png".format(metrics_path))
 
     report_dict = {
         "metrics": {

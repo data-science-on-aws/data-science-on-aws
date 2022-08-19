@@ -40,6 +40,14 @@ If you do not logout of existing AWS Consoles, things will not work properly.
 
 _Please logout of all AWS Console sessions in all browser tabs._
 
+### 0.5 Click on this link to enter the workshop
+
+https://eventbox.dev?code=L8KB7SLVTZ!
+Click on the link below:
+
+![Event Engine Account](img/event_box_tmp_ee_account.png)
+
+Follow the rest of these instructions!
 
 ### 1. Login to the Workshop Portal (aka Event Engine). 
 
@@ -114,6 +122,8 @@ _Note:  This is not a fatal error ^^ above ^^.  Just re-run the command again un
 
 ### 6. Start the Workshop!
 
-Navigate to the first directory and start the workshop!
+Navigate to the `data-science-on-aws/00_quickstart/` directory and start the workshop!
+
+![Start Workshop](img/start_workshop.png)
 
 _You may need to refresh your browser if you don't see the directories._

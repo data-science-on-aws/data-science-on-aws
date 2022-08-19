@@ -32,57 +32,56 @@ subprocess.check_call([sys.executable, "-m", "conda", "install", "-c", "conda-fo
 from transformers import DistilBertTokenizer
 from transformers import DistilBertConfig
 
-subprocess.check_call([sys.executable, "-m", "pip", "install", "matplotlib==3.2.1"])
-subprocess.check_call([sys.executable, "-m", "pip", "install", "sagemaker==2.24.1"])
+#subprocess.check_call([sys.executable, "-m", "pip", "install", "sagemaker==2.24.1"])
 import pandas as pd
 import re
-import sagemaker
-from sagemaker.session import Session
-from sagemaker.feature_store.feature_group import FeatureGroup
-from sagemaker.feature_store.feature_definition import (
-    FeatureDefinition,
-    FeatureTypeEnum,
-)
+# import sagemaker
+# from sagemaker.session import Session
+# from sagemaker.feature_store.feature_group import FeatureGroup
+# from sagemaker.feature_store.feature_definition import (
+#     FeatureDefinition,
+#     FeatureTypeEnum,
+# )
 
-region = os.environ["AWS_DEFAULT_REGION"]
-print("Region: {}".format(region))
+# region = os.environ["AWS_DEFAULT_REGION"]
+# print("Region: {}".format(region))
 
-#############################
-## We may need to get the Role and Bucket before setting sm, featurestore_runtime, etc.
-## Role and Bucket are malformed if we do this later.
-sts = boto3.Session(region_name=region).client(service_name="sts", region_name=region)
+# #############################
+# ## We may need to get the Role and Bucket before setting sm, featurestore_runtime, etc.
+# ## Role and Bucket are malformed if we do this later.
+# sts = boto3.Session(region_name=region).client(service_name="sts", region_name=region)
 
-caller_identity = sts.get_caller_identity()
-print("caller_identity: {}".format(caller_identity))
+# caller_identity = sts.get_caller_identity()
+# print("caller_identity: {}".format(caller_identity))
 
-assumed_role_arn = caller_identity["Arn"]
-print("(assumed_role) caller_identity_arn: {}".format(assumed_role_arn))
+# assumed_role_arn = caller_identity["Arn"]
+# print("(assumed_role) caller_identity_arn: {}".format(assumed_role_arn))
 
-assumed_role_name = assumed_role_arn.split("/")[-2]
+# assumed_role_name = assumed_role_arn.split("/")[-2]
 
-iam = boto3.Session(region_name=region).client(service_name="iam", region_name=region)
-get_role_response = iam.get_role(RoleName=assumed_role_name)
-print("get_role_response {}".format(get_role_response))
-role = get_role_response["Role"]["Arn"]
-print("role {}".format(role))
+# iam = boto3.Session(region_name=region).client(service_name="iam", region_name=region)
+# get_role_response = iam.get_role(RoleName=assumed_role_name)
+# print("get_role_response {}".format(get_role_response))
+# role = get_role_response["Role"]["Arn"]
+# print("role {}".format(role))
 
-bucket = sagemaker.Session().default_bucket()
-print("The DEFAULT BUCKET is {}".format(bucket))
-#############################
+# bucket = sagemaker.Session().default_bucket()
+# print("The DEFAULT BUCKET is {}".format(bucket))
+# #############################
 
-sm = boto3.Session(region_name=region).client(service_name="sagemaker", region_name=region)
+# sm = boto3.Session(region_name=region).client(service_name="sagemaker", region_name=region)
 
-featurestore_runtime = boto3.Session(region_name=region).client(
-    service_name="sagemaker-featurestore-runtime", region_name=region
-)
+# featurestore_runtime = boto3.Session(region_name=region).client(
+#     service_name="sagemaker-featurestore-runtime", region_name=region
+# )
 
-s3 = boto3.Session(region_name=region).client(service_name="s3", region_name=region)
+# s3 = boto3.Session(region_name=region).client(service_name="s3", region_name=region)
 
-sagemaker_session = sagemaker.Session(
-    boto_session=boto3.Session(region_name=region),
-    sagemaker_client=sm,
-    sagemaker_featurestore_runtime_client=featurestore_runtime,
-)
+# sagemaker_session = sagemaker.Session(
+#     boto_session=boto3.Session(region_name=region),
+#     sagemaker_client=sm,
+#     sagemaker_featurestore_runtime_client=featurestore_runtime,
+# )
 
 tokenizer = DistilBertTokenizer.from_pretrained("distilbert-base-uncased")
 
@@ -105,76 +104,76 @@ def cast_object_to_string(data_frame):
     return data_frame
 
 
-def wait_for_feature_group_creation_complete(feature_group):
-    try:
-        status = feature_group.describe().get("FeatureGroupStatus")
-        print("Feature Group status: {}".format(status))
-        while status == "Creating":
-            print("Waiting for Feature Group Creation")
-            time.sleep(5)
-            status = feature_group.describe().get("FeatureGroupStatus")
-            print("Feature Group status: {}".format(status))
-        if status != "Created":
-            print("Feature Group status: {}".format(status))
-            raise RuntimeError(f"Failed to create feature group {feature_group.name}")
-        print(f"FeatureGroup {feature_group.name} successfully created.")
-    except:
-        print("No feature group created yet.")
+# def wait_for_feature_group_creation_complete(feature_group):
+#     try:
+#         status = feature_group.describe().get("FeatureGroupStatus")
+#         print("Feature Group status: {}".format(status))
+#         while status == "Creating":
+#             print("Waiting for Feature Group Creation")
+#             time.sleep(5)
+#             status = feature_group.describe().get("FeatureGroupStatus")
+#             print("Feature Group status: {}".format(status))
+#         if status != "Created":
+#             print("Feature Group status: {}".format(status))
+#             raise RuntimeError(f"Failed to create feature group {feature_group.name}")
+#         print(f"FeatureGroup {feature_group.name} successfully created.")
+#     except:
+#         print("No feature group created yet.")
 
 
-def create_or_load_feature_group(prefix, feature_group_name):
+# def create_or_load_feature_group(prefix, feature_group_name):
 
-    # Feature Definitions for our records
-    feature_definitions = [
-        FeatureDefinition(feature_name="input_ids", feature_type=FeatureTypeEnum.STRING),
-        FeatureDefinition(feature_name="input_mask", feature_type=FeatureTypeEnum.STRING),
-        FeatureDefinition(feature_name="segment_ids", feature_type=FeatureTypeEnum.STRING),
-        FeatureDefinition(feature_name="label_id", feature_type=FeatureTypeEnum.INTEGRAL),
-        FeatureDefinition(feature_name="review_id", feature_type=FeatureTypeEnum.STRING),
-        FeatureDefinition(feature_name="date", feature_type=FeatureTypeEnum.STRING),
-        FeatureDefinition(feature_name="label", feature_type=FeatureTypeEnum.INTEGRAL),
-        #        FeatureDefinition(feature_name='review_body', feature_type=FeatureTypeEnum.STRING),
-        FeatureDefinition(feature_name="split_type", feature_type=FeatureTypeEnum.STRING),
-    ]
+#     # Feature Definitions for our records
+#     feature_definitions = [
+#         FeatureDefinition(feature_name="input_ids", feature_type=FeatureTypeEnum.STRING),
+#         FeatureDefinition(feature_name="input_mask", feature_type=FeatureTypeEnum.STRING),
+#         FeatureDefinition(feature_name="segment_ids", feature_type=FeatureTypeEnum.STRING),
+#         FeatureDefinition(feature_name="label_id", feature_type=FeatureTypeEnum.INTEGRAL),
+#         FeatureDefinition(feature_name="review_id", feature_type=FeatureTypeEnum.STRING),
+#         FeatureDefinition(feature_name="date", feature_type=FeatureTypeEnum.STRING),
+#         FeatureDefinition(feature_name="label", feature_type=FeatureTypeEnum.INTEGRAL),
+#         #        FeatureDefinition(feature_name='review_body', feature_type=FeatureTypeEnum.STRING),
+#         FeatureDefinition(feature_name="split_type", feature_type=FeatureTypeEnum.STRING),
+#     ]
 
-    feature_group = FeatureGroup(
-        name=feature_group_name, feature_definitions=feature_definitions, sagemaker_session=sagemaker_session
-    )
+#     feature_group = FeatureGroup(
+#         name=feature_group_name, feature_definitions=feature_definitions, sagemaker_session=sagemaker_session
+#     )
 
-    print("Feature Group: {}".format(feature_group))
+#     print("Feature Group: {}".format(feature_group))
 
-    try:
-        print(
-            "Waiting for existing Feature Group to become available if it is being created by another instance in our cluster..."
-        )
-        wait_for_feature_group_creation_complete(feature_group)
-    except Exception as e:
-        print("Before CREATE FG wait exeption: {}".format(e))
-    #        pass
+#     try:
+#         print(
+#             "Waiting for existing Feature Group to become available if it is being created by another instance in our cluster..."
+#         )
+#         wait_for_feature_group_creation_complete(feature_group)
+#     except Exception as e:
+#         print("Before CREATE FG wait exeption: {}".format(e))
+#     #        pass
 
-    try:
-        record_identifier_feature_name = "review_id"
-        event_time_feature_name = "date"
+#     try:
+#         record_identifier_feature_name = "review_id"
+#         event_time_feature_name = "date"
 
-        print("Creating Feature Group with role {}...".format(role))
-        feature_group.create(
-            s3_uri=f"s3://{bucket}/{prefix}",
-            record_identifier_name=record_identifier_feature_name,
-            event_time_feature_name=event_time_feature_name,
-            role_arn=role,
-            enable_online_store=False,
-        )
-        print("Creating Feature Group. Completed.")
+#         print("Creating Feature Group with role {}...".format(role))
+#         feature_group.create(
+#             s3_uri=f"s3://{bucket}/{prefix}",
+#             record_identifier_name=record_identifier_feature_name,
+#             event_time_feature_name=event_time_feature_name,
+#             role_arn=role,
+#             enable_online_store=False,
+#         )
+#         print("Creating Feature Group. Completed.")
 
-        print("Waiting for new Feature Group to become available...")
-        wait_for_feature_group_creation_complete(feature_group)
-        print("Feature Group available.")
-        feature_group.describe()
+#         print("Waiting for new Feature Group to become available...")
+#         wait_for_feature_group_creation_complete(feature_group)
+#         print("Feature Group available.")
+#         feature_group.describe()
 
-    except Exception as e:
-        print("Exception: {}".format(e))
+#     except Exception as e:
+#         print("Exception: {}".format(e))
 
-    return feature_group
+#     return feature_group
 
 
 class InputFeatures(object):
@@ -400,7 +399,7 @@ def _transform_tsv_to_tfrecord(file, max_seq_length, balance_dataset, prefix, fe
     print("feature_group_name {}".format(feature_group_name))
 
     # need to re-load since we can't pass feature_group object in _partial functions for some reason
-    feature_group = create_or_load_feature_group(prefix, feature_group_name)
+#    feature_group = create_or_load_feature_group(prefix, feature_group_name)
 
     filename_without_extension = Path(Path(file).stem).stem
 
@@ -522,35 +521,35 @@ def _transform_tsv_to_tfrecord(file, max_seq_length, balance_dataset, prefix, fe
     df_test_records.head()
 
     # Add record to feature store
-    df_fs_train_records = cast_object_to_string(df_train_records)
-    df_fs_validation_records = cast_object_to_string(df_validation_records)
-    df_fs_test_records = cast_object_to_string(df_test_records)
+#     df_fs_train_records = cast_object_to_string(df_train_records)
+#     df_fs_validation_records = cast_object_to_string(df_validation_records)
+#     df_fs_test_records = cast_object_to_string(df_test_records)
 
-    print("Ingesting features...")
-    feature_group.ingest(data_frame=df_fs_train_records, max_workers=3, wait=True)
-    feature_group.ingest(data_frame=df_fs_validation_records, max_workers=3, wait=True)
-    feature_group.ingest(data_frame=df_fs_test_records, max_workers=3, wait=True)
+#     print("Ingesting features...")
+#     feature_group.ingest(data_frame=df_fs_train_records, max_workers=3, wait=True)
+#     feature_group.ingest(data_frame=df_fs_validation_records, max_workers=3, wait=True)
+#     feature_group.ingest(data_frame=df_fs_test_records, max_workers=3, wait=True)
     
-    offline_store_status = None
-    while offline_store_status != 'Active':
-        try:
-            offline_store_status = feature_group.describe()['OfflineStoreStatus']['Status']
-        except:
-            pass
-        print('Offline store status: {}'.format(offline_store_status))    
-    print('...features ingested!')
+#     offline_store_status = None
+#     while offline_store_status != 'Active':
+#         try:
+#             offline_store_status = feature_group.describe()['OfflineStoreStatus']['Status']
+#         except:
+#             pass
+#         print('Offline store status: {}'.format(offline_store_status))    
+#     print('...features ingested!')
 
 
 def process(args):
     print("Current host: {}".format(args.current_host))
 
-    feature_group = create_or_load_feature_group(
-        prefix=args.feature_store_offline_prefix, feature_group_name=args.feature_group_name
-    )
+#     feature_group = create_or_load_feature_group(
+#         prefix=args.feature_store_offline_prefix, feature_group_name=args.feature_group_name
+#     )
 
-    feature_group.describe()
+#     feature_group.describe()
 
-    print(feature_group.as_hive_ddl())
+#     print(feature_group.as_hive_ddl())
 
     train_data = "{}/bert/train".format(args.output_data)
     validation_data = "{}/bert/validation".format(args.output_data)
@@ -592,16 +591,16 @@ def process(args):
     for file in dirs_output:
         print(file)
 
-    offline_store_contents = None
-    while offline_store_contents is None:
-        objects_in_bucket = s3.list_objects(Bucket=bucket, Prefix=args.feature_store_offline_prefix)
-        if "Contents" in objects_in_bucket and len(objects_in_bucket["Contents"]) > 1:
-            offline_store_contents = objects_in_bucket["Contents"]
-        else:
-            print("Waiting for data in offline store...\n")
-            sleep(60)
+#     offline_store_contents = None
+#     while offline_store_contents is None:
+#         objects_in_bucket = s3.list_objects(Bucket=bucket, Prefix=args.feature_store_offline_prefix)
+#         if "Contents" in objects_in_bucket and len(objects_in_bucket["Contents"]) > 1:
+#             offline_store_contents = objects_in_bucket["Contents"]
+#         else:
+#             print("Waiting for data in offline store...\n")
+#             sleep(60)
 
-    print("Data available.")
+#     print("Data available.")
 
     print("Complete")
 
