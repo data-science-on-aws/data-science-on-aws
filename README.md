@@ -93,6 +93,8 @@ _Note:  This is not a fatal error ^^ above ^^.  Just re-run the command again un
 
 ### 5. Start the Workshop!
 
-Navigate to `data-science-on-aws/` in SageMaker Studio and start the workshop!
+Navigate to the `data-science-on-aws/00_quickstart/` directory and start the workshop!
 
-_You may need to refresh your browser if you don't see the new `data-science-on-aws/` directory._
+![Start Workshop](img/start_workshop.png)
+
+_You may need to refresh your browser if you don't see the directories._
