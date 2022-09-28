@@ -45,7 +45,9 @@ In the AWS Console search bar, type `SageMaker` and select `Amazon SageMaker` to
 
 ![Notebook Instances](img/stu_notebook_instances_9.png)
 
-![Quick Start](img/sm-quickstart-iam-existing.png)
+![Quick Start](img/sm-quickstart.png)
+
+![Create S3 IAM Role](img/sm-create-iam-role-s3.png)
 
 ![Pending Studio](img/studio_pending.png)
 
