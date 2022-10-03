@@ -18,10 +18,7 @@
                         "ml.m5.4xlarge",
                         "ml.c5.large",
                         "ml.c5.xlarge",
-                        "ml.c5.2xlarge",
-                        "ml.c5.9xlarge",
-                        "ml.g4dn.xlarge",
-                        "ml.p3.2xlarge"
+                        "ml.c5.2xlarge"
                     ]
                 }
             }
