@@ -1,0 +1,77 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Creates a VPC with one internet gateway, one private subnet, and one
+  network firewall private subnet.
+Parameters:
+  ProjectName:
+    Type: String
+  VPCCIDR:
+    Type: String
+    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$
+  FirewallSubnetCIDR:
+    Type: String
+    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$
+  NATGatewaySubnetCIDR:
+    Type: String
+    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$
+  SageMakerStudioSubnetCIDR:
+    Type: String
+    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Delete
+    Properties:
+      CidrBlock:
+        Ref: VPCCIDR
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Sub: ${ProjectName}-vpc
+  SageMakerStudioSubnet:
+    Type: AWS::EC2::Subnet
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Delete
+    Properties:
+      CidrBlock:
+        Ref: SageMakerStudioSubnetCIDR
+      VpcId:
+        Ref: VPC
+      AvailabilityZone:
+        Fn::Sub: ${AWS::Region}a
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Sub: sn-${ProjectName}-sagemaker-studio
+  SageMakerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: security group for SageMaker notebook instance, training jobs
+        and hosting endpoint
+      VpcId:
+        Ref: VPC
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Sub: sg-sagemaker-${ProjectName}
+  SageMakerSecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      IpProtocol: '-1'
+      GroupId:
+        Ref: SageMakerSecurityGroup
+      SourceSecurityGroupId:
+        Ref: SageMakerSecurityGroup
+Outputs:
+  VPCId:
+    Description: The ID of VPC where SageMaker Studio will reside
+    Value:
+      Ref: VPC
+  SageMakerStudioSubnetId:
+    Value:
+      Ref: SageMakerStudioSubnet
+  SageMakerSecurityGroupId:
+    Value:
+      Ref: SageMakerSecurityGroup

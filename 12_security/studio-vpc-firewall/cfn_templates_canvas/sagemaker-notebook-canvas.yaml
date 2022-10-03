@@ -1,0 +1,45 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Creates SageMaker Notebook 
+Parameters:
+  NotebookName:
+    Type: String
+    Default: sagemaker
+  VPCId:
+    Type: AWS::EC2::VPC::Id
+    Description: Choose a VPC for SageMaker services 
+  SageMakerStudioSubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: Choose subnets
+  SageMakerSecurityGroupIds:
+    Type: List<AWS::EC2::SecurityGroup::Id>
+    Description: Choose security groups for SageMaker Studio and SageMaker workloads
+  SageMakerExecutionRoleArn:
+    Type: String
+  DirectInternetAccess:
+    Type: String
+    AllowedValues:
+    - Enabled
+    - Disabled
+    Description: Choose how SageMaker Noteook accesses resources over the Network
+    Default: Disabled 
+Resources:
+  SageMakerNotebookInstance:
+    Type: "AWS::SageMaker::NotebookInstance"
+    Properties:
+      NotebookInstanceName:
+        Ref: NotebookName 
+      InstanceType: "ml.t3.medium"
+      SubnetId: !Select [ 0, !Ref SageMakerStudioSubnetIds ]
+      SecurityGroupIds: 
+        Ref: SageMakerSecurityGroupIds
+      RoleArn: 
+        Ref: SageMakerExecutionRoleArn
+      DirectInternetAccess:
+        Ref: DirectInternetAccess
+      VolumeSizeInGB: 50
+      RootAccess: "Enabled"
+Outputs:
+  NotebookName:
+    Description: SageMaker Notebook name
+    Value:
+      Ref: NotebookName 

@@ -1,0 +1,176 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Creates SageMaker Studio domain and user profile for the SageMaker Studio
+Mappings:
+  RegionMap:
+    us-east-1:
+      datascience: arn:aws:sagemaker:us-east-1:081325390199:image/datascience-1.0
+      datawrangler: arn:aws:sagemaker:us-east-1:663277389841:image/sagemaker-data-wrangler-1.0
+    us-east-2:
+      datascience: arn:aws:sagemaker:us-east-2:429704687514:image/datascience-1.0
+      datawrangler: arn:aws:sagemaker:us-east-2:415577184552:image/sagemaker-data-wrangler-1.0
+    us-west-1:
+      datascience: arn:aws:sagemaker:us-west-1:742091327244:image/datascience-1.0
+      datawrangler: arn:aws:sagemaker:us-west-1:926135532090:image/sagemaker-data-wrangler-1.0
+    us-west-2:
+      datascience: arn:aws:sagemaker:us-west-2:236514542706:image/datascience-1.0
+      datawrangler: arn:aws:sagemaker:us-west-2:174368400705:image/sagemaker-data-wrangler-1.0
+    af-south-1:
+      datascience: arn:aws:sagemaker:af-south-1:559312083959:image/datascience-1.0
+      datawrangler: arn:aws:sagemaker:af-south-1:143210264188:image/sagemaker-data-wrangler-1.0
+    ap-east-1:
+      datascience: arn:aws:sagemaker:ap-east-1:493642496378:image/datascience-1.0
+      datawrangler: arn:aws:sagemaker:ap-east-1:707077482487:image/sagemaker-data-wrangler-1.0
+    ap-south-1:
+      datascience: arn:aws:sagemaker:ap-south-1:394103062818:image/datascience-1.0
+      datawrangler: arn:aws:sagemaker:ap-south-1:089933028263:image/sagemaker-data-wrangler-1.0
+    ap-northeast-2:
+      datascience: arn:aws:sagemaker:ap-northeast-2:806072073708:image/datascience-1.0
+      datawrangler: arn:aws:sagemaker:ap-northeast-2:131546521161:image/sagemaker-data-wrangler-1.0
+    ap-southeast-1:
+      datascience: arn:aws:sagemaker:ap-southeast-1:492261229750:image/datascience-1.0
+      datawrangler: arn:aws:sagemaker:ap-southeast-1:119527597002:image/sagemaker-data-wrangler-1.0
+    ap-southeast-2:
+      datascience: arn:aws:sagemaker:ap-southeast-2:452832661640:image/datascience-1.0
+      datawrangler: arn:aws:sagemaker:ap-southeast-2:422173101802:image/sagemaker-data-wrangler-1.0
+    ap-northeast-1:
+      datascience: arn:aws:sagemaker:ap-northeast-1:102112518831:image/datascience-1.0
+      datawrangler: arn:aws:sagemaker:ap-northeast-1:649008135260:image/sagemaker-data-wrangler-1.0
+    ca-central-1:
+      datascience: arn:aws:sagemaker:ca-central-1:310906938811:image/datascience-1.0
+      datawrangler: arn:aws:sagemaker:ca-central-1:557239378090:image/sagemaker-data-wrangler-1.0
+    eu-central-1:
+      datascience: arn:aws:sagemaker:eu-central-1:936697816551:image/datascience-1.0
+      datawrangler: arn:aws:sagemaker:eu-central-1:024640144536:image/sagemaker-data-wrangler-1.0
+    eu-west-1:
+      datascience: arn:aws:sagemaker:eu-west-1:470317259841:image/datascience-1.0
+      datawrangler: arn:aws:sagemaker:eu-west-1:245179582081:image/sagemaker-data-wrangler-1.0
+    eu-west-2:
+      datascience: arn:aws:sagemaker:eu-west-2:712779665605:image/datascience-1.0
+      datawrangler: arn:aws:sagemaker:eu-west-2:894491911112:image/sagemaker-data-wrangler-1.0
+    eu-west-3:
+      datascience: arn:aws:sagemaker:eu-west-3:615547856133:image/datascience-1.0
+      datawrangler: arn:aws:sagemaker:eu-west-3:807237891255:image/sagemaker-data-wrangler-1.0
+    eu-north-1:
+      datascience: arn:aws:sagemaker:eu-north-1:243637512696:image/datascience-1.0
+      datawrangler: arn:aws:sagemaker:eu-north-1:054986407534:image/sagemaker-data-wrangler-1.0
+    eu-south-1:
+      datascience: arn:aws:sagemaker:eu-south-1:488287956546:image/sagemaker-data-wrangler-1.0
+      datawrangler: arn:aws:sagemaker:eu-south-1:592751261982:image/datascience-1.0
+    sa-east-1:
+      datascience: arn:aws:sagemaker:sa-east-1:782484402741:image/datascience-1.0
+      datawrangler: arn:aws:sagemaker:sa-east-1:424196993095:image/sagemaker-data-wrangler-1.0
+Parameters:
+  DomainName:
+    Type: String
+  UserProfileName:
+    Type: String
+  ProjectName:
+    Type: String
+    Default: sagemaker-studio-vpc-firewall
+  ParsedStackId:
+    Type: String
+  VPCId:
+    Type: AWS::EC2::VPC::Id
+    Description: Choose a VPC for SageMaker Studio and SageMaker workloads
+  SageMakerStudioSubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: Choose subnets
+  SageMakerSecurityGroupIds:
+    Type: List<AWS::EC2::SecurityGroup::Id>
+    Description: Choose security groups for SageMaker Studio and SageMaker workloads
+  SageMakerExecutionRoleArn:
+    Type: String
+  NetworkAccessType:
+    Type: String
+    AllowedValues:
+    - PublicInternetOnly
+    - VpcOnly
+    Description: Choose how SageMaker Studio accesses resources over the Network
+    Default: PublicInternetOnly
+  AuthMode:
+    Type: String
+    AllowedValues:
+    - IAM
+    - SSO
+    Description: The mode of authentication that members use to access the domain
+    Default: IAM
+  StartKernelGatewayApps:
+    Type: String
+    Description: Start the KernelGateway Apps (Data Science and Data Wrangler)
+    AllowedValues:
+    - 'YES'
+    - 'NO'
+    Default: 'YES'
+Conditions:
+  KernelGatewayAppsCondition:
+    Fn::Equals:
+    - Ref: StartKernelGatewayApps
+    - 'YES'
+Resources:
+  SageMakerStudioDomain:
+    Type: AWS::SageMaker::Domain
+    Properties:
+      AppNetworkAccessType:
+        Ref: NetworkAccessType
+      AuthMode:
+        Ref: AuthMode
+      DefaultUserSettings:
+        ExecutionRole:
+          Ref: SageMakerExecutionRoleArn
+      DomainName:
+        Ref: DomainName
+      Tags:
+      - Key: ProjectName
+        Value:
+          Ref: ProjectName
+      SubnetIds:
+        Ref: SageMakerStudioSubnetIds
+      VpcId:
+        Ref: VPCId        
+  SageMakerUserProfile:
+    Type: AWS::SageMaker::UserProfile
+    Properties:
+      DomainId:
+        Fn::GetAtt:
+        - SageMakerStudioDomain
+        - DomainId
+      UserProfileName:
+        Ref: UserProfileName
+      UserSettings:
+        ExecutionRole:
+          Ref: SageMakerExecutionRoleArn
+      Tags:
+      - Key: ProjectName
+        Value:
+          Ref: ProjectName
+  CanvasApp:
+    Type: AWS::SageMaker::App
+    DependsOn: SageMakerUserProfile
+    Condition: KernelGatewayAppsCondition
+    Properties:
+      AppName: default
+      AppType: Canvas
+      DomainId:
+        Fn::GetAtt:
+        - SageMakerStudioDomain
+        - DomainId
+      ResourceSpec:
+        InstanceType: ml.m5.4xlarge
+        SageMakerImageArn:
+          Fn::FindInMap:
+          - RegionMap
+          - Ref: AWS::Region
+          - datawrangler
+      UserProfileName:
+        Ref: UserProfileName
+Outputs:
+  SageMakerStudioDomainId:
+    Description: SageMaker Studio domain id
+    Value:
+      Fn::GetAtt:
+      - SageMakerStudioDomain
+      - DomainId
+  UserProfileName:
+    Description: SageMaker user profile name
+    Value:
+      Ref: UserProfileName
