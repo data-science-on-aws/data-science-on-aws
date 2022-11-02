@@ -1,41 +1,70 @@
-# Data Science on AWS - O'Reilly Book
+# Data Science on AWS Workshop
 
-## Get the book on [Amazon.com](https://www.amazon.com/Data-Science-AWS-End-End/dp/1492079391)
+Based on this O'Reilly book:  
 
 [![Data Science on AWS](img/book_full_color_sm.png)](https://www.amazon.com/Data-Science-AWS-End-End/dp/1492079391/)
 
 
-## Book Outline
-![Book Outline](img/outline.png)
+## Workshop Description
+In this hands-on workshop, we will build an end-to-end AI/ML pipeline for natural language processing with Amazon SageMaker.  We will train and tune a text classifier to classify text-based product reviews using the state-of-the-art [BERT](https://arxiv.org/abs/1810.04805) model for language representation.
 
-# Quick Start Workshop (4-hours)
-![Workshop Paths](img/workshop_paths1.png)
+To build our BERT-based NLP model, we use the [Amazon Customer Reviews Dataset](https://s3.amazonaws.com/amazon-reviews-pds/readme.html) which contains 150+ million customer reviews from Amazon.com for the 20 year period between 1995 and 2015.  In particular, we train a classifier to predict the `star_rating` (1 is bad, 5 is good) from the `review_body` (free-form review text).
 
-In this quick start hands-on workshop, you will build an end-to-end AI/ML pipeline for natural language processing with Amazon SageMaker.  You will train and tune a text classifier to predict the star rating (1 is bad, 5 is good) for product reviews using the state-of-the-art [BERT](https://arxiv.org/abs/1810.04805) model for language representation.  To build our BERT-based NLP text classifier, you will use a product reviews dataset where each record contains some review text and a star rating (1-5).
+You will get hands-on with advanced model training and deployment techniques such as hyper-parameter tuning, A/B testing, and auto-scaling.  You will also setup a real-time, streaming analytics and data science pipeline to perform window-based aggregations and anomaly detection.
 
-## Quick Start Workshop Learning Objectives
 Attendees will learn how to do the following:
 * Ingest data into S3 using Amazon Athena and the Parquet data format
 * Visualize data with pandas, matplotlib on SageMaker notebooks
-* Detect statistical data bias with SageMaker Clarify
 * Perform feature engineering on a raw dataset using Scikit-Learn and SageMaker Processing Jobs
 * Store and share features using SageMaker Feature Store
 * Train and evaluate a custom BERT model using TensorFlow, Keras, and SageMaker Training Jobs
 * Evaluate the model using SageMaker Processing Jobs
 * Track model artifacts using Amazon SageMaker ML Lineage Tracking
-* Run model bias and explainability analysis with SageMaker Clarify
 * Register and version models using SageMaker Model Registry
 * Deploy a model to a REST endpoint using SageMaker Hosting and SageMaker Endpoints
-* Automate ML workflow steps by building end-to-end model pipelines using SageMaker Pipelines
+* Automate ML workflow steps by building end-to-end model pipelines
+* Find the best hyper-parameters for your custom model using SageMaker Hyper-parameter Tuning Jobs
+
+## Workshop Instructions
+_Note:  This workshop will create an ephemeral AWS acccount for each attendee.  This ephemeral account is not accessible after the workshop.  You can, of course, clone this GitHub repo and reproduce the entire workshop in your own AWS Account._
 
 
-# Workshop Instructions
+### 0. Logout of All AWS Consoles Across All Browser Tabs
+If you do not logout of existing AWS Consoles, things will not work properly.
 
-## 1. Login to AWS Console
+![AWS Account Logout](img/aws-logout.png)
 
-![Console](img/aws_console.png)
+_Please logout of all AWS Console sessions in all browser tabs._
 
-## 2. Launch SageMaker Studio
+### 1. Login to the Workshop Portal (aka Event Engine). 
+
+![Event Engine Terms and Conditions](img/ee1_terms.png)
+
+![Event Engine Login](img/ee-login.png)
+
+![Event Engine Dashboard](img/ee2_team_dashboard.png)
+
+
+### 2. Login to the **AWS Console**
+
+![Event Engine AWS Console](img/ee3_open_console.png)
+
+Take the defaults and click on **Open AWS Console**. This will open AWS Console in a new browser tab.
+
+If you see this message, you need to logout from any previously used AWS accounts.
+
+![AWS Account Logout](img/aws-logout.png)
+
+_Please logout of all AWS Console sessions in all browser tabs._
+
+Double-check that your account name is similar to `TeamRole/MasterKey` as follows:
+
+![IAM Role](img/teamrole-masterkey.png)
+
+If not, please logout of your AWS Console in all browser tabs and re-run the steps above!
+
+
+### 3. Launch SageMaker Studio
 
 Open the [AWS Management Console](https://console.aws.amazon.com/console/home)
 
@@ -43,33 +72,21 @@ Open the [AWS Management Console](https://console.aws.amazon.com/console/home)
 
 In the AWS Console search bar, type `SageMaker` and select `Amazon SageMaker` to open the service console.
 
-![Notebook Instances](img/stu_notebook_instances_9.png)
+![SageMaker Studio](img/console2_studio.png)
 
-![Quick Start](img/sm-quickstart.png)
-
-![Create S3 IAM Role](img/sm-create-iam-role-s3.png)
-
-![Pending Studio](img/studio_pending.png)
-
-![Open Studio](img/studio_open.png)
+![Open SageMaker Studio](img/console3_open_studio.png)
 
 ![Loading Studio](img/studio_loading.png)
 
-## 3. Configure IAM to run the workshop.
 
-![IAM 1](img/sagemaker-iam-1.png)
-
-![IAM 2](img/sagemaker-iam-2.png)
-
-![IAM 3](img/sagemaker-iam-3.png)
-
-## 4. Launch a New Terminal within Studio
+### 4. Launch a New Terminal within Studio
 
 Click `File` > `New` > `Terminal` to launch a terminal in your Jupyter instance.
 
 ![Terminal Studio](img/studio_terminal.png)
 
-## 5. Clone this GitHub Repo in the Terminal
+
+### 5. Clone this GitHub Repo in the Terminal
 
 Within the Terminal, run the following:
 
@@ -89,8 +106,11 @@ remove the file manually to continue.
 ```
 _Note:  This is not a fatal error ^^ above ^^.  Just re-run the command again until it works._
 
-## 6. Start the Workshop!
 
-Navigate to `data-science-on-aws/` in SageMaker Studio and start the workshop!
+### 6. Start the Workshop!
 
-_You may need to refresh your browser if you don't see the new `data-science-on-aws/` directory._
+Navigate to the `data-science-on-aws/00_quickstart/` directory and start the workshop!
+
+![Start Workshop](img/start_workshop.png)
+
+_You may need to refresh your browser if you don't see the directories._
