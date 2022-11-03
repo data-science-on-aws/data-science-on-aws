@@ -6,6 +6,9 @@ YouTube Videos, Meetups, Book, and Code:  **https://datascienceonaws.com**
 
 [![Data Science on AWS](img/data-science-on-aws-book.png)](https://datascienceonaws.com)
 
+Book examples here:  https://github.com/data-science-on-aws/data-science-on-aws/tree/main
+
+
 # Workshop Description
 In this hands-on workshop, we will build an end-to-end AI/ML pipeline for natural language processing with Amazon SageMaker.  We will train and tune a text classifier to classify text-based product reviews using the state-of-the-art [BERT](https://arxiv.org/abs/1810.04805) model for language representation.
 
