@@ -2,9 +2,9 @@
 
 ## Data Science on AWS
 
-YouTube Videos, Meetups, Book, and Code:  **https://datascienceonaws.com**
+Based on this O'Reilly book:  
 
-[![Data Science on AWS](img/data-science-on-aws-book.png)](https://datascienceonaws.com)
+[![Data Science on AWS](img/book_full_color_sm.png)](https://www.amazon.com/Data-Science-AWS-End-End/dp/1492079391/)
 
 Book examples here:  https://github.com/data-science-on-aws/data-science-on-aws/tree/main
 
