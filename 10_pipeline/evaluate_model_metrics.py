@@ -7,7 +7,6 @@ import sys
 
 #subprocess.check_call([sys.executable, "-m", "conda", "install", "-c", "anaconda", "tensorflow==2.3.0", "-y"])
 subprocess.check_call([sys.executable, "-m", "pip", "install", "tensorflow==2.3.1"])
-
 import tensorflow as tf
 from tensorflow import keras
 
@@ -15,7 +14,7 @@ subprocess.check_call([sys.executable, "-m", "conda", "install", "-c", "conda-fo
 from transformers import DistilBertTokenizer
 from transformers import DistilBertConfig
 
-subprocess.check_call([sys.executable, "-m", "pip", "install", "matplotlib==3.2.1"])
+#subprocess.check_call([sys.executable, "-m", "pip", "install", "matplotlib==3.2.1"])
 import pandas as pd
 import os
 import re
@@ -30,7 +29,7 @@ from pathlib import Path
 import tarfile
 import itertools
 from sklearn.metrics import confusion_matrix
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 from tensorflow import keras
 from sklearn.metrics import classification_report
 from sklearn.metrics import accuracy_score
@@ -104,6 +103,27 @@ def parse_args():
     return parser.parse_args()
 
 
+def predict(text, model, max_seq_length):
+    encode_plus_tokens = tokenizer.encode_plus(
+        text, 
+        padding='max_length', 
+        max_length=max_seq_length, 
+        truncation=True, 
+        return_tensors="tf"
+    )
+    # The id from the pre-trained BERT vocabulary that represents the token.  (Padding of 0 will be used if the # of tokens is less than `max_seq_length`)
+    input_ids = encode_plus_tokens["input_ids"]
+
+    # Specifies which tokens BERT should pay attention to (0 or 1).  Padded `input_ids` will have 0 in each of these vector elements.
+    input_mask = encode_plus_tokens["attention_mask"]
+
+    outputs = model.predict(x=(input_ids, input_mask))
+
+    prediction = [{"label": config.id2label[item.argmax()], "score": item.max().item()} for item in outputs]
+
+    return prediction[0]["label"]
+
+
 def process(args):
     print("Current host: {}".format(args.current_host))
 
@@ -122,36 +142,16 @@ def process(args):
     model = keras.models.load_model("{}/tensorflow/saved_model/0".format(args.input_model))
     print(model)
 
-    def predict(text):
-        encode_plus_tokens = tokenizer.encode_plus(
-            text, 
-            padding='max_length', 
-            max_length=args.max_seq_length, 
-            truncation=True, 
-            return_tensors="tf"
-        )
-        # The id from the pre-trained BERT vocabulary that represents the token.  (Padding of 0 will be used if the # of tokens is less than `max_seq_length`)
-        input_ids = encode_plus_tokens["input_ids"]
-
-        # Specifies which tokens BERT should pay attention to (0 or 1).  Padded `input_ids` will have 0 in each of these vector elements.
-        input_mask = encode_plus_tokens["attention_mask"]
-
-        outputs = model.predict(x=(input_ids, input_mask))
-
-        prediction = [{"label": config.id2label[item.argmax()], "score": item.max().item()} for item in outputs]
-
-        return prediction[0]["label"]
-
     print(
         """I loved it!  I will recommend this to everyone.""",
-        predict("""I loved it!  I will recommend this to everyone."""),
+        predict("""I loved it!  I will recommend this to everyone.""", model, args.max_seq_length),
     )
 
-    print("""It's OK.""", predict("""It's OK."""))
+    print("""It's OK.""", predict("""It's OK.""", model, args.max_seq_length))
 
     print(
         """Really bad.  I hope they don't make this anymore.""",
-        predict("""Really bad.  I hope they don't make this anymore."""),
+        predict("""Really bad.  I hope they don't make this anymore.""", model, args.max_seq_length),
     )
 
     ###########################################################################################
@@ -172,7 +172,7 @@ def process(args):
     df_test_reviews.shape
     df_test_reviews.head()
 
-    y_test = df_test_reviews["review_body"].map(predict)
+    y_test = [predict(review, model, args.max_seq_length) for review in df_test_reviews["review_body"]]
     y_test
 
     y_actual = df_test_reviews["star_rating"]
@@ -183,43 +183,43 @@ def process(args):
     accuracy = accuracy_score(y_true=y_test, y_pred=y_actual)
     print("Test accuracy: ", accuracy)
 
-    def plot_conf_mat(cm, classes, title, cmap):
-        print(cm)
-        plt.imshow(cm, interpolation="nearest", cmap=cmap)
-        plt.title(title)
-        plt.colorbar()
-        tick_marks = np.arange(len(classes))
-        plt.xticks(tick_marks, classes, rotation=45)
-        plt.yticks(tick_marks, classes)
+#     def plot_conf_mat(cm, classes, title, cmap):
+#         print(cm)
+#         plt.imshow(cm, interpolation="nearest", cmap=cmap)
+#         plt.title(title)
+#         plt.colorbar()
+#         tick_marks = np.arange(len(classes))
+#         plt.xticks(tick_marks, classes, rotation=45)
+#         plt.yticks(tick_marks, classes)
 
-        fmt = "d"
-        thresh = cm.max() / 2.0
-        for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
-            plt.text(
-                j,
-                i,
-                format(cm[i, j], fmt),
-                horizontalalignment="center",
-                color="black" if cm[i, j] > thresh else "black",
-            )
+#         fmt = "d"
+#         thresh = cm.max() / 2.0
+#         for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+#             plt.text(
+#                 j,
+#                 i,
+#                 format(cm[i, j], fmt),
+#                 horizontalalignment="center",
+#                 color="black" if cm[i, j] > thresh else "black",
+#             )
 
-            plt.tight_layout()
-            plt.ylabel("True label")
-            plt.xlabel("Predicted label")
+#             plt.tight_layout()
+#             plt.ylabel("True label")
+#             plt.xlabel("Predicted label")
 
-    cm = confusion_matrix(y_true=y_test, y_pred=y_actual)
+#     cm = confusion_matrix(y_true=y_test, y_pred=y_actual)
 
-    plt.figure()
-    fig, ax = plt.subplots(figsize=(10, 5))
-    plot_conf_mat(cm, classes=CLASSES, title="Confusion Matrix", cmap=plt.cm.Greens)
+#     plt.figure()
+#     fig, ax = plt.subplots(figsize=(10, 5))
+#     plot_conf_mat(cm, classes=CLASSES, title="Confusion Matrix", cmap=plt.cm.Greens)
 
-    # Save the confusion matrix
-    plt.show()
+#     # Save the confusion matrix
+#     plt.show()
 
     # Model Output
     metrics_path = os.path.join(args.output_data, "metrics/")
     os.makedirs(metrics_path, exist_ok=True)
-    plt.savefig("{}/confusion_matrix.png".format(metrics_path))
+#     plt.savefig("{}/confusion_matrix.png".format(metrics_path))
 
     report_dict = {
         "metrics": {

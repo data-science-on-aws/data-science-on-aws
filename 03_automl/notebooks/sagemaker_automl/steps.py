@@ -15,27 +15,21 @@ class AutoMLCandidateAlgoStep:
     and `mlp`.
     """
 
-    def __init__(
-        self,
-        name,
-        training_resource_config,
-        region,
-        repo_version,
-        inference_repo_version,
-        candidate_specific_static_hyperparameters=None,
-    ):
+    def __init__(self, name, training_resource_config, region, repo_version, inference_repo_version,
+                 candidate_specific_static_hyperparameters=None):
 
         self.algo_name = name
         self.training_resource_config = training_resource_config
-        self.candidate_specific_static_hps = (
-            candidate_specific_static_hyperparameters if candidate_specific_static_hyperparameters else {}
-        )
+        self.candidate_specific_static_hps = candidate_specific_static_hyperparameters \
+            if candidate_specific_static_hyperparameters else {}
         self.region = region
         self.repo_version = repo_version
         self.algo_image_uri = get_algo_image_uri(self.algo_name, region, repo_version)
         self.algo_inference_image_uri = get_algo_image_uri(self.algo_name, region, inference_repo_version)
 
-    def create_estimator(self, role, output_path, hyperparameters, sagemaker_session, **kwargs):
+    def create_estimator(
+        self, role, output_path, hyperparameters, sagemaker_session, **kwargs
+    ):
 
         estimator = Estimator(
             self.algo_image_uri,
@@ -53,11 +47,15 @@ class AutoMLCandidateAlgoStep:
 
     def get_inference_container_config(self):
         config = {
-            "env": {"SAGEMAKER_DEFAULT_INVOCATIONS_ACCEPT": "text/csv"},
-            "image_uri": self.algo_inference_image_uri,
+            'env': {
+                'SAGEMAKER_DEFAULT_INVOCATIONS_ACCEPT': 'text/csv'
+            },
+            'image_uri': self.algo_inference_image_uri
         }
-        if self.algo_name == "mlp":
-            config["env"]["ML_APPLICATION"] = "mlp"
+        if self.algo_name == 'mlp':
+            config['env']['ML_APPLICATION'] = 'mlp'
+        elif self.algo_name == 'linear-learner':
+            config['env']['ML_APPLICATION'] = 'linear_learner'
 
         return config
 
@@ -110,8 +108,8 @@ class AutoMLCandidateDataTransformerStep:
         self.source_module_path = source_module_path or self.DEFAULT_SOURCE_MODULE
 
         # We share registry account id with all framework container
-        xgb_image_uri = image_uris.retrieve("xgboost", region=region, version="1.0-1")
-        last_slash_index = xgb_image_uri.rfind("/")
+        xgb_image_uri = image_uris.retrieve("xgboost", region=region, version="1.3-1")
+        last_slash_index = xgb_image_uri.rfind('/')
         self.transformer_image_uri = "{}/{}:{}".format(
             xgb_image_uri[:last_slash_index], "sagemaker-sklearn-automl", repo_version
         )
@@ -202,9 +200,13 @@ class AutoMLCandidateDataTransformerStep:
         def _train_transform(context):
             _trainer = context.get("trainer")
 
-            training_data_input_path = local_run_config.automl_job_processed_training_data_path
+            training_data_input_path = (
+                local_run_config.automl_job_processed_training_data_path
+            )
             return _trainer.fit(
-                {AutoMLCandidateDataTransformerStep.TRAIN_CHANNEL_NAME: training_data_input_path},
+                {
+                    AutoMLCandidateDataTransformerStep.TRAIN_CHANNEL_NAME: training_data_input_path
+                },
                 job_name=training_job_name,
                 wait=True,
                 logs=False,
@@ -227,7 +229,7 @@ class AutoMLCandidateDataTransformerStep:
                 accept=self.content_type,
                 env=transform_env,
                 volume_kms_key=local_run_config.volume_kms_key,
-                output_kms_key=local_run_config.output_kms_key,
+                output_kms_key=local_run_config.output_kms_key
             )
             context["transformer"] = transformer
 
@@ -262,7 +264,9 @@ class AutoMLCandidateDataTransformerStep:
             ),
         ]
 
-    def create_model(self, estimator, role, sagemaker_session, transform_mode, **kwargs):
+    def create_model(
+        self, estimator, role, sagemaker_session, transform_mode, **kwargs
+    ):
         """Create a deployable data transformer model
         Args:
             estimator: an estimator attached from trainer
