@@ -69,20 +69,6 @@ Resources:
           - arn:aws:s3:::binstar-cio-packages-prod
           - arn:aws:s3:::models.huggingface.co/*
           - arn:aws:s3:::models.huggingface.co
-          - arn:aws:s3:::coursera-nv-nlp/*
-          - arn:aws:s3:::coursera-nv-nlp
-          - arn:aws:s3:::nvidia-aws-coursera/*
-          - arn:aws:s3:::nvidia-aws-coursera
-          - arn:aws:s3:::aws-tc-largeobjects/*
-          - arn:aws:s3:::aws-tc-largeobjects
-          - arn:aws:s3:::rapidsai-data/*
-          - arn:aws:s3:::rapidsai-data
-          - arn:aws:s3:::sagemaker-rapids-hpo-us-east-1/*
-          - arn:aws:s3:::sagemaker-rapids-hpo-us-east-1
-          - arn:aws:s3:::sagemaker-rapids-hpo-us-west-2/*
-          - arn:aws:s3:::sagemaker-rapids-hpo-us-west-2
-          - arn:aws:s3:::prod-model-registry-ngc-bucket/*
-          - arn:aws:s3:::prod-model-registry-ngc-bucket
         - Sid: ECRAccess
           Effect: Allow
           Action:
@@ -127,17 +113,14 @@ Resources:
           Condition:
             ForAnyValue:StringNotLike:
               sagemaker:InstanceTypes:
-              - ml.t3.medium
+              - ml.m4.xlarge
               - ml.m5.large
               - ml.m5.xlarge
               - ml.m5.2xlarge
               - ml.m5.4xlarge
-              - ml.c5.large
               - ml.c5.xlarge
               - ml.c5.2xlarge
               - ml.c5.9xlarge
-              - ml.g4dn.xlarge
-              - ml.p3.2xlarge
         - Sid: SageMakerList
           Action:
           - sagemaker:Describe*
@@ -212,7 +195,6 @@ Resources:
               ForAnyValue:StringNotLike:
                 sagemaker:InstanceTypes:
                 - ml.t3.medium
-                - ml.g4dn.xlarge
                 - system
                 - default
       - PolicyName: s3-access

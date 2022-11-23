@@ -1,0 +1,64 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Create S3 Buckets
+Parameters:
+  ProjectName:
+    Type: String
+  ParsedStackId:
+    Type: String
+Resources:
+  KMSCMK:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: KMS key for S3 buckets
+      KeyPolicy:
+        Id: key-policy-1
+        Version: 2012-10-17
+        Statement:
+        - Sid: Enable IAM User Permissions
+          Effect: Allow
+          Principal:
+            AWS:
+              Fn::Sub: arn:aws:iam::${AWS::AccountId}:root
+          Action: kms:*
+          Resource: '*'
+        - Sid: Allow access for Key Users
+          Effect: Allow
+          Principal:
+            AWS:
+              Fn::Sub: arn:aws:iam::${AWS::AccountId}:root
+          Action:
+          - kms:Encrypt
+          - kms:Decrypt
+          - kms:ReEncrypt*
+          - kms:GenerateDataKey
+          - kms:DescribeKey
+          Resource: '*'
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Sub: ${ProjectName}-${ParsedStackId}
+  KMSCMKAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName:
+        Fn::Sub: alias/kms-cmk-${ProjectName}-${ParsedStackId}
+      TargetKeyId:
+        Ref: KMSCMK
+  KMSCMKArn:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name:
+        Fn::Sub: kms-cmk-${ProjectName}-arn
+      Type: String
+      Value:
+        Fn::GetAtt:
+        - KMSCMK
+        - Arn
+      Description: SageMakerExecRole ARN
+Outputs:
+  KMSKeyArn:
+    Description: KMS Key ARN for the S3 buckets
+    Value:
+      Fn::GetAtt:
+      - KMSCMK
+      - Arn

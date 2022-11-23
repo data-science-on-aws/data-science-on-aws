@@ -178,16 +178,123 @@ Resources:
             pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".huggingface.co";
             endswith; msg:"Allowed HTTPS domain"; sid:22; rev:1;)
 
-            drop http $HOME_NET any -> $EXTERNAL_NET any (http.header_names; content:"|0d
-            0a|"; startswith; msg:"not matching any HTTP allowlisted FQDNs"; flow:to_server,
-            established; sid:97; rev:1;)
+            pass http $HOME_NET any -> $EXTERNAL_NET any (http.host; dotprefix; content:".s3-us-east-1.amazonaws.com";
+            endswith; msg:"Allowed HTTP domain"; sid:23; rev:1;)
+
+            pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".s3-us-east-1.amazonaws.com";
+            endswith; msg:"Allowed HTTPS domain"; sid:24; rev:1;)
+
+            pass http $HOME_NET any -> $EXTERNAL_NET any (http.host; dotprefix; content:".s3-us-west-2.amazonaws.com";
+            endswith; msg:"Allowed HTTP domain"; sid:25; rev:1;)
+
+            pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".s3-us-west-2.amazonaws.com";
+            endswith; msg:"Allowed HTTPS domain"; sid:26; rev:1;)
+
+            pass http $HOME_NET any -> $EXTERNAL_NET any (http.host; dotprefix; content:".transtats.bts.gov";
+            endswith; msg:"Allowed HTTP domain"; sid:27; rev:1;)
+
+            pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".transtats.bts.gov";
+            endswith; msg:"Allowed HTTPS domain"; sid:28; rev:1;)
+
+            pass http $HOME_NET any -> $EXTERNAL_NET any (http.host; dotprefix; content:".ourairports.co";
+            endswith; msg:"Allowed HTTP domain"; sid:29; rev:1;)
+
+            pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".ourairports.co";
+            endswith; msg:"Allowed HTTPS domain"; sid:30; rev:1;)
+
+            pass http $HOME_NET any -> $EXTERNAL_NET any (http.host; dotprefix; content:".api.ngc.nvidia.com";
+            endswith; msg:"Allowed HTTP domain"; sid:31; rev:1;)
+
+            pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".api.ngc.nvidia.com";
+            endswith; msg:"Allowed HTTPS domain"; sid:32; rev:1;)
+
+            pass http $HOME_NET any -> $EXTERNAL_NET any (http.host; dotprefix; content:".archive.ics.uci.edu";
+            endswith; msg:"Allowed HTTP domain"; sid:33; rev:1;)
+
+            pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".archive.ics.uci.edu";
+            endswith; msg:"Allowed HTTPS domain"; sid:34; rev:1;)
+
+            pass http $HOME_NET any -> $EXTERNAL_NET any (http.host; dotprefix; content:".dcc.fc.up.pt"; 
+            endswith; msg:"Allowed HTTP domain"; sid:35; rev:1;)
+
+            pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".dcc.fc.up.pt"; 
+            endswith; msg:"Allowed HTTPS domain"; sid:36; rev:1;)
+
+            pass http $HOME_NET any -> $EXTERNAL_NET any (http.host; dotprefix; content:".figshare.com"; 
+            endswith; msg:"Allowed HTTP domain"; sid:37; rev:1;)
+            
+            pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".figshare.com"; 
+            endswith; msg:"Allowed HTTPS domain"; sid:38; rev:1;)
+
+            pass http $HOME_NET any -> $EXTERNAL_NET any (http.host; dotprefix; content:".ngc.nvidia.com"; 
+            endswith; msg:"Allowed HTTP domain"; sid:39; rev:1;)
+            
+            pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".ngc.nvidia.com"; 
+            endswith; msg:"Allowed HTTPS domain"; sid:40; rev:1;)
+            
+            pass http $HOME_NET any -> $EXTERNAL_NET any (http.host; dotprefix; content:".github.io"; 
+            endswith; msg:"Allowed HTTP domain"; sid:41; rev:1;)
+            
+            pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".github.io"; 
+            endswith; msg:"Allowed HTTPS domain"; sid:42; rev:1;)
+            
+            pass http $HOME_NET any -> $EXTERNAL_NET any (http.host; dotprefix; content:".codalab.org"; 
+            endswith; msg:"Allowed HTTP domain"; sid:43; rev:1;)    
+            
+            pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".codalab.org"; 
+            endswith; msg:"Allowed HTTPS domain"; sid:44; rev:1;)
+
+            pass http $HOME_NET any -> $EXTERNAL_NET any (http.host; dotprefix; content:".download.nvidia.com"; 
+            endswith; msg:"Allowed HTTP domain"; sid:45; rev:1;)        
+            
+            pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".download.nvidia.com"; 
+            endswith; msg:"Allowed HTTPS domain"; sid:46; rev:1;)
+
+            pass http $HOME_NET any -> $EXTERNAL_NET any (http.host; dotprefix; content:".pytorch.org"; 
+            endswith; msg:"Allowed HTTP domain"; sid:47; rev:1;)        
+            
+            pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".pytorch.org"; 
+            endswith; msg:"Allowed HTTPS domain"; sid:48; rev:1;)
+
+            pass http $HOME_NET any -> $EXTERNAL_NET any (http.host; dotprefix; content:".cocodataset.org";
+            endswith; msg:"Allowed HTTP domain"; sid:49; rev:1;)
+
+            pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".cocodataset.org";
+            endswith; msg:"Allowed HTTPS domain"; sid:50; rev:1;)
+
+            pass http $HOME_NET any -> $EXTERNAL_NET any (http.host; dotprefix; content:".images.cocodataset.org";
+            endswith; msg:"Allowed HTTP domain"; sid:51; rev:1;)
+
+            pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".images.cocodataset.org";
+            endswith; msg:"Allowed HTTPS domain"; sid:52; rev:1;)
+
+            pass http $HOME_NET any -> $EXTERNAL_NET any (http.host; dotprefix; content:".docker.io";
+            endswith; msg:"Allowed HTTP domain"; sid:53; rev:1;)
+
+            pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".docker.io";
+            endswith; msg:"Allowed HTTPS domain"; sid:54; rev:1;)
+
+            pass http $HOME_NET any -> $EXTERNAL_NET any (http.host; dotprefix;content:".registry-1.docker.io";
+            endswith; msg:"Allowed HTTP domain"; sid:55; rev:1;)
+
+            pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".registry-1.docker.io";
+            endswith; msg:"Allowed HTTPS domain"; sid:56; rev:1;)
+
+            pass http $HOME_NET any -> $EXTERNAL_NET any (http.host; dotprefix;content:".index.docker.io";
+            endswith; msg:"Allowed HTTP domain"; sid:57; rev:1;)
+
+            pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".index.docker.io";
+            endswith; msg:"Allowed HTTPS domain"; sid:58; rev:1;)
+
+            drop http $HOME_NET any -> $EXTERNAL_NET any (http.header_names; content:"|0d0a|"; 
+            startswith; msg:"not matching any HTTP allowlisted FQDNs"; flow:to_server,established; sid:97; rev:1;)
 
             drop tls $HOME_NET any -> $EXTERNAL_NET any (msg:"not matching any TLS
             allowlisted FQDNs"; flow:to_server, established; sid:98; rev:1;)
 
             drop ip $HOME_NET any -> $EXTERNAL_NET any (msg:"Drop any remaining IP
             traffic including TCP and UDP"; flow:to_server, established; sid:99; rev:1;)
-
+            
             '
       Tags:
       - Key: Name
@@ -420,6 +527,20 @@ Resources:
           - arn:aws:s3:::binstar-cio-packages-prod/*
           - arn:aws:s3:::models.huggingface.co
           - arn:aws:s3:::models.huggingface.co/*
+          - arn:aws:s3:::coursera-nv-nlp
+          - arn:aws:s3:::coursera-nv-nlp/*       
+          - arn:aws:s3:::nvidia-aws-coursera
+          - arn:aws:s3:::nvidia-aws-coursera/*
+          - arn:aws:s3:::aws-tc-largeobjects          
+          - arn:aws:s3:::aws-tc-largeobjects/*
+          - arn:aws:s3:::rapidsai-data
+          - arn:aws:s3:::rapidsai-data/*
+          - arn:aws:s3:::sagemaker-rapids-hpo-us-east-1          
+          - arn:aws:s3:::sagemaker-rapids-hpo-us-east-1/*
+          - arn:aws:s3:::sagemaker-rapids-hpo-us-west-2
+          - arn:aws:s3:::sagemaker-rapids-hpo-us-west-2/*
+          - arn:aws:s3:::prod-model-registry-ngc-bucket
+          - arn:aws:s3:::prod-model-registry-ngc-bucket/*
       RouteTableIds:
       - Ref: SageMakerStudioRouteTable
   VPCEndpointS3Id:

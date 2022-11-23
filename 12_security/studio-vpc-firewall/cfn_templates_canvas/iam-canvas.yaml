@@ -198,7 +198,7 @@ Resources:
       - arn:aws:iam::aws:policy/AmazonAthenaFullAccess
       - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
       - arn:aws:iam::aws:policy/AmazonS3FullAccess
-      - arn:aws:iam::aws:policy/AWSCodePipelineFullAccess
+      - arn:aws:iam::aws:policy/AWSCodePipeline_FullAccess
       - arn:aws:iam::aws:policy/AmazonRedshiftFullAccess
       - arn:aws:iam::aws:policy/AmazonForecastFullAccess
       Policies:

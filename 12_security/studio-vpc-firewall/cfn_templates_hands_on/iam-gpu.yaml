@@ -128,6 +128,7 @@ Resources:
             ForAnyValue:StringNotLike:
               sagemaker:InstanceTypes:
               - ml.t3.medium
+              - ml.m4.xlarge
               - ml.m5.large
               - ml.m5.xlarge
               - ml.m5.2xlarge
