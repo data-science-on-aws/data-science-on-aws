@@ -12,11 +12,11 @@ To build our GPT3-based NLP model, we use the [Amazon Customer Reviews Dataset](
 You will get hands-on with advanced model training and deployment techniques such as hyper-parameter tuning, A/B testing, and auto-scaling.  You will also setup a real-time, streaming analytics and data science pipeline to perform window-based aggregations and anomaly detection.
 
 Attendees will learn how to do the following:
-* Ingest data into S3 using Amazon Athena and the Parquet data format
+* Ingest data into S3 using Amazon Athena, AWS Glue, Spark, Ray and the Parquet data format
 * Visualize data with pandas, matplotlib on SageMaker notebooks
 * Perform feature engineering on a raw dataset using Scikit-Learn and SageMaker Processing Jobs
 * Store and share features using SageMaker Feature Store
-* Train and evaluate a custom BERT model using TensorFlow, Keras, and SageMaker Training Jobs
+* Train and evaluate a custom GPT3 model using PyTorch and SageMaker Training Jobs
 * Evaluate the model using SageMaker Processing Jobs
 * Track model artifacts using Amazon SageMaker ML Lineage Tracking
 * Register and version models using SageMaker Model Registry
