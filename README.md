@@ -1,6 +1,6 @@
 # Data Science on AWS
 
-[![Data Science on AWS - O'Reilly Book](img/dsoaws-book.jpeg | width=100)](https://github.com/data-science-on-aws/data-science-on-aws/tree/oreilly-book)
+[![Data Science on AWS - O'Reilly Book](img/dsoaws-book.jpeg)](https://github.com/data-science-on-aws/data-science-on-aws/tree/oreilly-book | width=100)
 
 [![Data Science on AWS - GPT3](img/dsoaws-gpt3.jpeg | width=100)](https://github.com/data-science-on-aws/data-science-on-aws/tree/gpt3)
 
