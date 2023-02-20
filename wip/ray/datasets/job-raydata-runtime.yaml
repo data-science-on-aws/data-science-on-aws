@@ -1,6 +1,0 @@
-conda:
-    dependencies:
-    - pip:
-      - pyarrow
-      - pandas
-      - scikit-learn

@@ -1,1 +1,0 @@
-![](img/braket-home.png)

@@ -1,5 +1,0 @@
-Follow this example:  
-* https://docs.aws.amazon.com/eks/latest/userguide/fsx-csi.html (latest policies and config)
-
-and this:
-* https://www.eksworkshop.com/beginner/190_fsx_lustre/launching-fsx/ (slightly out of date).

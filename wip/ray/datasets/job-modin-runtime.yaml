@@ -1,6 +1,0 @@
-conda:
-    dependencies:
-    - pip:
-      - modin
-      - pandas
-      - scikit-learn

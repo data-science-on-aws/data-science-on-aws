@@ -1,3 +1,0 @@
-numpy
-pandas
-transformers==3.0.2

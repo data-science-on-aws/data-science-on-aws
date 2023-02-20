@@ -1,0 +1,179 @@
+{
+  "metadata": {
+    "version": 1,
+    "disable_limits": false,
+    "instance_type": "ml.r5.24xlarge"
+  },
+  "parameters": [],
+  "nodes": [
+    {
+      "node_id": "4187ab2a-f38d-45d9-8efe-ed4bd1b91a93",
+      "type": "SOURCE",
+      "operator": "sagemaker.s3_source_0.1",
+      "parameters": {
+        "dataset_definition": {
+          "__typename": "S3CreateDatasetDefinitionOutput",
+          "datasetSourceType": "S3",
+          "name": "part-00000-tid-3325758054719273621-f557a9df-d255-4241-bc37-5c43869c3044-879-8.c000.parquet",
+          "description": null,
+          "s3ExecutionContext": {
+            "__typename": "S3ExecutionContext",
+            "s3Uri": "s3://dsoaws/nyc-taxi-orig-cleaned-split-parquet-per-year/ride-info/year=2019/part-00000-tid-3325758054719273621-f557a9df-d255-4241-bc37-5c43869c3044-879-8.c000.parquet",
+            "s3ContentType": "parquet",
+            "s3HasHeader": true,
+            "s3FieldDelimiter": ",",
+            "s3DirIncludesNested": false,
+            "s3AddsFilenameColumn": false,
+            "s3RoleArn": null
+          }
+        }
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "default"
+        }
+      ]
+    },
+    {
+      "node_id": "471164c3-f682-4d66-ad94-6ff911fa33c8",
+      "type": "TRANSFORM",
+      "operator": "sagemaker.spark.infer_and_cast_type_0.1",
+      "parameters": {},
+      "trained_parameters": {
+        "schema": {
+          "store_and_fwd_flag": "string",
+          "ride_id": "long",
+          "vendor_id": "long",
+          "passenger_count": "long",
+          "pickup_at": "datetime",
+          "dropoff_at": "datetime",
+          "trip_distance": "float",
+          "rate_code_id": "long"
+        }
+      },
+      "inputs": [
+        {
+          "name": "default",
+          "node_id": "4187ab2a-f38d-45d9-8efe-ed4bd1b91a93",
+          "output_name": "default"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "default"
+        }
+      ]
+    },
+    {
+      "node_id": "1a4fecf2-505c-4e05-926f-60c22099c6cb",
+      "type": "SOURCE",
+      "operator": "sagemaker.s3_source_0.1",
+      "parameters": {
+        "dataset_definition": {
+          "__typename": "S3CreateDatasetDefinitionOutput",
+          "datasetSourceType": "S3",
+          "name": "part-00000-tid-4629508899230787795-13cdd6fc-f68a-4bbe-a8d9-b1f89f5baabd-1054-8.c000.parquet",
+          "description": null,
+          "s3ExecutionContext": {
+            "__typename": "S3ExecutionContext",
+            "s3Uri": "s3://dsoaws/nyc-taxi-orig-cleaned-split-parquet-per-year/ride-fare/year=2019/part-00000-tid-4629508899230787795-13cdd6fc-f68a-4bbe-a8d9-b1f89f5baabd-1054-8.c000.parquet",
+            "s3ContentType": "parquet",
+            "s3HasHeader": true,
+            "s3FieldDelimiter": ",",
+            "s3DirIncludesNested": false,
+            "s3AddsFilenameColumn": false,
+            "s3RoleArn": null
+          }
+        }
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "default"
+        }
+      ]
+    },
+    {
+      "node_id": "2f0a9492-f2b0-4171-9909-735779490f05",
+      "type": "TRANSFORM",
+      "operator": "sagemaker.spark.infer_and_cast_type_0.1",
+      "parameters": {},
+      "trained_parameters": {
+        "schema": {
+          "ride_id": "long",
+          "payment_type": "long",
+          "fare_amount": "float",
+          "extra": "float",
+          "mta_tax": "float",
+          "tip_amount": "float",
+          "tolls_amount": "float",
+          "total_amount": "float"
+        }
+      },
+      "inputs": [
+        {
+          "name": "default",
+          "node_id": "1a4fecf2-505c-4e05-926f-60c22099c6cb",
+          "output_name": "default"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "default"
+        }
+      ]
+    },
+    {
+      "node_id": "885d0017-0c4c-4151-8361-059fefc53fee",
+      "type": "TRANSFORM",
+      "operator": "sagemaker.spark.join_tables_0.1",
+      "parameters": {
+        "left_column": "ride_id",
+        "right_column": "ride_id",
+        "join_type": "inner"
+      },
+      "inputs": [
+        {
+          "name": "df",
+          "node_id": "471164c3-f682-4d66-ad94-6ff911fa33c8",
+          "output_name": "default"
+        },
+        {
+          "name": "df",
+          "node_id": "2f0a9492-f2b0-4171-9909-735779490f05",
+          "output_name": "default"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "default"
+        }
+      ]
+    },
+    {
+      "node_id": "c21c9506-1464-4603-964a-bb493c6cfe56",
+      "type": "VISUALIZATION",
+      "operator": "sagemaker.visualizations.data_insights_report_0.1",
+      "parameters": {
+        "report_content": "Duplicate rows",
+        "insights_report_parameters": {
+          "target_column": "total_amount",
+          "problem_type": "Regression"
+        }
+      },
+      "inputs": [
+        {
+          "name": "df",
+          "node_id": "885d0017-0c4c-4151-8361-059fefc53fee",
+          "output_name": "default"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "default"
+        }
+      ]
+    }
+  ]
+}

@@ -1,4 +1,0 @@
-conda:
-    dependencies:
-    - pip:
-      - scikit-learn==0.23.0

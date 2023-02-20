@@ -1,8 +1,0 @@
-conda:
-    dependencies:
-    - pip:
-      - raydp
-      - pandas
-      - scikit-learn
-
-

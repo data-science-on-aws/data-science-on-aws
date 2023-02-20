@@ -1,6 +1,0 @@
-Tom Jackson
-Skill Summary:
-- Strong analytical and problem solving skills
-- Holds AWS Certified Associated Solution Architect Certification
-- Databases: MySQL, SQL
-- Programming Languages: C, C++, Java, PHP, JavaScript
