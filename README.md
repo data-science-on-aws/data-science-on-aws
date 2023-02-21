@@ -98,7 +98,7 @@ Click `File` > `New` > `Terminal` to launch a terminal in your Jupyter instance.
 Within the Terminal, run the following:
 
 ```
-cd ~ && git clone -b main https://github.com/data-science-on-aws/data-science-on-aws
+cd ~ && git clone -b oreilly-book https://github.com/data-science-on-aws/data-science-on-aws
 ```
 
 If you see an error like the following, just re-run the command again until it works:
