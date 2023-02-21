@@ -1,4 +1,4 @@
-# Data Science on AWS
+# Data Science on AWS - O'Reilly Book
 
 [![Data Science on AWS - O'Reilly Book](img/dsoaws-book.png)](https://github.com/data-science-on-aws/data-science-on-aws/tree/oreilly-book)
 [![Data Science on AWS - GPT3](img/dsoaws-gpt3.png)](https://github.com/data-science-on-aws/data-science-on-aws/tree/gpt3)
