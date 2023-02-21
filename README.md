@@ -96,7 +96,7 @@ Within the Terminal, run the following:
 
 ```
 cd ~ && git clone -b gpt3 https://github.com/data-science-on-aws/data-science-on-aws
-```t
+```
 
 If you see an error like the following, just re-run the command again until it works:
 ```
