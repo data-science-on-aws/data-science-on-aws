@@ -9,3 +9,7 @@
 Based on the following book:
 
 [![Data Science on AWS](img/book_full_color_sm.png)](https://www.amazon.com/Data-Science-AWS-End-End/dp/1492079391/)
+
+
+References:
+* https://engineering.zalando.com/posts/2020/06/distributed-xgb-sagemaker.html
