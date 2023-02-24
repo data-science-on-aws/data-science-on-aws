@@ -1,15 +1,10 @@
 import json
-import sys
 import logging
-import torch
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-logger.addHandler(logging.StreamHandler(sys.stdout))
-
-###################################
-### VARIABLES
-###################################
+from typing import Any
+from typing import Dict
+from typing import Union
+import subprocess
+import sys
 
 subprocess.check_call([sys.executable, "-m", "pip", "install", "torch==1.13.1"])
 import torch
@@ -18,107 +13,209 @@ subprocess.check_call([sys.executable, "-m", "pip", "install", "transformers==4.
 from transformers import AutoModelForCausalLM
 from transformers import AutoTokenizer
 
-import os
-        
-tokenizer = AutoTokenizer.from_pretrained(model_checkpoint, use_fast=True)
+
+import torch
+#from constants import constants
+from sagemaker_inference import encoder
+from transformers import TextGenerationPipeline
+from transformers import pipeline
+from transformers import set_seed
 
 
-###################################
-### SAGEMKAER LOAD MODEL FUNCTION
-###################################
+APPLICATION_X_TEXT = "application/x-text"
+APPLICATION_JSON = "application/json"
+STR_DECODE_CODE = "utf-8"
 
-# You need to put in config.json from saved fine-tuned Hugging Face model in code/
-# Reference it in the inference container at /opt/ml/model/code
-# The model needs to be called 'model.pth' per https://github.com/aws/sagemaker-pytorch-inference-toolkit/blob/6936c08581e26ff3bac26824b1e4946ec68ffc85/src/sagemaker_pytorch_serving_container/torchserve.py#L45
+VERBOSE_EXTENSION = ";verbose"
+
+TEXT_GENERATION = "text-generation"
+
+GENERATED_TEXT = "generated_text"
+GENERATED_TEXTS = "generated_texts"
+
+# Possible model parameters
+TEXT_INPUTS = "text_inputs"
+MAX_LENGTH = "max_length"
+NUM_RETURN_SEQUENCES = "num_return_sequences"
+NUM_BEAMS = "num_beams"
+TOP_P = "top_p"
+EARLY_STOPPING = "early_stopping"
+DO_SAMPLE = "do_sample"
+NO_REPEAT_NGRAM_SIZE = "no_repeat_ngram_size"
+TOP_K = "top_k"
+TEMPERATURE = "temperature"
+SEED = "seed"
+
+ALL_PARAM_NAMES = [
+    TEXT_INPUTS,
+    MAX_LENGTH,
+    NUM_RETURN_SEQUENCES,
+    NUM_BEAMS,
+    TOP_P,
+    EARLY_STOPPING,
+    DO_SAMPLE,
+    NO_REPEAT_NGRAM_SIZE,
+    TOP_K,
+    TEMPERATURE,
+    SEED,
+]
 
 
-def model_fn(model_dir):
+# Model parameter ranges
+MAX_LENGTH_MIN = 1
+NUM_RETURN_SEQUENCE_MIN = 1
+NUM_BEAMS_MIN = 1
+TOP_P_MIN = 0
+TOP_P_MAX = 1
+NO_REPEAT_NGRAM_SIZE_MIN = 1
+TOP_K_MIN = 0
+TEMPERATURE_MIN = 0
+
+
+
+
+def model_fn(model_dir: str) -> TextGenerationPipeline:
+    """Create our inference task as a delegate to the model.
+
+    This runs only once per one worker.
+
+    Args:
+        model_dir (str): directory where the model files are stored
+    Returns:
+        TextGenerationPipeline: a huggingface pipeline for generating text
+    Raises:
+        ValueError if the model file cannot be found.
+    """
+    
+    print('walking model_dir: {}'.format(model_dir))
+
+    import os
     for root, dirs, files in os.walk(model_dir, topdown=False):
         for name in files:
             print(os.path.join(root, name))
         for name in dirs:
             print(os.path.join(root, name))
-
-    model = AutoModelForCausalLM.from_pretrained(model_dir)
-    print(model)
-
-#     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-#     model.to(device)
-
-    return model
-
-
-###################################
-### SAGEMKAER PREDICT FUNCTION
-###################################
+    
+    try:
+        device_id = 0 if torch.cuda.is_available() else -1
+        return pipeline(TEXT_GENERATION, model_dir, device=device_id)
+    except Exception:
+        logging.exception(f"Failed to load model from: {model_dir}")
+        raise
 
 
-def predict_fn(input_data, model):
-    model.eval()
+def _validate_payload(payload: Dict[str, Any]) -> None:
+    """Validate the parameters in the input loads.
 
-    print("input_data: {}".format(input_data))
-    print("type(input_data): {}".format(type(input_data)))
+    Checks if max_length, num_return_sequences, num_beams, top_p and temprature are in bounds.
+    Checks if do_sample is boolean.
+    Checks max_length, num_return_sequences, num_beams and seed are integers.
 
-    data_str = input_data.decode("utf-8")
-    print("data_str: {}".format(data_str))
-    print("type data_str: {}".format(type(data_str)))
+    Args:
+        payload: a decoded input payload (dictionary of input parameter and values)
+    """
+    for param_name in payload:
+        assert (
+            param_name in ALL_PARAM_NAMES
+        ), f"Input payload contains an invalid key {param_name}. Valid keys are {ALL_PARAM_NAMES}."
 
-    jsonlines = data_str.split("\n")
-    print("jsonlines: {}".format(jsonlines))
-    print("type jsonlines: {}".format(type(jsonlines)))
+    assert TEXT_INPUTS in payload, f"Input payload must contain {TEXT_INPUTS} key."
 
-    predictions = []
+    for param_name in [MAX_LENGTH, NUM_RETURN_SEQUENCES, NUM_BEAMS, SEED]:
+        if param_name in payload:
+            assert type(payload[param_name]) == int, f"{param_name} must be an integer, got {payload[param_name]}."
 
-    for jsonline in jsonlines:
-        print("jsonline: {}".format(jsonline))
-        print("type jsonline: {}".format(type(jsonline)))
-
-        # features[0]:  review_body
-        # features[1..n]:  is anything else (we can define the order ourselves)
-        # Example:
-        #    {"features": ["The best gift ever", "Gift Cards"]}
-        #
-        review_body = json.loads(jsonline)["features"][0]
-        print("""review_body: {}""".format(review_body))
-
-        result_length = 100
-        inputs = tokenizer(review_body, return_tensors='pt')
-
-        output = tokenizer.decode(model.generate(inputs["input_ids"],
-                               max_length=result_length, 
-                               do_sample=True, 
-                               top_k=50, 
-                               top_p=0.9
-                              )[0])
-        
-        print("output: {}".format(output))
-
-        prediction_dict = {}
-        prediction_dict["generated_response"] = output
-
-        jsonline = json.dumps(prediction_dict)
-        print("jsonline: {}".format(jsonline))
-
-        predictions.append(jsonline)
-        print("predictions in the loop: {}".format(predictions))
-
-    predictions_jsonlines = "\n".join(predictions)
-    print("predictions_jsonlines: {}".format(predictions_jsonlines))
-
-    return predictions_jsonlines
-
-
-###################################
-### SAGEMKAER MODEL INPUT FUNCTION
-###################################
-
-def input_fn(serialized_input_data, content_type="application/jsonlines"):
-    return serialized_input_data
+    if MAX_LENGTH in payload:
+        assert (
+            payload[MAX_LENGTH] >= MAX_LENGTH_MIN
+        ), f"{MAX_LENGTH} must be at least {MAX_LENGTH_MIN}, got {payload[MAX_LENGTH]}."
+    if NUM_RETURN_SEQUENCES in payload:
+        assert payload[NUM_RETURN_SEQUENCES] >= NUM_RETURN_SEQUENCE_MIN, (
+            f"{NUM_RETURN_SEQUENCES} must be at least {NUM_RETURN_SEQUENCE_MIN}, "
+            f"got {payload[NUM_RETURN_SEQUENCES]}."
+        )
+    if NUM_BEAMS in payload:
+        assert (
+            payload[NUM_BEAMS] >= NUM_BEAMS_MIN
+        ), f"{NUM_BEAMS} must be at least {NUM_BEAMS_MIN}, got {payload[NUM_BEAMS]}."
+    if NUM_RETURN_SEQUENCES in payload and NUM_BEAMS in payload:
+        assert payload[NUM_RETURN_SEQUENCES] <= payload[NUM_BEAMS], (
+            f"{NUM_BEAMS} must be at least {NUM_RETURN_SEQUENCES}. Instead got "
+            f"{NUM_BEAMS}={payload[NUM_BEAMS]} and {NUM_RETURN_SEQUENCES}="
+            f"{payload[NUM_RETURN_SEQUENCES]}."
+        )
+    if TOP_P in payload:
+        assert TOP_P_MIN <= payload[TOP_P] <= TOP_P_MAX, (
+            f"{TOP_K} must be in range [{TOP_P_MIN},{TOP_P_MAX}], got "
+            f"{payload[TOP_P]}"
+        )
+    if TEMPERATURE in payload:
+        assert payload[TEMPERATURE] >= TEMPERATURE_MIN, (
+            f"{TEMPERATURE} must be a float with value at least {TEMPERATURE_MIN}, got "
+            f"{payload[TEMPERATURE]}."
+        )
+    if DO_SAMPLE in payload:
+        assert (
+            type(payload[DO_SAMPLE]) == bool
+        ), f"{DO_SAMPLE} must be a boolean, got {payload[DO_SAMPLE]}."
 
 
-###################################
-### SAGEMKAER MODEL OUTPUT FUNCTION
-###################################
+def _update_num_beams(payload: Dict[str, Union[str, float, int]]) -> Dict[str, Union[str, float, int]]:
+    """Add num_beans to the payload if missing and num_return_sequences is present."""
+    if NUM_RETURN_SEQUENCES in payload and NUM_BEAMS not in payload:
+        payload[NUM_BEAMS] = payload[NUM_RETURN_SEQUENCES]
+    return payload
 
-def output_fn(prediction_output, accept="application/jsonlines"):
-    return prediction_output, accept
+
+def transform_fn(text_generator: TextGenerationPipeline, input_data: bytes, content_type: str, accept: str) -> bytes:
+    """Make predictions against the model and return a serialized response.
+
+    The function signature conforms to the SM contract.
+
+    Args:
+        text_generator (TextGenerationPipeline): a huggingface pipeline
+        input_data (obj): the request data.
+        content_type (str): the request content type.
+        accept (str): accept header expected by the client.
+    Returns:
+        obj: a byte string of the prediction
+    """
+    if content_type == APPLICATION_X_TEXT:
+        try:
+            input_text = input_data.decode(STR_DECODE_CODE)
+        except Exception:
+            logging.exception(
+                f"Failed to parse input payload. For content_type={APPLICATION_X_TEXT}, input "
+                f"payload must be a string encoded in utf-8 format."
+            )
+            raise
+        try:
+            output = text_generator(input_text)[0]
+        except Exception:
+            logging.exception("Failed to do inference")
+            raise
+    elif content_type == APPLICATION_JSON:
+        try:
+            payload = json.loads(input_data)
+        except Exception:
+            logging.exception(
+                f"Failed to parse input payload. For content_type={APPLICATION_JSON}, input "
+                f"payload must be a json encoded dictionary with keys {ALL_PARAM_NAMES}."
+            )
+            raise
+        _validate_payload(payload)
+        payload = _update_num_beams(payload)
+        if SEED in payload:
+            set_seed(payload[SEED])
+            del payload[SEED]
+        try:
+            model_output = text_generator(**payload)
+            output = {GENERATED_TEXTS: [x[GENERATED_TEXT] for x in model_output]}
+        except Exception:
+            logging.exception("Failed to do inference")
+            raise
+    else:
+        raise ValueError('{{"error": "unsupported content type {}"}}'.format(content_type or "unknown"))
+    if accept.endswith(VERBOSE_EXTENSION):
+        accept = accept.rstrip(VERBOSE_EXTENSION)  # Verbose and non-verbose response are identical
+    return encoder.encode(output, accept)

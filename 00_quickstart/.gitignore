@@ -1,3 +1,6 @@
+bloom-560m-finetuned-amazon-customer-reviews/
+sourcedir/
+tmp_models/
 endpoint_data_capture/
 data/
 amazon_reviews_us_Digital_Software_v1_00_autopilot.csv

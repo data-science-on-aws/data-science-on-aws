@@ -21,9 +21,6 @@ import datasets
 from transformers import AutoTokenizer
 from transformers import AutoModelForCausalLM
 
-#subprocess.check_call([sys.executable, "-m", "pip", "install", "scikit-learn==0.23.1"])
-#subprocess.check_call([sys.executable, "-m", "pip", "install", "matplotlib==3.2.1"])
-
 
 # def load_checkpoint_model(checkpoint_path):
 #     import glob
@@ -173,7 +170,7 @@ if __name__ == "__main__":
     print("Using pipe_mode: {}".format(pipe_mode))
 
     # Model Output
-    transformer_fine_tuned_model_path = os.path.join(local_model_dir, "transformers/fine-tuned/")
+    transformer_fine_tuned_model_path = os.path.join(local_model_dir) #, "transformers/fine-tuned/")
     os.makedirs(transformer_fine_tuned_model_path, exist_ok=True)
 
     # Tensorboard Logs
@@ -315,6 +312,7 @@ if __name__ == "__main__":
     # Save the Fine-tuned Transformers Model as a New "Pre-Trained" Model
     print("transformer_fine_tuned_model_path {}".format(transformer_fine_tuned_model_path))
     model.save_pretrained(transformer_fine_tuned_model_path)
+    tokenizer.save_pretrained(transformer_fine_tuned_model_path)
 
     # Copy inference.py and requirements.txt to the code/ directory
     #   Note: This is required for the SageMaker Endpoint to pick them up.
@@ -324,7 +322,7 @@ if __name__ == "__main__":
     os.makedirs(inference_path, exist_ok=True)
     os.system("cp inference.py {}".format(inference_path))
     print(glob(inference_path))
-    #        os.system('cp requirements.txt {}/code'.format(inference_path))
+    os.system('cp requirements.txt {}'.format(inference_path))
 
     # Copy test data for the evaluation step
     os.system("cp -R ./test_data/ {}".format(local_model_dir))
@@ -343,12 +341,12 @@ if __name__ == "__main__":
                                   )[0])
 
         print(
-            """Norton Antivirus.""",
-            predict("""Norton Antivirus.""",),
+            """Write a review for Norton Antivirus.""",
+            predict("""Write a review for Norton Antivirus.""",),
         )
         
         print(
-            """TurboTax.""",
-            predict("""TurboTax.""",),
+            """Write a review for TurboTax.""",
+            predict("""Write a review for TurboTax.""",),
         )
         
