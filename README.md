@@ -1,24 +1,27 @@
-# Data Science on AWS Workshop
+# Data Science on AWS - GPT3
+
+[![Data Science on AWS - O'Reilly Book](img/dsoaws-book.png)](https://github.com/data-science-on-aws/data-science-on-aws/tree/oreilly-book)
+[![Data Science on AWS - GPT3](img/dsoaws-gpt3.png)](https://github.com/data-science-on-aws/data-science-on-aws/tree/gpt3)
+[![Data Science on AWS - BERT](img/dsoaws-bert.png)](https://github.com/data-science-on-aws/data-science-on-aws/tree/bert)
+[![Data Science on AWS - XGBoost](img/dsoaws-xgboost.png)](https://github.com/data-science-on-aws/data-science-on-aws/tree/xgboost)
 
 Based on this O'Reilly book:  
 
 [![Data Science on AWS](img/book_full_color_sm.png)](https://www.amazon.com/Data-Science-AWS-End-End/dp/1492079391/)
 
-Book examples here:  https://github.com/data-science-on-aws/data-science-on-aws/tree/main
-
 ## Workshop Description
-In this hands-on workshop, we will build an end-to-end AI/ML pipeline for natural language processing with Amazon SageMaker.  We will train and tune a text classifier to classify text-based product reviews using the state-of-the-art [BERT](https://arxiv.org/abs/1810.04805) model for language representation.
+In this hands-on workshop, we will build an end-to-end AI/ML pipeline for natural language processing with Amazon SageMaker.  We will train and tune a text generator to generated product reviews using the state-of-the-art GPT3 model for language representation.
 
-To build our BERT-based NLP model, we use the [Amazon Customer Reviews Dataset](https://s3.amazonaws.com/amazon-reviews-pds/readme.html) which contains 150+ million customer reviews from Amazon.com for the 20 year period between 1995 and 2015.  In particular, we train a classifier to predict the `star_rating` (1 is bad, 5 is good) from the `review_body` (free-form review text).
+To build our GPT3-based NLP model, we use the [Amazon Customer Reviews Dataset](https://s3.amazonaws.com/amazon-reviews-pds/readme.html) which contains 150+ million customer reviews from Amazon.com for the 20 year period between 1995 and 2015.  In particular, we train a review generator from the `review_body` (free-form review text).
 
 You will get hands-on with advanced model training and deployment techniques such as hyper-parameter tuning, A/B testing, and auto-scaling.  You will also setup a real-time, streaming analytics and data science pipeline to perform window-based aggregations and anomaly detection.
 
 Attendees will learn how to do the following:
-* Ingest data into S3 using Amazon Athena and the Parquet data format
+* Ingest data into S3 using Amazon Athena, AWS Glue, Spark, Ray and the Parquet data format
 * Visualize data with pandas, matplotlib on SageMaker notebooks
 * Perform feature engineering on a raw dataset using Scikit-Learn and SageMaker Processing Jobs
 * Store and share features using SageMaker Feature Store
-* Train and evaluate a custom BERT model using TensorFlow, Keras, and SageMaker Training Jobs
+* Train and evaluate a custom GPT3 model using PyTorch and SageMaker Training Jobs
 * Evaluate the model using SageMaker Processing Jobs
 * Track model artifacts using Amazon SageMaker ML Lineage Tracking
 * Register and version models using SageMaker Model Registry
@@ -92,7 +95,7 @@ Click `File` > `New` > `Terminal` to launch a terminal in your Jupyter instance.
 Within the Terminal, run the following:
 
 ```
-cd ~ && git clone -b quickstart https://github.com/data-science-on-aws/data-science-on-aws
+cd ~ && git clone -b gpt3 https://github.com/data-science-on-aws/data-science-on-aws
 ```
 
 If you see an error like the following, just re-run the command again until it works:
