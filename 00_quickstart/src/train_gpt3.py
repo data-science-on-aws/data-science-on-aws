@@ -59,19 +59,14 @@ if __name__ == "__main__":
     parser.add_argument("--current_host", type=str, default=os.environ["SM_CURRENT_HOST"])
     parser.add_argument("--num_gpus", type=int, default=os.environ["SM_NUM_GPUS"])
     parser.add_argument("--checkpoint_base_path", type=str, default="/opt/ml/checkpoints")
-#    parser.add_argument("--use_xla", type=eval, default=False)
-#    parser.add_argument("--use_amp", type=eval, default=False)
-#    parser.add_argument("--max_seq_length", type=int, default=64)
     parser.add_argument("--train_batch_size", type=int, default=128)
     parser.add_argument("--validation_batch_size", type=int, default=256)
     parser.add_argument("--test_batch_size", type=int, default=256)
     parser.add_argument("--epochs", type=int, default=2)
     parser.add_argument("--learning_rate", type=float, default=0.00003)
-#    parser.add_argument("--epsilon", type=float, default=0.00000001)
     parser.add_argument("--train_steps_per_epoch", type=int, default=None)
     parser.add_argument("--validation_steps", type=int, default=None)
     parser.add_argument("--test_steps", type=int, default=None)
-#    parser.add_argument("--freeze_bert_layer", type=eval, default=False)
     parser.add_argument("--enable_sagemaker_debugger", type=eval, default=False)
     parser.add_argument("--run_validation", type=eval, default=False)
     parser.add_argument("--run_test", type=eval, default=False)
@@ -80,11 +75,6 @@ if __name__ == "__main__":
     parser.add_argument("--enable_checkpointing", type=eval, default=False)
     parser.add_argument("--output_data_dir", type=str, default=os.environ["SM_OUTPUT_DATA_DIR"])  # This is unused
 
-    # This points to the S3 location - this should not be used by our code
-    # We should use /opt/ml/model/ instead
-    # parser.add_argument('--model_dir',
-    #                     type=str,
-    #                     default=os.environ['SM_MODEL_DIR'])
 
     args, _ = parser.parse_known_args()
     print("Args:")
@@ -116,12 +106,6 @@ if __name__ == "__main__":
     print("num_gpus {}".format(num_gpus))
     job_name = os.environ["SAGEMAKER_JOB_NAME"]
     print("job_name {}".format(job_name))
-    # use_xla = args.use_xla
-    # print("use_xla {}".format(use_xla))
-    # use_amp = args.use_amp
-    # print("use_amp {}".format(use_amp))
-    # max_seq_length = args.max_seq_length
-    # print("max_seq_length {}".format(max_seq_length))
     train_batch_size = args.train_batch_size
     print("train_batch_size {}".format(train_batch_size))
     validation_batch_size = args.validation_batch_size
@@ -132,16 +116,12 @@ if __name__ == "__main__":
     print("epochs {}".format(epochs))
     learning_rate = args.learning_rate
     print("learning_rate {}".format(learning_rate))
-    # epsilon = args.epsilon
-    # print("epsilon {}".format(epsilon))
     train_steps_per_epoch = args.train_steps_per_epoch
     print("train_steps_per_epoch {}".format(train_steps_per_epoch))
     validation_steps = args.validation_steps
     print("validation_steps {}".format(validation_steps))
     test_steps = args.test_steps
     print("test_steps {}".format(test_steps))
-    # freeze_bert_layer = args.freeze_bert_layer
-    # print("freeze_bert_layer {}".format(freeze_bert_layer))
     enable_sagemaker_debugger = args.enable_sagemaker_debugger
     print("enable_sagemaker_debugger {}".format(enable_sagemaker_debugger))
     run_validation = args.run_validation
@@ -201,7 +181,7 @@ if __name__ == "__main__":
 
     callbacks = []
 
-#    initial_epoch_number = 0
+#     initial_epoch_number = 0
 
 #     if enable_checkpointing:
 #         print("***** Checkpoint enabled *****")
@@ -252,16 +232,12 @@ if __name__ == "__main__":
     from datasets import Dataset
 
     lm_dataset_train = Dataset.from_parquet('{}/*.parquet'.format(train_data))
-    lm_dataset_validation = Dataset.from_parquet('{}/*.parquet'.format(validation_data))
-    #lm_dataset_test = Dataset.from_parquet('{}/*.parquet'.format(test_data))
                 
     model_name = model_checkpoint.split("/")[-1]
     
-    # if run_validation:
     print("lm_dataset_train {}".format(lm_dataset_train))
-    print("lm_dataset_validation {}".format(lm_dataset_validation))
 
-    print("Setting up Training and Validation...")
+    print("Setting up Training...")
 
     from transformers import TrainingArguments
 
@@ -273,8 +249,6 @@ if __name__ == "__main__":
         num_train_epochs=epochs,
         no_cuda=True
     )
-
-    # else:  # Not running validation
     
     from transformers import Trainer
         
@@ -309,7 +283,7 @@ if __name__ == "__main__":
     if run_sample_predictions:
         def predict(text):
             result_length = 100
-            inputs = tokenizer(text, )
+            inputs = tokenizer(text, return_tensors='pt')
 
             return tokenizer.decode(model.generate(inputs["input_ids"],
                                    max_length=result_length, 
