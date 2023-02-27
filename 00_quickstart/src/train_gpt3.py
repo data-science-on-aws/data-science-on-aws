@@ -267,11 +267,9 @@ if __name__ == "__main__":
 
     training_args = TrainingArguments(
         f"{model_name}-finetuned-amazon-customer-reviews",
-#        evaluation_strategy = "epoch",
         learning_rate=learning_rate,
         weight_decay=0.01,
         max_steps=train_steps_per_epoch,
-#        eval_steps=validation_steps,
         num_train_epochs=epochs,
         no_cuda=True
     )
@@ -284,30 +282,10 @@ if __name__ == "__main__":
         model=model,
         args=training_args,
         train_dataset=lm_dataset_train,
-#        eval_dataset=lm_dataset_validation,
     )
 
     trainer.train()
-    
-#     if run_test:
-#         test_data_filenames = glob(os.path.join(test_data, "*.tfrecord"))
-#         print("test_data_filenames {}".format(test_data_filenames))
-#         test_dataset = file_based_input_dataset_builder(
-#             channel="test",
-#             input_filenames=test_data_filenames,
-#             pipe_mode=pipe_mode,
-#             is_training=False,
-#             drop_remainder=False,
-#             batch_size=test_batch_size,
-#             epochs=epochs,
-#             steps_per_epoch=test_steps,
-#             max_seq_length=max_seq_length,
-#         ).map(select_data_and_label_from_record)
 
-#         print("Starting test...")
-#         test_history = model.evaluate(test_dataset, steps=test_steps, callbacks=callbacks)
-
-#         print("Test history {}".format(test_history))
 
     # Save the Fine-tuned Transformers Model as a New "Pre-Trained" Model
     print("transformer_fine_tuned_model_path {}".format(transformer_fine_tuned_model_path))
@@ -331,7 +309,7 @@ if __name__ == "__main__":
     if run_sample_predictions:
         def predict(text):
             result_length = 100
-            inputs = tokenizer(text)
+            inputs = tokenizer(text, )
 
             return tokenizer.decode(model.generate(inputs["input_ids"],
                                    max_length=result_length, 
