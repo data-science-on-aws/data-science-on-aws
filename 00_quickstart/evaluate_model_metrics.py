@@ -117,14 +117,11 @@ def process(args):
     print("Using just {} to evaluate.".format(test_data_path))
 
     # select 10 samples
-    lm_dataset_test = Dataset.from_parquet(test_data_path).select([0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140])
+    lm_dataset_test = Dataset.from_parquet(test_data_path).select([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14])
     print(lm_dataset_test.shape)
 
-    model_checkpoint = "bigscience/bloom-560m"
-    model_name = model_checkpoint.split("/")[-1]
-
     training_args = TrainingArguments(
-        f"{model_name}-finetuned-amazon-customer-reviews",
+        "finetuned-amazon-customer-reviews",
         evaluation_strategy = "epoch",
         learning_rate=2e-5,
         weight_decay=0.01, 

@@ -1,0 +1,32 @@
+name: show_new_templates
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.7'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install .
+          pip install black isort flake8
+      - id: files
+        uses: jitterbit/get-changed-files@v1
+        continue-on-error: true
+      - name: Prompt outputs
+        run: |
+            for changed_file in ${{ steps.files.outputs.all }}; do
+                python test/show_templates.py ${changed_file}
+            done

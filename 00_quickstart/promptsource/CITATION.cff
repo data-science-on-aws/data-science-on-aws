@@ -1,0 +1,118 @@
+cff-version: "0.2.2"
+date-released: 2022-02
+message: "If you use this software, please cite it using these metadata."
+title: "PromptSource"
+url: "https://github.com/bigscience-workshop/promptsource"
+authors:
+  - family-names: Bach
+    given-names: "Stephen H."
+  - family-names: Sanh
+    given-names: Victor
+  - family-names: Yong
+    given-names: Zheng-Xin
+  - family-names: Webson
+    given-names: Albert
+  - family-names: Raffel
+    given-names: Colin
+  - family-names: Nayak
+    given-names: "Nihal V."
+  - family-names: Sharma
+    given-names: Abheesht
+  - family-names: Kim
+    given-names: Taewoon
+  - family-names: Bari
+    given-names: "M Saiful"
+  - family-names: Fevry
+    given-names: Thibault
+  - family-names: Alyafeaiu
+    given-names: Zaid
+  - family-names: Dey
+    given-names: Manan
+  - family-names: Santilli
+    given-names: Andrea
+  - family-names: Sun
+    given-names: Zhiqing
+  - family-names: Ben-David
+    given-names: Srulik
+  - family-names: Xu
+    given-names: Canwen
+  - family-names: Chhablani
+    given-names: Gunjan
+  - family-names: Wang
+    given-names: Han
+  - family-names: Fries
+    given-names: "Jason Alan"
+  - family-names: Al-shaibani
+    given-names: "Maged S."
+  - family-names: Sharma
+    given-names: Shanya
+  - family-names: Thakker
+    given-names: Urmish
+  - family-names: Almubarak
+    given-names: Khalid
+  - family-names: Tang
+    given-names: Xiangru
+  - family-names: Tian-Jian
+    given-names: Mike
+  - family-names: Rush
+    given-names: "Alexander M."
+preferred-citation:
+  type: article
+  authors:
+  - family-names: Bach
+    given-names: "Stephen H."
+  - family-names: Sanh
+    given-names: Victor
+  - family-names: Yong
+    given-names: Zheng-Xin
+  - family-names: Webson
+    given-names: Albert
+  - family-names: Raffel
+    given-names: Colin
+  - family-names: Nayak
+    given-names: "Nihal V."
+  - family-names: Sharma
+    given-names: Abheesht
+  - family-names: Kim
+    given-names: Taewoon
+  - family-names: Bari
+    given-names: "M Saiful"
+  - family-names: Fevry
+    given-names: Thibault
+  - family-names: Alyafeaiu
+    given-names: Zaid
+  - family-names: Dey
+    given-names: Manan
+  - family-names: Santilli
+    given-names: Andrea
+  - family-names: Sun
+    given-names: Zhiqing
+  - family-names: Ben-David
+    given-names: Srulik
+  - family-names: Xu
+    given-names: Canwen
+  - family-names: Chhablani
+    given-names: Gunjan
+  - family-names: Wang
+    given-names: Han
+  - family-names: Fries
+    given-names: "Jason Alan"
+  - family-names: Al-shaibani
+    given-names: "Maged S."
+  - family-names: Sharma
+    given-names: Shanya
+  - family-names: Thakker
+    given-names: Urmish
+  - family-names: Almubarak
+    given-names: Khalid
+  - family-names: Tang
+    given-names: Xiangru
+  - family-names: Tian-Jian
+    given-names: Mike
+  - family-names: Rush
+    given-names: "Alexander M."
+  title: "PromptSource: An Integrated Development Environment and Repository for Natural Language Prompts"
+  year: 2022
+  publisher: "arXiv"
+  url: "https://arxiv.org/abs/2202.01279"
+  address: "Online"
