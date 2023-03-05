@@ -416,8 +416,6 @@ Resources:
           - arn:aws:s3:::reviews-feature-store-*/*
           - arn:aws:s3:::aws-athena-query-results-*
           - arn:aws:s3:::aws-athena-query-results-*/*
-          - arn:aws:s3:::dsoaws
-          - arn:aws:s3:::dsoaws/*
           - arn:aws:s3:::sagemaker-*
           - arn:aws:s3:::sagemaker-*/*
           - arn:aws:s3:::binstar-cio-packages-prod
