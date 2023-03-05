@@ -57,6 +57,10 @@ Resources:
           - s3:DeleteObject
           - s3:ListBucket
           Resource:
+          - arn:aws:s3:::amazon-reviews-pds/*
+          - arn:aws:s3:::amazon-reviews-pds
+          - arn:aws:s3:::dsoaws/*
+          - arn:aws:s3:::dsoaws
           - arn:aws:s3:::dlai-practical-data-science/*
           - arn:aws:s3:::dlai-practical-data-science
           - arn:aws:s3:::reviews-feature-store-*/*
