@@ -26,6 +26,8 @@ def _xgb_train(params, dtrain, evals, num_boost_round, model_dir, is_master):
                         dtrain=dtrain,
                         evals=evals,
                         num_boost_round=num_boost_round)
+    print(f'train:rmse: {booster}')  # 'train:rmse:\s(\d+)'
+#           print('train:rmse: ' + booster.train_rmse (or whatever) + 'validation:rmse: ' + booster.validation_rmse (or whatever)'
 
     if is_master:
         model_location = model_dir + '/xgboost-model'
@@ -47,6 +49,7 @@ if __name__ == '__main__':
     parser.add_argument('--num_round', type=int)
     parser.add_argument('--tree_method', type=str, default="auto")
     parser.add_argument('--predictor', type=str, default="auto")
+    parser.add_argument('--content_type', type=str, default="")
 
     # Sagemaker specific arguments. Defaults are set in the environment variables.
     parser.add_argument('--output_data_dir', type=str, default=os.environ.get('SM_OUTPUT_DATA_DIR'))
@@ -62,8 +65,13 @@ if __name__ == '__main__':
     sm_hosts = json.loads(args.sm_hosts)
     sm_current_host = args.sm_current_host
 
-    dtrain = get_dmatrix(args.train, 'libsvm')
-    dval = get_dmatrix(args.validation, 'libsvm')
+    dtrain = get_dmatrix(args.train, args.content_type)
+    if args.validation:
+        dval = get_dmatrix(args.validation, args.content_type)
+    else:
+        dval = None
+    
+        
     watchlist = [(dtrain, 'train'), (dval, 'validation')] if dval is not None else [(dtrain, 'train')]
 
     train_hp = {
