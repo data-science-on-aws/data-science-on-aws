@@ -194,6 +194,7 @@ Resources:
               ForAnyValue:StringNotLike:
                 sagemaker:InstanceTypes:
                 - ml.t3.medium
+                - ml.m5.2xlarge
                 - system
                 - default
       - PolicyName: s3-access
