@@ -170,6 +170,10 @@ Resources:
           Principal:
             Service: sagemaker.amazonaws.com
           Action: sts:AssumeRole
+        - Effect: Allow
+          Principal:
+            Service: glue.amazonaws.com
+          Action: sts:AssumeRole
       Path: /
       RoleName:
         Fn::Sub: ${ProjectName}-${AWS::Region}-sagemaker-execution-role
