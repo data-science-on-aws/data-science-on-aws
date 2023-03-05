@@ -247,7 +247,7 @@ if __name__ == "__main__":
         weight_decay=0.01,
         max_steps=train_steps_per_epoch,
         num_train_epochs=epochs,
-        no_cuda=True
+        no_cuda=not torch.cuda.is_available()
     )
     
     from transformers import Trainer
