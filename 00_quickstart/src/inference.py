@@ -37,6 +37,7 @@ GENERATED_TEXTS = "generated_texts"
 TEXT_INPUTS = "text_inputs"
 MAX_LENGTH = "max_length"
 NUM_RETURN_SEQUENCES = "num_return_sequences"
+NUM_NEW_TOKENS = "num_new_tokens"
 NUM_BEAMS = "num_beams"
 TOP_P = "top_p"
 EARLY_STOPPING = "early_stopping"
@@ -49,6 +50,7 @@ SEED = "seed"
 ALL_PARAM_NAMES = [
     TEXT_INPUTS,
     MAX_LENGTH,
+    NUM_NEW_TOKENS,
     NUM_RETURN_SEQUENCES,
     NUM_BEAMS,
     TOP_P,

@@ -1,3 +1,5 @@
+bloomz-560m-finetuned-amazon-customer-reviews/
+amazon-reviews-spark-analyzer/
 explainability_report/
 post_train_data.csv
 meta.json

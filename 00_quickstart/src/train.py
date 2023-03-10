@@ -73,6 +73,7 @@ if __name__ == "__main__":
     parser.add_argument("--run_sample_predictions", type=eval, default=False)
     parser.add_argument("--enable_tensorboard", type=eval, default=False)
     parser.add_argument("--enable_checkpointing", type=eval, default=False)
+    parser.add_argument("--model_checkpoint", type=str, default=None)    
     parser.add_argument("--output_data_dir", type=str, default=os.environ["SM_OUTPUT_DATA_DIR"])  # This is unused
 
 
@@ -134,6 +135,8 @@ if __name__ == "__main__":
     print("enable_tensorboard {}".format(enable_tensorboard))
     enable_checkpointing = args.enable_checkpointing
     print("enable_checkpointing {}".format(enable_checkpointing))
+    model_checkpoint = args.model_checkpoint
+    print("model_checkpoint {}".format(model_checkpoint))
 
     checkpoint_base_path = args.checkpoint_base_path
     print("checkpoint_base_path {}".format(checkpoint_base_path))
@@ -149,6 +152,7 @@ if __name__ == "__main__":
     pipe_mode = pipe_mode_str.find("Pipe") >= 0
     print("Using pipe_mode: {}".format(pipe_mode))
 
+
     # Model Output
     transformer_fine_tuned_model_path = os.path.join(local_model_dir) #, "transformers/fine-tuned/")
     os.makedirs(transformer_fine_tuned_model_path, exist_ok=True)
@@ -157,7 +161,7 @@ if __name__ == "__main__":
     tensorboard_logs_path = os.path.join(local_model_dir, "tensorboard/")
     os.makedirs(tensorboard_logs_path, exist_ok=True)
 
-    model_checkpoint = "bigscience/bloom-560m"
+#    model_checkpoint = "bigscience/bloom-560m"
     tokenizer = None
     model = None
 
