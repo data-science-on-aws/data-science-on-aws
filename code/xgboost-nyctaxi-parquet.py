@@ -4,6 +4,7 @@ import logging
 import os
 import pandas as pd
 import pickle as pkl
+import glob
 
 from sagemaker_containers import entry_point
 from sagemaker_xgboost_container.data_utils import get_dmatrix
@@ -21,7 +22,7 @@ def _xgb_train(params, dtrain, evals, num_boost_round, model_dir, is_master):
     :param is_master: True if current node is master host in distributed training,
                         or is running single node training job.
                         Note that rabit_run includes this argument.
-    """
+    """    
     booster = xgb.train(params=params,
                         dtrain=dtrain,
                         evals=evals,
@@ -64,14 +65,22 @@ if __name__ == '__main__':
     # Get SageMaker host information from runtime environment variables
     sm_hosts = json.loads(args.sm_hosts)
     sm_current_host = args.sm_current_host
+    
+    input_files = glob.glob("{}/**/*.snappy.parquet".format(args.train))
+    print('Input files: {}'.format(input_files))
 
-    dtrain = get_dmatrix(args.train, args.content_type)
+    print("Listing contents of {}".format(args.train))
+    dirs_input = os.listdir(args.train)
+    for file in dirs_input:
+        print(file)
+    
+    dtrain = get_dmatrix(input_files, args.content_type)
+#    dtrain = get_dmatrix(args.train, args.content_type)
     if args.validation:
         dval = get_dmatrix(args.validation, args.content_type)
     else:
-        dval = None
+        dval = None    
     
-        
     watchlist = [(dtrain, 'train'), (dval, 'validation')] if dval is not None else [(dtrain, 'train')]
 
     train_hp = {
