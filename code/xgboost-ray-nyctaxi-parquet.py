@@ -91,12 +91,14 @@ def train(args):
 
     print(result)
     
-    # Need to write out the model
-    print(args.model_dir)    
-    result.checkpoint.to_directory(args.model_dir)
+    # Need to write out the model    
+    model_path = os.path.join(args.model_dir, "/xgb_model/")
+    print(model_path)    
+    
+    result.checkpoint.to_directory(model_path)
 
-    print("Listing contents of {}".format(args.model_dir))
-    dirs_input = os.listdir(args.model_dir)
+    print("Listing contents of {}".format(model_path))
+    dirs_input = os.listdir(model_path)
     for file in dirs_input:
         print(file)
 
