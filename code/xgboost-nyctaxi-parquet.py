@@ -66,16 +66,17 @@ if __name__ == '__main__':
     sm_hosts = json.loads(args.sm_hosts)
     sm_current_host = args.sm_current_host
     
-    input_files = glob.glob("{}/**/*.snappy.parquet".format(args.train))
-    print('Input files: {}'.format(input_files))
+    #input_files = glob.glob("{}/**/*.snappy.parquet".format(args.train))
+    #input_files = glob.glob("{}/*/".format(args.train))
+    #print('Input files: {}'.format(input_files))
 
     print("Listing contents of {}".format(args.train))
     dirs_input = os.listdir(args.train)
     for file in dirs_input:
         print(file)
     
-    dtrain = get_dmatrix(input_files, args.content_type)
-#    dtrain = get_dmatrix(args.train, args.content_type)
+    #dtrain = get_dmatrix(input_files, args.content_type)
+    dtrain = get_dmatrix(args.train, args.content_type)
     if args.validation:
         dval = get_dmatrix(args.validation, args.content_type)
     else:
