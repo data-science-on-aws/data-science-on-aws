@@ -1,7 +1,7 @@
-# Data Science on AWS - GPT3
+# Data Science on AWS - Generative AI
 
 [![Data Science on AWS - O'Reilly Book](img/dsoaws-book.png)](https://github.com/data-science-on-aws/data-science-on-aws/tree/oreilly-book)
-[![Data Science on AWS - GPT3](img/dsoaws-generative.png)](https://github.com/data-science-on-aws/data-science-on-aws/tree/generative)
+[![Data Science on AWS - Generative AI](img/dsoaws-generative.png)](https://github.com/data-science-on-aws/data-science-on-aws/tree/generative)
 [![Data Science on AWS - BERT](img/dsoaws-bert.png)](https://github.com/data-science-on-aws/data-science-on-aws/tree/bert)
 [![Data Science on AWS - XGBoost](img/dsoaws-xgboost.png)](https://github.com/data-science-on-aws/data-science-on-aws/tree/xgboost)
 
@@ -10,24 +10,18 @@ Based on this O'Reilly book:
 [![Data Science on AWS](img/book_full_color_sm.png)](https://www.amazon.com/Data-Science-AWS-End-End/dp/1492079391/)
 
 ## Workshop Description
-In this hands-on workshop, we will build an end-to-end AI/ML pipeline for natural language processing with Amazon SageMaker.  We will train and tune a text generator to generated product reviews using the state-of-the-art GPT3 model for language representation.
-
-To build our GPT3-based NLP model, we use the [Amazon Customer Reviews Dataset](https://s3.amazonaws.com/amazon-reviews-pds/readme.html) which contains 150+ million customer reviews from Amazon.com for the 20 year period between 1995 and 2015.  In particular, we train a review generator from the `review_body` (free-form review text).
-
-You will get hands-on with advanced model training and deployment techniques such as hyper-parameter tuning, A/B testing, and auto-scaling.  You will also setup a real-time, streaming analytics and data science pipeline to perform window-based aggregations and anomaly detection.
+In this hands-on workshop, we will build an end-to-end AI/ML pipeline to fine tune, evaluate, and deploy a state-of-the-art large language model (LLM) using with Amazon SageMaker and the [Amazon Customer Reviews Dataset](https://s3.amazonaws.com/amazon-reviews-pds/readme.html) which contains 150+ million customer reviews from Amazon.com for the 20 year period between 1995 and 2015.  In particular, we will fine-tune the large language model on the `review_body` column - as well as other columns depending on the language task.
 
 Attendees will learn how to do the following:
 * Ingest data into S3 using Amazon Athena, AWS Glue, Spark, Ray and the Parquet data format
 * Visualize data with pandas, matplotlib on SageMaker notebooks
-* Perform feature engineering on a raw dataset using Scikit-Learn and SageMaker Processing Jobs
+* Perform feature engineering on a raw dataset using Scikit-Learn, PySpark, and SageMaker Processing Jobs
 * Store and share features using SageMaker Feature Store
-* Train and evaluate a custom GPT3 model using PyTorch and SageMaker Training Jobs
+* Fine-tune and evaluate a generative AI model using PyTorch and SageMaker Training Jobs
 * Evaluate the model using SageMaker Processing Jobs
-* Track model artifacts using Amazon SageMaker ML Lineage Tracking
 * Register and version models using SageMaker Model Registry
 * Deploy a model to a REST endpoint using SageMaker Hosting and SageMaker Endpoints
 * Automate ML workflow steps by building end-to-end model pipelines
-* Find the best hyper-parameters for your custom model using SageMaker Hyper-parameter Tuning Jobs
 
 ## Workshop Instructions
 _Note:  This workshop will create an ephemeral AWS acccount for each attendee.  This ephemeral account is not accessible after the workshop.  You can, of course, clone this GitHub repo and reproduce the entire workshop in your own AWS Account._
