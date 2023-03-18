@@ -53,7 +53,7 @@ Resources:
               echo "unpack completed"
 
               echo "installing packages with pip"
-              source /home/ec2-user/rapids_kernel/bin/activate && pip install seaborn matplotlib pytest dask_cudf sagemaker
+              source /home/ec2-user/rapids_kernel/bin/activate && pip install seaborn==0.12.2 matplotlib==3.7.1 pytest==7.2.2 dask_cudf sagemaker==2.140.0 numpy==1.22.4
               echo "completed installing pip packages"
               
               # optionally install AutoGluon for AutoML GPU demo
