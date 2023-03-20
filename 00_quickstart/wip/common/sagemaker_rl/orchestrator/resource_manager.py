@@ -545,12 +545,16 @@ class Predictor(object):
                 with the Amazon SageMaker APIs and any other AWS services needed.
         """
         self.endpoint_name = endpoint_name
-        self._realtime_predictor = sagemaker.predictor.Predictor(
+        print(self.endpoint_name)
+        
+        self._realtime_predictor = sagemaker.Predictor(
             endpoint_name,
-            serializer=sagemaker.serializers.JSONSerializer(),
-            deserializer=sagemaker.deserializers.JSONDeserializer(),
+#            serializer=sagemaker.serializers.JSONSerializer(),
+#            deserializer=sagemaker.deserializers.JSONDeserializer(),
             sagemaker_session=sagemaker_session,
         )
+        print(self.realtime_predictor)
+
 
     def get_action(self, obs=None):
         """Get prediction from the endpoint

@@ -964,6 +964,9 @@ class ExperimentManager:
             model_id (str): A unique string representing which model to deploy
             wait (bool): Whether to wait until the deployment finished
         """
+        
+        print('_setup_hosting_endpoint')
+        
         # this should only be called once per experiment
         model_record = self.model_db_client.get_model_record(self.experiment_id, model_id)
 
@@ -1229,6 +1232,8 @@ class ExperimentManager:
 
     @property
     def predictor(self):
+        print(self.experiment_record._hosting_endpoint)
+        print(self.sagemaker_session)
         if self.experiment_record._hosting_endpoint:
             return Predictor(endpoint_name=self.experiment_id, sagemaker_session=self.sagemaker_session)
         else:
@@ -1447,6 +1452,8 @@ class ExperimentManager:
         # Sync experiment state if required
         self._sync_experiment_state_with_ddb()
 
+        print('initialize_first_model')
+        
         # experiment only allow one training job at a time,
         # validate no other training request is in progress
         if self.experiment_record._training_state is not None and self.experiment_record._training_state.endswith(
@@ -1461,6 +1468,9 @@ class ExperimentManager:
         else:
             # update next_model_to_train_id and training state
             next_model_to_train_id = ModelManager.name_next_model(experiment_id=self.experiment_id)
+            
+            print('name_next_model'.format(self.experiment_id))
+                
             logger.info(f"Next Model name would be {next_model_to_train_id}")
             self.exp_db_client.update_experiment_next_model_to_train_id(self.experiment_id, next_model_to_train_id)
             self.exp_db_client.update_experiment_training_state(self.experiment_id, TrainingState.PENDING)

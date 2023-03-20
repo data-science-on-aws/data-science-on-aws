@@ -63,6 +63,7 @@ if __name__ == "__main__":
     parser.add_argument("--validation_batch_size", type=int, default=256)
     parser.add_argument("--test_batch_size", type=int, default=256)
     parser.add_argument("--epochs", type=int, default=2)
+    parser.add_argument("--weight_decay", type=float, default=0.01)
     parser.add_argument("--learning_rate", type=float, default=0.00003)
     parser.add_argument("--train_steps_per_epoch", type=int, default=None)
     parser.add_argument("--validation_steps", type=int, default=None)
@@ -117,6 +118,8 @@ if __name__ == "__main__":
     print("epochs {}".format(epochs))
     learning_rate = args.learning_rate
     print("learning_rate {}".format(learning_rate))
+    weight_decay = args.weight_decay
+    print("weight_decay {}".format(weight_decay))
     train_steps_per_epoch = args.train_steps_per_epoch
     print("train_steps_per_epoch {}".format(train_steps_per_epoch))
     validation_steps = args.validation_steps
@@ -161,7 +164,6 @@ if __name__ == "__main__":
     tensorboard_logs_path = os.path.join(local_model_dir, "tensorboard/")
     os.makedirs(tensorboard_logs_path, exist_ok=True)
 
-#    model_checkpoint = "bigscience/bloom-560m"
     tokenizer = None
     model = None
 
@@ -248,7 +250,7 @@ if __name__ == "__main__":
     training_args = TrainingArguments(
         f"{model_name}-finetuned-amazon-customer-reviews",
         learning_rate=learning_rate,
-        weight_decay=0.01,
+        weight_decay=weight_decay,
         max_steps=train_steps_per_epoch,
         num_train_epochs=epochs,
         no_cuda=not torch.cuda.is_available()
