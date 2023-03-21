@@ -115,8 +115,6 @@ _Note:  This is not a fatal error ^^ above ^^.  Just re-run the command again un
 
 ### 6. Start the Workshop!
 
-Navigate to the `data-science-on-aws/00_quickstart/` directory and start the workshop!
+Navigate to the `data-science-on-aws/` directory and start the workshop!
 
-![Start Workshop](img/start_workshop.png)
-
-_You may need to refresh your browser if you don't see the directories._
+_You may need to refresh your browser if you don't see the directory._
