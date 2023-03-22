@@ -1,0 +1,17 @@
+{
+  "modelName": "FLAN-T5-XXL",
+  "endpoint_name": "huggingface-pytorch-inference-2023-03-21-21-37-56-686",
+  "payload": {
+    "inputs": [
+        "how do I earn more money?"
+    ],
+    "parameters": {
+      "early_stopping": false,
+      "length_penalty": 2.0,
+      "max_new_tokens": 20,
+      "temperature": 1.0,
+      "min_length": 10,
+      "no_repeat_ngram_size": 3
+    }
+  }
+}
