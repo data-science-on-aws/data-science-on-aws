@@ -1,6 +1,9 @@
 {
   "modelName": "FLAN-T5-XXL",
-  "endpoint_name": "huggingface-pytorch-inference-2023-03-21-21-37-56-686",
+  "endpoint_name": "huggingface-pytorch-inference-2023-03-22-03-19-48-182",
+  "subnets": ["subnet-0165235e75bb2f41e", 
+              "subnet-054ea799e452092fa"],
+  "security_group_ids": ["sg-0b6fdafa771b65d2"],    
   "payload": {
     "inputs": [
         "how do I earn more money?"
