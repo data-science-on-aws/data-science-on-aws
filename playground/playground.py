@@ -32,13 +32,13 @@ def read_template(template_path):
     outputText = template.render()
     return outputText
 
-def generate_text(payload, endpoint_name):
+def generate_text(payload, endpoint_name): #, subnets, security_group_ids):
     encoded_input = json.dumps(payload).encode("utf-8")
     
-    response = sagemaker_runtime.invoke_endpoint(
+    response = sagemaker_runtime.invoke_endpoint(        
         EndpointName=endpoint_name,
         ContentType='application/json',
-        Body=encoded_input
+        Body=encoded_input,        
     )
     print("Model input: \n", encoded_input)
     result = json.loads(response['Body'].read().decode()) # -
@@ -70,12 +70,18 @@ def handle_stable_diffusion(response):
 count, fileList, fileNames = read_template_dir('templates')
 
 
-endpoint_name_radio = st.sidebar.selectbox(
-    "Select the endpoint to run in SageMaker",
+endpoint_name_selectbox = st.sidebar.selectbox(
+    "Select the SageMaker endpoint to run",
     tuple(fileNames)
 )
 
-output_text = read_template(f'templates/{endpoint_name_radio}.template.json')
+# tenant_name_selectbox = st.sidebar.selectbox(
+#     "Select the vpc for the endpoint",
+#     tuple(["vpc1", "vpc2"])
+# )
+
+
+output_text = read_template(f'templates/{endpoint_name_selectbox}.template.json')
 output = json.loads(output_text)
 
 parameters = output['payload']['parameters']
@@ -123,6 +129,13 @@ if st.button("Run"):
     print(endpoint_name)    
     model_name = output['modelName']
     print(model_name)
+    
+#     subnets = output['subnets']
+#     print(subnets)
+
+#     security_group_ids = output['security_group_ids']
+#     print(security_group_ids)
+    
     if 'COHERE' in model_name.upper():
         parameters["prompt"] = prompt
         parameters["return_likelihood"] = "GENERATION"
@@ -136,6 +149,6 @@ if st.button("Run"):
         payload = parameters
         
     print('Generated payload for inference : ', payload)
-    generated_text = generate_text(payload, endpoint_name)
+    generated_text = generate_text(payload, endpoint_name) #, subnets, security_group_ids)
     print(generated_text)
     st.write(generated_text)

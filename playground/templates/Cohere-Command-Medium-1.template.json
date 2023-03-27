@@ -1,6 +1,6 @@
 {
   "modelName": "Cohere-Command-Medium-1",
-  "endpoint_name": "Endpoint-Cohere-Generate-Model-Command-Medium-1",
+  "endpoint_name": "Cohere-Generate-Model-Command-Medium-1-Endpoint-tenant1",
   "payload": {
     "inputs": [
         "how do I earn more money?"

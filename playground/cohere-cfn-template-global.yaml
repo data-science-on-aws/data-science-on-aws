@@ -1,0 +1,66 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: "This AWS CloudFormation template creates an endpoint for \"Cohere Generate Model - Command Medium\" in \"us-east-1\" region."
+Parameters:
+  EndPointName:
+    Type: String
+    Default: "Cohere-Generate-Model-Command-Medium-1-Endpoint-global"
+    Description: Specify suitable name to host the model endpoint. This is a mandatory field.
+  IAMRole:
+    Type: String
+    Default: "arn:aws:iam::079002598131:role/service-role/AmazonSageMaker-ExecutionRole-20230321T141979"
+    Description: The SageMaker ExecutionRoleArn.
+  ProductARN:
+    Type: String
+    Default: "arn:aws:sagemaker:us-east-1:865070037744:model-package/cohere-gpt-medium-v1-4-825b877abfd53d7ca65fd7b4b262c421"
+    Description: Product identifier based on software version and region.
+  InstanceType:
+    Type: String
+    Default: "ml.g5.xlarge"
+    Description: The deployment instance type.
+    AllowedValues:
+    - "ml.p3.2xlarge"
+    - "ml.g5.xlarge"
+    - "ml.g5.2xlarge"
+  InstanceCount:
+    Type: Number
+    Default: "1"
+    Description: Initial instance count for the endpoint.
+Resources:
+  Model:
+    Type: "AWS::SageMaker::Model"
+    Properties:
+      EnableNetworkIsolation: True
+     VpcConfig:
+         Subnets:
+         - subnet-0165235e75bb2f41e
+         - subnet-054ea799e452092fa
+         SecurityGroupIds:
+         - sg-0b6fdafa771b65d27
+      ExecutionRoleArn: !Ref IAMRole
+      PrimaryContainer:
+        ModelPackageName: !Ref ProductARN
+  EndPointConfig:
+    Type: "AWS::SageMaker::EndpointConfig"
+    Properties:
+      ProductionVariants:
+      - ModelName: !GetAtt Model.ModelName
+        VariantName: AllTraffic
+        InitialInstanceCount: !Ref InstanceCount
+        InstanceType: !Ref InstanceType
+        InitialVariantWeight: 1
+  EndPoint:
+    Type: "AWS::SageMaker::Endpoint"
+    Properties:
+      EndpointName: !Ref EndPointName
+      EndpointConfigName: !GetAtt EndPointConfig.EndpointConfigName
+Outputs:
+  EndPointConfigName:
+    Description: Endpoint confirmation.
+    Value: !GetAtt 'EndPointConfig.EndpointConfigName'
+  EndpointName:
+    Description: Endpoint Name.
+    Value: !Ref EndPointName
+  EndPointURL:
+    Description: Please use the URL only after endpoint has been created. Endpoint creation can take time. Use SageMaker console to check the status.
+    Value: !Sub 'https://runtime.sagemaker.${AWS::Region}.amazonaws.com/endpoints/${EndPointName}/invocations'
+
