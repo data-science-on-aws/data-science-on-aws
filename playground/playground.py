@@ -71,6 +71,7 @@ count, fileList, fileNames = read_template_dir('templates')
 
 
 endpoint_name_selectbox = st.sidebar.selectbox(
+<<<<<<< HEAD
     "Select the SageMaker endpoint to run",
     tuple(fileNames)
 )
@@ -79,6 +80,16 @@ endpoint_name_selectbox = st.sidebar.selectbox(
 #     "Select the vpc for the endpoint",
 #     tuple(["vpc1", "vpc2"])
 # )
+=======
+    "Select the endpoint to run in SageMaker",
+    tuple(fileNames)
+)
+
+tenant_name_selectbox = st.sidebar.selectbox(
+    "Select the tenant",
+    tuple(["tenant1", "tenant2"])
+)
+>>>>>>> b376d43c2327079ab095b6b5b51ee0f0ad380e0e
 
 
 output_text = read_template(f'templates/{endpoint_name_selectbox}.template.json')
