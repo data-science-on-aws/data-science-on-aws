@@ -305,7 +305,7 @@ def parse_args():
     parser.add_argument(
         "--model-checkpoint",
         type=str,
-        default="facebook/opt-350m",
+        default="bigscience/bloom-560m"
     )
     parser.add_argument(
         "--dataset-templates-name",

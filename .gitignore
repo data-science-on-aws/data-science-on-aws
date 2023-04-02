@@ -1,3 +1,6 @@
+data/eval
+tmp_trainer/
+bigscience-bloom-560m-finetuned-amazon-customer-reviews/
 bigscience_bloomz-560m_reward_model/
 bigscience_bloomz-560m_summarization_reward_model/
 playground.tar.gz
