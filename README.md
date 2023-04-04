@@ -1,5 +1,7 @@
 # Data Science on AWS - Generative AI
 
+Select a branch to explore...
+
 [![Data Science on AWS - O'Reilly Book](img/dsoaws-book.png)](https://github.com/data-science-on-aws/data-science-on-aws/tree/oreilly-book)
 [![Data Science on AWS - Generative AI](img/dsoaws-generative.png)](https://github.com/data-science-on-aws/data-science-on-aws/tree/generative)
 [![Data Science on AWS - BERT](img/dsoaws-bert.png)](https://github.com/data-science-on-aws/data-science-on-aws/tree/bert)
