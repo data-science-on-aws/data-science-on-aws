@@ -1,5 +1,6 @@
 # Data Science on AWS - BERT
 
+Select a branch to explore...
 
 [![Data Science on AWS - O'Reilly Book](img/dsoaws-book.png)](https://github.com/data-science-on-aws/data-science-on-aws/tree/oreilly-book)
 [![Data Science on AWS - GPT3](img/dsoaws-generative.png)](https://github.com/data-science-on-aws/data-science-on-aws/tree/generative)
