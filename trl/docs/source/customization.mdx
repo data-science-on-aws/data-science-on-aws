@@ -63,7 +63,7 @@ optimizer = Lion(filter(lambda p: p.requires_grad, self.model.parameters()), lr=
 ...
 ppo_trainer = PPOTrainer(config, model, model_ref, tokenizer, optimizer=optimizer)
 ```
-We advice you to use the learning rate that you would use for `Adam` divided by 3 as pointed out [here](https://github.com/lucidrains/lion-pytorch#lion---pytorch). We observed an improvement when using this optimizer compared to classic Adam (check the full logs [here](https://wandb.ai/distill-bloom/trl/runs/lj4bheke?workspace=user-younesbelkada)):
+We advise you to use the learning rate that you would use for `Adam` divided by 3 as pointed out [here](https://github.com/lucidrains/lion-pytorch#lion---pytorch). We observed an improvement when using this optimizer compared to classic Adam (check the full logs [here](https://wandb.ai/distill-bloom/trl/runs/lj4bheke?workspace=user-younesbelkada)):
 
 <div style="text-align: center">
 <img src="https://huggingface.co/datasets/trl-internal-testing/example-images/resolve/main/images/trl-lion.png">
@@ -149,4 +149,17 @@ When training large models, you should better handle the CUDA cache by iterative
 
 ```python
 config = PPOConfig(..., optimize_cuda_cache=True)
+```
+
+## Use correctly DeepSpeed stage 3:
+
+A small tweak need to be added to your training script to use DeepSpeed stage 3 correctly. You need to properly initialize your reward model on the correct device using the `zero3_init_context_manager` context manager. Here is an example adapted for the `gpt2-sentiment` script:
+
+```python
+ds_plugin = ppo_trainer.accelerator.state.deepspeed_plugin
+if ds_plugin is not None and ds_plugin.is_zero3_init_enabled():
+    with ds_plugin.zero3_init_context_manager(enable=False):
+        sentiment_pipe = pipeline("sentiment-analysis", model="lvwerra/distilbert-imdb", device=device)
+else:
+    sentiment_pipe = pipeline("sentiment-analysis", model="lvwerra/distilbert-imdb", device=device)
 ```

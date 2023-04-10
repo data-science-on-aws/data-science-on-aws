@@ -265,16 +265,33 @@ class PPOTrainer(BaseTrainer):
         else:
             self.kl_ctl = FixedKLController(self.config.init_kl_coef)
 
+        # Safety checkers for DS integration
+        is_deepspeed_used = self.accelerator.distributed_type == "DEEPSPEED" and hasattr(
+            self.accelerator.state, "deepspeed_plugin"
+        )
+
         (
             self.model,
-            self.ref_model,
             self.optimizer,
             self.data_collator,
             self.dataloader,
             self.lr_scheduler,
         ) = self.accelerator.prepare(
-            self.model, self.ref_model, self.optimizer, self.data_collator, self.dataloader, self.lr_scheduler
+            self.model, self.optimizer, self.data_collator, self.dataloader, self.lr_scheduler
         )
+        if is_deepspeed_used:
+            # 8 bit models are already set on the correct device
+            if not getattr(self.ref_model.pretrained_model, "is_loaded_in_8bit", False):
+                # DS integration only allows for single model and as `ref_model` is only used for
+                # `KL devergence loss`,i.e, in eval model, just have it be on the respective device and
+                # there is no need to pass it to the `accelerator.prepare` call
+                self.ref_model = self.ref_model.to(self.accelerator.device)
+
+            # this hack seems to be needed for DS stage 3 to work
+            if self.accelerator.state.deepspeed_plugin.zero_stage == 3:
+                self.model.train()
+        else:
+            self.ref_model = self.accelerator.prepare(self.ref_model)
 
         # In a distributed setup, only logging needs to be performed on the main process
         # check: https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html
@@ -575,11 +592,12 @@ class PPOTrainer(BaseTrainer):
         rewards, non_score_reward = self.compute_rewards(scores, all_logprobs, ref_logprobs, masks)
         timing["time/ppo/compute_rewards"] = time.time() - t
 
+        # upcast to float32 to avoid dataset issues
         mini_batch_dict = {
             "queries": queries,
             "responses": responses,
-            "logprobs": all_logprobs,
-            "values": values,
+            "logprobs": all_logprobs.to(torch.float32),
+            "values": values.to(torch.float32),
             "rewards": rewards,
             "masks": masks,
         }
@@ -625,12 +643,14 @@ class PPOTrainer(BaseTrainer):
                     vpreds,
                     batch["masks"],
                 )
-                if self.config.early_stopping and train_stats["policy/policykl"] > 1.5 * self.config.target_kl:
-                    early_stop = True
-                    self.optimizer.zero_grad()
-                    break
 
                 all_stats.append(train_stats)
+
+                if self.config.early_stopping:
+                    policykl = train_stats["policy/policykl"]
+                    early_stop = self._early_stop(policykl)
+                    if early_stop:
+                        break
 
         timing["time/ppo/optimize_step"] = time.time() - t
 
@@ -673,6 +693,41 @@ class PPOTrainer(BaseTrainer):
             self.lr_scheduler.step()
 
         return stats
+
+    def _early_stop(self, policykl):
+        r"""
+        Handles the early stopping logic. If the policy KL is greater than the target KL, then the gradient is zeroed and
+        the optimization step is skipped.
+        This also handles the multi-gpu case where the policy KL is averaged across all processes.
+
+        Args:
+            policy_kl (torch.Tensor):
+                the policy KL
+
+        Returns:
+            `bool`: whether to early stop or not
+        """
+        early_stop = False
+        if not self.config.early_stopping:
+            return early_stop
+
+        if not self.is_distributed and policykl > 1.5 * self.config.target_kl:
+            self.optimizer.zero_grad()
+            early_stop = True
+        elif self.is_distributed:
+            import torch.distributed as dist
+
+            # Wait for all processes to finish
+            dist.barrier()
+
+            # all gather the policykl
+            dist.all_reduce(policykl, dist.ReduceOp.SUM)
+            policykl /= self.accelerator.num_processes
+
+            if policykl > 1.5 * self.config.target_kl:
+                self.optimizer.zero_grad()
+                early_stop = True
+        return early_stop
 
     def gather_stats(self, stats):
         """
@@ -899,9 +954,9 @@ class PPOTrainer(BaseTrainer):
             old_logprobs (`torch.FloatTensor`):
                 Log probabilities of the model, shape (`batch_size`, `response_length`)
             values (`torch.FloatTensor`):
-                Values of the value head, shape (`batch_size`, `hidden_dim`)
+                Values of the value head, shape (`batch_size`, `response_length`)
             rewards (`torch.FloatTensor`):
-                Rewards from the reward model, shape (`batch_size`)
+                Rewards from the reward model, shape (`batch_size`, `response_length`)
             logits (`torch.FloatTensor`):
                 Logits of the model, shape (`batch_size`, `response_length`, `vocab_size`)
             v_pred (`torch.FloatTensor`):

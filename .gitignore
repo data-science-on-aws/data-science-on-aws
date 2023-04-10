@@ -1,3 +1,6 @@
+wip/summary-long-training/
+wip/flan-dialogue-summary-checkpoint/
+flan-dialogue-summary-checkpoint/
 data/eval
 tmp_trainer/
 bigscience-bloom-560m-finetuned-amazon-customer-reviews/
