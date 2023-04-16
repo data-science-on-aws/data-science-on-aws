@@ -9,14 +9,13 @@ import sys
 subprocess.check_call([sys.executable, "-m", "pip", "install", "torch==1.13.1", "torchdata==0.5.1"])
 import torch
 
-subprocess.check_call([sys.executable, "-m", "pip", "install", "transformers==4.26.1", "datasets==2.9.0"])
-import datasets
-from transformers import AutoTokenizer
-from transformers import AutoModelForCausalLM
-from transformers import Trainer
-from transformers import TrainingArguments
-import datasets
+subprocess.check_call([sys.executable, "-m", "pip", "install", "transformers==4.26.1", "datasets==2.9.0", "evaluate==0.4.0"])
+from datasets import load_dataset
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, TrainingArguments, Trainer, GenerationConfig
 from datasets import Dataset
+
+subprocess.check_call([sys.executable, "-m", "pip", "install", "evaluate==0.4.0", "py7zr==0.20.4", "sentencepiece", "rouge_score"])
+import evaluate
 
 #subprocess.check_call([sys.executable, "-m", "pip", "install", "matplotlib==3.2.1"])
 import pandas as pd
@@ -87,6 +86,7 @@ def parse_args():
 def process(args):
     print("Current host: {}".format(args.current_host))
     
+    # extract the model tar file from the training job
     print("input_model: {}".format(args.input_model))
     print("Listing contents of input model dir: {}".format(args.input_model))
     input_files = os.listdir(args.input_model)
@@ -97,59 +97,75 @@ def process(args):
     model_tar.extractall(args.input_model)
     model_tar.close()
 
+    # load the tokenizer and model
     tokenizer = AutoTokenizer.from_pretrained(args.input_model, use_fast=True)
-    model = AutoModelForCausalLM.from_pretrained(args.input_model)
-    
-    print(model)
+    print(f'Loaded Local HuggingFace Tokenzier:\n{tokenizer}')
+    model = AutoModelForSeq2SeqLM.from_pretrained(args.input_model)
+    print(f'Loaded Local HuggingFace Model:\n{model}')
 
-    ###########################################################################################
-    # TODO:  Replace this with glob for all files and remove test_data/ from the model.tar.gz #
-    ###########################################################################################
-    #    evaluation_data_path = '/opt/ml/processing/input/data/'
-
+    # List files in the input data
     print("input_data: {}".format(args.input_data))
     print("Listing contents of input data dir: {}".format(args.input_data))
     input_files = os.listdir(args.input_data)
     for file in input_files:
         print(file)
 
-    test_data_path = "{}/amazon_reviews_us_Digital_Software_v1_00.parquet".format(args.input_data)    
-    print("Using just {} to evaluate.".format(test_data_path))
+    # load the test dataset
+    tokenized_dataset = load_dataset(
+        args.input_data,
+        data_files={'train': '*.parquet'}
+    ).with_format("torch")
+    print(f"Dataset loaded from local path {args.input_data}:\n{tokenized_dataset}")
+    
+    # load rouge metric
+    rouge = evaluate.load('rouge')
+    
+    # select sample inputs for evaluation
+    dialogues = tokenized_dataset['train'][0:10]['input_ids']
+    baseline_summaries = tokenized_dataset['train'][0:10]['labels']
 
-    # select 10 samples
-    lm_dataset_test = Dataset.from_parquet(test_data_path).select([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14])
-    print(lm_dataset_test.shape)
+    # decode the original summaries
+    human_baseline_summaries = []
+    for base_summary in baseline_summaries:
+        human_baseline_summaries.append(tokenizer.decode(base_summary, skip_special_tokens=True))
 
-    training_args = TrainingArguments(
-        "finetuned-amazon-customer-reviews",
-        evaluation_strategy = "epoch",
-        learning_rate=2e-5,
-        weight_decay=0.01, 
-        eval_steps=15,
-        no_cuda=True    
-    )    
-
-    trainer = Trainer(
-        model=model,
-        args=training_args,
-        eval_dataset=lm_dataset_test,
+    # generate the tuned summaries
+    tuned_outputs = model.generate(dialogues, GenerationConfig(max_new_tokens=200))
+    tuned_model_summaries = []
+    for tuned_summary in tuned_outputs:
+        tuned_model_summaries.append(tokenizer.decode(tuned_summary, skip_special_tokens=True))
+    
+    # compute ROUGE metrics
+    tuned_results = rouge.compute(
+        predictions=tuned_model_summaries,
+        references=human_baseline_summaries,
+        use_aggregator=True,
+        use_stemmer=True,
     )
-
-    evaluation_results = trainer.evaluate()
-    print(evaluation_results)    
-
+    print(f'Fine-Tuned ROUGE metrics:\n{tuned_results}')
+    
     # Model Output
     metrics_path = os.path.join(args.output_data, "metrics/")
     os.makedirs(metrics_path, exist_ok=True)
 
     report_dict = {
         "metrics": {
-            "eval_loss": {
-                "value": evaluation_results['eval_loss'],
+            "eval_rouge1": {
+                "value": tuned_results['rouge1'],
+            },
+            "eval_rouge2": {
+                "value": tuned_results['rouge2'],
+            },
+            "eval_rougeL": {
+                "value": tuned_results['rougeL'],
+            },
+            "eval_rougeLsum": {
+                "value": tuned_results['rougeLsum'],
             },
         },
     }
-
+    print(f"Evalution Metric Report: \n{report_dict}")
+    
     evaluation_path = "{}/evaluation.json".format(metrics_path)
     with open(evaluation_path, "w") as f:
         f.write(json.dumps(report_dict))
@@ -164,7 +180,7 @@ def process(args):
     for file in output_files:
         print(file)
 
-    print("Complete")
+    print("Evaluation Complete")
 
 
 if __name__ == "__main__":
