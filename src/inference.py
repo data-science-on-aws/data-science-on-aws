@@ -6,16 +6,9 @@ from typing import Union
 import subprocess
 import sys
 
-subprocess.check_call([sys.executable, "-m", "pip", "install", "torch==1.13.1"])
 import torch
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, GenerationConfig
 
-subprocess.check_call([sys.executable, "-m", "pip", "install", "transformers==4.26.1"])
-from transformers import AutoModelForCausalLM
-from transformers import AutoTokenizer
-
-
-import torch
-#from constants import constants
 from sagemaker_inference import encoder
 from transformers import TextGenerationPipeline
 from transformers import pipeline
@@ -76,7 +69,7 @@ TEMPERATURE_MIN = 0
 
 
 
-def model_fn(model_dir: str) -> TextGenerationPipeline:
+def model_fn(model_dir: str) -> list:
     """Create our inference task as a delegate to the model.
 
     This runs only once per one worker.
@@ -84,9 +77,7 @@ def model_fn(model_dir: str) -> TextGenerationPipeline:
     Args:
         model_dir (str): directory where the model files are stored
     Returns:
-        TextGenerationPipeline: a huggingface pipeline for generating text
-    Raises:
-        ValueError if the model file cannot be found.
+        list: a huggingface tokenizer and model
     """
     
     print('walking model_dir: {}'.format(model_dir))
@@ -97,13 +88,14 @@ def model_fn(model_dir: str) -> TextGenerationPipeline:
             print(os.path.join(root, name))
         for name in dirs:
             print(os.path.join(root, name))
+            
+    # load the tokenizer and model
+    tokenizer = AutoTokenizer.from_pretrained(model_dir, use_fast=True)
+    print(f'Loaded Local HuggingFace Tokenzier:\n{tokenizer}')
+    model = AutoModelForSeq2SeqLM.from_pretrained(model_dir)
+    print(f'Loaded Local HuggingFace Model:\n{model}')
     
-    try:
-        device_id = 0 if torch.cuda.is_available() else -1
-        return pipeline(TEXT_GENERATION, model_dir, device=device_id)
-    except Exception:
-        logging.exception(f"Failed to load model from: {model_dir}")
-        raise
+    return [tokenizer, model]
 
 
 def _validate_payload(payload: Dict[str, Any]) -> None:
@@ -169,19 +161,22 @@ def _update_num_beams(payload: Dict[str, Union[str, float, int]]) -> Dict[str, U
     return payload
 
 
-def transform_fn(text_generator: TextGenerationPipeline, input_data: bytes, content_type: str, accept: str) -> bytes:
+def transform_fn(model_objs: list, input_data: bytes, content_type: str, accept: str) -> bytes:
     """Make predictions against the model and return a serialized response.
 
     The function signature conforms to the SM contract.
 
     Args:
-        text_generator (TextGenerationPipeline): a huggingface pipeline
+        model_objs (list): tokenizer, model
         input_data (obj): the request data.
         content_type (str): the request content type.
         accept (str): accept header expected by the client.
     Returns:
         obj: a byte string of the prediction
     """
+    tokenizer = model_objs[0]
+    model = model_objs[1]
+    
     if content_type == APPLICATION_X_TEXT:
         try:
             input_text = input_data.decode(STR_DECODE_CODE)
@@ -192,30 +187,40 @@ def transform_fn(text_generator: TextGenerationPipeline, input_data: bytes, cont
             )
             raise
         try:
-            output = text_generator(input_text)[0]
+            # output = text_generator(input_text)[0]
+            input_ids = tokenizer(input_text, return_tensors="pt").input_ids
+            original_outputs = model.generate(input_ids,
+                                              GenerationConfig(max_new_tokens=200)
+                                             )
+            output = tokenizer.decode(original_outputs[0], skip_special_tokens=True)
         except Exception:
             logging.exception("Failed to do inference")
             raise
-    elif content_type == APPLICATION_JSON:
-        try:
-            payload = json.loads(input_data)
-        except Exception:
-            logging.exception(
-                f"Failed to parse input payload. For content_type={APPLICATION_JSON}, input "
-                f"payload must be a json encoded dictionary with keys {ALL_PARAM_NAMES}."
-            )
-            raise
-        _validate_payload(payload)
-        payload = _update_num_beams(payload)
-        if SEED in payload:
-            set_seed(payload[SEED])
-            del payload[SEED]
-        try:
-            model_output = text_generator(**payload)
-            output = {GENERATED_TEXTS: [x[GENERATED_TEXT] for x in model_output]}
-        except Exception:
-            logging.exception("Failed to do inference")
-            raise
+    # elif content_type == APPLICATION_JSON:
+    #     try:
+    #         payload = json.loads(input_data)
+    #     except Exception:
+    #         logging.exception(
+    #             f"Failed to parse input payload. For content_type={APPLICATION_JSON}, input "
+    #             f"payload must be a json encoded dictionary with keys {ALL_PARAM_NAMES}."
+    #         )
+    #         raise
+    #     _validate_payload(payload)
+    #     payload = _update_num_beams(payload)
+    #     if SEED in payload:
+    #         set_seed(payload[SEED])
+    #         del payload[SEED]
+    #     try:
+    #         model_output = text_generator(**payload)
+    #         input_ids = tokenizer(input_text, return_tensors="pt").input_ids
+    #         original_outputs = model.generate(input_ids,
+    #                                           GenerationConfig(max_new_tokens=200)
+    #                                          )
+    #         model_output = tokenizer.decode(original_outputs[0], skip_special_tokens=True)
+    #         output = {GENERATED_TEXTS: [x[GENERATED_TEXT] for x in model_output]}
+    #     except Exception:
+    #         logging.exception("Failed to do inference")
+    #         raise
     else:
         raise ValueError('{{"error": "unsupported content type {}"}}'.format(content_type or "unknown"))
     if accept.endswith(VERBOSE_EXTENSION):

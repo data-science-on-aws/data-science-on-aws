@@ -107,6 +107,18 @@ if __name__ == "__main__":
     model.save_pretrained(transformer_fine_tuned_model_path)
     tokenizer.save_pretrained(transformer_fine_tuned_model_path)
     
+    # Copy inference.py and requirements.txt to the code/ directory for model inference
+    #   Note: This is required for the SageMaker Endpoint to pick them up.
+    #         This appears to be hard-coded and must be called code/
+    local_model_dir = os.environ["SM_MODEL_DIR"]
+    inference_path = os.path.join(local_model_dir, "code/")
+    print("Copying inference source files to {}".format(inference_path))
+    os.makedirs(inference_path, exist_ok=True)
+    os.system("cp inference.py {}".format(inference_path))
+    os.system('cp requirements.txt {}'.format(inference_path))
+    print(f'Files in inference code path "{inference_path}"')
+    list_files(inference_path)
+
 
 ############################################################################################################
 # if __name__ == "__main__":
