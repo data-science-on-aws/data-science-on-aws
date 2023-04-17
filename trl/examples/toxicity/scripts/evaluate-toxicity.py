@@ -12,28 +12,44 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 toxicity = evaluate.load("ybelkada/toxicity", "DaNLP/da-electra-hatespeech-detection", module_type="measurement")
 ds = load_dataset("OxAISH-AL-LLM/wiki_toxic", split="test")
 
-model_type = "all"
-output_file = "toxicity.csv"
-batch_size=64
-num_samples=400
-context_length=2000
-max_new_tokens=30
+parser = argparse.ArgumentParser(description="Evaluate de-toxified models")
+parser.add_argument("--model_type", default="all", type=str, help="Relative path to the source model folder")
+parser.add_argument("--output_file", default="toxicity.csv", type=str, help="Relative path to the source model folder")
+parser.add_argument("--batch_size", default=64, type=int, help="Batch size")
+parser.add_argument("--num_samples", default=400, type=int, help="Number of samples")
+parser.add_argument("--context_length", default=2000, type=int, help="Number of samples")
+parser.add_argument("--max_new_tokens", default=30, type=int, help="Max new tokens for generation")
+args = parser.parse_args()
 
-if model_type == "all":
+
+if args.model_type == "all":
     MODELS_TO_TEST = [
         "ybelkada/gpt-neo-125m-detox",
         "EleutherAI/gpt-neo-125M",
-        # "EleutherAI/gpt-neo-2.7B",
-        # "ybelkada/gpt-neo-2.7B-detox",
-        # "ybelkada/gpt-j-6b-sharded-bf16",
-        # "ybelkada/gpt-j-6b-detoxs",
+        "EleutherAI/gpt-neo-2.7B",
+        "ybelkada/gpt-neo-2.7B-detox",
+        "ybelkada/gpt-j-6b-sharded-bf16",
+        "ybelkada/gpt-j-6b-detoxs",
     ]
-    
-NUM_SAMPLES = num_samples
-BATCH_SIZE = batch_size
-output_file = output_file
-max_new_tokens = max_new_tokens
-context_length = context_length
+elif args.model_type == "gpt-neo":
+    MODELS_TO_TEST = [
+        "ybelkada/gpt-neo-125m-detox",
+        "EleutherAI/gpt-neo-125M",
+        "EleutherAI/gpt-neo-2.7B",
+        "ybelkada/gpt-neo-2.7B-detox",
+    ]
+elif args.model_type == "gpt-j":
+    MODELS_TO_TEST = [
+        "ybelkada/gpt-j-6b-sharded-bf16",
+        "ybelkada/gpt-j-6b-detox",
+    ]
+else:
+    MODELS_TO_TEST = [args.model_type]
+NUM_SAMPLES = args.num_samples
+BATCH_SIZE = args.batch_size
+output_file = args.output_file
+max_new_tokens = args.max_new_tokens
+context_length = args.context_length
 device = torch.cuda.current_device() if torch.cuda.is_available() else "cpu"
 
 # consider only toxic prompts

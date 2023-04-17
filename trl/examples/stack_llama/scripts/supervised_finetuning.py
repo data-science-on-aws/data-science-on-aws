@@ -7,11 +7,11 @@ from datasets import load_dataset
 from peft import LoraConfig, get_peft_model, prepare_model_for_int8_training
 from torch.utils.data import IterableDataset
 from tqdm import tqdm
-from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer, Trainer, TrainingArguments, logging, set_seed
+from transformers import AutoConfig, AutoModelForSeq2SeqLM, AutoTokenizer, Trainer, TrainingArguments, logging, set_seed
 
 
 """
-Fine-Tune Llama-7b on SE paired dataset
+Fine-Tune flan-t5-base on stack exchange paired dataset
 """
 
 
@@ -177,20 +177,20 @@ def create_datasets(tokenizer, args):
         seq_length=args.seq_length,
         chars_per_token=chars_per_token,
     )
-    valid_dataset = ConstantLengthDataset(
+    validation_dataset = ConstantLengthDataset(
         tokenizer,
         valid_data,
         infinite=False,
         seq_length=args.seq_length,
         chars_per_token=chars_per_token,
     )
-    return train_dataset, valid_dataset
+    return train_dataset, validation_dataset
 
 
 def run_training(args, train_data, val_data):
     print("Loading the model")
     # disable caching mechanism when using gradient checkpointing
-    model = AutoModelForCausalLM.from_pretrained(
+    model = AutoModelForSeq2SeqLM.from_pretrained(
         args.model_path,
         trust_remote_code=True,
         use_cache=not args.no_gradient_checkpointing,
@@ -233,12 +233,16 @@ def run_training(args, train_data, val_data):
         fp16=not args.no_fp16,
         bf16=args.bf16,
         weight_decay=args.weight_decay,
-        run_name="llama-7b-finetuned",
-        report_to="wandb",
+        #run_name="llama-7b-finetuned",
+        run_name="flan-t5-base",
+        #report_to="wandb",
         ddp_find_unused_parameters=False,
     )
 
-    trainer = Trainer(model=model, args=training_args, train_dataset=train_data, eval_dataset=val_data)
+    trainer = Trainer(model=model, 
+                                 args=training_args, 
+                                 train_dataset=train_data, 
+                                 eval_dataset=validation_data)
 
     print("Training...")
     trainer.train()
@@ -263,8 +267,8 @@ def main(args):
             }
         )
 
-    train_dataset, eval_dataset = create_datasets(tokenizer, args)
-    run_training(args, train_dataset, eval_dataset)
+    train_dataset, validation_dataset = create_datasets(tokenizer, args)
+    run_training(args, train_dataset, validation_dataset)
 
 
 if __name__ == "__main__":

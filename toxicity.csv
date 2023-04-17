@@ -1,0 +1,3 @@
+model_id,mean_toxicity,std_toxicity
+google/flan-t5-base,0.10735442655624947,0.2648808616377917
+./peft_fine_tuned_with_detoxification_rewards,0.10265820373335635,0.26119035432926974

@@ -52,7 +52,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--train_data", type=str, default=os.environ["SM_CHANNEL_TRAIN"])
-    parser.add_argument("--validation_data", type=str, default=os.environ["SM_CHANNEL_VALIDATION"])
+    parser.add_argument("--validation_data", type=str, default=os.environ["SM_CHANNEL_VAL"])
     parser.add_argument("--test_data", type=str, default=os.environ["SM_CHANNEL_TEST"])
     parser.add_argument("--output_dir", type=str, default=os.environ["SM_OUTPUT_DIR"])
     parser.add_argument("--hosts", type=list, default=json.loads(os.environ["SM_HOSTS"]))
@@ -77,10 +77,16 @@ if __name__ == "__main__":
     parser.add_argument("--model_checkpoint", type=str, default=None)    
     parser.add_argument("--output_data_dir", type=str, default=os.environ["SM_OUTPUT_DATA_DIR"])  # This is unused
 
+    parser.add_argument("--flex_field_json_str", type=str, default=None)    
+    
 
     args, _ = parser.parse_known_args()
     print("Args:")
     print(args)
+    
+    args.flex_field_json = json.loads(args.flex_field_json_str)
+    my_flex_field1 = args.flex_field_json['my_flex_field1']
+    
 
     env_var = os.environ
     print("Environment Variables:")

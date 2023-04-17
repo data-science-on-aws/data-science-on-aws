@@ -93,9 +93,9 @@ script_args = parser.parse_args_into_dataclasses()[0]
 train_dataset = load_dataset("lvwerra/stack-exchange-paired", data_dir="data/reward", split="train")
 if script_args.train_subset > 0:
     train_dataset = train_dataset.select(range(script_args.train_subset))
-eval_dataset = load_dataset("lvwerra/stack-exchange-paired", data_dir="data/evaluation", split="train")
+validation_dataset = load_dataset("lvwerra/stack-exchange-paired", data_dir="data/evaluation", split="train")
 if script_args.eval_subset > 0:
-    eval_dataset = eval_dataset.select(range(script_args.eval_subset))
+    validation = validation.select(range(script_args.eval_subset))
 # Define the training args. Needs to be done before the model is loaded if you are using deepspeed.
 model_name_split = script_args.model_name.split("/")[-1]
 output_name = (
@@ -192,8 +192,8 @@ train_dataset = train_dataset.map(
 )
 train_dataset = train_dataset.filter(lambda x: len(x["input_ids_j"]) <= 512 and len(x["input_ids_k"]) <= 512)
 
-eval_dataset = eval_dataset.map(preprocess_function, batched=True, num_proc=num_proc, remove_columns=original_columns)
-eval_dataset = eval_dataset.filter(lambda x: len(x["input_ids_j"]) <= 512 and len(x["input_ids_k"]) <= 512)
+validation_dataset = validation_dataset.map(preprocess_function, batched=True, num_proc=num_proc, remove_columns=original_columns)
+validation_dataset = validation_dataset.filter(lambda x: len(x["input_ids_j"]) <= 512 and len(x["input_ids_k"]) <= 512)
 
 
 # We need to define a special data collator that batches the data in our j vs k format.
@@ -274,7 +274,7 @@ trainer = RewardTrainer(
     model=model,
     args=training_args,
     train_dataset=train_dataset,
-    eval_dataset=eval_dataset,
+    eval_dataset=validation_dataset,
     compute_metrics=compute_metrics,
     data_collator=RewardDataCollatorWithPadding(tokenizer=tokenizer, max_length=512),
 )

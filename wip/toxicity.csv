@@ -1,3 +1,1 @@
 model_id,mean_toxicity,std_toxicity
-google/flan-t5-base,0.10735442655624947,0.2648808616377917
-./flan-dialogue-summary-checkpoint/,0.12531453278060511,0.28167328436940203
