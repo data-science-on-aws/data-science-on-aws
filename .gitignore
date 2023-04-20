@@ -1,3 +1,5 @@
+fine_tuned_with_ranking_rewards/
+peft_fine_tuned_with_public_qanda/
 toxocity.csv
 peft_fine_tuned_with_detoxification_rewards/
 peft_rl_ranking_reward_public_dataset_model/
