@@ -1,0 +1,9 @@
+transformers==4.26.1
+accelerate==0.17.0
+deepspeed==0.8.2
+datasets==2.10.1
+nltk
+evaluate
+peft
+rouge-score
+tensorboard

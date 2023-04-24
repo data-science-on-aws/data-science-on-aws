@@ -1,3 +1,6 @@
+fine_tuned_with_public_qanda/
+peft_fine_tuned_with_ranking_rewards/
+peft_ranking_reward_public_qanda/
 fine_tuned_with_ranking_rewards/
 peft_fine_tuned_with_public_qanda/
 toxocity.csv
