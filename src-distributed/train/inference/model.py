@@ -6,11 +6,10 @@ from transformers import AutoModelForSeq2SeqLM, AutoTokenizer, pipeline
 import subprocess
 import sys
 
-subprocess.check_call([sys.executable, "-m", "pip", "install", "peft"])
-
 hf_pipeline = None
 
 def load_model(properties):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "peft"])
     
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     
