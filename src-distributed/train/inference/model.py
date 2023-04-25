@@ -3,6 +3,11 @@ from peft import PeftModel, PeftConfig
 import torch
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer, pipeline
 
+import subprocess
+import sys
+
+subprocess.check_call([sys.executable, "-m", "pip", "install", "peft"])
+
 hf_pipeline = None
 
 def load_model(properties):

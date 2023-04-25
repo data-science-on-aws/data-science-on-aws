@@ -407,10 +407,16 @@ def main(args):
                 # os.system('cp requirements.txt {}'.format(inference_path))
                 list_files(args.model_dir)
                 os.system('cd inference && cp -R * {}'.format(args.model_dir))
+            except:
+                print('failed copy cd inference')
+
+            try:
+                # Copy test data for the evaluation step
+                os.system("cp -R ./inference/* {}".format(args.model_dir))
                 #print(f'Files in inference code path "{args.model_dir}"')
                 list_files(args.model_dir)
             except:
-                print('failed copy')
+                print('failed copy cp -R ./inference/*')
 
         accelerator.save(
             get_peft_model_state_dict(

@@ -107,14 +107,18 @@ def process(args):
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     
-    peft_model_id = "google/flan-t5-small_LORA_SEQ_2_SEQ_LM"
+    peft_model_id = args.input_model + "/google/flan-t5-small_LORA_SEQ_2_SEQ_LM"
+    print('peft_model_id {}'.format(peft_model_id))
     #peft_model_id = properties.get("model_id")
+    input_files = os.listdir(peft_model_id)
+    for file in input_files:
+        print(file)
     config = PeftConfig.from_pretrained(peft_model_id)
     #base_model = AutoModelForSeq2SeqLM.from_pretrained(config.base_model_name_or_path)    
-    base_model = AutoModelForSeq2SeqLM.from_pretrained('google/flan-tf-small')    
+    base_model = AutoModelForSeq2SeqLM.from_pretrained('google/flan-t5-small')    
     model = PeftModel.from_pretrained(base_model, peft_model_id)
     #tokenizer = AutoTokenizer.from_pretrained(config.base_model_name_or_path)
-    tokenizer = AutoTokenizer.from_pretrained('google/flan-tf-small')    
+    tokenizer = AutoTokenizer.from_pretrained('google/flan-t5-small')    
 
     # List files in the input data
     print("input_data: {}".format(args.input_data))
@@ -143,7 +147,7 @@ def process(args):
         human_baseline_summaries.append(tokenizer.decode(base_summary, skip_special_tokens=True))
 
     # generate the tuned summaries
-    tuned_outputs = model.generate(dialogues, GenerationConfig(max_new_tokens=200))
+    tuned_outputs = model.generate(input_ids=dialogues, generation_config=GenerationConfig(max_new_tokens=200))
     tuned_model_summaries = []
     for tuned_summary in tuned_outputs:
         tuned_model_summaries.append(tokenizer.decode(tuned_summary, skip_special_tokens=True))
