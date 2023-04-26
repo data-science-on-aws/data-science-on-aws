@@ -397,6 +397,12 @@ def main(args):
         if accelerator.is_main_process:
             model.save_pretrained(f"{args.model_dir}/{peft_model_id}")
             tokenizer.save_pretrained(f"{args.model_dir}/{peft_model_id}")
+
+            # merge PEFT+base - and save to a different folder
+            # merged_model = model.merge_and_unload()
+            # merged_path = f"{args.model_dir}/merged/"
+            # merged_model.save_pretrained(merged_path)
+            # tokenizer.save_pretrained(merged_path)
             
             try:
                 #local_model_dir = args.model_dir
