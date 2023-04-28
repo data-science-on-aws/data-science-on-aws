@@ -14,6 +14,7 @@ from accelerate.utils import LoggerType
 from datasets import concatenate_datasets, load_dataset
 from nltk.tokenize import sent_tokenize
 from peft import LoraConfig, TaskType, get_peft_model, get_peft_model_state_dict
+from peft import PeftModel, PeftConfig
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from transformers import (
@@ -29,7 +30,7 @@ def parse_args():
     parser.add_argument(
         "--pretrained_model_name_or_path",
         type=str,
-        default="google/flan-t5-small",
+        default="google/flan-t5-large",
         # required=True,
         help="Path to pretrained model or model identifier from huggingface.co/models.",
     )
@@ -44,7 +45,7 @@ def parse_args():
     parser.add_argument("--num_epochs", type=int, default=5, help="Number of epochs.")
     parser.add_argument("--batch_size", type=int, default=1, help="Batch size.")
     parser.add_argument("--seed", type=int, default=42, help="Seed.")
-    parser.add_argument("--max_steps", type=int, default=10, help="Max steps.")
+    parser.add_argument("--max_steps", type=int, default=None, help="Max steps.")
     parser.add_argument(
         "--subsample", type=int, default=25, help="percentage of training data to use."
     )
@@ -321,9 +322,8 @@ def main(args):
         model.train()
         total_loss = 0
 
-        # TODO:  Use max_steps
         for step, batch in enumerate(tqdm(train_dataloader)):
-            if step > max_steps:
+            if max_steps and step > max_steps:
                 break
                 
             # gradient accumulation
@@ -398,8 +398,14 @@ def main(args):
             model.save_pretrained(f"{args.model_dir}/{peft_model_id}")
             tokenizer.save_pretrained(f"{args.model_dir}/{peft_model_id}")
 
-            # merge PEFT+base - and save to a different folder
-            # merged_model = model.merge_and_unload()
+            # # Re-load and merge PEFT/LoRA + base model
+            # peft_config = PeftConfig.from_pretrained(f"{args.model_dir}/{peft_model_id}")
+            # base_model = AutoModelForSeq2SeqLM.from_pretrained(
+            #     peft_config.base_model_name_or_path
+            # )
+            # peft_model = PeftModel.from_pretrained(base_model, f"{args.model_dir}/{peft_model_id}")
+            # peft_model.eval()
+            # merged_model = peft_model.merge_and_unload()
             # merged_path = f"{args.model_dir}/merged/"
             # merged_model.save_pretrained(merged_path)
             # tokenizer.save_pretrained(merged_path)

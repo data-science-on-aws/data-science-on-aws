@@ -1,2 +1,2 @@
-peft
+peft==0.2.0
 transformers==4.27.2

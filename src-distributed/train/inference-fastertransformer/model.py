@@ -25,7 +25,7 @@ model = None
 tokenizer = None
 
 def load_model(properties):
-    model_name = "google/flan-t5-xxl"
+    model_name = "google/flan-t5-large"
     tensor_parallel_degree = properties.get("tensor_parallel_degree", 1)
     pipeline_parallel_degree = 1
     model_location = properties["model_dir"]
@@ -44,8 +44,8 @@ def load_model(properties):
 
 
     # load base LLM model and tokenizer
-    peft_model_base = AutoModelForSeq2SeqLM.from_pretrained("google/flan-t5-base", device_map="auto")
-    tokenizer = AutoTokenizer.from_pretrained("google/flan-t5-base")
+    peft_model_base = AutoModelForSeq2SeqLM.from_pretrained("google/flan-t5-large", device_map="auto")
+    tokenizer = AutoTokenizer.from_pretrained("google/flan-t5-large")
 
     # Load the LoRA/PEFT model
     peft_model = PeftModel.from_pretrained(peft_model_base, f'{model_location}/', device_map="auto")

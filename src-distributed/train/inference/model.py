@@ -13,7 +13,7 @@ tokenizer = None
 def load_pipeline(properties):
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     
-    peft_model_id = "google/flan-t5-small_LORA_SEQ_2_SEQ_LM"
+    peft_model_id = "google/flan-t5-large_LORA_SEQ_2_SEQ_LM"
     #peft_model_id = properties.get("model_id")
     config = PeftConfig.from_pretrained(peft_model_id)
     model = AutoModelForSeq2SeqLM.from_pretrained(config.base_model_name_or_path)
@@ -28,7 +28,7 @@ def load_pipeline(properties):
 def load_model_tokenizer(properties):
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     
-    peft_model_id = "google/flan-t5-small_LORA_SEQ_2_SEQ_LM"
+    peft_model_id = "google/flan-t5-large_LORA_SEQ_2_SEQ_LM"
     #peft_model_id = properties.get("model_id")
     config = PeftConfig.from_pretrained(peft_model_id)
     model = AutoModelForSeq2SeqLM.from_pretrained(config.base_model_name_or_path)
@@ -52,7 +52,7 @@ def run_inference_model_tokenizer(model, tokenizer, data, params):
     input_ids = inputs["input_ids"]
     try:
         response = model.generate(input_ids=input_ids, generation_config=GenerationConfig(max_new_tokens=200))     
-        print("response succeeded with generation_config!")
+        print("response succeeded with generation_config! {}".format(response))
     except:
         print("response failed with generation_config")
     
@@ -64,7 +64,7 @@ def run_inference_model_tokenizer(model, tokenizer, data, params):
             )[0], 
             skip_special_tokens=True
         )        
-        print("response succeeded with regular generate!")
+        print("response succeeded with regular generate! {}".format(response))
     except:
         print("response failed with regular generate")
 
@@ -91,23 +91,23 @@ def handle(inputs: Input):
         
     if inputs.is_empty():
         return None
-    data = inputs.get_as_json()
+    data_json = inputs.get_as_json()
+    inputs = data_json["inputs"]
 
-    inputs = data["inputs"]
-    inputs = ["summarize: " + inp for inp in inputs]
+    prompts = [inp for inp in inputs]
     
     params = data.get("parameters", {})
 
     outputs = None
     try:
-        outputs = run_inference_pipeline(hf_pipeline, inputs, params)
-        print("inference succeeded with pipeline!")        
+        outputs = run_inference_pipeline(hf_pipeline, prompts, params)
+        print("inference succeeded with pipeline! {}".format(outputs)) 
     except:
         print("inference failed with pipeline")
     
     try:
-        outputs = run_inference_model_tokenizer(model, tokenizer, inputs, params)
-        print("inference succeeded with model_tokenizer!")        
+        outputs = run_inference_model_tokenizer(model, tokenizer, prompts, params)
+        print("inference succeeded with model_tokenizer! {}".format(outputs))
     except:
         print("inference failed with model_tokenizer")
     

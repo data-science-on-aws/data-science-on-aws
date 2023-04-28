@@ -147,7 +147,7 @@ def parse_args():
     parser.add_argument(
         "--model-checkpoint",
         type=str,
-        default="google/flan-t5-base"
+        default="google/flan-t5-large"
     )
     # parser.add_argument(
     #     "--dataset-templates-name",
