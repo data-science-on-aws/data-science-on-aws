@@ -229,6 +229,7 @@ Resources:
                 sagemaker:InstanceTypes:
                 - ml.t3.medium
                 - ml.m5.2xlarge
+                - ml.m5.4xlarge
                 - system
                 - default
       - PolicyName: s3-access
