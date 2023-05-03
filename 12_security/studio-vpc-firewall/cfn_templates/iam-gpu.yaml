@@ -123,6 +123,10 @@ Resources:
           - sagemaker:CreateHyperParameterTuningJob
           - sagemaker:CreateModel
           - sagemaker:CreatePipeline
+          - sagemaker:CreateNotebookInstance
+          - sagemaker:CreateNotebookInstanceLifecycleConfig
+          - sagemaker:CreateDomain
+          - sagemaker:CreateStudioLifecycleConfig
           Resource: '*'
           Condition:
             ForAnyValue:StringNotLike:
@@ -154,16 +158,38 @@ Resources:
           - sagemaker:*
           Resource: '*'
           Effect: Allow
+        - Sid: SageMakerDenyCreateNotebooks
+          Action:
+          - sagemaker:CreateNotebookInstance
+          - sagemaker:CreateNotebookInstanceLifecycleConfig
+          - sagemaker:CreateDomain
+          - sagemaker:CreateStudioLifecycleConfig
+          Resource: '*'
+          Effect: Deny
         - Sid: AthenaFullAccess
           Action:
           - athena:*
           Resource: '*'
           Effect: Allow
+        - Sid: AthenaDenyCreateNotebook
+          Action:
+          - athena:CreateNotebook
+          Resource: '*'
+          Effect: Deny
         - Sid: GlueFullAccess
           Action:
           - glue:*
           Resource: '*'
           Effect: Allow
+        - Sid: GlueDenyCreateRunnableStuff
+          Action:
+          - glue:CreateSession
+          - glue:CreateScript
+          - glue:CreateDevEndpoint
+          - glue:CreateJob
+          - glue:CreateUserDefinedFunction
+          Resource: '*'
+          Effect: Deny
         - Sid: EC2Access
           Effect: Allow
           Action:
@@ -196,9 +222,7 @@ Resources:
       - arn:aws:iam::aws:policy/AmazonSageMakerFullAccess
       - arn:aws:iam::aws:policy/AWSGlueConsoleFullAccess
       - arn:aws:iam::aws:policy/AmazonAthenaFullAccess
-      - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
       - arn:aws:iam::aws:policy/AmazonS3FullAccess
-      - arn:aws:iam::aws:policy/AWSCodePipeline_FullAccess
       Policies:
       - PolicyName: studio-instance-type-limits
         PolicyDocument:
