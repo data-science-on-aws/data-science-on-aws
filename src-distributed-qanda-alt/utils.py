@@ -40,7 +40,6 @@ def main_process_first(rank):
 def is_local_main_process(local_rank):
     return local_rank == 0
 
-
 # args parsing
 
 MODEL_CONFIG_CLASSES = list(MODEL_MAPPING.keys())
@@ -104,7 +103,7 @@ def parse_args():
     parser.add_argument(
         "--max_train_steps",
         type=int,
-        default=200,
+        default=500,
         help="Total number of training steps to perform. If provided, overrides num_train_epochs.",
     )
     parser.add_argument(
@@ -142,10 +141,10 @@ def parse_args():
         help="The number of processes to use for the preprocessing.",
     )
 
-    parser.add_argument("--group_texts",default=False,help="Whether to group texts together when tokenizing")
-  
-
-    parser.add_argument("model_dir",type=str,default="/opt/ml/model")
+    parser.add_argument("--group_texts",default=False,help="Whether to group texts together when tokenizing")  
+    # TODO:  Add -- to these 2:
+    parser.add_argument("checkpoint_dir", type=str, default="/opt/ml/checkpoints")
+    parser.add_argument("model_dir", type=str, default="/opt/ml/model")
 
     args,_ = parser.parse_known_args()
 
@@ -160,25 +159,6 @@ def parse_args():
             extension = args.validation_file.split(".")[-1]
             assert extension in ["csv", "json"], "`validation_file` should be a csv or json file."
 
-    num_nodes = 0
-    sm_config_path = '/opt/ml/input/config/resourceconfig.json'
-    if os.path.exists(sm_config_path):
-        with open(sm_config_path) as file:
-            cluster_config = json.load(file)
 
-        hosts = cluster_config['hosts']
-        print("*****printing list of hosts **********")
-        print(hosts)
-        num_nodes = len(hosts)
-        print("Total number of nodes in the training cluster - {}".format(num_nodes))
-       
- 
-    args.local_rank = int(os.getenv('OMPI_COMM_WORLD_LOCAL_RANK'))
-    args.local_size = int(os.getenv('OMPI_COMM_WORLD_LOCAL_SIZE'))
-    
-    args.rank = int(os.getenv('OMPI_COMM_WORLD_RANK'))
-    args.world_size = num_nodes*args.local_size
-
-    print("local rank : {}, global rank : {} , local size : {},  world size : {}".format(args.local_rank,args.rank, args.local_size, args.world_size))
 
     return args

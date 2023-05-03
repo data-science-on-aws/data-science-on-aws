@@ -1,10 +1,5 @@
-transformers
-datasets >= 1.8.0
-sentencepiece != 0.1.92
-protobuf
-evaluate
-scikit-learn
-peft
-deepspeed
-boto3
-awscli
+transformers==4.27.2
+datasets==2.11.0
+sentencepiece==0.1.99
+evaluate==0.4.0
+peft==0.2.0
