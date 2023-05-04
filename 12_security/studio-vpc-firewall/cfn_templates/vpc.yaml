@@ -178,6 +178,9 @@ Resources:
             pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".huggingface.co";
             endswith; msg:"Allowed HTTPS domain"; sid:22; rev:1;)
 
+            pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".storage.googleapis.com";
+            endswith; msg:"Allowed HTTPS domain"; sid:23; rev:1;)
+
             drop http $HOME_NET any -> $EXTERNAL_NET any (http.header_names; content:"|0d
             0a|"; startswith; msg:"not matching any HTTP allowlisted FQDNs"; flow:to_server,
             established; sid:97; rev:1;)
