@@ -169,7 +169,6 @@ Resources:
           Effect: Allow
         - Sid: GlueDenyCreateRunnableStuff
           Action:
-          - glue:CreateSession
           - glue:CreateScript
           - glue:CreateDevEndpoint
           - glue:CreateJob
