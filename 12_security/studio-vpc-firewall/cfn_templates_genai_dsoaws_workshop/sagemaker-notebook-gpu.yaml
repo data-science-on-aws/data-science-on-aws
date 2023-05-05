@@ -1,0 +1,90 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Creates SageMaker Notebook 
+Parameters:
+  NotebookName:
+    Type: String
+    Default: sagemaker
+  VPCId:
+    Type: AWS::EC2::VPC::Id
+    Description: Choose a VPC for SageMaker services
+  SageMakerStudioSubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: Choose subnets
+  SageMakerSecurityGroupIds:
+    Type: List<AWS::EC2::SecurityGroup::Id>
+    Description: Choose security groups for SageMaker Studio and SageMaker workloads
+  SageMakerExecutionRoleArn:
+    Type: String
+  DirectInternetAccess:
+    Type: String
+    AllowedValues:
+    - Enabled
+    - Disabled
+    Description: Choose how SageMaker Noteook accesses resources over the Network
+    Default: Disabled 
+Resources:
+  CFNNotebookInstanceLifeCycleConfig:
+    Type: "AWS::SageMaker::NotebookInstanceLifecycleConfig"
+    Properties:
+      NotebookInstanceLifecycleConfigName: "nb-lifecycle-config"
+      OnStart:
+        - Content:
+            Fn::Base64:
+              !Sub |
+              #!/bin/bash
+
+              set -e
+
+              sudo -u ec2-user -i <<'EOF'
+
+              sudo sed -i 's%runtimes%data-root": "/home/ec2-user/SageMaker/docker", "runtimes%g' /etc/docker/daemon.json 
+              mkdir /home/ec2-user/SageMaker/docker
+              sudo service docker restart
+              sudo service docker reload
+
+              mkdir -p rapids_kernel
+              cd rapids_kernel
+              wget -q https://rapidsai-data.s3.us-east-2.amazonaws.com/conda-pack/rapidsai/rapids0.18_cuda11.0_py3.8.tar.gz
+              echo "wget completed"
+              tar -xzf *.gz
+              echo "unzip completed"
+              source /home/ec2-user/rapids_kernel/bin/activate
+              conda-unpack 
+              echo "unpack completed"
+
+              echo "installing packages with pip"
+              source /home/ec2-user/rapids_kernel/bin/activate && pip install seaborn==0.12.2 matplotlib==3.7.1 pytest==7.2.2 dask_cudf sagemaker==2.60.0 numpy==1.22.4
+              echo "completed installing pip packages"
+              
+              # optionally install AutoGluon for AutoML GPU demo
+              # source /home/ec2-user/rapids_kernel/bin/activate && pip install --pre autogluon
+              
+              python -m ipykernel install --user --name AWS-RAPIDS-Coursera
+              echo "kernel install completed"
+
+              echo "cleaning up unused conda installs"
+              rm -rf /home/ec2-user/anaconda3/envs/amazonei*
+
+              EOF
+              
+  SageMakerNotebookInstance:
+    Type: "AWS::SageMaker::NotebookInstance"
+    Properties:
+      NotebookInstanceName:
+        Ref: NotebookName 
+      InstanceType: "ml.g4dn.xlarge"
+      SubnetId: !Select [ 0, !Ref SageMakerStudioSubnetIds ]
+      SecurityGroupIds: 
+        Ref: SageMakerSecurityGroupIds
+      RoleArn: 
+        Ref: SageMakerExecutionRoleArn
+      DirectInternetAccess:
+        Ref: DirectInternetAccess
+      VolumeSizeInGB: 100
+      RootAccess: "Enabled"
+      LifecycleConfigName: !GetAtt CFNNotebookInstanceLifeCycleConfig.NotebookInstanceLifecycleConfigName      
+Outputs:
+  NotebookName:
+    Description: SageMaker Notebook name
+    Value:
+      Ref: NotebookName 
