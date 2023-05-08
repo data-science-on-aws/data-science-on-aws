@@ -413,6 +413,8 @@ Resources:
           - arn:aws:s3:::amazon-reviews-pds
           - arn:aws:s3:::dsoaws/*
           - arn:aws:s3:::dsoaws
+          - arn:aws:s3:::dlai-generative-ai/*
+          - arn:aws:s3:::dlai-generative-ai
           - arn:aws:s3:::dlai-practical-data-science
           - arn:aws:s3:::dlai-practical-data-science/*
           - arn:aws:s3:::reviews-feature-store-*
