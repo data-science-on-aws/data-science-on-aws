@@ -2,27 +2,54 @@
     "Version": "2012-10-17",
     "Statement": [
         {
-            "Sid": "SageMakerFullAccess",
+            "Sid": "SageMakerConsoleAllowAccess",
             "Effect": "Allow",
             "Action": [
-                "sagemaker:*"
+                "sagemaker:List*",
+                "sagemaker:Describe*",
+                "sagemaker:CreatePresignedNotebookInstanceUrl",
+                "sagemaker:CreatePresignedDomainUrl"
             ],
-            "Resource": "*",
-            "Condition": {
-                "ForAllValues:StringLike": {
-                    "sagemaker:InstanceTypes": [
-                        "ml.t3.medium",
-                        "ml.m5.large",
-                        "ml.m5.xlarge",
-                        "ml.m5.2xlarge",
-                        "ml.m5.4xlarge",
-                        "ml.c5.large",
-                        "ml.c5.xlarge",
-                        "ml.c5.2xlarge",
-                        "ml.c5.9xlarge"
-                    ]
-                }
-            }
+            "Resource": "*"
+        },
+        {
+            "Sid": "SageMakerConsoleDenyAccess",
+            "Effect": "Deny",
+            "Action": [
+                "sagemaker:CreateNotebookInstance",
+                "sagemaker:CreateDomain",
+                "sagemaker:CreateProcessingJob",
+                "sagemaker:CreateTrainingJob",
+                "sagemaker:CreatePipeline",
+                "sagemaker:CreateModel",
+                "sagemaker:CreateHyperParameterTuningJob",
+                "sagemaker:CreateEndpoint",
+                "sagemaker:CreateAutoML*",
+                "sagemaker:CreateApp",
+                "sagemaker:CreateTransformJob"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "AthenaDenyCreateNotebook",
+            "Effect": "Deny",
+            "Action": [
+                "athena:CreateNotebook"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "GlueDenyCreateRunnableStuff",
+            "Effect": "Deny",
+            "Action": [
+                "glue:CreateSession",
+                "glue:CreateScript",
+                "glue:CreateDevEndpoint",
+                "glue:CreateJob",
+                "glue:CreateUserDefinedFunction"
+
+            ],
+            "Resource": "*"
         },
         {
             "Sid": "S3",
