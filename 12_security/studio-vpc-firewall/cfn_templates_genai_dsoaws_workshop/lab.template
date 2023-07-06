@@ -34,7 +34,7 @@ Resources:
           Ref: ProjectName
         ParsedStackId:
           !Select [2, !Split ['/', !Ref AWS::StackId]]
-      TemplateURL: https://dsoaws.s3.amazonaws.com/cfn_templates/iam.yaml
+      TemplateURL: https://dsoaws.s3.amazonaws.com/cfn_templates_genai_dsoaws_workshop/iam.yaml
   S3:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -43,7 +43,7 @@ Resources:
           Ref: ProjectName
         ParsedStackId:
           !Select [2, !Split ['/', !Ref AWS::StackId]]
-      TemplateURL: https://dsoaws.s3.amazonaws.com/cfn_templates/s3.yaml
+      TemplateURL: https://dsoaws.s3.amazonaws.com/cfn_templates_genai_dsoaws_workshop/s3.yaml
   VPC:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -58,7 +58,7 @@ Resources:
           Ref: NATGatewaySubnetCIDR
         SageMakerStudioSubnetCIDR:
           Ref: SageMakerStudioSubnetCIDR
-      TemplateURL: https://dsoaws.s3.amazonaws.com/cfn_templates/vpc.yaml
+      TemplateURL: https://dsoaws.s3.amazonaws.com/cfn_templates_genai_dsoaws_workshop/vpc-no-endpoints.yaml
   SageMakerStudio:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -87,30 +87,30 @@ Resources:
           Fn::GetAtt:
           - IAM
           - Outputs.ExecutionRoleArn
-      TemplateURL: https://dsoaws.s3.amazonaws.com/cfn_templates/sagemaker-studio.yaml
-  SageMakerNotebook:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      Parameters:
-        NotebookName:
-          Ref: ProjectName
-        VPCId:
-          Fn::GetAtt:
-          - VPC
-          - Outputs.VPCId
-        SageMakerStudioSubnetIds:
-          Fn::GetAtt:
-          - VPC
-          - Outputs.SageMakerStudioSubnetId
-        SageMakerSecurityGroupIds:
-          Fn::GetAtt:
-          - VPC
-          - Outputs.SageMakerSecurityGroupId
-        SageMakerExecutionRoleArn:
-          Fn::GetAtt:
-          - IAM
-          - Outputs.ExecutionRoleArn
-      TemplateURL: https://dsoaws.s3.amazonaws.com/cfn_templates/sagemaker-notebook.yaml
+      TemplateURL: https://dsoaws.s3.amazonaws.com/cfn_templates_genai_dsoaws_workshop/sagemaker-studio-genai-ml-m5-2xlarge.yaml
+#  SageMakerNotebook:
+#    Type: AWS::CloudFormation::Stack
+#    Properties:
+#      Parameters:
+#        NotebookName:
+#          Ref: ProjectName
+#        VPCId:
+#          Fn::GetAtt:
+#          - VPC
+#          - Outputs.VPCId
+#        SageMakerStudioSubnetIds:
+#          Fn::GetAtt:
+#          - VPC
+#          - Outputs.SageMakerStudioSubnetId
+#        SageMakerSecurityGroupIds:
+#          Fn::GetAtt:
+#          - VPC
+#          - Outputs.SageMakerSecurityGroupId
+#        SageMakerExecutionRoleArn:
+#          Fn::GetAtt:
+#          - IAM
+#          - Outputs.ExecutionRoleArn
+#      TemplateURL: https://dsoaws.s3.amazonaws.com/cfn_templates_genai_dsoaws_workshop/sagemaker-notebook.yaml
 Outputs:
   VPCId:
     Description: The ID of VPC where SageMaker Studio will reside
