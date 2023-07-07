@@ -441,6 +441,7 @@ Resources:
               - EndpointIds
   FirewallEgressRoute:
     Type: AWS::EC2::Route
+    DependsOn: IGWVPCAttachment
     Properties:
       RouteTableId:
         Ref: FirewallRouteTable
