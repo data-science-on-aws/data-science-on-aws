@@ -1,5 +1,7 @@
 # Data Science on AWS - O'Reilly Book
 
+Select a branch to explore...
+
 [![Data Science on AWS - O'Reilly Book](img/dsoaws-book.png)](https://github.com/data-science-on-aws/data-science-on-aws/tree/oreilly-book)
 
 ## Get the book on [Amazon.com](https://www.amazon.com/Data-Science-AWS-End-End/dp/1492079391)!

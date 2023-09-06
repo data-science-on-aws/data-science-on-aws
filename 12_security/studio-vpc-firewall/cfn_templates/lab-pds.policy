@@ -1,0 +1,110 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "SageMakerFullAccess",
+            "Effect": "Allow",
+            "Action": [
+                "sagemaker:*"
+            ],
+            "Resource": "*",
+            "Condition": {
+                "ForAllValues:StringLike": {
+                    "sagemaker:InstanceTypes": [
+                        "ml.t3.medium",
+                        "ml.m5.large",
+                        "ml.m5.xlarge",
+                        "ml.m5.2xlarge",
+                        "ml.m5.4xlarge",
+                        "ml.c5.large",
+                        "ml.c5.xlarge",
+                        "ml.c5.2xlarge",
+                        "ml.c5.9xlarge"
+                    ]
+                }
+            }
+        },
+        {
+            "Sid": "S3",
+            "Effect": "Allow",
+            "Action": [
+                "s3:*"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "ServiceCatalog",
+            "Effect": "Allow",
+            "Action": [
+                "servicecatalog:*"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "IAM",
+            "Effect": "Allow",
+            "Action": [
+                "iam:GetRole",
+                "iam:GetRolePolicy"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "Glue",
+            "Effect": "Allow",
+            "Action": [
+                "glue:*"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "Athena",
+            "Effect": "Allow",
+            "Action": [
+                "athena:*"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "CloudWatch",
+            "Effect": "Allow",
+            "Action": [
+                "logs:*",
+                "cloudwatch:*"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "ECR",
+            "Effect": "Allow",
+            "Action": [
+                "ecr:*"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "EKS",
+            "Effect": "Deny",
+            "Action": [
+                "eks:*"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "ECS",
+            "Effect": "Deny",
+            "Action": [
+                "ecs:*"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "EC2",
+            "Effect": "Deny",
+            "Action": [
+                "ec2:*"
+            ],
+            "Resource": "*"
+        }
+    ]
+}

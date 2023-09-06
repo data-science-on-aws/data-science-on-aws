@@ -1,0 +1,309 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Create IAM Roles for SageMaker Notebook Instance and KMS Key for Encrypting
+  Notebook EBS Volume.
+Parameters:
+  ProjectName:
+    Type: String
+  ParsedStackId:
+    Type: String
+  KMSAlias:
+    Type: String
+    Default: sagemaker-kms
+Resources:
+  SageMakerExecutionPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: SageMaker Notebook restricted access
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Sid: CloudWatchLogsAccess
+          Effect: Allow
+          Action:
+          - logs:CreateLogGroup
+          - logs:CreateLogStream
+          - logs:DescribeLogStreams
+          - logs:PutLogEvents
+          - logs:GetLogEvents
+          Resource:
+          - Fn::Sub: arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/sagemaker/*
+          - Fn::Sub: arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-stream:*
+          - Fn::Sub: arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*
+        - Sid: CloudWatchMetricsAccess
+          Effect: Allow
+          Action:
+          - cloudwatch:GetMetricStatistics
+          - cloudwatch:ListMetrics
+          - cloudwatch:PutMetricData
+          - cloudwatch:GetMetricData
+          - cloudwatch:PutMetricAlarm
+          - cloudwatch:DescribeAlarms
+          Resource: '*'
+        - Sid: KMSAccess
+          Effect: Allow
+          Action:
+          - kms:CreateGrant
+          - kms:Decrypt
+          - kms:DescribeKey
+          - kms:Encrypt
+          - kms:GenerateDataKey
+          - kms:ListAliases
+          Resource: '*'
+        - Sid: S3Access
+          Effect: Allow
+          Action:
+          - s3:GetObject
+          - s3:PutObject
+          - s3:DeleteObject
+          - s3:ListBucket
+          Resource:
+          - arn:aws:s3:::amazon-reviews-pds/*
+          - arn:aws:s3:::amazon-reviews-pds
+          - arn:aws:s3:::dsoaws/*
+          - arn:aws:s3:::dsoaws
+          - arn:aws:s3:::dlai-practical-data-science/*
+          - arn:aws:s3:::dlai-practical-data-science
+          - arn:aws:s3:::reviews-feature-store-*/*
+          - arn:aws:s3:::reviews-feature-store-*
+          - arn:aws:s3:::aws-athena-query-results-*/*
+          - arn:aws:s3:::aws-athena-query-results-*
+          - arn:aws:s3:::sagemaker-*/*
+          - arn:aws:s3:::sagemaker-*
+          - arn:aws:s3:::binstar-cio-packages-prod/*
+          - arn:aws:s3:::binstar-cio-packages-prod
+          - arn:aws:s3:::models.huggingface.co/*
+          - arn:aws:s3:::models.huggingface.co
+        - Sid: ECRAccess
+          Effect: Allow
+          Action:
+          - ecr:GetAuthorizationToken
+          - ecr:GetDownloadUrlForLayer
+          - ecr:BatchGetImage
+          - ecr:BatchCheckLayerAvailability
+          - ecr:SetRepositoryPolicy
+          - ecr:CompleteLayerUpload
+          - ecr:BatchDeleteImage
+          - ecr:UploadLayerPart
+          - ecr:InitiateLayerUpload
+          - ecr:PutImage
+          Resource:
+          - arn:aws:ecr:*:*:repository/*sagemaker*
+          - arn:aws:ecr:*:*:repository/*"
+        - Sid: PassRole
+          Effect: Allow
+          Action:
+          - iam:PassRole
+          Resource: '*'
+          Condition:
+            StringEquals:
+              iam:PassedToService: sagemaker.amazonaws.com
+        - Sid: SageMakerDenyInstanceTypes
+          Effect: Deny
+          Action:
+          - sagemaker:CreateAutoMLJob
+          - sagemaker:CreateArtifact
+          - sagemaker:CreateCompilationJob
+          - sagemaker:CreateDataQualityJobDefinition
+          - sagemaker:CreateExperiment
+          - sagemaker:CreateProcessingJob
+          - sagemaker:CreateTrainingJob
+          - sagemaker:CreateTransformJob
+          - sagemaker:CreateEndpoint
+          - sagemaker:CreateEndpointConfig
+          - sagemaker:CreateHyperParameterTuningJob
+          - sagemaker:CreateModel
+          - sagemaker:CreatePipeline
+          - sagemaker:CreateNotebookInstance
+          - sagemaker:CreateNotebookInstanceLifecycleConfig
+          - sagemaker:CreateDomain
+          - sagemaker:CreateStudioLifecycleConfig
+          Resource: '*'
+          Condition:
+            ForAnyValue:StringNotLike:
+              sagemaker:InstanceTypes:
+              - ml.m5.large
+              - ml.m5.xlarge
+              - ml.m5.2xlarge
+              - ml.m5.4xlarge
+              - ml.c5.xlarge
+              - ml.c5.2xlarge
+              - ml.c5.9xlarge
+        - Sid: SageMakerList
+          Action:
+          - sagemaker:Describe*
+          - sagemaker:List*
+          Resource: '*'
+          Effect: Allow
+        - Sid: SageMakerStudioSignedURLCreation
+          Action:
+          - sagemaker:CreateApp
+          Resource: '*'
+          Effect: Allow
+        - Sid: SageMakerFullAccess
+          Action:
+          - sagemaker:*
+          Resource: '*'
+          Effect: Allow
+        - Sid: SageMakerDenyCreateNotebooks
+          Action:
+          - sagemaker:CreateNotebookInstance
+          - sagemaker:CreateNotebookInstanceLifecycleConfig
+          - sagemaker:CreateDomain
+          - sagemaker:CreateStudioLifecycleConfig
+          Resource: '*'
+          Effect: Deny
+        - Sid: AthenaFullAccess
+          Action:
+          - athena:*
+          Resource: '*'
+          Effect: Allow
+        - Sid: AthenaDenyCreateNotebook
+          Action:
+          - athena:CreateNotebook
+          Resource: '*'
+          Effect: Deny
+        - Sid: GlueFullAccess
+          Action:
+          - glue:*
+          Resource: '*'
+          Effect: Allow
+        - Sid: GlueDenyCreateRunnableStuff
+          Action:
+          - glue:CreateScript
+          - glue:CreateDevEndpoint
+          - glue:CreateJob
+          - glue:CreateUserDefinedFunction
+          Resource: '*'
+          Effect: Deny
+        - Sid: EC2Access
+          Effect: Allow
+          Action:
+          - ec2:CreateNetworkInterface
+          - ec2:CreateNetworkInterfacePermission
+          - ec2:DeleteNetworkInterface
+          - ec2:DeleteNetworkInterfacePermission
+          - ec2:DescribeNetworkInterfaces
+          - ec2:DescribeVpcs
+          - ec2:DescribeDhcpOptions
+          - ec2:DescribeSubnets
+          - ec2:DescribeSecurityGroups
+          - ec2:DescribeVpcEndpoints
+          Resource: '*'
+  SageMakerExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: sagemaker.amazonaws.com
+          Action: sts:AssumeRole
+        - Effect: Allow
+          Principal:
+            Service: glue.amazonaws.com
+          Action: sts:AssumeRole
+      Path: /
+      RoleName:
+        Fn::Sub: ${ProjectName}-${AWS::Region}-sagemaker-execution-role
+      ManagedPolicyArns:
+      - Ref: SageMakerExecutionPolicy
+      - arn:aws:iam::aws:policy/AmazonSageMakerFullAccess
+      - arn:aws:iam::aws:policy/AWSGlueConsoleFullAccess
+      - arn:aws:iam::aws:policy/AmazonAthenaFullAccess
+      - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
+      - arn:aws:iam::aws:policy/AmazonS3FullAccess
+      - arn:aws:iam::aws:policy/AWSCodePipeline_FullAccess
+      Policies:
+      - PolicyName: studio-instance-type-limits
+        PolicyDocument:
+          Version: 2012-10-17
+          Statement:
+          - Effect: Deny
+            Action:
+            - sagemaker:CreateApp
+            Resource: '*'
+            Condition:
+              ForAnyValue:StringNotLike:
+                sagemaker:InstanceTypes:
+                - ml.t3.medium
+                - ml.m5.2xlarge
+                - ml.m5.4xlarge
+                - system
+                - default
+      - PolicyName: s3-access
+        PolicyDocument:
+          Version: 2012-10-17
+          Statement:
+          - Effect: Allow
+            Action:
+            - s3:GetObject
+            - s3:PutObject
+            - s3:DeleteObject
+            - s3:ListBucket
+            Resource: arn:aws:s3:::*
+      - PolicyName: iam-access
+        PolicyDocument:
+          Version: 2012-10-17
+          Statement:
+          - Effect: Allow
+            Action:
+            - iam:GetRole
+            - iam:GetRolePolicy
+            - iam:PassRole
+            Resource: '*'
+  KMSKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: Generated KMS Key for sagemaker Notebook's EBS encryption
+      EnableKeyRotation: true
+      Enabled: true
+      KeyPolicy:
+        Version: 2012-10-17
+        Id: allow-root-access-to-key
+        Statement:
+        - Sid: allow-root-to-delegate-actions
+          Effect: Allow
+          Principal:
+            AWS:
+              Fn::Sub: arn:aws:iam::${AWS::AccountId}:root
+          Action:
+          - kms:DeleteAlias
+          - kms:DescribeKey
+          - kms:EnableKey
+          - kms:GetKeyPolicy
+          - kms:UpdateAlias
+          - kms:CreateAlias
+          - kms:GetKeyPolicy
+          - kms:CreateGrant
+          - kms:DisableKey
+          - kms:Revoke*
+          - kms:Disable*
+          - kms:CancelKeyDeletion
+          - kms:ScheduleKeyDeletion
+          - kms:PutKeyPolicy
+          - kms:RevokeGrant
+          - kms:TagResource
+          - kms:UnTagResource
+          - kms:EnableKeyRotation
+          - kms:ListResourceTags
+          Resource: '*'
+  KeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName:
+        Fn::Sub: alias/${KMSAlias}-${ParsedStackId}
+      TargetKeyId:
+        Ref: KMSKey
+Outputs:
+  ExecutionRoleArn:
+    Value:
+      Fn::GetAtt:
+      - SageMakerExecutionRole
+      - Arn
+  KMSKeyArn:
+    Description: KMS CMK arn for SageMaker notebooks EBS encryption
+    Value:
+      Fn::GetAtt:
+      - KMSKey
+      - Arn

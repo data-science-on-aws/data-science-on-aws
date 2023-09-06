@@ -178,6 +178,9 @@ Resources:
             pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".huggingface.co";
             endswith; msg:"Allowed HTTPS domain"; sid:22; rev:1;)
 
+            pass tls $HOME_NET any -> $EXTERNAL_NET any (tls.sni; dotprefix; content:".storage.googleapis.com";
+            endswith; msg:"Allowed HTTPS domain"; sid:23; rev:1;)
+
             drop http $HOME_NET any -> $EXTERNAL_NET any (http.header_names; content:"|0d
             0a|"; startswith; msg:"not matching any HTTP allowlisted FQDNs"; flow:to_server,
             established; sid:97; rev:1;)
@@ -334,6 +337,7 @@ Resources:
               - EndpointIds
   FirewallEgressRoute:
     Type: AWS::EC2::Route
+    DependsOn: IGWVPCAttachment
     Properties:
       RouteTableId:
         Ref: FirewallRouteTable
@@ -410,6 +414,8 @@ Resources:
           - arn:aws:s3:::amazon-reviews-pds
           - arn:aws:s3:::dsoaws/*
           - arn:aws:s3:::dsoaws
+          - arn:aws:s3:::dlai-generative-ai/*
+          - arn:aws:s3:::dlai-generative-ai
           - arn:aws:s3:::dlai-practical-data-science
           - arn:aws:s3:::dlai-practical-data-science/*
           - arn:aws:s3:::reviews-feature-store-*

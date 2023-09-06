@@ -441,6 +441,7 @@ Resources:
               - EndpointIds
   FirewallEgressRoute:
     Type: AWS::EC2::Route
+    DependsOn: IGWVPCAttachment
     Properties:
       RouteTableId:
         Ref: FirewallRouteTable
@@ -513,6 +514,8 @@ Resources:
           - s3:PutObject
           - s3:ListBucket
           Resource:
+          - arn:aws:s3:::dlai-generative-ai/*
+          - arn:aws:s3:::dlai-generative-ai
           - arn:aws:s3:::dlai-practical-data-science
           - arn:aws:s3:::dlai-practical-data-science/*
           - arn:aws:s3:::reviews-feature-store-*

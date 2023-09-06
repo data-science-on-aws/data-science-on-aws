@@ -1,0 +1,137 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "SageMakerConsoleAllowAccess",
+            "Effect": "Allow",
+            "Action": [
+                "sagemaker:List*",
+                "sagemaker:Describe*",
+                "sagemaker:CreatePresignedNotebookInstanceUrl",
+                "sagemaker:CreatePresignedDomainUrl"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "SageMakerConsoleDenyAccess",
+            "Effect": "Deny",
+            "Action": [
+                "sagemaker:CreateNotebookInstance",
+                "sagemaker:CreateDomain",
+                "sagemaker:CreateProcessingJob",
+                "sagemaker:CreateTrainingJob",
+                "sagemaker:CreatePipeline",
+                "sagemaker:CreateModel",
+                "sagemaker:CreateHyperParameterTuningJob",
+                "sagemaker:CreateEndpoint",
+                "sagemaker:CreateAutoML*",
+                "sagemaker:CreateApp",
+                "sagemaker:CreateTransformJob"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "AthenaDenyCreateNotebook",
+            "Effect": "Deny",
+            "Action": [
+                "athena:CreateNotebook"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "GlueDenyCreateRunnableStuff",
+            "Effect": "Deny",
+            "Action": [
+                "glue:CreateSession",
+                "glue:CreateScript",
+                "glue:CreateDevEndpoint",
+                "glue:CreateJob",
+                "glue:CreateUserDefinedFunction"
+
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "S3",
+            "Effect": "Allow",
+            "Action": [
+                "s3:*"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "ServiceCatalog",
+            "Effect": "Allow",
+            "Action": [
+                "servicecatalog:*"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "IAM",
+            "Effect": "Allow",
+            "Action": [
+                "iam:GetRole",
+                "iam:GetRolePolicy"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "Glue",
+            "Effect": "Allow",
+            "Action": [
+                "glue:*"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "Athena",
+            "Effect": "Allow",
+            "Action": [
+                "athena:*"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "CloudWatch",
+            "Effect": "Allow",
+            "Action": [
+                "logs:*",
+                "cloudwatch:*"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "ECR",
+            "Effect": "Allow",
+            "Action": [
+                "ecr:*"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "EKS",
+            "Effect": "Deny",
+            "Action": [
+                "eks:*"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "ECS",
+            "Effect": "Deny",
+            "Action": [
+                "ecs:*"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "EC2",
+            "Effect": "Deny",
+            "Action": [
+                "ec2:*"
+            ],
+            "Resource": "*"
+        }
+    ]
+}

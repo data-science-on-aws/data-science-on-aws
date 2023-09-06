@@ -1,0 +1,162 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Amazon SageMaker Studio secure deployment demo. The deployment creates
+  all necessary network infrastructure and SageMaker Studio domain.
+Parameters:
+  ProjectName:
+    Type: String
+    Default: sagemaker-studio-vpc-firewall
+  DomainName:
+    Description: SageMaker domain name
+    Type: String
+    Default: sagemaker-domain
+  UserProfileName:
+    Description: User profile name for the SageMaker domain
+    Type: String
+    Default: sagemaker-user-profile
+  VPCCIDR:
+    Type: String
+    Default: 10.2.0.0/16
+  FirewallSubnetCIDR:
+    Type: String
+    Default: 10.2.1.0/24
+  NATGatewaySubnetCIDR:
+    Type: String
+    Default: 10.2.2.0/24
+  SageMakerStudioSubnetCIDR:
+    Type: String
+    Default: 10.2.3.0/24
+Resources:
+  IAM:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        ProjectName:
+          Ref: ProjectName
+        ParsedStackId:
+          !Select [2, !Split ['/', !Ref AWS::StackId]]
+      TemplateURL: https://dsoaws.s3.amazonaws.com/cfn_templates_genai_dsoaws_workshop/iam.yaml
+  S3:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        ProjectName:
+          Ref: ProjectName
+        ParsedStackId:
+          !Select [2, !Split ['/', !Ref AWS::StackId]]
+      TemplateURL: https://dsoaws.s3.amazonaws.com/cfn_templates_genai_dsoaws_workshop/s3.yaml
+  VPC:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        ProjectName:
+          Ref: ProjectName
+        VPCCIDR:
+          Ref: VPCCIDR
+        FirewallSubnetCIDR:
+          Ref: FirewallSubnetCIDR
+        NATGatewaySubnetCIDR:
+          Ref: NATGatewaySubnetCIDR
+        SageMakerStudioSubnetCIDR:
+          Ref: SageMakerStudioSubnetCIDR
+      TemplateURL: https://dsoaws.s3.amazonaws.com/cfn_templates_genai_dsoaws_workshop/vpc-no-endpoints.yaml
+  SageMakerStudio:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        DomainName:
+          Fn::Sub: ${DomainName}-${AWS::Region}
+        UserProfileName:
+          Fn::Sub: ${UserProfileName}-${AWS::Region}
+        ProjectName:
+          Ref: ProjectName
+        ParsedStackId:
+          !Select [2, !Split ['/', !Ref AWS::StackId]]
+        VPCId:
+          Fn::GetAtt:
+          - VPC
+          - Outputs.VPCId
+        SageMakerStudioSubnetIds:
+          Fn::GetAtt:
+          - VPC
+          - Outputs.SageMakerStudioSubnetId
+        SageMakerSecurityGroupIds:
+          Fn::GetAtt:
+          - VPC
+          - Outputs.SageMakerSecurityGroupId
+        SageMakerExecutionRoleArn:
+          Fn::GetAtt:
+          - IAM
+          - Outputs.ExecutionRoleArn
+      TemplateURL: https://dsoaws.s3.amazonaws.com/cfn_templates_genai_dsoaws_workshop/sagemaker-studio-genai-ml-m5-2xlarge.yaml
+#  SageMakerNotebook:
+#    Type: AWS::CloudFormation::Stack
+#    Properties:
+#      Parameters:
+#        NotebookName:
+#          Ref: ProjectName
+#        VPCId:
+#          Fn::GetAtt:
+#          - VPC
+#          - Outputs.VPCId
+#        SageMakerStudioSubnetIds:
+#          Fn::GetAtt:
+#          - VPC
+#          - Outputs.SageMakerStudioSubnetId
+#        SageMakerSecurityGroupIds:
+#          Fn::GetAtt:
+#          - VPC
+#          - Outputs.SageMakerSecurityGroupId
+#        SageMakerExecutionRoleArn:
+#          Fn::GetAtt:
+#          - IAM
+#          - Outputs.ExecutionRoleArn
+#      TemplateURL: https://dsoaws.s3.amazonaws.com/cfn_templates_genai_dsoaws_workshop/sagemaker-notebook.yaml
+Outputs:
+  VPCId:
+    Description: The ID of VPC where SageMaker Studio will reside
+    Value:
+      Fn::GetAtt:
+      - VPC
+      - Outputs.VPCId
+  SageMakerStudioSubnetId:
+    Description: The ID of the SageMaker subnet
+    Value:
+      Fn::GetAtt:
+      - VPC
+      - Outputs.SageMakerStudioSubnetId
+  SageMakerStudioSecurityGroupId:
+    Description: The ID the SageMaker security group
+    Value:
+      Fn::GetAtt:
+      - VPC
+      - Outputs.SageMakerSecurityGroupId
+  SageMakerExecutionRoleArn:
+    Description: IAM Execution role for SageMaker Studio and SageMaker notebooks
+    Value:
+      Fn::GetAtt:
+      - IAM
+      - Outputs.ExecutionRoleArn
+  KMSKeyEBSArn:
+    Description: KMS key arn for SageMaker notebooks EBS encryption
+    Value:
+      Fn::GetAtt:
+      - IAM
+      - Outputs.KMSKeyArn
+  KMSKeyS3bucketsArn:
+    Description: KMS key arn for data encryption in S3 buckets
+    Value:
+      Fn::GetAtt:
+      - S3
+      - Outputs.KMSKeyArn
+  SageMakerStudioDomainId:
+    Description: SageMaker Studio domain id
+    Value:
+      Fn::GetAtt:
+      - SageMakerStudio
+      - Outputs.SageMakerStudioDomainId
+  UserProfileName:
+    Description: SageMaker user profile name
+    Value:
+      Fn::GetAtt:
+      - SageMakerStudio
+      - Outputs.UserProfileName
