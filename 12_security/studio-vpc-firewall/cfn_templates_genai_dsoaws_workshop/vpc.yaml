@@ -292,6 +292,7 @@ Resources:
           Fn::Sub: rtb-${ProjectName}-sagemaker
   IGWRouteTableAssociation:
     Type: AWS::EC2::GatewayRouteTableAssociation
+    DependsOn: IGWVPCAttachment
     Properties:
       RouteTableId:
         Ref: IGWIngressRouteTable
