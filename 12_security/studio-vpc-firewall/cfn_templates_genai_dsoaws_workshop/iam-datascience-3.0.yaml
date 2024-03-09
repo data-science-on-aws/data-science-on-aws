@@ -229,7 +229,6 @@ Resources:
               ForAnyValue:StringNotLike:
                 sagemaker:InstanceTypes:
                 - ml.m5.2xlarge
-                - system
               ForAnyValue:StringNotLike:
                 sagemaker:ImageArns:
                 - '*image/sagemaker-data-science-310-v1*'
