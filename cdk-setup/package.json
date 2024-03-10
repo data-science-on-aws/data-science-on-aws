@@ -1,0 +1,40 @@
+{
+  "name": "cdk-setup",
+  "version": "0.1.0",
+  "bin": {
+    "cdk-setup": "bin/cdk-setup.js"
+  },
+  "scripts": {
+    "clean-linux": "rm -rf dist",
+    "clean-windows": "rmdir /s /q dist",
+    "build": "tsc",
+    "watch": "tsc -w",
+    "test": "jest",
+    "cdk": "cdk"
+  },
+  "devDependencies": {
+    "@aws-cdk/assert": "1.36.1",
+    "@types/jest": "^25.2.1",
+    "@types/node": "10.17.5",
+    "jest": "^25.5.0",
+    "ts-jest": "^25.3.1",
+    "aws-cdk": "1.36.1",
+    "ts-node": "^8.1.0",
+    "typescript": "~3.7.2"
+  },
+  "dependencies": {
+    "@aws-cdk/core": "1.36.1",
+    "@aws-cdk/aws-sagemaker": "1.36.1",
+    "@aws-cdk/aws-apigateway": "1.36.1",
+    "@aws-cdk/aws-autoscaling": "1.36.1",
+    "@aws-cdk/aws-cloudwatch": "1.36.1",
+    "@aws-cdk/aws-ec2": "1.36.1",
+    "@aws-cdk/aws-iam": "1.36.1",
+    "@aws-cdk/aws-lambda": "1.36.1",
+    "@aws-cdk/aws-logs": "1.36.1",
+    "@aws-cdk/aws-s3": "1.36.1",
+    "@aws-cdk/aws-sns": "1.36.1",
+    "@aws-cdk/aws-sqs": "1.36.1",
+    "source-map-support": "^0.5.16"
+  }
+}
